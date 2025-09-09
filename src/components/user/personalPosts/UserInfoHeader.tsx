@@ -9,7 +9,7 @@ const UserInfoHeader: React.FC = () => {
     >
       <div className="flex flex-col items-center gap-4">
         <div className="flex flex-row text-left items-center gap-2">
-          <div className="w-16 h-16 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden">
+          <div className="w-28 h-28 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden">
             <img
               src="/placeholder.svg?height=64&width=64"
               alt="Avatar"
@@ -17,9 +17,9 @@ const UserInfoHeader: React.FC = () => {
             />
           </div>
           <div className="text-left">
-            <h3 className="text-lg font-bold">Nguyễn Văn A</h3>
+            <h3 className="text-xl font-bold mb-8">Nguyễn Văn A</h3>
             <p
-              className="text-sm font-bold"
+              className="text-lg font-bold"
               style={{ color: "var(--primary-color)" }}
             >
               Trường Đại học Công nghiệp TP. Hồ Chí Minh
