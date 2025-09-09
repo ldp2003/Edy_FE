@@ -1,10 +1,10 @@
 @import "tailwindcss";
 
 :root {
-  --primary-color: #0D99FF;
-  --secondary-color: #3586DB;
+  --primary-color: #0d99ff;
+  --secondary-color: #3586db;
   --primary-text-color: #174371;
-  --secondary-text-color: #4C5966;
-  --card-background-color: #EFF2F3;
-
+  --secondary-text-color: #4c5966;
+  --link-color: #00ace8;
+  --card-background-color: #eff2f3;
 }

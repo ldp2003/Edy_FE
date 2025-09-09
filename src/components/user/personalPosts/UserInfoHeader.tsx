@@ -15,24 +15,30 @@ const UserInfoHeader: React.FC = () => {
           </div>
           <div className="text-left">
             <h3 className="text-lg font-bold">Nguyễn Văn A</h3>
-            <p className="text-sm text-gray-600">
+            <p
+              className="text-sm font-bold"
+              style={{ color: "var(--primary-color)" }}
+            >
               Trường Đại học Công nghiệp TP. Hồ Chí Minh
             </p>
           </div>
         </div>
 
-        <div className="flex gap-8">
+        <div
+          className="flex gap-8"
+          style={{ color: "var(--primary-text-color)" }}
+        >
           <div className="text-center">
-            <div className="text-xl font-bold">0</div>
-            <div className="text-sm text-gray-600">Đang theo dõi</div>
+            <div className="">0</div>
+            <div className="text-sm">Đang theo dõi</div>
           </div>
           <div className="text-center">
-            <div className="text-xl font-bold">0</div>
-            <div className="text-sm text-gray-600">Người theo dõi</div>
+            <div className="">0</div>
+            <div className="text-sm">Người theo dõi</div>
           </div>
           <div className="text-center">
-            <div className="text-xl font-bold">5</div>
-            <div className="text-sm text-gray-600">Tài liệu</div>
+            <div className="">5</div>
+            <div className="text-sm">Tài liệu</div>
           </div>
         </div>
       </div>
