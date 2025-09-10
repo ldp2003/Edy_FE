@@ -20,17 +20,25 @@ const PersonalPostList: React.FC = () => {
 
   return (
     <div className="p-4">
-      <h1 className="text-xl font-bold mb-4">Danh sách bài đăng cá nhân</h1>
-      <div className="flex gap-4 mb-4">
-        <select
-          className="px-4 py-2 border rounded"
-          value={viewMode}
-          onChange={(e) => setViewMode(e.target.value)}
-        >
-          <option value="table">Hiển thị dạng bảng</option>
-          <option value="list">Hiển thị dạng danh sách</option>
-          <option value="grid">Hiển thị dạng lưới</option>
-        </select>
+      <div className="flex flex-row justify-between items-center gap-4 mb-4">
+        <div className="flex flex-row gap-4">
+          <h1
+            className="text-lg font-bold"
+            style={{ color: "var(--primary-text-color)" }}
+          >
+            Tài liệu của tôi
+          </h1>
+          <select
+            className="px-4 text-sm w-fit border rounded h-7"
+            value={viewMode}
+            onChange={(e) => setViewMode(e.target.value)}
+          >
+            <option value="table">Hiển thị dạng bảng</option>
+            <option value="list">Hiển thị dạng danh sách</option>
+            <option value="grid">Hiển thị dạng lưới</option>
+          </select>
+        </div>
+
         <UploadButton onClick={() => console.log("Upload button clicked")} />
       </div>
       {renderContent()}
