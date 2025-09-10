@@ -2,8 +2,7 @@ import React from "react";
 
 const LoginForm: React.FC = () => {
   return (
-    <div className="flex justify-center items-center h-screen bg-gray-100">
-      <div className="bg-white p-6 rounded-lg shadow-lg w-80 text-center">
+      <div className="bg-white p-6 w-full  text-center">
         <h2 className="text-2xl mb-4">Đăng Nhập</h2>
         <p className="text-sm mb-4">Nhập email hoặc số điện thoại</p>
         <input
@@ -23,7 +22,6 @@ const LoginForm: React.FC = () => {
           Quên mật khẩu?
         </p>
       </div>
-    </div>
   );
 };
 
