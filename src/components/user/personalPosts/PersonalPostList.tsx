@@ -19,7 +19,7 @@ const PersonalPostList: React.FC = () => {
   };
 
   return (
-    <div className="p-4">
+    <div className="">
       <div className="flex flex-row justify-between items-center gap-4 mb-4">
         <div className="flex flex-row gap-4">
           <h1

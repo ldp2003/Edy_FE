@@ -7,7 +7,7 @@ const UserInfoHeader: React.FC = () => {
       className="flex items-start justify-between p-4 rounded-md mb-4"
       style={{ backgroundColor: "var( --field-background-color)" }}
     >
-      <div className="flex flex-col items-center gap-4">
+      <div className="flex flex-col items-center gap-2">
         <div className="flex flex-row text-left items-center gap-2">
           <div className="w-28 h-28 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden">
             <img

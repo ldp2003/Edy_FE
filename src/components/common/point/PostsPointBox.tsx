@@ -28,7 +28,7 @@ const PostsPointBox: React.FC<PostsPointBoxProps> = ({
         </div>
       </div>
       <div
-        className="text-right mt-6 border-t-[0.5px] pt-4"
+        className="text-right mt-4 border-t-[0.5px] pt-4"
         style={{ borderColor: "var(--secondary-text-color)" }}
       >
         <a href="#" className=" text-sm" style={{ color: "var(--link-color)" }}>
