@@ -1,5 +1,7 @@
 import { Search, Bell } from "lucide-react";
+import { Dropdown } from "antd";
 import logo from "/public/image/Logo.png";
+import AvatarDropdown from "../dropdown/AvatarDropdown";
 
 export function Header() {
   return (
@@ -34,29 +36,31 @@ export function Header() {
           <button className="p-2 hover:bg-gray-100 rounded-md transition-colors">
             <Bell className="w-5 h-5" />
           </button>
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden">
-              <img
-                src="/placeholder.svg?height=32&width=32"
-                alt="Avatar"
-                className="w-full h-full object-cover"
-                onError={(e) => {
-                  e.currentTarget.style.display = "none";
-                  const sibling = e.currentTarget
-                    .nextElementSibling as HTMLElement | null;
-                  if (sibling) {
-                    sibling.style.display = "flex";
-                  }
-                }}
-              />
-              <span className="text-xs font-medium text-gray-600 hidden">
-                NA
+          <Dropdown overlay={<AvatarDropdown />} >
+            <div className="flex items-center gap-2 cursor-pointer">
+              <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden">
+                <img
+                  src="/placeholder.svg?height=32&width=32"
+                  alt="Avatar"
+                  className="w-full h-full object-cover"
+                  onError={(e) => {
+                    e.currentTarget.style.display = "none";
+                    const sibling = e.currentTarget
+                      .nextElementSibling as HTMLElement | null;
+                    if (sibling) {
+                      sibling.style.display = "flex";
+                    }
+                  }}
+                />
+                <span className="text-xs font-medium text-gray-600 hidden">
+                  NA
+                </span>
+              </div>
+              <span className="text-sm font-medium text-blue-600">
+                NGUYEN VAN A
               </span>
             </div>
-            <span className="text-sm font-medium text-blue-600">
-              NGUYEN VAN A
-            </span>
-          </div>
+          </Dropdown>
         </div>
       </div>
     </header>
