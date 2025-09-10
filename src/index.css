@@ -1,9 +1,15 @@
 @import "tailwindcss";
 
 :root {
-  --primary-color: #0D99FF;
-  --secondary-color: #3586DB;
+  --primary-color: #0d99ff;
+  --secondary-color: #3586db;
   --primary-text-color: #174371;
-  --secondary-text-color: #4C5966;
-
+  --secondary-text-color: #4c5966;
+  --third-text-color: #665e4c;
+  --link-color: #00ace8;
+  --card-background-color: #eff2f3;
+  --field-background-color: #f1f7fe;
+  --green-button-color: #27a743;
+  --red-button-color: #d63847;
+  --page-nav-color: #f4f2ff;
 }

@@ -1,16 +1,19 @@
 import { Home, FileText, Heart, Users, Clock } from "lucide-react";
+import { Link, useLocation } from "react-router-dom";
 
 interface NavigationMenuProps {
   isCompact?: boolean;
 }
 
 export function NavigationMenu({ isCompact }: NavigationMenuProps) {
+  const location = useLocation();
+
   const menuItems = [
-    { icon: Home, label: "Trang chủ", active: true },
-    { icon: FileText, label: "Bài đăng của tôi" },
-    { icon: Heart, label: "Yêu thích" },
-    { icon: Users, label: "Danh sách theo dõi" },
-    { icon: Clock, label: "Đã xem gần đây" },
+    { icon: Home, label: "Trang chủ", path: "/" },
+    { icon: FileText, label: "Bài đăng của tôi", path: "/personal-posts" },
+    { icon: Heart, label: "Yêu thích", path: "/favorites" },
+    { icon: Users, label: "Danh sách theo dõi", path: "/following" },
+    { icon: Clock, label: "Đã xem gần đây", path: "/recent" },
   ];
 
   return (
@@ -22,18 +25,19 @@ export function NavigationMenu({ isCompact }: NavigationMenuProps) {
       >
         {menuItems.map((item, index) => (
           <li key={index}>
-            <button
+            <Link
+              to={item.path}
               className={`flex items-center justify-${
                 isCompact ? "center" : "start"
               } gap-3 px-3 py-2 rounded-md transition-colors ${
-                item.active
+                location.pathname === item.path
                   ? "bg-blue-100 text-blue-700"
                   : "text-[var(--secondary-text-color)] hover:bg-gray-100"
               }`}
             >
               <item.icon className="w-4 h-4" />
               {!isCompact && item.label}
-            </button>
+            </Link>
           </li>
         ))}
       </ul>

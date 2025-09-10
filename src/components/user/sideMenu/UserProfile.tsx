@@ -9,33 +9,35 @@ export function UserProfile({ isCompact }: UserProfileProps) {
         isCompact ? "flex justify-center" : ""
       }`}
     >
-      <div className="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden">
-        <img
-          src="/placeholder.svg?height=48&width=48"
-          alt="Avatar"
-          className="w-full h-full object-cover"
-          onError={(e) => {
-            e.currentTarget.style.display = "none";
-            const sibling = e.currentTarget
-              .nextElementSibling as HTMLElement | null;
-            if (sibling) {
-              sibling.style.display = "flex";
-            }
-          }}
-        />
-        <span className="text-sm font-medium text-gray-600 hidden">NA</span>
-      </div>
-      {!isCompact && (
-        <div className="text-left flex-1 overflow-hidden">
-          <h3 className="font-bold text-sm">Nguyễn Văn A</h3>
-          <p
-            className="text-xs font-bold  whitespace-nowrap truncate"
-            style={{ color: "var(--primary-color)" }}
-          >
-            Trường Đại học Công nghiệp Thành phố Hồ Chí Minh
-          </p>
+      <div className="flex items-center gap-3">
+        <div className="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden">
+          <img
+            src="/placeholder.svg?height=48&width=48"
+            alt="Avatar"
+            className="w-full h-full object-cover"
+            onError={(e) => {
+              e.currentTarget.style.display = "none";
+              const sibling = e.currentTarget
+                .nextElementSibling as HTMLElement | null;
+              if (sibling) {
+                sibling.style.display = "flex";
+              }
+            }}
+          />
+          <span className="text-sm font-medium text-gray-600 hidden">NA</span>
         </div>
-      )}
+        {!isCompact && (
+          <div className="text-left flex-1">
+            <h3 className="font-bold text-sm">Nguyễn Văn A</h3>
+            <p
+              className="text-xs font-bold overflow-hidden whitespace-nowrap text-ellipsis"
+              style={{ color: "var(--primary-color)", maxWidth: "150px" }}
+            >
+              Trường Đại học Công nghiệp Thành phố Hồ Chí Minh
+            </p>
+          </div>
+        )}
+      </div>
       {!isCompact && (
         <div
           className="flex justify-between mt-3 text-center pt-7"

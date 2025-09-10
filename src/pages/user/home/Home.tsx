@@ -65,7 +65,10 @@ export default function HomePage() {
             title="Tài liệu nổi bật"
             documents={featuredDocuments}
           />
-          <DocumentGrid title="Xem gần đây" documents={recentDocuments} />
+          <DocumentGrid
+            title="Tài liệu bạn có thể quan tâm"
+            documents={recentDocuments}
+          />
         </main>
       </div>
     </div>
