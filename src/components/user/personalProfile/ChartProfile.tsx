@@ -52,7 +52,7 @@ const ChartProfile: React.FC = () => {
   }, []);
 
   return (
-    <div className="p-4 border rounded-lg shadow-md w-64">
+    <div className="px-10 py-6 border rounded-lg shadow-md h-full w-full">
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-lg font-bold">Thành tích đóng góp</h2>
         <select className="text-sm border rounded px-2 py-1">
@@ -64,7 +64,7 @@ const ChartProfile: React.FC = () => {
       <div className="relative w-full h-40">
         <canvas ref={chartRef}></canvas>
       </div>
-      <div className="flex justify-around mt-4 text-sm">
+      <div className="grid grid-cols-2 gap-4 mt-4 text-sm">
         <div className="flex items-center">
           <span className="w-3 h-3 rounded-full bg-green-500 inline-block mr-2"></span>
           Đăng bài
