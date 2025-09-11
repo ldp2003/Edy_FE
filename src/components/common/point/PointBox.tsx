@@ -15,7 +15,7 @@ const PointBox: React.FC<PointBoxProps> = ({
 }) => {
   return (
     <div
-      className="p-4  w-[30%] rounded-md text-left shadow-md"
+      className="p-4  w-full rounded-md text-left shadow-md"
       style={{ backgroundColor: "var( --field-background-color)" }}
     >
       <div
