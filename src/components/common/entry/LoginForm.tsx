@@ -4,14 +4,20 @@ import { login } from "../../../utils/AuthService";
 
 const LoginForm: React.FC<{ onSuccess: () => void }> = ({ onSuccess }) => {
   const [loading, setLoading] = useState(false);
+  const [form] = Form.useForm();
 
   const onFinish = async (values: { email: string; password: string }) => {
     setLoading(true);
     try {
       const { email, password } = values;
-      await login(email, password); // Removed unused response
-      message.success("Đăng nhập thành công");
-      onSuccess(); // Call the success handler
+      const result = await login(email, password); // Removed unused response
+      if (result) {
+        message.success("Đăng nhập thành công");
+        setTimeout(() => {
+          form.resetFields(); // Clear form data
+          onSuccess(); // Call the success handler
+        }, 5000);
+      }
     } catch (error) {
       message.error("Đăng nhập thất bại. Vui lòng kiểm tra lại thông tin.");
       console.error("Login failed:", error);
@@ -23,7 +29,7 @@ const LoginForm: React.FC<{ onSuccess: () => void }> = ({ onSuccess }) => {
   return (
     <div className="bg-white p-6 w-full text-center">
       <h2 className="text-2xl mb-4">Đăng Nhập</h2>
-      <Form name="login" layout="vertical" onFinish={onFinish}>
+      <Form form={form} name="login" layout="vertical" onFinish={onFinish}>
         <Form.Item
           label="Email"
           name="email"

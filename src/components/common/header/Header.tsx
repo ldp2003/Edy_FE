@@ -3,8 +3,28 @@ import { Dropdown } from "antd";
 import logo from "/public/image/Logo.png";
 import AvatarDropdown from "../dropdown/AvatarDropdown";
 import UploadHeaderButton from "../buttons/UploadHeaderButton";
+import { useEffect, useState } from "react";
+import UserDropdown from "../dropdown/UserDropdown";
+import { getCurrentUser } from "../../../utils/AuthService";
 
 export function Header() {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  useEffect(() => {
+    const checkLoginStatus = async () => {
+      try {
+        const user = await getCurrentUser();
+        console.log("Current User:", user);
+        setIsLoggedIn(!!user);
+      } catch (error) {
+        console.error("Error fetching user info:", error);
+        setIsLoggedIn(false);
+      }
+    };
+
+    checkLoginStatus();
+  }, []);
+
   return (
     <header className="bg-white border-b border-gray-200 px-6 py-4 fixed left-0 top-0 w-full z-20">
       <div className="flex items-center justify-between">
@@ -34,38 +54,53 @@ export function Header() {
 
         {/* User Info */}
         <div className="flex items-center gap-4">
-          <UploadHeaderButton></UploadHeaderButton>
-          <button className="p-2 hover:bg-gray-100 rounded-md transition-colors">
-            <Bell className="w-5 h-5" />
-          </button>
-          <Dropdown overlay={<AvatarDropdown />}>
-            <div className="flex items-center gap-2 cursor-pointer">
-              <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden">
-                <img
-                  src="/placeholder.svg?height=32&width=32"
-                  alt="Avatar"
-                  className="w-full h-full object-cover"
-                  onError={(e) => {
-                    e.currentTarget.style.display = "none";
-                    const sibling = e.currentTarget
-                      .nextElementSibling as HTMLElement | null;
-                    if (sibling) {
-                      sibling.style.display = "flex";
-                    }
-                  }}
-                />
-                <span className="text-xs font-medium text-gray-600 hidden">
-                  NA
-                </span>
-              </div>
-              <span
-                className="text-sm font-medium "
-                style={{ color: "var(--primary-color)" }}
+          {isLoggedIn ? (
+            <>
+              <UploadHeaderButton></UploadHeaderButton>
+              <button className="p-2 hover:bg-gray-100 rounded-md transition-colors">
+                <Bell className="w-5 h-5" />
+              </button>
+              <Dropdown overlay={<UserDropdown />}>
+                <div className="flex items-center gap-2 cursor-pointer">
+                  <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden">
+                    <img
+                      src="/placeholder.svg?height=32&width=32"
+                      alt="Avatar"
+                      className="w-full h-full object-cover"
+                      onError={(e) => {
+                        e.currentTarget.style.display = "none";
+                        const sibling = e.currentTarget
+                          .nextElementSibling as HTMLElement | null;
+                        if (sibling) {
+                          sibling.style.display = "flex";
+                        }
+                      }}
+                    />
+                    <span className="text-xs font-medium text-gray-600 hidden">
+                      NA
+                    </span>
+                  </div>
+                  <span
+                    className="text-sm font-medium "
+                    style={{ color: "var(--primary-color)" }}
+                  >
+                    NGUYEN VAN A
+                  </span>
+                </div>
+              </Dropdown>
+            </>
+          ) : (
+            <Dropdown overlay={<AvatarDropdown />}>
+              <button
+                className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md"
+                onClick={() => {
+                  // Logic to show login modal
+                }}
               >
-                NGUYEN VAN A
-              </span>
-            </div>
-          </Dropdown>
+                Đăng nhập
+              </button>
+            </Dropdown>
+          )}
         </div>
       </div>
     </header>
