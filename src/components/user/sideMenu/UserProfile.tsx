@@ -28,7 +28,9 @@ export function UserProfile({ isCompact }: UserProfileProps) {
         </div>
         {!isCompact && (
           <div className="text-left flex-1">
-            <h3 className="font-bold text-sm">Nguyễn Văn A</h3>
+            <a href="personal-profile" className="font-bold text-sm">
+              Nguyễn Văn A
+            </a>
             <p
               className="text-xs font-bold overflow-hidden whitespace-nowrap text-ellipsis"
               style={{ color: "var(--primary-color)", maxWidth: "150px" }}
