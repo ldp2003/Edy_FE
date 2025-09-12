@@ -13,10 +13,9 @@ const LoginForm: React.FC<{ onSuccess: () => void }> = ({ onSuccess }) => {
       const result = await login(email, password); // Removed unused response
       if (result) {
         message.success("Đăng nhập thành công");
-        setTimeout(() => {
-          form.resetFields(); // Clear form data
-          onSuccess(); // Call the success handler
-        }, 5000);
+        form.resetFields(); // Clear form data
+        onSuccess(); // Call the success handler
+        window.location.reload(); // Reload the page after 5 seconds
       }
     } catch (error) {
       message.error("Đăng nhập thất bại. Vui lòng kiểm tra lại thông tin.");

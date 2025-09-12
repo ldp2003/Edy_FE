@@ -1,41 +1,46 @@
-import React from "react";
-import { Menu, message } from "antd";
-import { useNavigate } from "react-router-dom";
+import React, { useState } from "react";
+import { Menu, message, Modal } from "antd";
 import { logout } from "../../../utils/AuthService";
 
 const UserDropdown: React.FC = () => {
   const [messageApi, contextHolder] = message.useMessage();
-  const navigate = useNavigate();
+  const [isLogoutModalVisible, setLogoutModalVisible] = useState(false);
 
-  const handleMenuClick = async (e: { key: string }) => {
+  const handleMenuClick = (e: { key: string }) => {
     switch (e.key) {
       case "profile":
-        navigate("/profile");
+        window.location.href = "/profile";
         break;
       case "upload":
-        navigate("/upload");
+        window.location.href = "/upload";
         break;
       case "edit":
-        navigate("/edit-info");
+        window.location.href = "/edit-info";
         break;
       case "history":
-        navigate("/point-history");
+        window.location.href = "/point-history";
         break;
       case "stats":
-        navigate("/stats");
+        window.location.href = "/stats";
         break;
       case "logout":
-        try {
-          await logout();
-          messageApi.success("Đăng xuất thành công");
-          navigate("/login");
-        } catch (error) {
-          messageApi.error("Đăng xuất thất bại");
-          console.error("Logout failed:", error);
-        }
+        setLogoutModalVisible(true);
         break;
       default:
         break;
+    }
+  };
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+      messageApi.success("Đăng xuất thành công");
+      window.location.href = "/";
+    } catch (error) {
+      messageApi.error("Đăng xuất thất bại");
+      console.error("Logout failed:", error);
+    } finally {
+      setLogoutModalVisible(false);
     }
   };
 
@@ -77,6 +82,16 @@ const UserDropdown: React.FC = () => {
     <>
       {contextHolder}
       {menu}
+      <Modal
+        title="Xác nhận đăng xuất"
+        visible={isLogoutModalVisible}
+        onOk={handleLogout}
+        onCancel={() => setLogoutModalVisible(false)}
+        okText="Đăng xuất"
+        cancelText="Hủy"
+      >
+        Bạn có chắc chắn muốn đăng xuất không?
+      </Modal>
     </>
   );
 };
