@@ -5,10 +5,9 @@ import {
   Select,
   InputNumber,
   Button,
-  Checkbox,
   message,
 } from "antd";
-import { Plus, Minus, Trash2 } from "lucide-react";
+import { Plus, Minus } from "lucide-react";
 
 const { TextArea } = Input;
 const { Option } = Select;
