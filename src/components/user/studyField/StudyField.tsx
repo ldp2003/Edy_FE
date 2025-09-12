@@ -1,6 +1,6 @@
 import React from "react";
 
-const StudyField = () => {
+const StudyField: React.FC = () => {
   return <div>{/* Add content for StudyField here */}</div>;
 };
 

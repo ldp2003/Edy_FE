@@ -1,7 +1,7 @@
 import React from "react";
 import RecentItem from "./RecentItem";
 
-const RecentDocument = () => {
+const RecentDocument: React.FC = () => {
   const recentDocs = [
     {
       title: "Tài liệu tổng hợp Kinh tế chính trị Mác Lênin",

@@ -1,13 +1,13 @@
 import React, { useState } from "react";
 import RecentDocument from "../document/RecentDocument";
-import StudyField from "./StudyField";
+import StudyList from "../studyField/StudyList";
 
 const ProfileTab: React.FC = () => {
   const [activeTab, setActiveTab] = useState("recent");
 
   return (
     <div>
-      <div className="flex flex-row gap-4 border-b border-gray-300 mb-4">
+      <div className="flex flex-row gap-4 font-bold border-b border-gray-300 mb-4">
         <button
           onClick={() => setActiveTab("recent")}
           className={
@@ -41,7 +41,7 @@ const ProfileTab: React.FC = () => {
       </div>
       <div className="w-full">
         {activeTab === "recent" && <RecentDocument />}
-        {activeTab === "study" && <StudyField />}
+        {activeTab === "study" && <StudyList />}
       </div>
     </div>
   );
