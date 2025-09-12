@@ -5,7 +5,7 @@ const PersonalInfo: React.FC = () => {
   return (
     <div className="ml-6 w-3/4">
       <div className="flex flex-row justify-between text-lg my-4 border-b border-gray-300 pb-2">
-        <div className="text-sm font-medium">THÔNG TIN CÁ NHÂN</div>
+        <div className="text-base font-medium">THÔNG TIN CÁ NHÂN</div>
         <div className="text-blue-500 cursor-pointer flex items-center">
           <span>Chỉnh sửa</span>
           <svg
