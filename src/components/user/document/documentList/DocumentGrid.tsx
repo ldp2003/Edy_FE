@@ -1,4 +1,4 @@
-import DocumentCard from "./DocumentCard";
+import DocumentCard from "../documentCard/DocumentCard";
 
 interface Document {
   id: string;
@@ -26,7 +26,7 @@ const DocumentGrid: React.FC<DocumentGridProps> = ({ title, documents }) => {
           Xem tất cả {">>"}
         </a>
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
         {documents.map((doc) => (
           <DocumentCard
             key={doc.id}

@@ -1,9 +1,9 @@
 import React from "react";
 import { FileText } from "lucide-react";
-import ViewCount from "./documentElement/ViewCount";
-import RatingRatio from "./documentElement/RatingRatio";
-import PageCount from "./documentElement/PageCount";
-import IntensiveMark from "./documentElement/IntensiveMark";
+import ViewCount from "../documentElement/ViewCount";
+import RatingRatio from "../documentElement/RatingRatio";
+import PageCount from "../documentElement/PageCount";
+import IntensiveMark from "../documentElement/IntensiveMark";
 
 type RecentItemProps = {
   title: string;

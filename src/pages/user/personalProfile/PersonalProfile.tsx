@@ -7,11 +7,11 @@ const PersonalProfile: React.FC = () => {
   return (
     <div className="">
       <PersonalHeader></PersonalHeader>
-      <div className="flex w-full flex-row mt-6 gap-6">
-        <div className="w-1/3">
+      <div className="flex w-full flex-row mt-8 gap-6">
+        <div className="w-1/4">
           <ChartProfile></ChartProfile>
         </div>
-        <div className="w-2/3">
+        <div className="w-3/4">
           <ProfileTab></ProfileTab>
         </div>
       </div>

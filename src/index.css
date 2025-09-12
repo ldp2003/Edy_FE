@@ -3,6 +3,7 @@
 :root {
   --primary-color: #0d99ff;
   --secondary-color: #3586db;
+  --third-color: #d9d9d9;
   --primary-text-color: #174371;
   --secondary-text-color: #4c5966;
   --third-text-color: #665e4c;
@@ -15,3 +16,4 @@
   --page-element-color: #696969;
   --intensive-color: #FFD557;
 }
+

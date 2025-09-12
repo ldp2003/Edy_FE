@@ -52,7 +52,7 @@ const ChartProfile: React.FC = () => {
   }, []);
 
   return (
-    <div className="px-10 py-6 border rounded-lg shadow-md h-full w-full">
+    <div className="px-10 py-6 border rounded-lg shadow-md min-h-[365px] w-full">
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-lg font-bold">Thành tích đóng góp</h2>
         <select className="text-sm border rounded px-2 py-1">

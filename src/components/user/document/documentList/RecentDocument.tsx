@@ -1,5 +1,5 @@
 import React from "react";
-import RecentItem from "./RecentItem";
+import RecentItem from "../documentCard/RecentItem";
 
 const RecentDocument: React.FC = () => {
   const recentDocs = [

@@ -8,7 +8,7 @@ interface UploadButtonProps {
 const UploadButton: React.FC<UploadButtonProps> = ({ onClick }) => {
   return (
     <button
-      className="flex items-center gap-2 px-4 py-2  text-white rounded hover:bg-blue-600"
+      className="flex items-center gap-2 px-4 py-2 cursor-pointer text-white rounded hover:bg-blue-600"
       style={{ backgroundColor: "var(--primary-color)" }}
       onClick={onClick}
     >

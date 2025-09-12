@@ -1,4 +1,4 @@
-import DocumentGrid from "../../../components/user/document/DocumentGrid";
+import DocumentGrid from "../../../components/user/document/documentList/DocumentGrid";
 
 const featuredDocuments = [
   {

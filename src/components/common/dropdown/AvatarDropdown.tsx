@@ -1,11 +1,12 @@
 import React, { useState } from "react";
-import { Menu, Modal } from "antd";
+import { Menu, Modal, message } from "antd";
 import LoginForm from "../entry/LoginForm";
 import RegisterForm from "../entry/RegisterForm";
 
 const AvatarDropdown: React.FC = () => {
   const [isLoginModalVisible, setLoginModalVisible] = useState(false);
   const [isRegisterModalVisible, setRegisterModalVisible] = useState(false);
+  const [messageApi, contextHolder] = message.useMessage();
 
   const handleMenuClick = (e: { key: string }) => {
     if (e.key === "login") {
@@ -13,6 +14,16 @@ const AvatarDropdown: React.FC = () => {
     } else if (e.key === "register") {
       setRegisterModalVisible(true);
     }
+  };
+
+  const handleRegisterSuccess = () => {
+    messageApi.success("Đăng ký thành công");
+    setRegisterModalVisible(false);
+  };
+
+  const handleLoginSuccess = () => {
+    messageApi.success("Đăng nhập thành công");
+    setLoginModalVisible(false);
   };
 
   const menu = (
@@ -25,13 +36,13 @@ const AvatarDropdown: React.FC = () => {
   return (
     <>
       {menu}
-
+      {contextHolder}
       <Modal
         open={isLoginModalVisible}
         onCancel={() => setLoginModalVisible(false)}
         footer={null}
       >
-        <LoginForm />
+        <LoginForm onSuccess={handleLoginSuccess} />
       </Modal>
 
       <Modal
@@ -39,7 +50,7 @@ const AvatarDropdown: React.FC = () => {
         onCancel={() => setRegisterModalVisible(false)}
         footer={null}
       >
-        <RegisterForm />
+        <RegisterForm onSuccess={handleRegisterSuccess} />
       </Modal>
     </>
   );

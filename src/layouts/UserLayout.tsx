@@ -17,7 +17,7 @@ const UserLayout: React.FC = () => {
           ></Sidebar>
           <div
             className={`flex-grow mt-20 transition-all duration-300 ${
-              isSidebarVisible ? "ml-72 mr-10" : "mx-[10%]"
+              isSidebarVisible ? "ml-[20%] mr-[5%]" : "mx-[10%]"
             }`}
           >
             <Outlet />

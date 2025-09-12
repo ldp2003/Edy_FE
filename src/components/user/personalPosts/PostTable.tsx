@@ -144,7 +144,7 @@ const PostTable: React.FC = () => {
         columns={columns}
         dataSource={data}
         pagination={false}
-        size="small"
+        size="middle"
       />
       <div
         className="flex justify-between items-center px-4 py-2"
