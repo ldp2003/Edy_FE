@@ -1,27 +1,21 @@
 import React from "react";
 import PointBox from "../../common/point/PointBox";
+import { Edit } from "lucide-react";
 
 const PersonalInfo: React.FC = () => {
   return (
     <div className="ml-6 w-3/4">
       <div className="flex flex-row justify-between text-lg my-4 border-b border-gray-300 pb-2">
         <div className="text-base font-medium">THÔNG TIN CÁ NHÂN</div>
-        <div className="text-blue-500 cursor-pointer flex items-center">
+        <div
+          className="cursor-pointer flex items-center border rounded-full px-3 py-1 text-sm font-medium  hover:bg-blue-50 w-fit"
+          style={{
+            color: "var(--primary-color)",
+            borderColor: "var(--primary-color)",
+          }}
+        >
           <span>Chỉnh sửa</span>
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            strokeWidth="1.5"
-            stroke="currentColor"
-            className="w-5 h-5 ml-1"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M16.862 3.487c.28-.28.735-.28 1.015 0l2.636 2.636c.28.28.28.735 0 1.015L7.5 20.141l-4.125.458.458-4.125L16.862 3.487z"
-            />
-          </svg>
+          <Edit className="ml-1" size={20} />
         </div>
       </div>
       <div className="flex flex-row justify-between w-full">

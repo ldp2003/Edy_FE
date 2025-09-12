@@ -31,7 +31,7 @@ export function NavigationMenu({ isCompact }: NavigationMenuProps) {
                 isCompact ? "center" : "start"
               } gap-3 px-3 py-2 rounded-md transition-colors ${
                 location.pathname === item.path
-                  ? "bg-blue-100 text-blue-700"
+                  ? "bg-blue-100 text-[var(--primary-color)]"
                   : "text-[var(--secondary-text-color)] hover:bg-gray-100"
               }`}
             >

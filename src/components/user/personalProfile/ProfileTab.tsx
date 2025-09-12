@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import RecentDocument from "../document/RecentDocument";
+import RecentDocument from "../document/documentList/RecentDocument";
 import StudyList from "../studyField/StudyList";
 
 const ProfileTab: React.FC = () => {

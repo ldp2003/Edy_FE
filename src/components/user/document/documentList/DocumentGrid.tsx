@@ -1,4 +1,4 @@
-import DocumentCard from "./DocumentCard";
+import DocumentCard from "../documentCard/DocumentCard";
 
 interface Document {
   id: string;
