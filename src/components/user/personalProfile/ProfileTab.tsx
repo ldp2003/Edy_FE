@@ -11,7 +11,8 @@ const ProfileTab: React.FC = () => {
         <button
           onClick={() => setActiveTab("recent")}
           className={
-            activeTab === "recent" ? "active tab-button" : "tab-button"
+            " cursor-pointer " +
+            (activeTab === "recent" ? "active tab-button" : "tab-button")
           }
           style={
             activeTab === "recent"
@@ -26,7 +27,10 @@ const ProfileTab: React.FC = () => {
         </button>
         <button
           onClick={() => setActiveTab("study")}
-          className={activeTab === "study" ? "active tab-button" : "tab-button"}
+          className={
+            " cursor-pointer " +
+            (activeTab === "study" ? "active tab-button" : "tab-button")
+          }
           style={
             activeTab === "study"
               ? {

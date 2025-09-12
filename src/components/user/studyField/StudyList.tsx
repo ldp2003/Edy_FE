@@ -13,7 +13,7 @@ const StudyList: React.FC = () => {
     "Nghiên cứu khoa học",
     "Tiểu luận",
     "Lập trình hướng đối tượng",
-  ]; 
+  ];
 
   const [visibleCount, setVisibleCount] = useState(5);
 
@@ -29,7 +29,8 @@ const StudyList: React.FC = () => {
       {visibleCount < items.length && (
         <div className="text-center mt-4">
           <button
-            className="text-blue-500 hover:underline"
+            className=" hover:underline"
+            style={{ color: "var(--primary-color)" }}
             onClick={handleExpand}
           >
             Xem thêm

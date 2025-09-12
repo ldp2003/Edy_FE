@@ -1,9 +1,11 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import PostTable from "./PostTable";
 import UploadButton from "../../common/buttons/UploadButton";
 
 const PersonalPostList: React.FC = () => {
   const [viewMode, setViewMode] = useState("table");
+  const navigate = useNavigate();
 
   const renderContent = () => {
     switch (viewMode) {
@@ -39,7 +41,7 @@ const PersonalPostList: React.FC = () => {
           </select>
         </div>
 
-        <UploadButton onClick={() => console.log("Upload button clicked")} />
+        <UploadButton onClick={() => navigate("/upload-document")} />
       </div>
       {renderContent()}
     </div>

@@ -2,6 +2,7 @@ import { Search, Bell } from "lucide-react";
 import { Dropdown } from "antd";
 import logo from "/public/image/Logo.png";
 import AvatarDropdown from "../dropdown/AvatarDropdown";
+import UploadHeaderButton from "../buttons/UploadHeaderButton";
 
 export function Header() {
   return (
@@ -33,10 +34,11 @@ export function Header() {
 
         {/* User Info */}
         <div className="flex items-center gap-4">
+          <UploadHeaderButton></UploadHeaderButton>
           <button className="p-2 hover:bg-gray-100 rounded-md transition-colors">
             <Bell className="w-5 h-5" />
           </button>
-          <Dropdown overlay={<AvatarDropdown />} >
+          <Dropdown overlay={<AvatarDropdown />}>
             <div className="flex items-center gap-2 cursor-pointer">
               <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden">
                 <img
@@ -56,7 +58,10 @@ export function Header() {
                   NA
                 </span>
               </div>
-              <span className="text-sm font-medium text-blue-600">
+              <span
+                className="text-sm font-medium "
+                style={{ color: "var(--primary-color)" }}
+              >
                 NGUYEN VAN A
               </span>
             </div>
