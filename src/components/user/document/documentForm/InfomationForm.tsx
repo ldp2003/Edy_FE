@@ -5,11 +5,10 @@ import {
   Select,
   InputNumber,
   Button,
-  Upload,
   Checkbox,
   message,
 } from "antd";
-import { Plus, Minus, Trash2, UploadIcon } from "lucide-react";
+import { Plus, Minus, Trash2 } from "lucide-react";
 
 const { TextArea } = Input;
 const { Option } = Select;
@@ -56,7 +55,7 @@ const InformationForm = () => {
     message.success("Đăng tải thành công!");
   };
 
-  const onFinishFailed = (errorInfo: any) => {
+  const onFinishFailed = (errorInfo: unknown) => {
     console.log("Failed:", errorInfo);
     message.error("Vui lòng kiểm tra lại thông tin!");
   };
@@ -297,26 +296,6 @@ const InformationForm = () => {
 
           {/* Action buttons */}
           <div className="flex items-center justify-between mt-8 pt-6 border-t border-gray-200">
-            <div className="flex items-center gap-4">
-              <Form.Item
-                style={{ marginBottom: 5 }}
-                name="saveData"
-                valuePropName="checked"
-                className="mb-0"
-              >
-                <Checkbox>Lưu</Checkbox>
-              </Form.Item>
-
-              <Button
-                type="text"
-                icon={<Trash2 size={20} />}
-                onClick={() => form.resetFields()}
-                className="text-gray-500"
-              >
-                Xóa
-              </Button>
-            </div>
-
             <div className="flex gap-3">
               <Button onClick={() => form.resetFields()}>Hủy</Button>
               <Button type="primary" htmlType="submit">
