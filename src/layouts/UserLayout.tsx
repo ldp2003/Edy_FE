@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Header } from "../components/common/header/Header";
 import { Sidebar } from "../components/user/sideMenu/SideBar";
-import { Outlet } from "react-router-dom";
+import { Outlet, useLocation } from "react-router-dom";
 import AuthRoute from "../routes/AuthRoute";
 import { UserContext } from "../contexts/UserContext";
 import { getCurrentUser } from "../utils/AuthService";
@@ -13,6 +13,7 @@ const UserLayout: React.FC = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [user, setUser] = useState<User>(defaultUser);
   const [account, setAccount] = useState(null);
+  const location = useLocation();
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -31,20 +32,26 @@ const UserLayout: React.FC = () => {
     fetchUser();
   }, []);
 
+  const isAccountActivationPage = location.pathname === "/account-activation";
+
   return (
     <AuthRoute>
       <UserContext.Provider value={{ isLoggedIn, user, account }}>
         <div className="w-screen h-screen overflow-x-hidden">
-          <Header></Header>
+          <Header />
           <main className="w-full h-full">
             <div className="flex h-full">
-              <Sidebar
-                isVisible={isSidebarVisible}
-                setIsVisible={setIsSidebarVisible}
-              ></Sidebar>
+              {!isAccountActivationPage && (
+                <Sidebar
+                  isVisible={isSidebarVisible}
+                  setIsVisible={setIsSidebarVisible}
+                />
+              )}
               <div
                 className={`flex-grow mt-20 transition-all duration-300 ${
-                  isSidebarVisible ? "ml-[20%] mr-[5%]" : "mx-[10%]"
+                  isSidebarVisible && !isAccountActivationPage
+                    ? "ml-[20%] mr-[5%]"
+                    : "mx-[10%]"
                 }`}
               >
                 <Outlet />

@@ -1,8 +1,8 @@
 import React from "react";
-import { Form, Input, Button } from "antd";
+import { Form, Input, Button, message } from "antd";
 import type { Store } from "antd/es/form/interface";
 import type { ValidateErrorEntity } from "rc-field-form/lib/interface";
-import { register } from "../../../utils/AuthService";
+import { register, login } from "../../../utils/AuthService";
 
 const RegisterForm: React.FC<{ onSuccess: () => void }> = ({ onSuccess }) => {
   const onFinish = async (values: Store) => {
@@ -10,8 +10,16 @@ const RegisterForm: React.FC<{ onSuccess: () => void }> = ({ onSuccess }) => {
       const { firstname, lastname, email, password } = values;
       const response = await register(firstname, lastname, email, password);
       console.log("Registration successful:", response);
-      onSuccess(); // Call the success handler
+
+      // Automatically log in the user after successful registration
+      const loginResponse = await login(email, password);
+      if (loginResponse) {
+        message.success("Đăng ký thành công!");
+        onSuccess(); // Call the success handler
+        window.location.reload(); // Reload the page
+      }
     } catch (error) {
+      message.error("Đăng ký thất bại. Vui lòng thử lại.");
       console.error("Registration failed:", error);
     }
   };
