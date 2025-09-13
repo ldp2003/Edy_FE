@@ -10,9 +10,10 @@ const AuthRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const checkAuth = async () => {
       try {
         const response = await getCurrentUser();
-        if (response && response.roles.includes("USER")) {
-          navigate("/"); // Redirect to Home page
-        }
+        console.log("AuthRoute - Current User:", response.roles);
+        // if (response && response.roles.includes("USER")) {
+        //   navigate("/"); // Redirect to Home page
+        // }
       } catch (error) {
         console.error("Error checking authentication:", error);
       } finally {

@@ -1,8 +1,14 @@
+import { useContext } from "react";
+import { UserContext } from "../../../contexts/UserContext";
+
 interface UserProfileProps {
   isCompact?: boolean;
 }
 
 export function UserProfile({ isCompact }: UserProfileProps) {
+  const { user } = useContext(UserContext);
+
+  console.log("User in UserProfile:", user);
   return (
     <div
       className={`p-4 border-b border-gray-200 ${
@@ -28,14 +34,14 @@ export function UserProfile({ isCompact }: UserProfileProps) {
         </div>
         {!isCompact && (
           <div className="text-left flex-1">
-            <a href="personal-profile" className="font-bold text-sm">
-              Nguyễn Văn A
+            <a href="personal-profile" className="font-bold text-base">
+              {user?.first_name} {user?.last_name}
             </a>
             <p
               className="text-xs font-bold overflow-hidden whitespace-nowrap text-ellipsis"
               style={{ color: "var(--primary-color)", maxWidth: "150px" }}
             >
-              Trường Đại học Công nghiệp Thành phố Hồ Chí Minh
+              {user?.organization?._id || "No Organization"}
             </p>
           </div>
         )}
@@ -46,15 +52,17 @@ export function UserProfile({ isCompact }: UserProfileProps) {
           style={{ color: "var(--primary-text-color)" }}
         >
           <div>
-            <div className="text-lg font-bold ">0</div>
+            <div className="text-lg font-bold ">{user?.point}</div>
             <div className="text-xs ">Điểm tiêu dùng</div>
           </div>
           <div>
-            <div className="text-lg font-bold ">0</div>
+            <div className="text-lg font-bold ">{user?.rank_point}</div>
             <div className="text-xs ">Điểm hạng</div>
           </div>
           <div>
-            <div className="text-lg font-bold ">0</div>
+            <div className="text-lg font-bold ">
+              {user?.shared_documents.length}
+            </div>
             <div className="text-xs ">Bài đăng</div>
           </div>
         </div>

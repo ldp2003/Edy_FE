@@ -5,13 +5,14 @@ import { Outlet } from "react-router-dom";
 import AuthRoute from "../routes/AuthRoute";
 import { UserContext } from "../contexts/UserContext";
 import { getCurrentUser } from "../utils/AuthService";
-import type { User } from "../data/user"; 
+import type { User } from "../data/user";
 import { defaultUser } from "../data/user";
 
 const UserLayout: React.FC = () => {
   const [isSidebarVisible, setIsSidebarVisible] = useState(true);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [user, setUser] = useState<User>(defaultUser);
+  const [account, setAccount] = useState(null);
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -19,7 +20,8 @@ const UserLayout: React.FC = () => {
         const data = await getCurrentUser();
         if (data) {
           setIsLoggedIn(true);
-          setUser(data.user);
+          setUser(data.user); // Full user data.
+          setAccount(data.account); // Account data
         }
       } catch (error) {
         console.error("Error fetching user:", error);
@@ -31,7 +33,7 @@ const UserLayout: React.FC = () => {
 
   return (
     <AuthRoute>
-      <UserContext.Provider value={{ isLoggedIn, user }}>
+      <UserContext.Provider value={{ isLoggedIn, user, account }}>
         <div className="w-screen h-screen overflow-x-hidden">
           <Header></Header>
           <main className="w-full h-full">
