@@ -3,27 +3,12 @@ import { Dropdown } from "antd";
 import logo from "/public/image/Logo.png";
 import AvatarDropdown from "../dropdown/AvatarDropdown";
 import UploadHeaderButton from "../buttons/UploadHeaderButton";
-import { useEffect, useState } from "react";
+import { useContext } from "react";
 import UserDropdown from "../dropdown/UserDropdown";
-import { getCurrentUser } from "../../../utils/AuthService";
+import { UserContext } from "../../../contexts/UserContext";
 
 export function Header() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-
-  useEffect(() => {
-    const checkLoginStatus = async () => {
-      try {
-        const user = await getCurrentUser();
-        console.log("Current User:", user);
-        setIsLoggedIn(!!user);
-      } catch (error) {
-        console.error("Error fetching user info:", error);
-        setIsLoggedIn(false);
-      }
-    };
-
-    checkLoginStatus();
-  }, []);
+  const { isLoggedIn, user } = useContext(UserContext);
 
   return (
     <header className="bg-white border-b border-gray-200 px-6 py-4 fixed left-0 top-0 w-full z-20">
@@ -84,7 +69,7 @@ export function Header() {
                     className="text-sm font-medium "
                     style={{ color: "var(--primary-color)" }}
                   >
-                    NGUYEN VAN A
+                    {user?.first_name} {user?.last_name}
                   </span>
                 </div>
               </Dropdown>

@@ -1,10 +1,10 @@
 import React from "react";
 
 interface PointBoxProps {
-  rankPoints: number;
-  usagePoints: number;
-  freeDownloads: number;
-  violations: number;
+  rankPoints: number | undefined;
+  usagePoints: number | undefined;
+  freeDownloads: number | undefined;
+  violations: number | undefined;
 }
 
 const PointBox: React.FC<PointBoxProps> = ({

@@ -1,7 +1,10 @@
-import React from "react";
+import React, { useContext } from "react";
 import PostsPointBox from "../../common/point/PostsPointBox";
+import { UserContext } from "../../../contexts/UserContext";
 
 const UserInfoHeader: React.FC = () => {
+  const { user, account } = useContext(UserContext);
+
   return (
     <div
       className="flex items-start justify-between p-4 rounded-md mb-4"
@@ -17,12 +20,14 @@ const UserInfoHeader: React.FC = () => {
             />
           </div>
           <div className="text-left">
-            <h3 className="text-xl font-bold mb-8">Nguyễn Văn A</h3>
+            <h3 className="text-xl font-bold mb-8">
+              {user?.first_name} {user?.last_name}
+            </h3>
             <p
               className="text-lg font-bold"
               style={{ color: "var(--primary-color)" }}
             >
-              Trường Đại học Công nghiệp TP. Hồ Chí Minh
+              {user?.organization?._id || "Không có tổ chức"}
             </p>
           </div>
         </div>
@@ -32,20 +37,24 @@ const UserInfoHeader: React.FC = () => {
           style={{ color: "var(--primary-text-color)" }}
         >
           <div className="text-center">
-            <div className="">0</div>
+            <div className="">{user?.following.length}</div>
             <div className="text-sm">Đang theo dõi</div>
           </div>
           <div className="text-center">
-            <div className="">0</div>
+            <div className="">{user?.follower.length}</div>
             <div className="text-sm">Người theo dõi</div>
           </div>
           <div className="text-center">
-            <div className="">5</div>
+            <div className="">{user?.shared_documents.length}</div>
             <div className="text-sm">Tài liệu</div>
           </div>
         </div>
       </div>
-      <PostsPointBox rankPoints={15} usagePoints={15} accountType="Thường" />
+      <PostsPointBox
+        rankPoints={user?.rank_point || 0}
+        usagePoints={user?.point || 0}
+        accountType={account?.is_vip ? "VIP" : "Thường"}
+      />
     </div>
   );
 };

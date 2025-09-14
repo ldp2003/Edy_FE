@@ -1,8 +1,11 @@
-import React from "react";
+import React, { useContext } from "react";
 import PointBox from "../../common/point/PointBox";
 import { Edit } from "lucide-react";
+import { UserContext } from "../../../contexts/UserContext";
 
 const PersonalInfo: React.FC = () => {
+  const { user, account } = useContext(UserContext);
+
   return (
     <div className="ml-6 w-3/4">
       <div className="flex flex-row justify-between text-lg my-4 border-b border-gray-300 pb-2">
@@ -22,29 +25,31 @@ const PersonalInfo: React.FC = () => {
         <div className="flex flex-col text-sm text-left w-3/5">
           <div className="flex flex-row my-2">
             <div className="w-1/7 font-bold">Họ và tên:</div>
-            <div className="w-6/7">Nguyễn Văn A</div>
+            <div className="w-6/7">
+              {user?.first_name} {user?.last_name}
+            </div>
           </div>
           <div className="flex flex-row my-2">
             <div className="w-1/7 font-bold">Tổ chức:</div>
             <div className="w-6/7">
-              Trường Đại học Công Nghiệp Thành phố Hồ Chí Minh
+              {user?.organization?._id || "Không có tổ chức"}
             </div>
           </div>
           <div className="flex flex-row my-2">
             <div className="w-1/7 font-bold">Email:</div>
-            <div className="w-6/7">abc123@gmail.com</div>
+            <div className="w-6/7">{user?.contact_email}</div>
           </div>
           <div className="flex flex-row my-2">
             <div className="w-1/7 font-bold">Tài khoản:</div>
-            <div className="w-6/7">Bình thường</div>
+            <div className="w-6/7">{account?.is_vip ? "VIP" : "Thường"}</div>
           </div>
         </div>
         <div className="w-2/5">
           <PointBox
-            rankPoints={15}
-            freeDownloads={3}
-            usagePoints={15}
-            violations={0}
+            rankPoints={user?.rank_point}
+            freeDownloads={user?.free_download_count}
+            usagePoints={user?.point}
+            violations={user?.strike}
           ></PointBox>
         </div>
       </div>

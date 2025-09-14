@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useContext } from "react";
 import {
   Chart as ChartJS,
   DoughnutController,
@@ -6,10 +6,12 @@ import {
   Tooltip,
   Legend,
 } from "chart.js";
+import { UserContext } from "../../../contexts/UserContext";
 
 ChartJS.register(DoughnutController, ArcElement, Tooltip, Legend);
 
 const ChartProfile: React.FC = () => {
+  const { user } = useContext(UserContext);
   const chartRef = React.useRef<HTMLCanvasElement>(null);
   const chartInstanceRef = React.useRef<ChartJS | null>(null);
 
@@ -21,13 +23,20 @@ const ChartProfile: React.FC = () => {
     }
 
     if (ctx) {
+      const data = [
+        user?.shared_documents.length || 0,
+        user?.free_download_count || 0,
+        user?.rank_point || 0,
+        user?.point || 0,
+      ]; // Ensure no undefined values
+
       chartInstanceRef.current = new ChartJS(ctx, {
         type: "doughnut",
         data: {
           labels: ["Đăng bài", "Tải tài liệu", "Đánh giá", "Bình luận"],
           datasets: [
             {
-              data: [64, 100, 84, 54],
+              data, // Use the filtered data array
               backgroundColor: ["#4CAF50", "#F44336", "#FF9800", "#2196F3"],
             },
           ],
@@ -49,7 +58,7 @@ const ChartProfile: React.FC = () => {
         chartInstanceRef.current.destroy();
       }
     };
-  }, []);
+  }, [user]);
 
   return (
     <div className="px-10 py-6 border rounded-lg shadow-md min-h-[365px] w-full">
