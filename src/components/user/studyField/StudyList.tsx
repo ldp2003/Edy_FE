@@ -22,7 +22,10 @@ const StudyList: React.FC = () => {
   };
 
   return (
-    <div className="bg-gray-100 p-4 rounded-lg">
+    <div
+      className="h-full p-4 rounded-lg"
+      style={{ backgroundColor: "var(--card-background-color)" }}
+    >
       {items.slice(0, visibleCount).map((item, index) => (
         <StudyItem key={index} title={item} />
       ))}

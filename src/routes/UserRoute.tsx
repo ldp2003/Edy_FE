@@ -6,6 +6,7 @@ import PresonalPost from "../pages/user/presonalPosts/PresonalPost";
 import PersonalProfile from "../pages/user/personalProfile/PersonalProfile";
 import UploadPage from "../pages/user/upload/UploadPage";
 import AccountActivation from "../pages/user/accountActivation/AccountActivation";
+import EditProfile from "../pages/user/personalProfile/EditProfile";
 
 const UserRoute: React.FC = () => {
   return (
@@ -16,6 +17,7 @@ const UserRoute: React.FC = () => {
         <Route path="personal-profile" element={<PersonalProfile />} />
         <Route path="upload-document" element={<UploadPage />} />
         <Route path="account-activation" element={<AccountActivation />} />
+        <Route path="edit-profile" element={<EditProfile />} />
       </Route>
     </Routes>
   );

@@ -25,7 +25,7 @@ const SearchScopeInput: React.FC<{
 
   return (
     <div>
-      <label className="block text-gray-700 mb-2">
+      <label className="block text-lg font-bold mb-2">
         Nhập phạm vi tìm kiếm của bạn
       </label>
       <div className="flex items-center gap-2 mb-4">

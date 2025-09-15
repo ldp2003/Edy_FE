@@ -9,7 +9,7 @@ const UserDropdown: React.FC = () => {
   const handleMenuClick = (e: { key: string }) => {
     switch (e.key) {
       case "profile":
-        window.location.href = "/profile";
+        window.location.href = "/personal-profile";
         break;
       case "upload":
         window.location.href = "/upload";

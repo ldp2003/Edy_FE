@@ -2,9 +2,15 @@ import React, { useContext } from "react";
 import PointBox from "../../common/point/PointBox";
 import { Edit } from "lucide-react";
 import { UserContext } from "../../../contexts/UserContext";
+import { useNavigate } from "react-router-dom";
 
 const PersonalInfo: React.FC = () => {
   const { user, account } = useContext(UserContext);
+  const navigate = useNavigate();
+
+  const handleEditClick = () => {
+    navigate("/edit-profile");
+  };
 
   return (
     <div className="ml-6 w-3/4">
@@ -16,6 +22,7 @@ const PersonalInfo: React.FC = () => {
             color: "var(--primary-color)",
             borderColor: "var(--primary-color)",
           }}
+          onClick={handleEditClick}
         >
           <span>Chỉnh sửa</span>
           <Edit className="ml-1" size={20} />

@@ -27,7 +27,10 @@ const AccountActivation: React.FC = () => {
       <h1 className="text-2xl font-bold mb-4 text-center">
         Bổ sung thông tin cá nhân
       </h1>
-      <p className="text-gray-600 mb-6 text-center">
+      <p
+        className="mb-6 text-center"
+        style={{ color: "var(--third-text-color)" }}
+      >
         Hãy cho chúng tôi biết về bạn để chúng tôi có thể đề xuất tài liệu học
         tập, tính năng mới và nhiều hơn nữa!
       </p>
