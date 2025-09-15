@@ -23,14 +23,11 @@ const UserLayout: React.FC = () => {
           setIsLoggedIn(true);
           setUser(data.user); // Full user data.
           setAccount(data.account); // Account data
-        }
-        else {
+        } else {
           setIsLoggedIn(false);
           setUser(defaultUser);
           setAccount(null);
-            
         }
-
       } catch (error) {
         console.error("Error fetching user:", error);
       }
@@ -40,14 +37,22 @@ const UserLayout: React.FC = () => {
   }, []);
 
   const isAccountActivationPage = location.pathname === "/account-activation";
+  const isDocumentDetailPage = location.pathname.includes("/document-detail");
 
   return (
     <AuthRoute>
       <UserContext.Provider value={{ isLoggedIn, user, account }}>
-        <div className="w-screen h-screen overflow-x-hidden">
+        <div
+          className="w-screen min-h-screen overflow-x-hidden"
+          style={{
+            backgroundColor: isDocumentDetailPage
+              ? "var(--secondary-background-color)"
+              : "var(--primary-background-color)",
+          }}
+        >
           <Header />
-          <main className="w-full h-full">
-            <div className="flex h-full">
+          <main className="w-full min-h-screen">
+            <div className="flex min-h-screen">
               {!isAccountActivationPage && (
                 <Sidebar
                   isVisible={isSidebarVisible}

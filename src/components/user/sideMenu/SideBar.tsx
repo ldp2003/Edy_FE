@@ -1,6 +1,8 @@
 import { UserProfile } from "./UserProfile";
 import { NavigationMenu } from "./NavigationMenu";
 import { PanelLeftClose, PanelLeftOpen } from "lucide-react";
+import { useLocation } from "react-router-dom";
+import { useEffect } from "react";
 
 interface SidebarProps {
   isVisible: boolean;
@@ -8,10 +10,19 @@ interface SidebarProps {
 }
 
 export function Sidebar({ isVisible, setIsVisible }: SidebarProps) {
+  const location = useLocation();
+
+  useEffect(() => {
+    // Automatically hide the sidebar when on the document detail page
+    if (location.pathname.includes("/document-detail")) {
+      setIsVisible(false);
+    }
+  }, [location.pathname, setIsVisible]);
+
   return (
     <>
       <button
-        className={`fixed text-white bg-white p-2 z-10 rounded-full shadow-md cursor-pointer border border-gray-300 transition-all duration-300 ${
+        className={`fixed text-white bg-white p-2 z-20 rounded-full shadow-md cursor-pointer border border-gray-300 transition-all duration-300 ${
           isVisible ? "top-26 left-62" : "top-26 left-14"
         }`}
         onClick={() => setIsVisible(!isVisible)}
@@ -30,7 +41,7 @@ export function Sidebar({ isVisible, setIsVisible }: SidebarProps) {
       </button>
 
       <aside
-        className={`border-r border-gray-200 min-h-screen fixed left-0 top-[80px] transition-transform duration-300 ${
+        className={`border-r border-gray-200 min-h-screen fixed left-0 top-[80px] bg-white transition-transform duration-300 ${
           isVisible ? "w-64 translate-x-0" : "w-16 translate-x-0"
         }`}
       >

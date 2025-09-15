@@ -16,7 +16,7 @@ const AuthRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
         const response = await getCurrentUser();
         console.log("AuthRoute - Current User:", response.roles);
 
-        if (response && response.roles.includes("NOT_VERIFIED")) {
+        if (response && (response.roles.includes("NOT_VERIFIED") || response.roles.includes("NOT_VERIFY"))) {
           navigate("/account-activation"); // Redirect to account activation page
         }
       } catch (error) {
