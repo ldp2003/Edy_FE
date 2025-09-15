@@ -32,7 +32,10 @@ const PersonalInfo: React.FC = () => {
           <div className="flex flex-row my-2">
             <div className="w-1/7 font-bold">Tổ chức:</div>
             <div className="w-6/7">
-              {user?.organization?._id || "Không có tổ chức"}
+              {typeof user?.organization === "object" &&
+              user?.organization !== null
+                ? user.organization._id
+                : "Không có tổ chức"}
             </div>
           </div>
           <div className="flex flex-row my-2">

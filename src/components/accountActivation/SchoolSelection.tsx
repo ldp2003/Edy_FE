@@ -1,34 +1,81 @@
-import React, { useState } from "react";
-import {  AutoComplete, Button } from "antd";
+import React, { useState, useEffect } from "react";
+import { AutoComplete, Modal } from "antd";
+import InsertOrganization from "../user/organization/InsertOrganization";
+import { getOrganizations } from "../../utils/OrganizationService";
 
-const predefinedSchools = [
-  "Harvard University",
-  "Stanford University",
-  "Massachusetts Institute of Technology",
-  "University of Oxford",
-  "University of Cambridge",
-];
+const SchoolSelection: React.FC<{
+  onOrganizationChange: (id: string) => void;
+}> = ({ onOrganizationChange }) => {
+  const [schoolOptions, setSchoolOptions] = useState<
+    { value: string; id: string }[]
+  >([]);
+  const [isModalVisible, setIsModalVisible] = useState(false);
 
-const SchoolSelection: React.FC = () => {
-  const [school, setSchool] = useState("");
+  useEffect(() => {
+    const fetchSchools = async () => {
+      try {
+        const organizations = await getOrganizations();
+        console.log("Fetched organizations in SchoolSelection:", organizations);
+        if (Array.isArray(organizations)) {
+          const options = organizations
+            .filter((org) => org._id)
+            .map((org) => ({
+              value: org.name,
+              id: org._id!,
+            }));
+          setSchoolOptions(options);
+        } else {
+          console.error("Expected an array but received:", organizations);
+        }
+      } catch (error) {
+        console.error("Failed to fetch schools:", error);
+      }
+    };
+
+    fetchSchools();
+  }, []);
 
   const handleSelect = (value: string) => {
-    setSchool(value);
+    const selected = schoolOptions.find((option) => option.value === value);
+    if (selected) {
+      onOrganizationChange(selected.id);
+    }
+  };
+
+  const showModal = () => {
+    setIsModalVisible(true);
+  };
+
+  const handleCancel = () => {
+    setIsModalVisible(false);
   };
 
   return (
     <div>
-      <label className="block text-gray-700 mb-2">I study at</label>
+      <div className="mb-4 flex justify-between items-center">
+        <label className="block text-gray-700 text-lg font-bold mb-2">
+          Tôi học tại
+        </label>
+        <a onClick={showModal} className="text-blue-500 hover:underline">
+          Không tìm thấy trường của bạn? Thêm ở đây
+        </a>
+      </div>
+
       <AutoComplete
-        options={predefinedSchools.map((school) => ({ value: school }))}
+        options={schoolOptions.map((option) => ({ value: option.value }))}
         style={{ width: "100%" }}
+        placeholder="Chọn hoặc nhập tên trường của bạn"
         onSelect={handleSelect}
-        onChange={(value) => setSchool(value)}
-        placeholder="Type your university / school name"
       />
-      <Button type="primary" className="mt-4 w-full">
-        Save
-      </Button>
+
+      <Modal
+        title="Thêm Tổ chức/Trường"
+        visible={isModalVisible}
+        onCancel={handleCancel}
+        footer={null}
+      >
+        <InsertOrganization />
+      </Modal>
     </div>
   );
 };

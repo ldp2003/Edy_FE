@@ -1,6 +1,6 @@
 import { createContext } from "react";
-import type { User } from "../data/user";
-import type { Account } from "../data/account";
+import type { User } from "../models/user";
+import type { Account } from "../models/account";
 
 export const UserContext = createContext({
   isLoggedIn: false,

@@ -1,10 +1,16 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Input, Button, Tag } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
 
-const SearchScopeInput: React.FC = () => {
+const SearchScopeInput: React.FC<{
+  onFieldOfStudyChange: (field: string) => void;
+}> = ({ onFieldOfStudyChange }) => {
   const [scopes, setScopes] = useState<string[]>([]);
   const [inputValue, setInputValue] = useState("");
+
+  useEffect(() => {
+    onFieldOfStudyChange(scopes.join(","));
+  }, [scopes, onFieldOfStudyChange]);
 
   const handleAddScope = () => {
     if (inputValue.trim() && !scopes.includes(inputValue.trim())) {
@@ -19,20 +25,22 @@ const SearchScopeInput: React.FC = () => {
 
   return (
     <div>
-      <label className="block text-gray-700 mb-2">Search scopes</label>
+      <label className="block text-gray-700 mb-2">
+        Nhập phạm vi tìm kiếm của bạn
+      </label>
       <div className="flex items-center gap-2 mb-4">
         <Input
           value={inputValue}
           onChange={(e) => setInputValue(e.target.value)}
           onPressEnter={handleAddScope}
-          placeholder="Enter a scope and press Enter"
+          placeholder="Nhập phạm vi và nhấn Enter"
           style={{ flex: 1 }}
         />
         <Button type="primary" icon={<PlusOutlined />} onClick={handleAddScope}>
-          Add
+          Thêm
         </Button>
       </div>
-      <div className="flex flex-wrap gap-2">
+      <div className="flex flex-wrap gap-2 mb-4">
         {scopes.map((scope) => (
           <Tag
             closable

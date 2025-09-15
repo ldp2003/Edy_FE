@@ -5,8 +5,8 @@ import { Outlet, useLocation } from "react-router-dom";
 import AuthRoute from "../routes/AuthRoute";
 import { UserContext } from "../contexts/UserContext";
 import { getCurrentUser } from "../utils/AuthService";
-import type { User } from "../data/user";
-import { defaultUser } from "../data/user";
+import type { User } from "../models/user";
+import { defaultUser } from "../models/user";
 
 const UserLayout: React.FC = () => {
   const [isSidebarVisible, setIsSidebarVisible] = useState(true);
@@ -24,6 +24,13 @@ const UserLayout: React.FC = () => {
           setUser(data.user); // Full user data.
           setAccount(data.account); // Account data
         }
+        else {
+          setIsLoggedIn(false);
+          setUser(defaultUser);
+          setAccount(null);
+            
+        }
+
       } catch (error) {
         console.error("Error fetching user:", error);
       }

@@ -68,3 +68,57 @@ export const AuthAPI = {
     }
   },
 };
+
+export const OrganizationAPI = {
+  createOrganization: async (organization: {
+    name: string;
+    code: string;
+    description?: string;
+    country: string;
+    address: string;
+    website: string;
+  }) => {
+    try {
+      const response = await apiClient.post("/organizations", organization);
+      return response.data;
+    } catch (error) {
+      console.error("Error creating organization:", error);
+      throw error;
+    }
+  },
+
+  getOrganizations: async () => {
+    try {
+      const response = await apiClient.get("/organizations");
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching organizations:", error);
+      throw error;
+    }
+  },
+};
+
+export const UserAPI = {
+  verifyUser: async (data: {
+    organization: string;
+    field_of_study: string;
+  }) => {
+    try {
+      const response = await apiClient.put("/users/verify", data);
+      return response.data;
+    } catch (error) {
+      console.error("Error verifying user:", error);
+      throw error;
+    }
+  },
+
+  getUsers: async () => {
+    try {
+      const response = await apiClient.get("/users");
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching users:", error);
+      throw error;
+    }
+  },
+};
