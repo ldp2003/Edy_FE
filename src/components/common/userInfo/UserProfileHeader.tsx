@@ -3,13 +3,26 @@ import { Avatar, Button, Input, Select } from "antd";
 
 const { Option } = Select;
 
-const UserProfileHeader: React.FC = () => {
+interface UserProfileHeaderProps {
+  firstName: string;
+  lastName: string;
+  organization: string;
+  email: string;
+  organizationOptions: string[];
+}
+
+const UserProfileHeader: React.FC<UserProfileHeaderProps> = ({
+  firstName,
+  lastName,
+  organization,
+  email,
+  organizationOptions,
+}) => {
   return (
     <div
       className="rounded-lg text-left p-6 shadow-lg"
       style={{ backgroundColor: "var(--card-background-color)" }}
     >
-
       <div className="flex items-start gap-6">
         <Avatar size={120} className="bg-orange-400 text-white text-2xl">
           👤
@@ -28,8 +41,8 @@ const UserProfileHeader: React.FC = () => {
 
           {/* Column 2: Inputs for Họ and Tên */}
           <div className="flex flex-col gap-4">
-            <Input id="ho" defaultValue="Nguyễn Văn" className="mt-1" />
-            <Input id="ten" defaultValue="A" className="mt-1" />
+            <Input id="ho" defaultValue={firstName} className="mt-1" />
+            <Input id="ten" defaultValue={lastName} className="mt-1" />
           </div>
 
           {/* Column 3: Labels for Học tập/làm việc tại and Email */}
@@ -44,14 +57,14 @@ const UserProfileHeader: React.FC = () => {
 
           {/* Column 4: Inputs for Học tập/làm việc tại and Email */}
           <div className="flex flex-col gap-4">
-            <Select defaultValue="truong-dai-hoc" className="mt-1">
-              <Option value="truong-dai-hoc">Trường đại học công nghiệp</Option>
+            <Select defaultValue={organization} className="mt-1">
+              {organizationOptions.map((org) => (
+                <Option key={org} value={org}>
+                  {org}
+                </Option>
+              ))}
             </Select>
-            <Input
-              id="email"
-              defaultValue="abc123@gmail.com"
-              className="mt-1"
-            />
+            <Input id="email" defaultValue={email} disabled className="mt-1" />
           </div>
         </div>
       </div>
