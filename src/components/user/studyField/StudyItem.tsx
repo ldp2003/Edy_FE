@@ -7,7 +7,7 @@ type StudyItemProps = {
 
 const StudyItem: React.FC<StudyItemProps> = ({ title }) => {
   return (
-    <div className="flex justify-between items-center py-2 border-b">
+    <div className="flex justify-between items-center py-4 border-b">
       <span className="text-gray-800 text-sm">{title}</span>
       <div className="flex items-center gap-2 ">
         <button

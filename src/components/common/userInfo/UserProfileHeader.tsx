@@ -6,10 +6,9 @@ const { Option } = Select;
 const UserProfileHeader: React.FC = () => {
   return (
     <div
-      className="rounded-lg text-left shadow  p-6"
+      className="rounded-lg text-left p-6 shadow-lg"
       style={{ backgroundColor: "var(--card-background-color)" }}
     >
-      <h2 className="text-lg font-medium mb-6">Cập nhật thông tin cá nhân</h2>
 
       <div className="flex items-start gap-6">
         <Avatar size={120} className="bg-orange-400 text-white text-2xl">

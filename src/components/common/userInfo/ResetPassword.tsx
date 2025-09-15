@@ -9,7 +9,7 @@ const ResetPassword: React.FC = () => {
       className="rounded-lg text-left border border-gray-200 p-6 shadow"
       style={{ backgroundColor: "var(--card-background-color)" }}
     >
-          <div className="">
+          <div className="space-y-2">
         <div>
           <label htmlFor="old-password" className="text-sm font-medium">
             Mật khẩu cũ:
@@ -44,21 +44,21 @@ const ResetPassword: React.FC = () => {
           OTP đã được gửi về Email, hết hạn sau 60s
         </div>
 
-        <div className="flex justify-center gap-3">
-          <Button type="default" size="small">
+        <div className="flex justify-end gap-3">
+          <Button type="default" size="middle">
             Gửi lại OTP
           </Button>
-          <Button size="small" onClick={() => setShowOTP(true)}>
+          <Button size="middle" onClick={() => setShowOTP(true)}>
             Lấy OTP
           </Button>
         </div>
       </div>
 
       <div className="flex justify-end gap-3 mt-6">
-        <Button danger size="small">
+        <Button danger size="middle">
           Hủy
         </Button>
-        <Button type="primary" size="small">
+        <Button type="primary" size="middle">
           Xác nhận
         </Button>
       </div>
