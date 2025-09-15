@@ -7,18 +7,23 @@ import { verifyUser } from "../../../utils/UserService";
 const AccountActivation: React.FC = () => {
   const [organizationId, setOrganizationId] = useState<string>("");
   const [fieldOfStudy, setFieldOfStudy] = useState<string>("");
+  const [messageApi, contextHolder] = message.useMessage();
 
   const handleSave = async () => {
     try {
       await verifyUser(organizationId, fieldOfStudy);
-      message.success("Thông tin đã được lưu thành công!");
+      messageApi.success("Thông tin đã được lưu thành công!");
+      setTimeout(() => {
+        window.location.href = "/";
+      }, 2000);
     } catch {
-      message.error("Lưu thông tin thất bại. Vui lòng thử lại.");
+      messageApi.error("Lưu thông tin thất bại. Vui lòng thử lại.");
     }
   };
 
   return (
     <div className="p-6 max-w-3xl text-left mx-auto">
+      {contextHolder}
       <h1 className="text-2xl font-bold mb-4 text-center">
         Bổ sung thông tin cá nhân
       </h1>
