@@ -13,11 +13,11 @@ const PersonalAvatar: React.FC = () => {
       />
       <div className="flex flex-row items-center text-xs mt-2">
         <div className="flex flex-col items-center mx-1">
-          <div className="font-bold">{user?.follower.length}</div>
+          <div className="font-bold">{user?.follower?.length}</div>
           <div className="text-gray-500">Người theo dõi</div>
         </div>
         <div className="flex flex-col items-center mx-1">
-          <div className="font-bold">{user?.following.length}</div>
+          <div className="font-bold">{user?.following?.length}</div>
           <div className="text-gray-500">Đang theo dõi</div>
         </div>
         <div className="flex flex-col items-center mx-1">

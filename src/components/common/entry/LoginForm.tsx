@@ -5,6 +5,7 @@ import { login } from "../../../utils/AuthService";
 const LoginForm: React.FC<{ onSuccess: () => void }> = ({ onSuccess }) => {
   const [loading, setLoading] = useState(false);
   const [form] = Form.useForm();
+  const [messageApi, contextHolder] = message.useMessage();
 
   const onFinish = async (values: { email: string; password: string }) => {
     setLoading(true);
@@ -12,7 +13,7 @@ const LoginForm: React.FC<{ onSuccess: () => void }> = ({ onSuccess }) => {
       const { email, password } = values;
       const result = await login(email, password); // Removed unused response
       if (result) {
-        message.success("Đăng nhập thành công");
+        messageApi.success("Đăng nhập thành công");
         form.resetFields(); // Clear form data
         onSuccess(); // Call the success handler
         window.location.reload(); // Reload the page after 5 seconds
@@ -27,6 +28,7 @@ const LoginForm: React.FC<{ onSuccess: () => void }> = ({ onSuccess }) => {
 
   return (
     <div className="bg-white p-6 w-full text-center">
+      {contextHolder}
       <h2 className="text-2xl mb-4">Đăng Nhập</h2>
       <Form form={form} name="login" layout="vertical" onFinish={onFinish}>
         <Form.Item

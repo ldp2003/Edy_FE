@@ -1,9 +1,11 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import RecentDocument from "../document/documentList/RecentDocument";
 import StudyList from "../studyField/StudyList";
+import { UserContext } from "../../../contexts/UserContext";
 
 const ProfileTab: React.FC = () => {
   const [activeTab, setActiveTab] = useState("recent");
+  const { user } = useContext(UserContext);
 
   return (
     <div>
@@ -45,7 +47,9 @@ const ProfileTab: React.FC = () => {
       </div>
       <div className="w-full">
         {activeTab === "recent" && <RecentDocument />}
-        {activeTab === "study" && <StudyList />}
+        {activeTab === "study" && (
+          <StudyList fieldOfStudy={user?.field_of_study || []} />
+        )}
       </div>
     </div>
   );
