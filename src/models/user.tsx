@@ -4,9 +4,10 @@ export interface User {
   last_name: string;
   contact_email: string;
   avatar?: string;
-  organization?:
+  organization:
     | {
         _id: string;
+        name: string;
       }
     | string;
   last_organization_change?: string;
@@ -25,7 +26,7 @@ export interface User {
     document: string;
     read_at: string;
   }[];
-  shared_documents?: {
+  shared_documents: {
     document: string;
     shared_at: string;
   }[];
@@ -59,5 +60,6 @@ export const defaultUser: User = {
   updatedAt: "",
   organization: {
     _id: "",
+    name: "No Organization",
   },
 };

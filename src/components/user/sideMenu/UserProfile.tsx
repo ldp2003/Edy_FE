@@ -41,7 +41,9 @@ export function UserProfile({ isCompact }: UserProfileProps) {
               className="text-xs font-bold overflow-hidden whitespace-nowrap text-ellipsis"
               style={{ color: "var(--primary-color)", maxWidth: "150px" }}
             >
-              {user?.organization?._id || "No Organization"}
+              {typeof user?.organization === "object"
+                ? user.organization?.name
+                : user?.organization || "No Organization"}
             </p>
           </div>
         )}

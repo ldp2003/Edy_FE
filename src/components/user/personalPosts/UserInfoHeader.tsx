@@ -5,6 +5,11 @@ import { UserContext } from "../../../contexts/UserContext";
 const UserInfoHeader: React.FC = () => {
   const { user, account } = useContext(UserContext);
 
+  const organizationName =
+    typeof user?.organization === "object" && user?.organization !== null
+      ? user.organization.name
+      : "Không có tổ chức";
+
   return (
     <div
       className="flex items-start justify-between p-4 rounded-md mb-4"
@@ -27,7 +32,7 @@ const UserInfoHeader: React.FC = () => {
               className="text-lg font-bold"
               style={{ color: "var(--primary-color)" }}
             >
-              {user?.organization?._id || "Không có tổ chức"}
+              {organizationName}
             </p>
           </div>
         </div>
@@ -37,11 +42,11 @@ const UserInfoHeader: React.FC = () => {
           style={{ color: "var(--primary-text-color)" }}
         >
           <div className="text-center">
-            <div className="">{user?.following.length}</div>
+            <div className="">{user?.following?.length ?? 0}</div>
             <div className="text-sm">Đang theo dõi</div>
           </div>
           <div className="text-center">
-            <div className="">{user?.follower.length}</div>
+            <div className="">{user?.follower?.length ?? 0}</div>
             <div className="text-sm">Người theo dõi</div>
           </div>
           <div className="text-center">

@@ -34,7 +34,7 @@ const PersonalInfo: React.FC = () => {
             <div className="w-6/7">
               {typeof user?.organization === "object" &&
               user?.organization !== null
-                ? user.organization._id
+                ? user.organization.name
                 : "Không có tổ chức"}
             </div>
           </div>
