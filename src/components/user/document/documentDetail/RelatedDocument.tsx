@@ -1,28 +1,59 @@
-import { ThumbsUp } from "lucide-react";
 import React from "react";
+import SuggestCard from "../documentCard/SuggestCard";
+
+const featuredDocuments = [
+  {
+    id: "1",
+    title: "Tài liệu tổng hợp Kinh tế chính trị Mác-Lênin",
+    description: "Kinh tế chính trị Mác-Lênin",
+    imageUrl: "/image/thumb_1200_1553.png",
+    like: 160,
+  },
+  {
+    id: "2",
+    title: "Tài liệu tổng hợp Kinh tế chính trị Mác-Lênin",
+    description: "Kinh tế chính trị Mác-Lênin",
+    imageUrl: "/image/thumb_1200_1553.png",
+    like: 160,
+  },
+  {
+    id: "3",
+    title: "Tài liệu tổng hợp Kinh tế chính trị Mác-Lênin",
+    description: "Kinh tế chính trị Mác-Lênin",
+    imageUrl: "/image/thumb_1200_1553.png",
+    like: 160,
+  },
+  {
+    id: "4",
+    title: "Tài liệu tổng hợp Kinh tế chính trị Mác-Lênin",
+    description: "Kinh tế chính trị Mác-Lênin",
+    imageUrl: "/image/thumb_1200_1553.png",
+    like: 160,
+  },
+  {
+    id: "5",
+    title: "Tài liệu tổng hợp Kinh tế chính trị Mác-Lênin",
+    description: "Kinh tế chính trị Mác-Lênin",
+    imageUrl: "/image/thumb_1200_1553.png",
+    like: 160,
+  },
+];
 
 const RelatedDocument: React.FC = () => {
   return (
     <div className="pt-6">
-      <h4 className="font-medium text-sm mb-3">Gợi ý cho bạn:</h4>
+      <h4 className="font-medium text-lg mb-3">Gợi ý cho bạn:</h4>
       <div className="space-y-3">
-        <div className="flex space-x-2">
-          <img
-            src="/placeholder.svg?height=40&width=30"
-            alt="Document"
-            className="w-8 h-10 object-cover rounded"
+        {featuredDocuments.map((doc) => (
+          <SuggestCard
+            key={doc.id}
+            id={doc.id}
+            title={doc.title}
+            description={doc.description}
+            imageUrl={doc.imageUrl}
+            like={doc.like}
           />
-          <div className="flex-1">
-            <p className="text-xs font-medium">
-              Tài liệu tổng hợp Kinh tế chính trị Mác LêNin
-            </p>
-            <p className="text-xs text-gray-500">Kinh tế chính trị Mác-Lênin</p>
-            <div className="flex items-center space-x-2 mt-1">
-              <ThumbsUp className="w-3 h-3 text-blue-500" />
-              <span className="text-xs text-gray-500">160 Lượt thích</span>
-            </div>
-          </div>
-        </div>
+        ))}
       </div>
     </div>
   );
