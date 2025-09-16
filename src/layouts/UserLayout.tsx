@@ -43,7 +43,7 @@ const UserLayout: React.FC = () => {
     <AuthRoute>
       <UserContext.Provider value={{ isLoggedIn, user, account }}>
         <div
-          className="w-screen min-h-screen overflow-x-hidden"
+          className="w-screen h-full overflow-x-hidden"
           style={{
             backgroundColor: isDocumentDetailPage
               ? "var(--secondary-background-color)"

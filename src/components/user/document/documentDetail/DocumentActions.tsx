@@ -1,42 +1,23 @@
-import { Button } from "antd";
-import {
-  ThumbsUp,
-  ThumbsDown,
-  Heart,
-  Share2,
-  Flag,
-  Download,
-} from "lucide-react";
-const  DocumentActions: React.FC = () => {
-  return (
-    <div className="flex items-center justify-between p-4 bg-white border-b border-gray-200">
-      <div className="flex items-center space-x-4">
-        <Button size="small">
-          <Flag className="w-4 h-4 mr-2" />
-          Báo cáo
-        </Button>
-        <Button size="small">
-          <ThumbsUp className="w-4 h-4 mr-2" />0
-        </Button>
-        <Button size="small">
-          <ThumbsDown className="w-4 h-4 mr-2" />0
-        </Button>
-        <Button size="small">
-          <Heart className="w-4 h-4 mr-2" />
-          Lưu
-        </Button>
-        <Button size="small">
-          <Share2 className="w-4 h-4" />
-        </Button>
-      </div>
 
-      <div className="flex items-center space-x-2">
-        <Button className="bg-green-600 hover:bg-green-700">
-          <Download className="w-4 h-4 mr-2" />
-          Tải về / 6 UP
-        </Button>
+import DownloadButton from "../../../common/buttons/DownloadButton";
+import ReportButton from "../../../common/buttons/ReportButton";
+import LikeButton from "../../../common/buttons/LikeButton";
+import DislikeButton from "../../../common/buttons/DislikeButton";
+import FavoriteButton from "../../../common/buttons/FavoriteButton";
+import ShareButton from "../../../common/buttons/ShareButton";
+const DocumentActions: React.FC = () => {
+  return (
+    <div className="flex items-center justify-between p-4">
+      <DownloadButton point={6} />
+
+      <div className="flex items-center space-x-4">
+        <ReportButton></ReportButton>
+        <LikeButton likeCount={0}></LikeButton>
+        <DislikeButton dislikeCount={0}></DislikeButton>
+        <FavoriteButton></FavoriteButton>
+        <ShareButton></ShareButton>
       </div>
     </div>
-  );    
-}
+  );
+};
 export default DocumentActions;

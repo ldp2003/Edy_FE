@@ -8,7 +8,7 @@ const DescriptionModal: React.FC = () => {
   return (
     <div className="relative">
       {isVisible && (
-        <div className="absolute p-10 -top-50 bg-white/80 rounded-lg  items-center justify-center">
+        <div className="absolute p-8 -top-55 bg-white/80 rounded-lg  items-center justify-center w-full">
           <div className="bg-gradient-to-b from-[#2D6F95] to-[#4BBBFB] p-6 rounded-lg shadow-lg text-center">
             <p className="text-xl font-bold text-white mb-4">
               Dùng điểm để mở xem bản tóm tắt của tài liệu

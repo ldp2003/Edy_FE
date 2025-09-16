@@ -5,28 +5,28 @@ const Description: React.FC = () => {
   const [activeTab, setActiveTab] = useState<"original" | "ai">("original");
   return (
     <div className="mt-4">
-      <h4 className="font-medium text-sm mb-2">Tóm tắt</h4>
+      <h4 className="font-medium text-lg mb-2">Tóm tắt</h4>
       <div
         style={{ backgroundColor: "var(--field-background-color)" }}
         className="rounded-lg shadow-xl"
       >
-        <div className="flex bg-blue-50 rounded-lg p-1 mb-3">
+        <div className="flex bg-blue-50 rounded-lg p-1 mb-3 ">
           <button
             onClick={() => setActiveTab("original")}
-            className={`flex-1 py-2 px-3 text-xs font-medium rounded-md transition-colors ${
+            className={`cursor-pointer flex-1 py-2 px-3 text-xs font-medium rounded-md transition-colors ${
               activeTab === "original"
-                ? "bg-blue-200 text-blue-800"
-                : "text-blue-600 hover:bg-blue-100"
+                ? "bg-blue-200 text-[#174371]"
+                : "text-[#0d99ff] hover:bg-blue-100"
             }`}
           >
             Bản gốc
           </button>
           <button
             onClick={() => setActiveTab("ai")}
-            className={`flex-1 py-2 px-3 text-xs font-medium rounded-md transition-colors ${
+            className={`cursor-pointer flex-1 py-2 px-3 text-xs font-medium rounded-md transition-colors ${
               activeTab === "ai"
-                ? "bg-blue-200 text-blue-800"
-                : "text-blue-600 hover:bg-blue-100"
+                ? "bg-blue-200 text-[#174371]"
+                : "text-[#0d99ff] hover:bg-blue-100"
             }`}
           >
             Bản AI

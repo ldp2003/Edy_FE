@@ -6,12 +6,12 @@ import RelatedDocument from "./RelatedDocument";
 
 const DocumentSide: React.FC = () => {
   return (
-    <aside className="overflow-hidden fixed left-15 border-l top-[80px] bg-white z-10 pl-8 p-6 w-[20%] border-r border-gray-200 min-h-screen">
+    <div className="fixed left-15 border-l top-0 pt-[90px] bg-white z-10 pl-8 p-6 w-[20%] border-r border-gray-200 h-screen overflow-y-auto box-sizing:border-box">
       <DocumentInfo />
       <Description />
       <Comment />
       <RelatedDocument />
-    </aside>
+    </div>
   );
 };
 
