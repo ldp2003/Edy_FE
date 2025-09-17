@@ -34,11 +34,11 @@ export function UserProfile({ isCompact }: UserProfileProps) {
         </div>
         {!isCompact && (
           <div className="text-left flex-1">
-            <a href="personal-profile" className="font-bold text-base">
+            <a href="personal-profile" className="font-bold text-sm">
               {user?.first_name} {user?.last_name}
             </a>
             <p
-              className="text-xs font-bold overflow-hidden whitespace-nowrap text-ellipsis"
+              className="text-[10px] font-bold overflow-hidden whitespace-nowrap text-ellipsis"
               style={{ color: "var(--primary-color)", maxWidth: "150px" }}
             >
               {typeof user?.organization === "object"
@@ -50,19 +50,19 @@ export function UserProfile({ isCompact }: UserProfileProps) {
       </div>
       {!isCompact && (
         <div
-          className="flex justify-between mt-3 text-center pt-7"
+          className="flex justify-between mt-3 text-center"
           style={{ color: "var(--primary-text-color)" }}
         >
           <div>
-            <div className="text-lg font-bold ">{user?.point}</div>
+            <div className="text-sm font-bold ">{user?.point}</div>
             <div className="text-xs ">Điểm tiêu dùng</div>
           </div>
           <div>
-            <div className="text-lg font-bold ">{user?.rank_point}</div>
+            <div className="text-sm font-bold ">{user?.rank_point}</div>
             <div className="text-xs ">Điểm hạng</div>
           </div>
           <div>
-            <div className="text-lg font-bold ">
+            <div className="text-sm font-bold ">
               {user?.shared_documents.length}
             </div>
             <div className="text-xs ">Bài đăng</div>

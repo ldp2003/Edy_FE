@@ -20,11 +20,13 @@ export function Sidebar({ isVisible, setIsVisible }: SidebarProps) {
   }, [location.pathname, setIsVisible]);
 
   return (
-    <>
+    <aside
+      className={`border-r top-20 fixed z-30 border-gray-200 min-h-screen bg-white transition-all duration-300 flex flex-col  ${
+        isVisible ? "w-fit" : "w-16"
+      }`}
+    >
       <button
-        className={`fixed text-white bg-white p-2 z-20 rounded-full shadow-md cursor-pointer border border-gray-300 transition-all duration-300 ${
-          isVisible ? "top-26 left-62" : "top-26 left-14"
-        }`}
+        className="absolute top-4 -right-4 text-white bg-white p-2 z-30 rounded-full shadow-md cursor-pointer border border-gray-300 transition-all duration-300"
         onClick={() => setIsVisible(!isVisible)}
       >
         {isVisible ? (
@@ -39,15 +41,8 @@ export function Sidebar({ isVisible, setIsVisible }: SidebarProps) {
           />
         )}
       </button>
-
-      <aside
-        className={`border-r border-gray-200 min-h-screen fixed left-0 top-[80px] bg-white transition-transform duration-300 ${
-          isVisible ? "w-64 translate-x-0" : "w-16 translate-x-0"
-        }`}
-      >
-        <UserProfile isCompact={!isVisible} />
-        <NavigationMenu isCompact={!isVisible} />
-      </aside>
-    </>
+      <UserProfile isCompact={!isVisible} />
+      <NavigationMenu isCompact={!isVisible} />
+    </aside>
   );
 }

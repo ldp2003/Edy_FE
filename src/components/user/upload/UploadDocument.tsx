@@ -8,6 +8,7 @@ const UploadDocument: React.FC = () => {
       <Card
         className="mb-6"
         style={{ backgroundColor: "var(--field-background-color)" }}
+        size="small"
       >
         <Upload.Dragger
           multiple={false}
@@ -15,11 +16,11 @@ const UploadDocument: React.FC = () => {
           accept=".doc,.docx,.pdf,.ppt,.xls,.xlsx"
         >
           <div className="flex flex-col items-center text-center">
-            <CloudUpload size={150} color="var(--primary-color)" />
-            <p className="text-lg font-bold mt-4">
+            <CloudUpload size={80} color="var(--primary-color)" />
+            <p className="text-sm font-bold">
               Kéo thả hoặc tải file tài liệu lên
             </p>
-            <p className="text-base text-back italic mt-4">
+            <p className="text-xs text-back italic">
               Các file có thể đăng tải lên hệ thống bao gồm: doc, docx, pdf,
               ppt, xls, xlsx tối đa 10MB
             </p>

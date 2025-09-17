@@ -43,7 +43,7 @@ const UserLayout: React.FC = () => {
     <AuthRoute>
       <UserContext.Provider value={{ isLoggedIn, user, account }}>
         <div
-          className="w-screen h-full overflow-x-hidden"
+          className="w-full h-full overflow-x-hidden"
           style={{
             backgroundColor: isDocumentDetailPage
               ? "var(--secondary-background-color)"
@@ -60,9 +60,9 @@ const UserLayout: React.FC = () => {
                 />
               )}
               <div
-                className={`flex-grow mt-20 transition-all duration-300 ${
+                className={`flex-grow mt-24 transition-all duration-300 ${
                   isSidebarVisible && !isAccountActivationPage
-                    ? "ml-[20%] mr-[5%]"
+                    ? "ml-[18%] mr-[1%]"
                     : "mx-[10%]"
                 }`}
               >

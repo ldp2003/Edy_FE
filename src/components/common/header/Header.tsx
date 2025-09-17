@@ -11,14 +11,14 @@ export function Header() {
   const { isLoggedIn, user } = useContext(UserContext);
 
   return (
-    <header className="bg-white border-b border-gray-200 px-6 py-4 fixed left-0 top-0 w-full z-20">
+    <header className="bg-white border-b border-gray-200 px-6 py-4 fixed left-0 top-0 w-full z-50">
       <div className="flex items-center justify-between">
         {/* Logo */}
         <div className="flex items-center gap-2">
           <div className="w-12 h-12 rounded flex items-center justify-center">
             <img src={logo} alt="Logo" />
           </div>
-          <span className="text-5xl font-bold bg-gradient-to-b from-[#50C4FE] to-[#3586DB] bg-clip-text text-transparent">
+          <span className="text-3xl font-bold bg-gradient-to-b from-[#50C4FE] to-[#3586DB] bg-clip-text text-transparent">
             EDY
           </span>
         </div>
