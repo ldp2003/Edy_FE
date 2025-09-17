@@ -59,9 +59,20 @@ const UserLayout: React.FC = () => {
                   setIsVisible={setIsSidebarVisible}
                 />
               )}
+
+              {/* Modal overlay for document-detail page when sidebar is visible */}
+              {isDocumentDetailPage && isSidebarVisible && (
+                <div
+                  className="fixed inset-0 bg-black/50 bg-opacity-50 z-20"
+                  onClick={() => setIsSidebarVisible(false)}
+                />
+              )}
+
               <div
                 className={`flex-grow mt-24 transition-all duration-300 ${
-                  isSidebarVisible && !isAccountActivationPage
+                  isDocumentDetailPage
+                    ? "ml-[8%] mr-[1%]" // Fixed margin for document detail page
+                    : isSidebarVisible && !isAccountActivationPage
                     ? "ml-[18%] mr-[1%]"
                     : "mx-[10%]"
                 }`}

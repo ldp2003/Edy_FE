@@ -17,22 +17,25 @@ const SuggestCard: React.FC<SuggestCardProps> = ({
   like,
 }) => {
   return (
-    <div key={id} className="cursor-pointer hover:bg-gray-200 rounded-lg mb-4 flex flex-row gap-2">
+    <div
+      key={id}
+      className="cursor-pointer hover:bg-gray-200 rounded-lg mb-2 flex flex-row gap-2"
+    >
       <div
-        className="relative w-2/5 rounded-lg p-2 h-fit flex justify-center items-center"
+        className="relative w-1/3 rounded-lg p-1 h-fit flex justify-center items-center"
         style={{ backgroundColor: "var(--card-background-color)" }}
       >
         <img
           src={imageUrl || "/public/image/thumb_1200_1553.png"}
           alt={title}
-          className="h-24 w-full object-cover rounded-lg"
+          className="h-16 w-full object-cover rounded-lg"
         />
       </div>
-      <div>
-        <div className="item-title font-bold text-lg text-gray-800">
+      <div className="flex-1">
+        <div className="item-title font-semibold text-sm text-gray-800 line-clamp-1">
           {title}
         </div>
-        <p className="text-[14px] mb-3 line-clamp-2">{description}</p>
+        <p className="text-xs mb-2 line-clamp-2 text-gray-600">{description}</p>
         <span className="">
           <LikeCount like={like}></LikeCount>
         </span>
