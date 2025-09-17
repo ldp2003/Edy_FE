@@ -27,7 +27,7 @@ const RecentItem: React.FC<RecentItemProps> = ({
           <FileText size={24} />
         </div>
         <div>
-          <div className="item-title font-bold text-lg text-gray-800">
+          <div className="item-title font-bold text-sm text-gray-800">
             {title}
           </div>
           <div className="flex flex-row text-sm text-gray-600">
@@ -43,8 +43,10 @@ const RecentItem: React.FC<RecentItemProps> = ({
           </div>
         </div>
       </div>
-      <div className="flex flex-col items-center">
-        <span className="text-sm text-gray-500 mr-4">{date}</span>
+      <div className="flex flex-col text-right">
+        <span className="text-xs text-[var(--secondary-text-color)] mr-4">
+          {date}
+        </span>
         <IntensiveMark label="Chuyên sâu"></IntensiveMark>
       </div>
     </div>

@@ -18,15 +18,21 @@
   --favorite-color: #ffb800;
   --primary-background-color: #ffffff;
   --secondary-background-color: #e7ecf0;
+  --third-background-color: #CCE4FF;
 }
 /* src/docx-preview.css */
 .docx-wrapper {
   background: white;
   color: black;
   line-height: 1.5;
-  padding: 1rem;
 }
 
 .docx-wrapper section {
   margin-bottom: 1rem;
+}
+
+.docx-preview-content {
+  margin: 0 !important;
+  width: 100% !important;
+  margin: 10px;
 }

@@ -23,20 +23,20 @@ const PointBox: React.FC<PointBoxProps> = ({
         style={{ color: "var(--third-text-color)" }}
       >
         <div className="flex justify-between">
-          <p className="text-sm">Điểm hạng (RP)</p>
-          <p className="text-sm font-bold">{rankPoints}</p>
+          <p className="text-xs">Điểm hạng (RP)</p>
+          <p className="text-xs font-bold">{rankPoints}</p>
         </div>
         <div className="flex justify-between">
-          <p className="text-sm">Điểm tiêu dùng (UP)</p>
-          <p className="text-sm font-bold">{usagePoints}</p>
+          <p className="text-xs">Điểm tiêu dùng (UP)</p>
+          <p className="text-xs font-bold">{usagePoints}</p>
         </div>
         <div className="flex justify-between">
-          <p className="text-sm">Số lần tải miễn phí (FC)</p>
-          <p className="text-sm font-bold">{freeDownloads}</p>
+          <p className="text-xs">Số lần tải miễn phí (FC)</p>
+          <p className="text-xs font-bold">{freeDownloads}</p>
         </div>
         <div className="flex justify-between">
-          <p className="text-sm">Số lần vi phạm (Strike)</p>
-          <p className="text-sm font-bold">{violations}</p>
+          <p className="text-xs">Số lần vi phạm (Strike)</p>
+          <p className="text-xs font-bold">{violations}</p>
         </div>
       </div>
     </div>

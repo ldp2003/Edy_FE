@@ -9,7 +9,7 @@ const ProfileTab: React.FC = () => {
 
   return (
     <div>
-      <div className="flex flex-row gap-4 font-bold border-b border-gray-300 mb-4">
+      <div className="text-sm flex flex-row gap-4 font-bold border-b border-gray-300 mb-4">
         <button
           onClick={() => setActiveTab("recent")}
           className={
