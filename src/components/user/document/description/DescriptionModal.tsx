@@ -10,16 +10,16 @@ const DescriptionModal: React.FC = () => {
       {isVisible && (
         <div className="absolute p-8 -top-55 bg-white/80 rounded-lg  items-center justify-center w-full">
           <div className="bg-gradient-to-b from-[#2D6F95] to-[#4BBBFB] p-6 rounded-lg shadow-lg text-center">
-            <p className="text-xl font-bold text-white mb-4">
+            <p className="text-sm font-bold text-white mb-4">
               Dùng điểm để mở xem bản tóm tắt của tài liệu
             </p>
             <Button
-              className=" hover:bg-blue-700 font-bold"
-              style={{ color: "var(--primary-text-color)", fontWeight: "bold" }}
+              className=" hover:bg-[var(--primary-color)] text-sm font-bold text-[var(--primary-text-color)]"
               onClick={() => setIsVisible(false)}
+              size="small"
             >
-              <Eye />
-              Xem
+              <Eye size={15} />
+              <span className="text-xs">Xem</span>
             </Button>
           </div>
         </div>

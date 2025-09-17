@@ -6,21 +6,9 @@ const DislikeButton: React.FC<{ dislikeCount: number }> = ({
 }) => {
   return (
     <div>
-      <button
-        className="flex items-center space-x-2 bg-white hover:bg-[#d63847] rounded-2xl border border-gray-300 px-3 py-1 font-semibold cursor-pointer"
-        style={{
-          color: "var(--red-button-color)",
-          transition: "color 0.3s",
-        }}
-        onMouseEnter={(e) => {
-          e.currentTarget.style.color = "white";
-        }}
-        onMouseLeave={(e) => {
-          e.currentTarget.style.color = "var(--red-button-color)";
-        }}
-      >
-        <ThumbsDown className="w-4 h-4" />
-        <span>{dislikeCount}</span>
+      <button className="text-xs flex items-center space-x-2 bg-white rounded-2xl border border-gray-300 px-3 py-1 font-semibold cursor-pointer text-[var(--red-button-color)] transition-colors duration-300 hover:bg-[#d63847] hover:text-white">
+        <ThumbsDown size={15} />
+        <span className="text-xs">{dislikeCount}</span>
       </button>
     </div>
   );

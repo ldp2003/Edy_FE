@@ -13,15 +13,12 @@ const AuthorInfo: React.FC = () => {
           />
         </Avatar>
         <div className="flex flex-col gap-3">
-          <h3
-            className="font-semibold text-lg"
-            style={{ color: "var(--primary-color)" }}
-          >
+          <h3 className="font-semibold text-base text-[var(--primary-color)]">
             Đại Phát
           </h3>
-          <div className="flex flex-row gap-3">
-            <School />
-            <p className="text-base font-semibold">
+          <div className="flex flex-row gap-2 items-center">
+            <School size={16} />
+            <p className="text-sm font-semibold">
               Trường đại học Công nghiệp Thành phố Hồ Chí Minh
             </p>
           </div>
@@ -34,16 +31,16 @@ const AuthorInfo: React.FC = () => {
       >
         <div className="flex flex-row space-x-6">
           <div className="text-center">
-            <div className="font-semibold">0</div>
-            <div className="text-sm">Người theo dõi</div>
+            <div className="font-semibold text-xs">0</div>
+            <div className="text-xs">Người theo dõi</div>
           </div>
           <div className="text-center">
-            <div className="font-semibold">0</div>
-            <div className="text-sm">Đang theo dõi</div>
+            <div className="font-semibold text-xs">0</div>
+            <div className="text-xs">Đang theo dõi</div>
           </div>
           <div className="text-center">
-            <div className="font-semibold">0</div>
-            <div className="text-sm">Bài đăng</div>
+            <div className="font-semibold text-xs">0</div>
+            <div className="text-xs">Bài đăng</div>
           </div>
         </div>
 

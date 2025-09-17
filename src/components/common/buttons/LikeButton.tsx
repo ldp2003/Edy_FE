@@ -4,21 +4,9 @@ import React from "react";
 const LikeButton: React.FC<{ likeCount: number }> = ({ likeCount }) => {
   return (
     <div>
-      <button
-        className="flex items-center space-x-2 bg-white hover:bg-[#27a743] rounded-2xl border border-gray-300 px-3 py-1 font-semibold cursor-pointer"
-        style={{
-          color: "var(--green-button-color)",
-          transition: "color 0.3s",
-        }}
-        onMouseEnter={(e) => {
-          e.currentTarget.style.color = "white";
-        }}
-        onMouseLeave={(e) => {
-          e.currentTarget.style.color = "var(--green-button-color)";
-        }}
-      >
-        <ThumbsUp className="w-4 h-4" />
-        <span>{likeCount}</span>
+      <button className="text-xs flex items-center space-x-2 bg-white rounded-2xl border border-gray-300 px-3 py-1 font-semibold cursor-pointer text-[var(--green-button-color)] transition-colors duration-300 hover:bg-[#27a743] hover:text-white">
+        <ThumbsUp size={15} />
+        <span className="text-xs">{likeCount}</span>
       </button>
     </div>
   );
