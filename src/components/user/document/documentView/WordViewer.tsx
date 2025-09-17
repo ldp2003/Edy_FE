@@ -4,9 +4,17 @@ import "../../../../docx-preview.css";
 
 interface WordViewerProps {
   url: string;
+  onPageChange?: (currentPage: number, totalPages: number) => void;
+  currentPage?: number;
+  onPageUpdate?: (page: number) => void;
 }
 
-const WordViewer: React.FC<WordViewerProps> = ({ url }) => {
+const WordViewer: React.FC<WordViewerProps> = ({
+  url,
+  onPageChange,
+  currentPage = 1,
+  onPageUpdate,
+}) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -27,6 +35,12 @@ const WordViewer: React.FC<WordViewerProps> = ({ url }) => {
             className: "docx-preview-content",
             inWrapper: false,
           });
+
+          // For Word documents, we simulate pagination by treating the document as 1 page
+          // In a real implementation, you might want to calculate pages based on content height
+          if (onPageChange) {
+            onPageChange(1, 1);
+          }
         }
       } catch (e) {
         console.error(e);
@@ -36,7 +50,7 @@ const WordViewer: React.FC<WordViewerProps> = ({ url }) => {
     };
 
     fetchAndRender();
-  }, [url]);
+  }, [url, onPageChange]);
 
   return (
     <div style={{ minHeight: 200 }}>
