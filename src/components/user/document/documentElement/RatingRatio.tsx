@@ -7,9 +7,9 @@ type RatingRatioProps = {
 
 const RatingRatio: React.FC<RatingRatioProps> = ({ rating }) => {
   return (
-    <div className="flex items-center bg-blue-100 text-blue-700 rounded-full px-4 py-[1px] text-xs font-bold w-fit">
-      <ThumbsUp className="mr-2" size={16} />
-      <span>Đánh giá {rating}%</span>
+    <div className="flex items-center justify-center bg-[var(--third-background-color)] text-[var(--primary-text-color)] rounded-full px-4 py-[1px] text-[10px] font-bold w-fit mx-auto">
+      <ThumbsUp size={12} />
+      <span className="ml-2 align-middle">Đánh giá {rating}%</span>
     </div>
   );
 };

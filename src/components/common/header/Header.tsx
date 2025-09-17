@@ -11,14 +11,14 @@ export function Header() {
   const { isLoggedIn, user } = useContext(UserContext);
 
   return (
-    <header className="bg-white border-b border-gray-200 px-6 py-4 fixed left-0 top-0 w-full z-20">
+    <header className="bg-white border-b border-gray-200 px-6 py-4 fixed left-0 top-0 w-full z-50">
       <div className="flex items-center justify-between">
         {/* Logo */}
         <div className="flex items-center gap-2">
           <div className="w-12 h-12 rounded flex items-center justify-center">
             <img src={logo} alt="Logo" />
           </div>
-          <span className="text-5xl font-bold bg-gradient-to-b from-[#50C4FE] to-[#3586DB] bg-clip-text text-transparent">
+          <span className="text-3xl font-bold bg-gradient-to-b from-[#50C4FE] to-[#3586DB] bg-clip-text text-transparent">
             EDY
           </span>
         </div>
@@ -29,9 +29,9 @@ export function Header() {
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
             <input
               placeholder="Nhập từ khóa tìm kiếm: Tên tài liệu, trường, môn học, tác giả..."
-              className="pl-10 pr-24 py-2 w-full border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="pl-10 text-sm pr-24 py-2 w-full border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
-            <button className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-gray-600 hover:bg-gray-700 text-white px-4 py-1 text-sm rounded transition-colors">
+            <button className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-gray-600 hover:bg-gray-700 text-white px-4 py-1 text-xs rounded transition-colors">
               Tìm kiếm
             </button>
           </div>
@@ -77,7 +77,7 @@ export function Header() {
           ) : (
             <Dropdown overlay={<AvatarDropdown />}>
               <button
-                className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md"
+                className="text-sm bg-[var(--primary-color)] hover:bg-white cursor-pointer hover:border-[var(--primary-color)] hover:border-1 hover:text-[var(--primary-color)] text-white px-4 py-2 rounded-md"
                 onClick={() => {
                   // Logic to show login modal
                 }}

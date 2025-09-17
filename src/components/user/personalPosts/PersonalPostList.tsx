@@ -24,10 +24,7 @@ const PersonalPostList: React.FC = () => {
     <div className="">
       <div className="flex flex-row justify-between items-center gap-4 mb-4">
         <div className="flex flex-row gap-4">
-          <h1
-            className="text-lg font-bold"
-            style={{ color: "var(--primary-text-color)" }}
-          >
+          <h1 className="text-lg font-bold text-[var(--primary-text-color)]">
             Tài liệu của tôi
           </h1>
           <select

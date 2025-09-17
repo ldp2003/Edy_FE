@@ -7,6 +7,9 @@ import ExcelTable from "./ExcelTable";
 interface DocumentViewerProps {
   url: string;
   type: "pdf" | "ppt" | "excel" | "video" | "word";
+  onPageChange?: (currentPage: number, totalPages: number) => void;
+  currentPage?: number;
+  onPageUpdate?: (page: number) => void;
 }
 
 const VideoViewer: React.FC<{ url: string }> = ({ url }) => {
@@ -44,12 +47,32 @@ const VideoViewer: React.FC<{ url: string }> = ({ url }) => {
   );
 };
 
-const DocumentViewer: React.FC<DocumentViewerProps> = ({ url, type }) => {
+const DocumentViewer: React.FC<DocumentViewerProps> = ({
+  url,
+  type,
+  onPageChange,
+  currentPage,
+  onPageUpdate,
+}) => {
   if (type === "pdf") {
-    return <PDFViewer url={url} />;
+    return (
+      <PDFViewer
+        url={url}
+        onPageChange={onPageChange}
+        currentPage={currentPage}
+        onPageUpdate={onPageUpdate}
+      />
+    );
   }
   if (type === "word") {
-    return <WordViewer url={url} />;
+    return (
+      <WordViewer
+        url={url}
+        onPageChange={onPageChange}
+        currentPage={currentPage}
+        onPageUpdate={onPageUpdate}
+      />
+    );
   }
   if (type === "ppt") {
     return (

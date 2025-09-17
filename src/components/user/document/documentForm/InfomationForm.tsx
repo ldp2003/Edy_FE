@@ -1,12 +1,5 @@
 import { useState } from "react";
-import {
-  Form,
-  Input,
-  Select,
-  InputNumber,
-  Button,
-  message,
-} from "antd";
+import { Form, Input, Select, InputNumber, Button, message } from "antd";
 import { Plus, Minus } from "lucide-react";
 
 const { TextArea } = Input;
@@ -60,12 +53,11 @@ const InformationForm = () => {
   };
 
   return (
-    <div className="p-6 bg-gray-50 min-h-screen text-left">
+    <div className="py-6  min-h-screen text-left">
+      <div className="font-bold text-base mb-6 text-[var(--primary-text-color)]">
+        Nhập thông tin
+      </div>
       <div className="mx-auto bg-white rounded-lg shadow-sm p-6">
-        <div className="text-xl font-semibold mb-6 text-gray-800">
-          Nhập thông tin
-        </div>
-
         <Form
           form={form}
           layout="vertical"
@@ -95,7 +87,7 @@ const InformationForm = () => {
               <Form.Item
                 style={{ marginBottom: 5 }}
                 name="privacy"
-                label={<span>Riêng tư</span>}
+                label={<span className="text-xs">Riêng tư</span>}
                 rules={[
                   { required: true, message: "Vui lòng chọn quyền riêng tư!" },
                 ]}
@@ -112,7 +104,7 @@ const InformationForm = () => {
               <Form.Item
                 style={{ marginBottom: 13.5 }}
                 name="documentName"
-                label={<span>Tên tài liệu</span>}
+                label={<span className="text-xs">Tên tài liệu</span>}
                 rules={[
                   { required: true, message: "Vui lòng nhập tên tài liệu!" },
                 ]}
@@ -123,7 +115,7 @@ const InformationForm = () => {
               <Form.Item
                 style={{ marginBottom: 13.5 }}
                 name="subject"
-                label={<span>Môn học</span>}
+                label={<span className="text-xs">Môn học</span>}
                 rules={[{ required: true, message: "Vui lòng nhập môn học!" }]}
               >
                 <Input placeholder="Nhập môn học" />
@@ -132,7 +124,7 @@ const InformationForm = () => {
               <Form.Item
                 style={{ marginBottom: 13.5 }}
                 name="organization"
-                label={<span>Tổ chức</span>}
+                label={<span className="text-xs">Tổ chức</span>}
                 rules={[{ required: true, message: "Vui lòng nhập tổ chức!" }]}
               >
                 <Input placeholder="Tổ chức" />
@@ -141,7 +133,7 @@ const InformationForm = () => {
               <Form.Item
                 style={{ marginBottom: 13.5 }}
                 name="documentType"
-                label={<span>Loại tài liệu</span>}
+                label={<span className="text-xs">Loại tài liệu</span>}
                 rules={[
                   { required: true, message: "Vui lòng chọn loại tài liệu!" },
                 ]}
@@ -165,7 +157,7 @@ const InformationForm = () => {
                 <Form.Item
                   style={{ marginBottom: 13.5 }}
                   name="pageCount"
-                  label="Số trang"
+                  label={<span className="text-xs">Số trang</span>}
                 >
                   <InputNumber
                     min={1}
@@ -178,7 +170,7 @@ const InformationForm = () => {
                 <Form.Item
                   style={{ marginBottom: 13.5 }}
                   name="level"
-                  label={<span>Trình độ</span>}
+                  label={<span className="text-xs">Trình độ</span>}
                   rules={[
                     { required: true, message: "Vui lòng chọn trình độ!" },
                   ]}
@@ -201,7 +193,7 @@ const InformationForm = () => {
               <Form.Item
                 style={{ marginBottom: 5 }}
                 name="summary"
-                label={<span>Tóm tắt</span>}
+                label={<span className="text-xs">Tóm tắt</span>}
                 rules={[{ required: true, message: "Vui lòng nhập tóm tắt!" }]}
               >
                 <TextArea
@@ -278,7 +270,7 @@ const InformationForm = () => {
                 <Form.Item
                   style={{ marginBottom: 5 }}
                   name="keywords"
-                  label={<span>Từ khóa</span>}
+                  label={<span className="text-xs">Từ khóa</span>}
                   rules={[
                     { required: true, message: "Vui lòng nhập từ khóa!" },
                   ]}

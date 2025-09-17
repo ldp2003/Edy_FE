@@ -8,10 +8,10 @@ type PageCountProps = {
 const PageCount: React.FC<PageCountProps> = ({ pages }) => {
   return (
     <div
-      className="flex items-center bg-gray-200 rounded-full px-4 py-[1px] text-xs font-bold w-fit"
+      className="flex items-center bg-gray-200 rounded-full px-4 py-[1px] text-[10px] font-bold w-fit"
       style={{ color: "var(--page-element-color)" }}
     >
-      <File className="mr-2" size={16} />
+      <File className="mr-2" size={12} />
       <span>{pages} trang</span>
     </div>
   );

@@ -29,7 +29,7 @@ export function NavigationMenu({ isCompact }: NavigationMenuProps) {
               to={item.path}
               className={`flex items-center justify-${
                 isCompact ? "center" : "start"
-              } gap-3 px-3 py-2 rounded-md transition-colors ${
+              } gap-3 px-3 py-2 rounded-md transition-colors text-sm ${
                 location.pathname === item.path
                   ? "bg-blue-100 text-[var(--primary-color)]"
                   : "text-[var(--secondary-text-color)] hover:bg-gray-100"

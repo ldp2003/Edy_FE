@@ -64,18 +64,16 @@ const PostTable: React.FC = () => {
       render: () => (
         <div className="flex gap-2 justify-center">
           <button
-            className="p-2  text-white rounded hover:bg-red-600"
-            style={{ backgroundColor: "var(--red-button-color)" }}
+            className="p-2 text-xs text-white rounded bg-[var(--red-button-color)] transition-colors duration-300 hover:bg-red-600"
             onClick={() => console.log("Delete action triggered")}
           >
-            <Trash className="w-4 h-4" />
+            <Trash size={15} />
           </button>
           <button
-            className="p-2  text-white rounded hover:bg-blue-600"
-            style={{ backgroundColor: "var(--green-button-color)" }}
+            className="p-2 text-xs text-white rounded bg-[var(--green-button-color)] transition-colors duration-300 hover:bg-blue-600"
             onClick={() => console.log("Edit action triggered")}
           >
-            <Edit className="w-4 h-4" />
+            <Edit size={15} />
           </button>
         </div>
       ),
@@ -136,22 +134,14 @@ const PostTable: React.FC = () => {
   ];
 
   return (
-    <div
-      className="rounded-md overflow-hidden w-full"
-      style={{ border: "1px solid rgba(0, 0, 0, 0.2)" }}
-    >
+    <div className="rounded-md overflow-hidden w-full border border-[rgba(0,0,0,0.2)]">
       <Table
         columns={columns}
         dataSource={data}
         pagination={false}
         size="middle"
       />
-      <div
-        className="flex justify-between items-center px-4 py-2"
-        style={{
-          backgroundColor: "var(--page-nav-color)",
-        }}
-      >
+      <div className="flex justify-between items-center px-4 py-2 bg-[var(--page-nav-color)]">
         <span className="text-sm">Số dòng: {data.length}</span>
         <div className="flex gap-2">
           <button className="px-2 py-1 border rounded hover:bg-gray-200">
