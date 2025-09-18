@@ -1,28 +1,101 @@
-import React, { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import { getCurrentUser, refreshToken } from "../utils/AuthService";
+import { UserContext } from "../contexts/UserContext";
+import type { User } from "../models/user";
+import { defaultUser } from "../models/user";
+import { ROLE_CODES } from "../constants/RoleConstants";
+import type { RoleCode } from "../models/role";
 
 const AuthRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [user, setUser] = useState<User>(defaultUser);
+  const [account, setAccount] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const checkAuth = async () => {
+      setIsLoading(true);
       try {
         await refreshToken();
-        const response = await getCurrentUser();
-        if (response && (response.roles.includes("NOT_VERIFIED") || response.roles.includes("NOT_VERIFY"))) {
-          navigate("/account-activation");
+        const data = await getCurrentUser();
+
+        if (data) {
+          setIsLoggedIn(true);
+          setUser(data.user); // Full user data
+          setAccount(data.account); // Account data
+
+          // Check if user needs account activation
+          if (
+            data.roles &&
+            (data.roles.includes("NOT_VERIFIED") ||
+              data.roles.includes("NOT_VERIFY"))
+          ) {
+            // Only redirect if not already on activation page
+            if (location.pathname !== "/account-activation") {
+              navigate("/account-activation");
+            }
+          } else {
+            // Check if user has any admin role
+            const adminRoles = [
+              ROLE_CODES.SUPER_ADMIN,
+              ROLE_CODES.DOCUMENT_ADMIN,
+              ROLE_CODES.USER_ADMIN,
+              ROLE_CODES.SYSTEM_ADMIN,
+              ROLE_CODES.ENTITY_ADMIN,
+            ];
+
+            const hasAdminRole =
+              data.roles &&
+              data.roles.some((role: string) =>
+                adminRoles.includes(role as RoleCode)
+              );
+
+            if (hasAdminRole) {
+              // User has admin role, check if they need to select role
+              const selectedRole = localStorage.getItem("selectedRole");
+              if (!selectedRole && location.pathname !== "/role-selection") {
+                navigate("/role-selection");
+              }
+            }
+            // If user doesn't have admin role, continue normally without role selection
+          }
+        } else {
+          setIsLoggedIn(false);
+          setUser(defaultUser);
+          setAccount(null);
+          navigate("/");
         }
       } catch (error) {
+        console.error("Error during auth check:", error);
+        setIsLoggedIn(false);
+        setUser(defaultUser);
+        setAccount(null);
         navigate("/");
+      } finally {
+        setIsLoading(false);
       }
     };
 
     checkAuth();
-  }, [navigate]);
+  }, [navigate, location.pathname]);
 
-  // Không block render children
-  return <>{children}</>;
+  // Show loading while checking authentication
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-lg">Đang kiểm tra xác thực...</div>
+      </div>
+    );
+  }
+
+  return (
+    <UserContext.Provider value={{ isLoggedIn, user, account }}>
+      {children}
+    </UserContext.Provider>
+  );
 };
 
 export default AuthRoute;

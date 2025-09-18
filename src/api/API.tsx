@@ -18,6 +18,7 @@ export const AuthAPI = {
       return response.data;
     } catch (error) {
       console.error("Error logging in:", error);
+      // Re-throw the error to preserve the original error structure
       throw error;
     }
   },

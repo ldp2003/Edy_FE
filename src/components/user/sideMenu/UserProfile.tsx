@@ -49,23 +49,20 @@ export function UserProfile({ isCompact }: UserProfileProps) {
         )}
       </div>
       {!isCompact && (
-        <div
-          className="flex justify-between mt-3 text-center"
-          style={{ color: "var(--primary-text-color)" }}
-        >
+        <div className="flex justify-between mt-3 text-center text-[var(--primary-text-color)]">
           <div>
-            <div className="text-sm font-bold ">{user?.point}</div>
-            <div className="text-xs ">Điểm tiêu dùng</div>
+            <div className="text-xs font-bold ">{user?.point}</div>
+            <div className="text-[10px] ">Điểm tiêu dùng</div>
           </div>
           <div>
-            <div className="text-sm font-bold ">{user?.rank_point}</div>
-            <div className="text-xs ">Điểm hạng</div>
+            <div className="text-xs font-bold ">{user?.rank_point}</div>
+            <div className="text-[10px] ">Điểm hạng</div>
           </div>
           <div>
-            <div className="text-sm font-bold ">
+            <div className="text-xs font-bold ">
               {user?.shared_documents.length}
             </div>
-            <div className="text-xs ">Bài đăng</div>
+            <div className="text-[10px] ">Bài đăng</div>
           </div>
         </div>
       )}

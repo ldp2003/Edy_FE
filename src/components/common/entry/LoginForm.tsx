@@ -11,15 +11,28 @@ const LoginForm: React.FC<{ onSuccess: () => void }> = ({ onSuccess }) => {
     setLoading(true);
     try {
       const { email, password } = values;
-      const result = await login(email, password); // Removed unused response
+      const result = await login(email, password);
       if (result) {
         messageApi.success("Đăng nhập thành công");
         form.resetFields(); // Clear form data
         onSuccess(); // Call the success handler
-        window.location.reload(); // Reload the page after 5 seconds
+        window.location.reload(); // Reload the page
       }
-    } catch (error) {
-      message.error("Đăng nhập thất bại. Vui lòng kiểm tra lại thông tin.");
+    } catch (error: unknown) {
+      // Extract error message from API response
+      let errorMessage = "Đăng nhập thất bại. Vui lòng kiểm tra lại thông tin.";
+
+      if (error && typeof error === "object" && "response" in error) {
+        const axiosError = error as { response: { data: { message: string } } };
+        if (axiosError.response?.data?.message) {
+          errorMessage = axiosError.response.data.message;
+        }
+      } else if (error && typeof error === "object" && "message" in error) {
+        const basicError = error as { message: string };
+        errorMessage = basicError.message;
+      }
+
+      messageApi.error(errorMessage);
       console.error("Login failed:", error);
     } finally {
       setLoading(false);

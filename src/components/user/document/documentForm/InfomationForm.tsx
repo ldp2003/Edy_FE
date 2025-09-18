@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Form, Input, Select, InputNumber, Button, message } from "antd";
 import { Plus, Minus } from "lucide-react";
 
@@ -21,9 +21,59 @@ interface FormData {
   saveData: boolean;
 }
 
-const InformationForm = () => {
+interface FileInfo {
+  url: string;
+  originalName: string;
+  size: number;
+  type: string;
+}
+
+interface InformationFormProps {
+  fileInfo?: FileInfo;
+}
+
+const InformationForm = ({ fileInfo }: InformationFormProps) => {
   const [form] = Form.useForm();
   const [authors, setAuthors] = useState<string[]>([""]);
+
+  // Auto-fill form when file is uploaded
+  useEffect(() => {
+    if (fileInfo) {
+      const fileName = fileInfo.originalName;
+      const nameWithoutExtension = fileName.substring(
+        0,
+        fileName.lastIndexOf(".")
+      );
+
+      // Auto-detect document type based on filename
+      const getDocumentType = (fileName: string): string => {
+        const name = fileName.toLowerCase();
+        if (name.includes("báo cáo") || name.includes("report"))
+          return "research-report";
+        if (name.includes("đề cương") || name.includes("outline"))
+          return "study-guide";
+        if (name.includes("giáo trình") || name.includes("textbook"))
+          return "textbook";
+        if (name.includes("tiểu luận") || name.includes("essay"))
+          return "essay";
+        if (name.includes("bài giải") || name.includes("solution"))
+          return "solution-set";
+        if (name.includes("luận văn") || name.includes("thesis"))
+          return "thesis";
+        if (name.includes("bài giảng") || name.includes("lecture"))
+          return "lecture";
+        return "other";
+      };
+
+      // Auto-fill form fields
+      form.setFieldsValue({
+        documentName: nameWithoutExtension,
+        documentType: getDocumentType(fileName),
+      });
+
+      message.success(`Đã tải lên thành công file: ${fileName}`);
+    }
+  }, [fileInfo, form]);
 
   const addAuthor = () => {
     setAuthors([...authors, ""]);
@@ -43,13 +93,33 @@ const InformationForm = () => {
   };
 
   const onFinish = (values: FormData) => {
-    console.log("Form data:", values);
+    if (!fileInfo) {
+      message.error("Vui lòng tải lên file trước khi đăng tải!");
+      return;
+    }
+
+    const submitData = {
+      ...values,
+      fileUrl: fileInfo.url,
+      fileSize: fileInfo.size,
+      fileType: fileInfo.type,
+    };
+
+    console.log("Form data:", submitData);
     message.success("Đăng tải thành công!");
   };
 
   const onFinishFailed = (errorInfo: unknown) => {
     console.log("Failed:", errorInfo);
     message.error("Vui lòng kiểm tra lại thông tin!");
+  };
+
+  const formatFileSize = (bytes: number): string => {
+    if (bytes === 0) return "0 Bytes";
+    const k = 1024;
+    const sizes = ["Bytes", "KB", "MB", "GB"];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i];
   };
 
   return (
@@ -77,11 +147,17 @@ const InformationForm = () => {
             <div className="space-y-4">
               <div className="mb-0">
                 <img
-                  src="https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png"
+                  src={
+                    fileInfo
+                      ? fileInfo.url
+                      : "https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png"
+                  }
                   alt="Document preview"
                   className="border border-gray-200 rounded object-cover"
                 />
-                <div className="text-xs text-gray-500 mt-1">16.8KB</div>
+                <div className="text-xs text-gray-500 mt-1">
+                  {fileInfo ? formatFileSize(fileInfo.size) : "16.8KB"}
+                </div>
               </div>
 
               <Form.Item
