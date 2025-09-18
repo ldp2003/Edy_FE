@@ -8,11 +8,10 @@ interface UploadButtonProps {
 const UploadButton: React.FC<UploadButtonProps> = ({ onClick }) => {
   return (
     <button
-      className="flex items-center gap-2 px-4 py-2 cursor-pointer text-white rounded hover:bg-blue-600"
-      style={{ backgroundColor: "var(--primary-color)" }}
+      className="flex text-xs bg-[var(--primary-color)] items-center gap-2 px-4 py-2 cursor-pointer text-white rounded hover:bg-blue-600"
       onClick={onClick}
     >
-      <CloudUpload className="w-5 h-5" />
+      <CloudUpload className="w-4 h-4" />
       Thêm tài liệu mới
     </button>
   );

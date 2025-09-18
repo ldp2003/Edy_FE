@@ -2,6 +2,8 @@ import { Card, Upload, message, Progress } from "antd";
 import { CloudUpload } from "lucide-react";
 import React, { useState } from "react";
 import type { UploadFile, UploadProps } from "antd";
+import { renderAsync } from "docx-preview";
+import html2canvas from "html2canvas";
 
 interface UploadDocumentProps {
   onFileUploaded?: (fileInfo: {
@@ -15,18 +17,112 @@ interface UploadDocumentProps {
   onUploadError?: () => void;
 }
 
-const UploadDocument: React.FC<UploadDocumentProps> = ({ 
+const UploadDocument: React.FC<UploadDocumentProps> = ({
   onFileUploaded,
   onUploadStart,
-  onUploadError 
+  onUploadError,
 }) => {
   const [uploading, setUploading] = useState(false);
   const [fileList, setFileList] = useState<UploadFile[]>([]);
   const [uploadProgress, setUploadProgress] = useState(0);
 
-  const uploadToCloudinary = async (file: File): Promise<{url: string, thumbnail?: string}> => {
+  // Word thumbnail generation utilities
+  const isWordDocument = (file: File): boolean => {
+    const wordTypes = [
+      "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+      "application/msword",
+    ];
+    const wordExtensions = [".doc", ".docx"];
+
+    return (
+      wordTypes.includes(file.type) ||
+      wordExtensions.some((ext) => file.name.toLowerCase().endsWith(ext))
+    );
+  };
+
+  const createWordThumbnail = async (file: File): Promise<string | null> => {
+    try {
+      if (!isWordDocument(file)) {
+        return null;
+      }
+
+      // Create container for rendering
+      const container = document.createElement("div");
+      container.style.position = "absolute";
+      container.style.left = "-9999px";
+      container.style.top = "-9999px";
+      container.style.width = "816px"; // A4 width
+      container.style.height = "1056px"; // A4 height
+      container.style.backgroundColor = "white";
+      container.style.padding = "72px"; // 1 inch margins
+      container.style.boxSizing = "border-box";
+      container.style.fontFamily = "Times, serif";
+      container.style.fontSize = "12pt";
+      container.style.lineHeight = "1.5";
+      document.body.appendChild(container);
+
+      // Convert file to ArrayBuffer
+      const arrayBuffer = await file.arrayBuffer();
+
+      // Render document using docx-preview
+      await renderAsync(arrayBuffer, container, undefined, {
+        className: "docx-wrapper",
+        inWrapper: false,
+        ignoreWidth: false,
+        ignoreHeight: false,
+        ignoreFonts: false,
+        breakPages: true,
+        ignoreLastRenderedPageBreak: true,
+        experimental: false,
+        trimXmlDeclaration: true,
+        useBase64URL: false,
+        debug: false,
+      });
+
+      // Wait for rendering to complete
+      await new Promise((resolve) => setTimeout(resolve, 500));
+
+      // Take screenshot with high quality
+      const canvas = await html2canvas(container, {
+        scale: 2,
+        useCORS: true,
+        allowTaint: true,
+        backgroundColor: "#ffffff",
+        width: 816,
+        height: 1056,
+      });
+
+      // Clean up
+      document.body.removeChild(container);
+
+      // Convert to JPEG with good quality
+      const thumbnailDataUrl = canvas.toDataURL("image/jpeg", 0.8);
+      return thumbnailDataUrl;
+    } catch (error) {
+      console.error("Error creating Word thumbnail:", error);
+      return null;
+    }
+  };
+
+  const uploadToCloudinary = async (
+    file: File
+  ): Promise<{ url: string; thumbnail?: string }> => {
     console.log("Starting upload to Cloudinary...");
     console.log("File:", file.name, file.size, file.type);
+
+    // Generate Word thumbnail if it's a Word document
+    let wordThumbnail: string | null = null;
+    if (isWordDocument(file)) {
+      try {
+        console.log("Generating Word document thumbnail...");
+        wordThumbnail = await createWordThumbnail(file);
+        if (wordThumbnail) {
+          console.log("Word thumbnail generated successfully");
+        }
+      } catch (error) {
+        console.error("Failed to generate Word thumbnail:", error);
+      }
+    }
 
     const uploadUrl = `https://api.cloudinary.com/v1_1/${
       import.meta.env.VITE_CLOUDINARY_NAME
@@ -49,7 +145,7 @@ const UploadDocument: React.FC<UploadDocumentProps> = ({
     try {
       // Simulate progress for better UX
       const progressInterval = setInterval(() => {
-        setUploadProgress(prev => {
+        setUploadProgress((prev) => {
           if (prev < 90) return prev + 10;
           return prev;
         });
@@ -70,15 +166,21 @@ const UploadDocument: React.FC<UploadDocumentProps> = ({
 
       const data = await response.json();
       console.log("Upload success:", data);
-      
+
       let thumbnailUrl;
-      if (data.format === 'pdf') {
-        thumbnailUrl = data.secure_url.replace('/upload/', '/upload/c_thumb,w_300,h_400,f_jpg/');
+      if (data.format === "pdf") {
+        thumbnailUrl = data.secure_url.replace(
+          "/upload/",
+          "/upload/c_thumb,w_300,h_400,f_jpg/"
+        );
+      } else if (wordThumbnail) {
+        // Use generated Word thumbnail
+        thumbnailUrl = wordThumbnail;
       }
-      
+
       return {
         url: data.secure_url,
-        thumbnail: thumbnailUrl
+        thumbnail: thumbnailUrl,
       };
     } catch (error) {
       console.error("Cloudinary upload error:", error);
@@ -190,16 +292,16 @@ const UploadDocument: React.FC<UploadDocumentProps> = ({
               Các file có thể đăng tải lên hệ thống bao gồm: doc, docx, pdf,
               ppt, pptx, xls, xlsx tối đa 10MB
             </p>
-            
+
             {uploading && (
               <div className="mt-4 w-full max-w-xs">
-                <Progress 
-                  percent={uploadProgress} 
+                <Progress
+                  percent={uploadProgress}
                   size="small"
                   status={uploadProgress === 100 ? "success" : "active"}
                   strokeColor={{
-                    '0%': '#108ee9',
-                    '100%': '#87d068',
+                    "0%": "#108ee9",
+                    "100%": "#87d068",
                   }}
                 />
                 <p className="text-xs text-gray-500 mt-1">

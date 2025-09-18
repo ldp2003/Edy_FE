@@ -4,7 +4,7 @@ import { getCurrentUser, refreshToken } from "../utils/AuthService";
 import { UserContext } from "../contexts/UserContext";
 import type { User } from "../models/user";
 import { defaultUser } from "../models/user";
-import { ROLE_CODES } from "../constants/roleConstants";
+import { ROLE_CODES } from "../constants/RoleConstants";
 import type { RoleCode } from "../models/role";
 
 const AuthRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {

@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
-import { Form, Input, Select, InputNumber, Button, message, notification } from "antd";
+import { Form, Input, Select, InputNumber, Button, message } from "antd";
 import { Plus, Minus } from "lucide-react";
-import { CheckCircleOutlined } from "@ant-design/icons";
 import { DocumentAPI } from "../../../../api/API";
 
 const { TextArea } = Input;
@@ -37,7 +36,11 @@ interface InformationFormProps {
   onUploadSuccess?: () => void;
 }
 
-const InformationForm = ({ fileInfo, isUploading, onUploadSuccess}: InformationFormProps) => {
+const InformationForm = ({
+  fileInfo,
+  isUploading,
+  onUploadSuccess,
+}: InformationFormProps) => {
   const [form] = Form.useForm();
   const [authors, setAuthors] = useState<string[]>([""]);
   const [submitting, setSubmitting] = useState(false);
@@ -117,27 +120,32 @@ const InformationForm = ({ fileInfo, isUploading, onUploadSuccess}: InformationF
         doc_type: values.documentType,
         file_type: fileInfo.type,
         subject: values.subject,
-        author: authors.filter(author => author.trim() !== ""),
-        published_year: values.publishYear ? parseInt(values.publishYear) : undefined,
+        author: authors.filter((author) => author.trim() !== ""),
+        published_year: values.publishYear
+          ? parseInt(values.publishYear)
+          : undefined,
         publisher: values.publisher,
         organization: values.organization,
         level: values.level,
         public_mode: values.public_mode,
-        keyword: values.keywords ? values.keywords.split(",").map(k => k.trim()) : [],
+        keyword: values.keywords
+          ? values.keywords.split(",").map((k) => k.trim())
+          : [],
         description: values.summary,
         page: values.pageCount,
       };
 
       const response = await DocumentAPI.uploadDocument(documentData);
-      
+
       message.success("Đăng tải tài liệu thành công!");
 
       // Reset form sau khi thành công
       form.resetFields();
       setAuthors([""]);
 
-      if (onUploadSuccess) { onUploadSuccess(); }
-
+      if (onUploadSuccess) {
+        onUploadSuccess();
+      }
     } catch (error: any) {
       console.error("Document upload error:", error);
 
@@ -171,11 +179,27 @@ const InformationForm = ({ fileInfo, isUploading, onUploadSuccess}: InformationF
       return fileInfo.thumbnail;
     }
 
-    if (fileInfo?.type === 'PDF' && fileInfo?.url && typeof fileInfo.url === 'string') {
-      return fileInfo.url.replace('/upload/', '/upload/c_thumb,w_300,h_400,f_jpg/');
+    if (
+      fileInfo?.type === "PDF" &&
+      fileInfo?.url &&
+      typeof fileInfo.url === "string"
+    ) {
+      return fileInfo.url.replace(
+        "/upload/",
+        "/upload/c_thumb,w_300,h_400,f_jpg/"
+      );
     }
 
-    if (fileInfo?.url && typeof fileInfo.url === 'string') {
+    if (
+      fileInfo?.type === "WORD" &&
+      fileInfo?.url &&
+      typeof fileInfo.url === "string"
+    ) {
+      // For Word documents without thumbnail, show document icon
+      return "https://cdn-icons-png.flaticon.com/512/337/337946.png";
+    }
+
+    if (fileInfo?.url && typeof fileInfo.url === "string") {
       return fileInfo.url;
     }
 
@@ -218,8 +242,9 @@ const InformationForm = ({ fileInfo, isUploading, onUploadSuccess}: InformationF
                 <img
                   src={getPreviewImage()}
                   alt="Document preview"
-                  className={`border border-gray-200 rounded object-cover ${isUploading ? 'opacity-50' : ''
-                    }`}
+                  className={`border border-gray-200 rounded object-cover ${
+                    isUploading ? "opacity-50" : ""
+                  }`}
                   style={{ maxHeight: "300px" }}
                 />
                 <div className="text-xs text-gray-500 mt-1">
@@ -326,9 +351,7 @@ const InformationForm = ({ fileInfo, isUploading, onUploadSuccess}: InformationF
                 >
                   <Select placeholder="Chọn trình độ" disabled={isUploading}>
                     <Option value="STUDENT">Học sinh</Option>
-                    <Option value="UNIVERSITY">
-                      Sinh viên (ĐH/CĐ)
-                    </Option>
+                    <Option value="UNIVERSITY">Sinh viên (ĐH/CĐ)</Option>
                     <Option value="LECTURER">Giảng viên</Option>
                     <Option value="RESEARCHER">Nghiên cứu sinh</Option>
                     <Option value="OTHER">Khác</Option>
@@ -455,9 +478,8 @@ const InformationForm = ({ fileInfo, isUploading, onUploadSuccess}: InformationF
                 {submitting
                   ? "Đang đăng tải..."
                   : isUploading
-                    ? "Đang tải file..."
-                    : "Đăng tải"
-                }
+                  ? "Đang tải file..."
+                  : "Đăng tải"}
               </Button>
             </div>
             {isSubmitDisabled && !submitting && (
@@ -465,9 +487,8 @@ const InformationForm = ({ fileInfo, isUploading, onUploadSuccess}: InformationF
                 {!fileInfo
                   ? "Vui lòng tải lên file trước"
                   : isUploading
-                    ? "Đang tải file lên..."
-                    : ""
-                }
+                  ? "Đang tải file lên..."
+                  : ""}
               </div>
             )}
           </div>

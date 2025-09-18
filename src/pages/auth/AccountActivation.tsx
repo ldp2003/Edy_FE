@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import { Button, Collapse, message } from "antd";
-import SchoolSelection from "../../../components/accountActivation/SchoolSelection";
-import SearchScopeInput from "../../../components/accountActivation/SearchScopeInput";
-import { verifyUser } from "../../../utils/UserService";
+import SchoolSelection from "../../components/accountActivation/SchoolSelection";
+import SearchScopeInput from "../../components/accountActivation/SearchScopeInput";
+import { verifyUser } from "../../utils/UserService";
 
 const AccountActivation: React.FC = () => {
   const [organizationId, setOrganizationId] = useState<string>("");

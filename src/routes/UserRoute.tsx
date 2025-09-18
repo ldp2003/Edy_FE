@@ -6,7 +6,7 @@ import HomePage from "../pages/user/home/Home";
 import PresonalPost from "../pages/user/presonalPosts/PresonalPost";
 import PersonalProfile from "../pages/user/personalProfile/PersonalProfile";
 import UploadPage from "../pages/user/upload/UploadPage";
-import AccountActivation from "../pages/user/accountActivation/AccountActivation";
+import AccountActivation from "../pages/auth/AccountActivation";
 import EditProfile from "../pages/user/personalProfile/EditProfile";
 import DocumentDetail from "../pages/user/document/DocumentDetail";
 import RoleSelectionPage from "../pages/auth/RoleSelectionPage";
