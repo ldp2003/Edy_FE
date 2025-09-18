@@ -1,7 +1,6 @@
 /* eslint-disable react-refresh/only-export-components */
 import type { RoleCode, Permission, UserRole } from "../models/role";
 
-// eslint-disable-next-line react-refresh/only-export-components
 export const ROLE_CODES: Record<string, RoleCode> = {
   SUPER_ADMIN: "SUPER_ADMIN",
   DOCUMENT_ADMIN: "DOCUMENT_ADMIN",
