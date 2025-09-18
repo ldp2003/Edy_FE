@@ -4,7 +4,7 @@ import { getCurrentUser, refreshToken } from "../utils/AuthService";
 import { UserContext } from "../contexts/UserContext";
 import type { User } from "../models/user";
 import { defaultUser } from "../models/user";
-import { ROLE_CODES } from "../constants/RoleConstants";
+import { ROLE_CODES } from "../constants/roleConstants";
 import type { RoleCode } from "../models/role";
 
 const AuthRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -14,10 +14,14 @@ const AuthRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User>(defaultUser);
   const [account, setAccount] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isInitialLoad, setIsInitialLoad] = useState(true);
 
   useEffect(() => {
     const checkAuth = async () => {
-      setIsLoading(true);
+      // Only show loading on initial load, not on route changes
+      if (isInitialLoad) {
+        setIsLoading(true);
+      }
       try {
         await refreshToken();
         const data = await getCurrentUser();
@@ -75,18 +79,21 @@ const AuthRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
         setAccount(null);
         navigate("/");
       } finally {
-        setIsLoading(false);
+        if (isInitialLoad) {
+          setIsLoading(false);
+          setIsInitialLoad(false);
+        }
       }
     };
 
     checkAuth();
-  }, [navigate, location.pathname]);
+  }, [navigate, location.pathname, isInitialLoad]);
 
-  // Show loading while checking authentication
-  if (isLoading) {
+  // Show loading only during initial authentication check
+  if (isLoading && isInitialLoad) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <div className="text-lg">Đang kiểm tra xác thực...</div>
+        <div className="text-lg">Đang tải...</div>
       </div>
     );
   }
