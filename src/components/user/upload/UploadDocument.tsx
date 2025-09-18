@@ -1,4 +1,4 @@
-import { Card, Upload, message } from "antd";
+import { Card, Upload, message, Progress } from "antd";
 import { CloudUpload } from "lucide-react";
 import React, { useState } from "react";
 import type { UploadFile, UploadProps } from "antd";
@@ -9,32 +9,32 @@ interface UploadDocumentProps {
     originalName: string;
     size: number;
     type: string;
+    thumbnail?: string;
   }) => void;
+  onUploadStart?: () => void;
+  onUploadError?: () => void;
 }
 
-const UploadDocument: React.FC<UploadDocumentProps> = ({ onFileUploaded }) => {
+const UploadDocument: React.FC<UploadDocumentProps> = ({ 
+  onFileUploaded,
+  onUploadStart,
+  onUploadError 
+}) => {
   const [uploading, setUploading] = useState(false);
   const [fileList, setFileList] = useState<UploadFile[]>([]);
+  const [uploadProgress, setUploadProgress] = useState(0);
 
-  const uploadToCloudinary = async (file: File): Promise<string> => {
+  const uploadToCloudinary = async (file: File): Promise<{url: string, thumbnail?: string}> => {
     console.log("Starting upload to Cloudinary...");
     console.log("File:", file.name, file.size, file.type);
 
-    // Use auto upload endpoint for documents
     const uploadUrl = `https://api.cloudinary.com/v1_1/${
       import.meta.env.VITE_CLOUDINARY_NAME
     }/auto/upload`;
 
-    console.log("Cloudinary Config:", {
-      cloudName: import.meta.env.VITE_CLOUDINARY_NAME,
-      preset: import.meta.env.VITE_CLOUDINARY_PRESET,
-      url: uploadUrl,
-    });
-
     const formData = new FormData();
     formData.append("file", file);
 
-    // Check if preset exists, otherwise try without preset for debugging
     const preset = import.meta.env.VITE_CLOUDINARY_PRESET;
     if (preset && preset !== "undefined") {
       formData.append("upload_preset", preset);
@@ -44,31 +44,46 @@ const UploadDocument: React.FC<UploadDocumentProps> = ({ onFileUploaded }) => {
       );
     }
 
-    formData.append("resource_type", "auto"); // Allow any file type
+    formData.append("resource_type", "auto");
 
     try {
+      // Simulate progress for better UX
+      const progressInterval = setInterval(() => {
+        setUploadProgress(prev => {
+          if (prev < 90) return prev + 10;
+          return prev;
+        });
+      }, 200);
+
       const response = await fetch(uploadUrl, {
         method: "POST",
         body: formData,
       });
 
-      console.log("Response status:", response.status);
-
-      const responseText = await response.text();
-      console.log("Response text:", responseText);
+      clearInterval(progressInterval);
+      setUploadProgress(100);
 
       if (!response.ok) {
-        console.error("Response error:", responseText);
+        const responseText = await response.text();
         throw new Error(`Upload failed: ${response.status} - ${responseText}`);
       }
 
-      const data = JSON.parse(responseText);
+      const data = await response.json();
       console.log("Upload success:", data);
-      return data.secure_url;
+      
+      let thumbnailUrl;
+      if (data.format === 'pdf') {
+        thumbnailUrl = data.secure_url.replace('/upload/', '/upload/c_thumb,w_300,h_400,f_jpg/');
+      }
+      
+      return {
+        url: data.secure_url,
+        thumbnail: thumbnailUrl
+      };
     } catch (error) {
       console.error("Cloudinary upload error:", error);
+      setUploadProgress(0);
 
-      // Provide more helpful error message
       if (error instanceof Error) {
         if (error.message.includes("401")) {
           throw new Error(
@@ -88,36 +103,19 @@ const UploadDocument: React.FC<UploadDocumentProps> = ({ onFileUploaded }) => {
     const extension = fileName.split(".").pop()?.toLowerCase();
     switch (extension) {
       case "pdf":
-        return "pdf";
+        return "PDF";
       case "doc":
       case "docx":
-        return "word";
+        return "WORD";
       case "ppt":
       case "pptx":
-        return "ppt";
+        return "PPT";
       case "xls":
       case "xlsx":
-        return "excel";
+        return "EXCEL";
       default:
-        return "other";
+        return "OTHER";
     }
-  };
-
-  const getDocumentType = (fileName: string): string => {
-    const name = fileName.toLowerCase();
-    if (name.includes("báo cáo") || name.includes("report"))
-      return "research-report";
-    if (name.includes("đề cương") || name.includes("outline"))
-      return "study-guide";
-    if (name.includes("giáo trình") || name.includes("textbook"))
-      return "textbook";
-    if (name.includes("tiểu luận") || name.includes("essay")) return "essay";
-    if (name.includes("bài giải") || name.includes("solution"))
-      return "solution-set";
-    if (name.includes("luận văn") || name.includes("thesis")) return "thesis";
-    if (name.includes("bài giảng") || name.includes("lecture"))
-      return "lecture";
-    return "other";
   };
 
   const customUpload: UploadProps["customRequest"] = async ({
@@ -126,30 +124,34 @@ const UploadDocument: React.FC<UploadDocumentProps> = ({ onFileUploaded }) => {
     onError,
   }) => {
     setUploading(true);
+    setUploadProgress(0);
+    onUploadStart?.();
 
     try {
-      const uploadedUrl = await uploadToCloudinary(file as File);
+      const uploadResult = await uploadToCloudinary(file as File);
 
       const fileInfo = {
-        url: uploadedUrl,
+        url: uploadResult.url,
         originalName: (file as File).name,
         size: (file as File).size,
         type: getFileType((file as File).name),
+        thumbnail: uploadResult.thumbnail,
       };
 
-      // Call parent callback with file info
       if (onFileUploaded) {
         onFileUploaded(fileInfo);
       }
 
       message.success(`${(file as File).name} được tải lên thành công!`);
-      onSuccess?.(uploadedUrl);
+      onSuccess?.(uploadResult.url);
     } catch (error) {
       console.error("Upload error:", error);
       message.error(`Tải lên ${(file as File).name} thất bại!`);
       onError?.(error as Error);
+      onUploadError?.();
     } finally {
       setUploading(false);
+      setTimeout(() => setUploadProgress(0), 1000); // Reset progress after 1s
     }
   };
 
@@ -177,6 +179,7 @@ const UploadDocument: React.FC<UploadDocumentProps> = ({ onFileUploaded }) => {
             <CloudUpload
               size={80}
               color={uploading ? "#d1d5db" : "var(--primary-color)"}
+              className={uploading ? "animate-pulse" : ""}
             />
             <p className="text-sm font-bold">
               {uploading
@@ -187,6 +190,23 @@ const UploadDocument: React.FC<UploadDocumentProps> = ({ onFileUploaded }) => {
               Các file có thể đăng tải lên hệ thống bao gồm: doc, docx, pdf,
               ppt, pptx, xls, xlsx tối đa 10MB
             </p>
+            
+            {uploading && (
+              <div className="mt-4 w-full max-w-xs">
+                <Progress 
+                  percent={uploadProgress} 
+                  size="small"
+                  status={uploadProgress === 100 ? "success" : "active"}
+                  strokeColor={{
+                    '0%': '#108ee9',
+                    '100%': '#87d068',
+                  }}
+                />
+                <p className="text-xs text-gray-500 mt-1">
+                  Đang tải lên... {uploadProgress}%
+                </p>
+              </div>
+            )}
           </div>
         </Upload.Dragger>
       </Card>

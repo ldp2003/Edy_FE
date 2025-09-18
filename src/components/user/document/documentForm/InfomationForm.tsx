@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
-import { Form, Input, Select, InputNumber, Button, message } from "antd";
+import { Form, Input, Select, InputNumber, Button, message, notification } from "antd";
 import { Plus, Minus } from "lucide-react";
+import { CheckCircleOutlined } from "@ant-design/icons";
+import { DocumentAPI } from "../../../../api/API";
 
 const { TextArea } = Input;
 const { Option } = Select;
@@ -17,7 +19,7 @@ interface FormData {
   publishYear?: string;
   authors: string[];
   summary: string;
-  privacy: string;
+  public_mode: string;
   saveData: boolean;
 }
 
@@ -26,15 +28,19 @@ interface FileInfo {
   originalName: string;
   size: number;
   type: string;
+  thumbnail?: string;
 }
 
 interface InformationFormProps {
   fileInfo?: FileInfo;
+  isUploading?: boolean;
+  onUploadSuccess?: () => void;
 }
 
-const InformationForm = ({ fileInfo }: InformationFormProps) => {
+const InformationForm = ({ fileInfo, isUploading, onUploadSuccess}: InformationFormProps) => {
   const [form] = Form.useForm();
   const [authors, setAuthors] = useState<string[]>([""]);
+  const [submitting, setSubmitting] = useState(false);
 
   // Auto-fill form when file is uploaded
   useEffect(() => {
@@ -45,27 +51,25 @@ const InformationForm = ({ fileInfo }: InformationFormProps) => {
         fileName.lastIndexOf(".")
       );
 
-      // Auto-detect document type based on filename
       const getDocumentType = (fileName: string): string => {
         const name = fileName.toLowerCase();
         if (name.includes("báo cáo") || name.includes("report"))
-          return "research-report";
+          return "RESEARCH_REPORT";
         if (name.includes("đề cương") || name.includes("outline"))
-          return "study-guide";
+          return "STUDY_GUIDE";
         if (name.includes("giáo trình") || name.includes("textbook"))
-          return "textbook";
+          return "TEXTBOOK";
         if (name.includes("tiểu luận") || name.includes("essay"))
-          return "essay";
+          return "ESSAY";
         if (name.includes("bài giải") || name.includes("solution"))
-          return "solution-set";
+          return "SOLUTION_SET";
         if (name.includes("luận văn") || name.includes("thesis"))
-          return "thesis";
+          return "THESIS";
         if (name.includes("bài giảng") || name.includes("lecture"))
-          return "lecture";
-        return "other";
+          return "LECTURE";
+        return "OTHER";
       };
 
-      // Auto-fill form fields
       form.setFieldsValue({
         documentName: nameWithoutExtension,
         documentType: getDocumentType(fileName),
@@ -92,21 +96,61 @@ const InformationForm = ({ fileInfo }: InformationFormProps) => {
     form.setFieldsValue({ authors: newAuthors });
   };
 
-  const onFinish = (values: FormData) => {
+  const onFinish = async (values: FormData) => {
     if (!fileInfo) {
       message.error("Vui lòng tải lên file trước khi đăng tải!");
       return;
     }
 
-    const submitData = {
-      ...values,
-      fileUrl: fileInfo.url,
-      fileSize: fileInfo.size,
-      fileType: fileInfo.type,
-    };
+    if (isUploading) {
+      message.warning("Vui lòng đợi file tải lên hoàn tất!");
+      return;
+    }
 
-    console.log("Form data:", submitData);
-    message.success("Đăng tải thành công!");
+    setSubmitting(true);
+
+    try {
+      // Chuẩn bị dữ liệu theo format API
+      const documentData = {
+        url: fileInfo.url,
+        title: values.documentName,
+        doc_type: values.documentType,
+        file_type: fileInfo.type,
+        subject: values.subject,
+        author: authors.filter(author => author.trim() !== ""),
+        published_year: values.publishYear ? parseInt(values.publishYear) : undefined,
+        publisher: values.publisher,
+        organization: values.organization,
+        level: values.level,
+        public_mode: values.public_mode,
+        keyword: values.keywords ? values.keywords.split(",").map(k => k.trim()) : [],
+        description: values.summary,
+        page: values.pageCount,
+      };
+
+      const response = await DocumentAPI.uploadDocument(documentData);
+      
+      message.success("Đăng tải tài liệu thành công!");
+
+      // Reset form sau khi thành công
+      form.resetFields();
+      setAuthors([""]);
+
+      if (onUploadSuccess) { onUploadSuccess(); }
+
+    } catch (error: any) {
+      console.error("Document upload error:", error);
+
+      if (error.response?.data?.message) {
+        message.error(`Lỗi: ${error.response.data.message}`);
+      } else if (error.message) {
+        message.error(`Lỗi: ${error.message}`);
+      } else {
+        message.error("Có lỗi xảy ra khi đăng tải tài liệu!");
+      }
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   const onFinishFailed = (errorInfo: unknown) => {
@@ -122,10 +166,34 @@ const InformationForm = ({ fileInfo }: InformationFormProps) => {
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i];
   };
 
+  const getPreviewImage = () => {
+    if (fileInfo?.thumbnail) {
+      return fileInfo.thumbnail;
+    }
+
+    if (fileInfo?.type === 'PDF' && fileInfo?.url && typeof fileInfo.url === 'string') {
+      return fileInfo.url.replace('/upload/', '/upload/c_thumb,w_300,h_400,f_jpg/');
+    }
+
+    if (fileInfo?.url && typeof fileInfo.url === 'string') {
+      return fileInfo.url;
+    }
+
+    return "https://cdn-icons-png.flaticon.com/512/2425/2425541.png";
+  };
+
+  // Determine if submit button should be disabled
+  const isSubmitDisabled = !fileInfo || isUploading || submitting;
+
   return (
-    <div className="py-6  min-h-screen text-left">
+    <div className="py-6 min-h-screen text-left">
       <div className="font-bold text-base mb-6 text-[var(--primary-text-color)]">
         Nhập thông tin
+        {isUploading && (
+          <span className="ml-2 text-sm text-orange-500 font-normal">
+            (Đang tải file...)
+          </span>
+        )}
       </div>
       <div className="mx-auto bg-white rounded-lg shadow-sm p-6">
         <Form
@@ -134,11 +202,12 @@ const InformationForm = ({ fileInfo }: InformationFormProps) => {
           onFinish={onFinish}
           onFinishFailed={onFinishFailed}
           initialValues={{
-            privacy: "private",
+            public_mode: "PRIVATE",
             saveData: false,
             authors: authors,
           }}
         >
+          {/* Rest of the form JSX remains the same... */}
           <div
             className="grid gap-6"
             style={{ gridTemplateColumns: "290px 1fr 1fr" }}
@@ -147,30 +216,33 @@ const InformationForm = ({ fileInfo }: InformationFormProps) => {
             <div className="space-y-4">
               <div className="mb-0">
                 <img
-                  src={
-                    fileInfo
-                      ? fileInfo.url
-                      : "https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png"
-                  }
+                  src={getPreviewImage()}
                   alt="Document preview"
-                  className="border border-gray-200 rounded object-cover"
+                  className={`border border-gray-200 rounded object-cover ${isUploading ? 'opacity-50' : ''
+                    }`}
+                  style={{ maxHeight: "300px" }}
                 />
                 <div className="text-xs text-gray-500 mt-1">
-                  {fileInfo ? formatFileSize(fileInfo.size) : "16.8KB"}
+                  {fileInfo ? formatFileSize(fileInfo.size) : "Chưa có file"}
                 </div>
+                {isUploading && (
+                  <div className="text-xs text-orange-500 mt-1 animate-pulse">
+                    Đang tải lên...
+                  </div>
+                )}
               </div>
 
               <Form.Item
                 style={{ marginBottom: 5 }}
-                name="privacy"
+                name="public_mode"
                 label={<span className="text-xs">Riêng tư</span>}
                 rules={[
                   { required: true, message: "Vui lòng chọn quyền riêng tư!" },
                 ]}
               >
-                <Select>
-                  <Option value="private">Riêng tư</Option>
-                  <Option value="public">Công khai</Option>
+                <Select disabled={isUploading}>
+                  <Option value="PRIVATE">Riêng tư</Option>
+                  <Option value="PUBLIC">Công khai</Option>
                 </Select>
               </Form.Item>
             </div>
@@ -185,7 +257,7 @@ const InformationForm = ({ fileInfo }: InformationFormProps) => {
                   { required: true, message: "Vui lòng nhập tên tài liệu!" },
                 ]}
               >
-                <Input placeholder="Nhập tên tài liệu" />
+                <Input placeholder="Nhập tên tài liệu" disabled={isUploading} />
               </Form.Item>
 
               <Form.Item
@@ -194,7 +266,7 @@ const InformationForm = ({ fileInfo }: InformationFormProps) => {
                 label={<span className="text-xs">Môn học</span>}
                 rules={[{ required: true, message: "Vui lòng nhập môn học!" }]}
               >
-                <Input placeholder="Nhập môn học" />
+                <Input placeholder="Nhập môn học" disabled={isUploading} />
               </Form.Item>
 
               <Form.Item
@@ -203,7 +275,7 @@ const InformationForm = ({ fileInfo }: InformationFormProps) => {
                 label={<span className="text-xs">Tổ chức</span>}
                 rules={[{ required: true, message: "Vui lòng nhập tổ chức!" }]}
               >
-                <Input placeholder="Tổ chức" />
+                <Input placeholder="Tổ chức" disabled={isUploading} />
               </Form.Item>
 
               <Form.Item
@@ -214,18 +286,18 @@ const InformationForm = ({ fileInfo }: InformationFormProps) => {
                   { required: true, message: "Vui lòng chọn loại tài liệu!" },
                 ]}
               >
-                <Select placeholder="Loại tài liệu">
-                  <Option value="research-report">
+                <Select placeholder="Loại tài liệu" disabled={isUploading}>
+                  <Option value="RESEARCH_REPORT">
                     Báo cáo nghiên cứu khoa học
                   </Option>
-                  <Option value="video">Video</Option>
-                  <Option value="study-guide">Đề cương ôn tập</Option>
-                  <Option value="textbook">Giáo trình</Option>
-                  <Option value="essay">Tiểu luận</Option>
-                  <Option value="solution-set">Bài giải</Option>
-                  <Option value="thesis">Luận văn / Khóa luận</Option>
-                  <Option value="lecture">Bài giảng</Option>
-                  <Option value="other">Khác</Option>
+                  <Option value="VIDEO">Video</Option>
+                  <Option value="STUDY_GUIDE">Đề cương ôn tập</Option>
+                  <Option value="TEXTBOOK">Giáo trình</Option>
+                  <Option value="ESSAY">Tiểu luận</Option>
+                  <Option value="SOLUTION_SET">Bài giải</Option>
+                  <Option value="THESIS">Luận văn / Khóa luận</Option>
+                  <Option value="LECTURE">Bài giảng</Option>
+                  <Option value="OTHER">Khác</Option>
                 </Select>
               </Form.Item>
 
@@ -240,6 +312,7 @@ const InformationForm = ({ fileInfo }: InformationFormProps) => {
                     className="w-full"
                     placeholder="Số trang"
                     style={{ width: "100%" }}
+                    disabled={isUploading}
                   />
                 </Form.Item>
 
@@ -251,20 +324,20 @@ const InformationForm = ({ fileInfo }: InformationFormProps) => {
                     { required: true, message: "Vui lòng chọn trình độ!" },
                   ]}
                 >
-                  <Select placeholder="Chọn trình độ">
-                    <Option value="student">Học sinh</Option>
-                    <Option value="university-student">
+                  <Select placeholder="Chọn trình độ" disabled={isUploading}>
+                    <Option value="STUDENT">Học sinh</Option>
+                    <Option value="UNIVERSITY">
                       Sinh viên (ĐH/CĐ)
                     </Option>
-                    <Option value="teacher">Giảng viên</Option>
-                    <Option value="researcher">Nghiên cứu sinh</Option>
-                    <Option value="other">Khác</Option>
+                    <Option value="LECTURER">Giảng viên</Option>
+                    <Option value="RESEARCHER">Nghiên cứu sinh</Option>
+                    <Option value="OTHER">Khác</Option>
                   </Select>
                 </Form.Item>
               </div>
             </div>
 
-            {/* Column 3 - Keywords */}
+            {/* Column 3 - Summary */}
             <div>
               <Form.Item
                 style={{ marginBottom: 5 }}
@@ -276,6 +349,7 @@ const InformationForm = ({ fileInfo }: InformationFormProps) => {
                   placeholder="Nhập mô tả hoặc tóm tắt tài liệu vào đây"
                   rows={15}
                   style={{ resize: "none", borderColor: "#60a5fa" }}
+                  disabled={isUploading}
                 />
               </Form.Item>
             </div>
@@ -290,7 +364,6 @@ const InformationForm = ({ fileInfo }: InformationFormProps) => {
               className="grid gap-6"
               style={{ gridTemplateColumns: "290px 1fr 1fr" }}
             >
-              {/* Left side - 2 columns for form fields */}
               <div className="col-span-2 grid grid-cols-2 gap-4">
                 <div className="space-y-4">
                   <Form.Item
@@ -298,7 +371,7 @@ const InformationForm = ({ fileInfo }: InformationFormProps) => {
                     name="publisher"
                     label="Nhà xuất bản"
                   >
-                    <Input placeholder="Nhà xuất bản" />
+                    <Input placeholder="Nhà xuất bản" disabled={isUploading} />
                   </Form.Item>
 
                   <Form.Item
@@ -306,7 +379,7 @@ const InformationForm = ({ fileInfo }: InformationFormProps) => {
                     name="publishYear"
                     label="Năm xuất bản"
                   >
-                    <Input placeholder="Năm xuất bản" />
+                    <Input placeholder="Năm xuất bản" disabled={isUploading} />
                   </Form.Item>
                 </div>
 
@@ -321,6 +394,7 @@ const InformationForm = ({ fileInfo }: InformationFormProps) => {
                         onChange={(e) => updateAuthor(idx, e.target.value)}
                         placeholder="Tác giả tài liệu"
                         className="flex-1"
+                        disabled={isUploading}
                       />
                       {idx > 0 && (
                         <Button
@@ -328,6 +402,7 @@ const InformationForm = ({ fileInfo }: InformationFormProps) => {
                           icon={<Minus size={16} />}
                           onClick={() => removeAuthor(idx)}
                           className="p-2"
+                          disabled={isUploading}
                         />
                       )}
                     </div>
@@ -337,11 +412,11 @@ const InformationForm = ({ fileInfo }: InformationFormProps) => {
                     icon={<Plus size={16} />}
                     onClick={addAuthor}
                     className="w-12 h-10"
+                    disabled={isUploading}
                   />
                 </div>
               </div>
 
-              {/* Right side - Summary textarea */}
               <div>
                 <Form.Item
                   style={{ marginBottom: 5 }}
@@ -352,9 +427,10 @@ const InformationForm = ({ fileInfo }: InformationFormProps) => {
                   ]}
                 >
                   <TextArea
-                    placeholder="Nhập các từ khóa liên quan đến tài liệu vào đây"
+                    placeholder="Nhập các từ khóa liên quan đến tài liệu vào đây (phân cách bằng dấu phẩy)"
                     rows={5}
                     style={{ resize: "none" }}
+                    disabled={isUploading}
                   />
                 </Form.Item>
               </div>
@@ -364,11 +440,36 @@ const InformationForm = ({ fileInfo }: InformationFormProps) => {
           {/* Action buttons */}
           <div className="flex items-center justify-between mt-8 pt-6 border-t border-gray-200">
             <div className="flex gap-3">
-              <Button onClick={() => form.resetFields()}>Hủy</Button>
-              <Button type="primary" htmlType="submit">
-                Đăng tải
+              <Button
+                onClick={() => form.resetFields()}
+                disabled={isUploading || submitting}
+              >
+                Hủy
+              </Button>
+              <Button
+                type="primary"
+                htmlType="submit"
+                loading={submitting}
+                disabled={isSubmitDisabled}
+              >
+                {submitting
+                  ? "Đang đăng tải..."
+                  : isUploading
+                    ? "Đang tải file..."
+                    : "Đăng tải"
+                }
               </Button>
             </div>
+            {isSubmitDisabled && !submitting && (
+              <div className="text-xs text-gray-500">
+                {!fileInfo
+                  ? "Vui lòng tải lên file trước"
+                  : isUploading
+                    ? "Đang tải file lên..."
+                    : ""
+                }
+              </div>
+            )}
           </div>
         </Form>
       </div>
