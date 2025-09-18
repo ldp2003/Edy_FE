@@ -16,7 +16,7 @@ const UserInfoHeader: React.FC = () => {
     <div className="flex items-start justify-between p-4 rounded-md mb-4 bg-[var(--field-background-color)]">
       <div className="flex flex-col items-center gap-2">
         <div className="flex flex-row text-left items-center gap-2">
-          <div className="w-28 h-28 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden">
+          <div className="w-15 h-15 mt-4 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden">
             <img
               src="/placeholder.svg?height=64&width=64"
               alt="Avatar"
@@ -24,7 +24,7 @@ const UserInfoHeader: React.FC = () => {
             />
           </div>
           <div className="text-left">
-            <h3 className="text-base font-bold mb-8">
+            <h3 className="text-base font-bold">
               {isLoading ? (
                 <span className="animate-pulse bg-gray-300 rounded w-32 h-6 inline-block"></span>
               ) : (

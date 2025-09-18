@@ -139,7 +139,7 @@ const PostTable: React.FC = () => {
         columns={columns}
         dataSource={data}
         pagination={false}
-        size="middle"
+        size="small"
       />
       <div className="flex justify-between items-center px-4 py-2 bg-[var(--page-nav-color)]">
         <span className="text-sm">Số dòng: {data.length}</span>
