@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { USER_ROLES } from "../../../constants/RoleConstants";
 import type { UserRole } from "../../../models/role";
 import RoleCard from "./RoleCard";
+import { USER_ROLES } from "../../../constants/RoleConstants";
 
 const RoleSelectionForm: React.FC = () => {
   const [selectedRole, setSelectedRole] = useState<UserRole | null>(null);
