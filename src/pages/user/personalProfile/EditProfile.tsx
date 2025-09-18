@@ -25,7 +25,7 @@ const EditProfile: React.FC = () => {
   return (
     <div className="p-4 text-left">
       <div>
-        <h2 className="font-bold text-xl mb-6">Cập nhật thông tin cá nhân</h2>
+        <h2 className="font-bold text-sm mb-6">Cập nhật thông tin cá nhân</h2>
         <UserProfileHeader
           firstName={user?.first_name || "Chưa đặt tên"}
           lastName={user?.last_name || "Chưa đặt tên"}
@@ -40,11 +40,11 @@ const EditProfile: React.FC = () => {
       </div>
       <div className="mt-8 flex flex-row">
         <div className="w-1/2 pr-2 flex flex-col gap-4">
-          <div className="font-bold text-xl">Cập nhật mật khẩu</div>
+          <div className="font-bold text-sm">Cập nhật mật khẩu</div>
           <ResetPassword />
         </div>
         <div className="w-1/2 pl-2 flex flex-col gap-4">
-          <div className="font-bold text-xl">Phạm vi tìm kiếm</div>
+          <div className="font-bold text-sm">Phạm vi tìm kiếm</div>
 
           <StudyList fieldOfStudy={user?.field_of_study || []} />
         </div>

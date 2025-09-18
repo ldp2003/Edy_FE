@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import PostTable from "./PostTable";
+import PostListView from "./PostListView";
+import PostGridView from "./PostGridView";
 import UploadButton from "../../common/buttons/UploadButton";
 
 const PersonalPostList: React.FC = () => {
@@ -12,9 +14,9 @@ const PersonalPostList: React.FC = () => {
       case "table":
         return <PostTable />;
       case "list":
-        return <div>Hiển thị dạng danh sách</div>; // Replace with actual list component
+        return <PostListView />;
       case "grid":
-        return <div>Hiển thị dạng lưới</div>; // Replace with actual grid component
+        return <PostGridView />;
       default:
         return <PostTable />;
     }
@@ -23,12 +25,12 @@ const PersonalPostList: React.FC = () => {
   return (
     <div className="">
       <div className="flex flex-row justify-between items-center gap-4 mb-4">
-        <div className="flex flex-row gap-4">
+        <div className="flex flex-row items-center gap-4">
           <h1 className="text-base font-bold text-[var(--primary-text-color)]">
             Tài liệu của tôi
           </h1>
           <select
-            className="px-4 text-sm w-fit border rounded h-7"
+            className="px-4 text-xs w-fit border rounded h-5"
             value={viewMode}
             onChange={(e) => setViewMode(e.target.value)}
           >

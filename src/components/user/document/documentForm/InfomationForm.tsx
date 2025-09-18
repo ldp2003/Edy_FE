@@ -1,15 +1,6 @@
 import { useState, useEffect } from "react";
-import {
-  Form,
-  Input,
-  Select,
-  InputNumber,
-  Button,
-  message,
-  notification,
-} from "antd";
+import { Form, Input, Select, InputNumber, Button, message } from "antd";
 import { Plus, Minus } from "lucide-react";
-import { CheckCircleOutlined } from "@ant-design/icons";
 import { DocumentAPI } from "../../../../api/API";
 
 const { TextArea } = Input;
