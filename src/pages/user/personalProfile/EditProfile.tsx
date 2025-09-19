@@ -33,11 +33,7 @@ const EditProfile: React.FC = () => {
         <UserProfileHeader
           firstName={user?.first_name || "Chưa đặt tên"}
           lastName={user?.last_name || "Chưa đặt tên"}
-          organization={
-            typeof user?.organization === "string"
-              ? user.organization || "Chưa có tổ chức"
-              : user?.organization?.name || "Chưa có tổ chức"
-          }
+          organization={user?.organization || "Chưa có tổ chức"}
           email={user?.contact_email || ""}
           organizationOptions={organizations}
           messageApi={messageApi}
