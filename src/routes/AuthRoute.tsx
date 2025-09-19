@@ -59,26 +59,17 @@ const AuthRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
               );
 
             if (hasAdminRole) {
-              // User có admin role, check cookie để xác định chế độ
+              // User có admin role, nhưng vẫn có thể truy cập trang user
               const isAdminMode = getIsAdminMode();
 
-              if (isAdminMode) {
-                // User đã chọn chế độ admin, đảm bảo ở trang admin
-                if (
-                  !location.pathname.startsWith("/admin") &&
-                  location.pathname !== "/role-selection"
-                ) {
-                  navigate("/admin");
-                }
-              } else {
-                // User chưa chọn hoặc chọn chế độ user, hiển thị role selection
-                if (
-                  !location.pathname.startsWith("/admin") &&
-                  location.pathname !== "/role-selection"
-                ) {
-                  navigate("/role-selection");
-                }
+              // Chỉ redirect đến role selection khi chưa có lựa chọn role
+              if (
+                isAdminMode === null &&
+                location.pathname !== "/role-selection"
+              ) {
+                navigate("/role-selection");
               }
+              // Admin có thể tự do truy cập trang user hoặc admin sau khi đã chọn role
             }
             // If user doesn't have admin role, continue normally without role selection
           }

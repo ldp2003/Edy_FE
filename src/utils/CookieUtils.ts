@@ -23,7 +23,8 @@ export const deleteCookie = (name: string): void => {
   document.cookie = `${name}=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT`;
 };
 
-export const getIsAdminMode = (): boolean => {
+export const getIsAdminMode = (): boolean | null => {
   const isAdminMode = getCookie("isAdminMode");
+  if (isAdminMode === null) return null; // Chưa có lựa chọn
   return isAdminMode === "true";
 };
