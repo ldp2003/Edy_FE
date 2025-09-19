@@ -50,6 +50,15 @@ export const DocumentService = {
     }
   },
 
+  async getDocumentById(documentId: string) {
+    try {
+      return await DocumentAPI.getDocumentById(documentId);
+    } catch (error) {
+      console.error("Error in DocumentService.getDocumentById:", error);
+      throw error;
+    }
+  },
+
   async approveDocument(documentId: string) {
     try {
       return await DocumentAPI.approveDocument(documentId);

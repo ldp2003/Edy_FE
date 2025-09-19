@@ -206,6 +206,17 @@ export const DocumentAPI = {
     }
   },
 
+  // Get document by ID
+  getDocumentById: async (documentId: string) => {
+    try {
+      const response = await apiClient.get(`/documents/${documentId}`);
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching document by ID:", error);
+      throw error;
+    }
+  },
+
   // Approve a document
   approveDocument: async (documentId: string) => {
     try {

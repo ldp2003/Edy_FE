@@ -1,47 +1,80 @@
 // TypeScript interfaces for Document
 
+export interface User {
+  _id: string;
+  first_name: string;
+  last_name: string;
+  doc_count?: number;
+  follower?: string[];
+  following?: string[];
+  organization?: {
+    _id: string;
+    name: string;
+  };
+  avatar?: string;
+}
+
+export interface Organization {
+  _id: string;
+  name: string;
+}
+
+export interface Subject {
+  _id: string;
+  name: string;
+}
+
 export interface Document {
-  id: string;
-  user: string;
-  description: {
+  _id: string;
+  user: User;
+  description?: {
     summary_by_user?: string;
     summary_by_ai?: string;
   };
   author: string[];
   url: string;
+  cover_page?: string;
   published_year?: number;
   publisher?: string;
-  intensive?: boolean;
-  organization?: string;
-  level: "Student" | "University" | "Lecturer" | "Researcher" | "Other";
-  subject: string;
-  status:
-    | "pending"
-    | "approved"
-    | "pending_summary"
-    | "rejected"
-    | "requested_edit";
-  public_mode: "public" | "private" | "private_shared" | "share_organization";
+  intensive: boolean;
+  organization: Organization;
+  level: "STUDENT" | "UNIVERSITY" | "LECTURER" | "RESEARCHER" | "OTHER";
+  subject: Subject;
+  status?:
+    | "PENDING"
+    | "APPROVED"
+    | "PENDING_SUMMARY"
+    | "REJECTED"
+    | "REQUESTED_EDIT";
+  public_mode?: "PUBLIC" | "PRIVATE" | "PRIVATE_SHARED" | "SHARE_ORGANIZATION";
   page?: number;
-  file_type: "Word" | "PDF" | "Excel" | "Video" | "Powerpoint";
-  keyword: string[];
+  file_type: "WORD" | "PDF" | "EXCEL" | "VIDEO" | "POWERPOINT";
+  keyword?: string[];
   title: string;
-  doc_type:
-    | "Research Report"
-    | "Video"
-    | "Study Guide"
-    | "Textbook"
-    | "Essay"
-    | "Solution Set"
-    | "Thesis"
-    | "Lecture"
-    | "Other";
+  doc_type?:
+    | "RESEARCH_REPORT"
+    | "VIDEO"
+    | "STUDY_GUIDE"
+    | "TEXTBOOK"
+    | "ESSAY"
+    | "SOLUTION_SET"
+    | "THESIS"
+    | "LECTURE"
+    | "OTHER";
   view: number;
   comment_count: number;
   download_count: number;
-  is_deleted: boolean;
+  is_deleted?: boolean;
   createdAt: string;
-  updatedAt: string;
+  updatedAt?: string;
+}
+
+export interface DocumentsResponse {
+  documents: Document[];
+  total: number;
+  page: number;
+  totalPages: number;
+  have_next: boolean;
 }
 
 export interface FetchDocumentsParams {

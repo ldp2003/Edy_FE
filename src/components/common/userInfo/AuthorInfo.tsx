@@ -1,25 +1,38 @@
 import { Avatar, Button } from "antd";
 import { School, UserPlus } from "lucide-react";
+import type { Document } from "../../../models/document";
 
-const AuthorInfo: React.FC = () => {
+interface AuthorInfoProps {
+  document: Document;
+}
+
+const AuthorInfo: React.FC<AuthorInfoProps> = ({ document }) => {
   return (
     <div className="flex items-center justify-between p-4 bg-white border-b border-gray-200 rounded-xl mb-6 shadow">
       <div className="flex items-center flex-row gap-4">
         <Avatar size={80} className="bg-gray-200">
-          <img
-            src="/placeholder.svg?height=100&width=100"
-            alt="Avatar"
-            className="w-full h-full object-cover"
-          />
+          {document.user.avatar ? (
+            <img
+              src={document.user.avatar}
+              alt="Avatar"
+              className="w-full h-full object-cover"
+            />
+          ) : (
+            <img
+              src="/placeholder.svg?height=100&width=100"
+              alt="Avatar"
+              className="w-full h-full object-cover"
+            />
+          )}
         </Avatar>
         <div className="flex flex-col gap-3">
           <h3 className="font-semibold text-base text-[var(--primary-color)]">
-            Đại Phát
+            {document.user.first_name} {document.user.last_name}
           </h3>
           <div className="flex flex-row gap-2 items-center">
             <School size={16} />
             <p className="text-sm font-semibold">
-              Trường đại học Công nghiệp Thành phố Hồ Chí Minh
+              {document.organization.name}
             </p>
           </div>
         </div>
@@ -31,15 +44,21 @@ const AuthorInfo: React.FC = () => {
       >
         <div className="flex flex-row space-x-6">
           <div className="text-center">
-            <div className="font-semibold text-xs">0</div>
+            <div className="font-semibold text-xs">
+              {document.user.follower?.length || 0}
+            </div>
             <div className="text-xs">Người theo dõi</div>
           </div>
           <div className="text-center">
-            <div className="font-semibold text-xs">0</div>
+            <div className="font-semibold text-xs">
+              {document.user.following?.length || 0}
+            </div>
             <div className="text-xs">Đang theo dõi</div>
           </div>
           <div className="text-center">
-            <div className="font-semibold text-xs">0</div>
+            <div className="font-semibold text-xs">
+              {document.user.doc_count || 0}
+            </div>
             <div className="text-xs">Bài đăng</div>
           </div>
         </div>

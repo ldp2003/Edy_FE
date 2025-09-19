@@ -3,12 +3,17 @@ import DocumentInfo from "./DocumentInfo";
 import Description from "../description/Description";
 import Comment from "./Comment";
 import RelatedDocument from "./RelatedDocument";
+import type { Document } from "../../../../models/document";
 
-const DocumentSide: React.FC = () => {
+interface DocumentSideProps {
+  document: Document;
+}
+
+const DocumentSide: React.FC<DocumentSideProps> = ({ document }) => {
   return (
     <div className="fixed left-15 border-l top-0 pt-[90px] bg-white z-10 pl-8 p-6 w-[20%] border-r border-gray-200 h-screen overflow-y-auto box-sizing:border-box">
-      <DocumentInfo />
-      <Description />
+      <DocumentInfo document={document} />
+      <Description document={document} />
       <Comment />
       <RelatedDocument />
     </div>
