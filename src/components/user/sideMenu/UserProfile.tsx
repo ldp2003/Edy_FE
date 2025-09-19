@@ -18,7 +18,7 @@ export function UserProfile({ isCompact }: UserProfileProps) {
       <div className="flex items-center gap-3">
         <div className="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden">
           <img
-            src="/placeholder.svg?height=48&width=48"
+            src={user?.avatar || "/default-avatar.png"}
             alt="Avatar"
             className="w-full h-full object-cover"
             onError={(e) => {

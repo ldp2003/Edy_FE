@@ -137,6 +137,10 @@ const InformationForm = ({
 
       const response = await DocumentAPI.uploadDocument(documentData);
 
+      if (response.status !== 201) {
+        throw new Error("Đăng tải tài liệu thất bại!");
+      }
+
       message.success("Đăng tải tài liệu thành công!");
 
       // Reset form sau khi thành công
@@ -146,6 +150,7 @@ const InformationForm = ({
       if (onUploadSuccess) {
         onUploadSuccess();
       }
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       console.error("Document upload error:", error);
 

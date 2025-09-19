@@ -30,6 +30,7 @@ export const updateProfile = async (profileData: {
   first_name?: string;
   last_name?: string;
   organization?: string;
+  avatar?: string;
 }) => {
   try {
     const result = await UserAPI.updateProfile(profileData);

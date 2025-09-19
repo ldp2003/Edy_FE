@@ -4,16 +4,19 @@ import ResetPassword from "../../../components/common/userInfo/ResetPassword";
 import StudyList from "../../../components/user/studyField/StudyList";
 import { UserContext } from "../../../contexts/UserContext";
 import { getOrganizations } from "../../../utils/OrganizationService";
+import type { Organization } from "../../../models/organization";
+import { message } from "antd";
 
 const EditProfile: React.FC = () => {
   const { user } = useContext(UserContext);
-  const [organizations, setOrganizations] = useState<string[]>([]);
+  const [organizations, setOrganizations] = useState<Organization[]>([]);
+  const [messageApi, contextHolder] = message.useMessage();
 
   useEffect(() => {
     const fetchOrganizations = async () => {
       try {
         const orgs = await getOrganizations();
-        setOrganizations(orgs.map((org) => org.name));
+        setOrganizations(orgs);
       } catch (error) {
         console.error("Failed to fetch organizations:", error);
       }
@@ -24,6 +27,7 @@ const EditProfile: React.FC = () => {
 
   return (
     <div className="p-4 text-left">
+      {contextHolder}
       <div>
         <h2 className="font-bold text-sm mb-6">Cập nhật thông tin cá nhân</h2>
         <UserProfileHeader
@@ -36,12 +40,14 @@ const EditProfile: React.FC = () => {
           }
           email={user?.contact_email || ""}
           organizationOptions={organizations}
+          messageApi={messageApi}
+          avatar={user?.avatar || ""}
         />
       </div>
       <div className="mt-8 flex flex-row">
         <div className="w-1/2 pr-2 flex flex-col gap-4">
           <div className="font-bold text-sm">Cập nhật mật khẩu</div>
-          <ResetPassword />
+          <ResetPassword messageApi={messageApi} />
         </div>
         <div className="w-1/2 pl-2 flex flex-col gap-4">
           <div className="font-bold text-sm">Phạm vi tìm kiếm</div>

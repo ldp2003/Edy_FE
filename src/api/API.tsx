@@ -127,6 +127,7 @@ export const UserAPI = {
     first_name?: string;
     last_name?: string;
     organization?: string;
+    avatar?: string;
   }) => {
     try {
       const response = await apiClient.put("/users/profile", data);
