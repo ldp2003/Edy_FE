@@ -60,7 +60,7 @@ const DocumentDetail: React.FC = () => {
   return (
     <div className="p-4 text-left">
       <DocumentSide></DocumentSide>
-      <div className="!ml-[20%] ">
+      <div className="!ml-[23%] ">
         <AuthorInfo></AuthorInfo>
         <DocumentActions />
         <DocumentViewer

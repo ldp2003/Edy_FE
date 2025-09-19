@@ -300,7 +300,6 @@ const AdminDocumentTable: React.FC = () => {
         </div>
 
         <div className="flex items-center space-x-2">
-          <span className="text-sm text-gray-600">50 lọc</span>
           <Button
             icon={<Filter size={14} />}
             size="small"
