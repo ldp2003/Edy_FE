@@ -231,7 +231,7 @@ const InformationForm = ({
           onFinish={onFinish}
           onFinishFailed={onFinishFailed}
           initialValues={{
-            public_mode: "PRIVATE",
+            public_mode: "PUBLIC",
             saveData: false,
             authors: authors,
           }}
@@ -265,14 +265,14 @@ const InformationForm = ({
               <Form.Item
                 style={{ marginBottom: 5 }}
                 name="public_mode"
-                label={<span className="text-xs">Riêng tư</span>}
+                label={<span className="text-xs">Chế độ công khai</span>}
                 rules={[
                   { required: true, message: "Vui lòng chọn quyền riêng tư!" },
                 ]}
               >
                 <Select disabled={isUploading}>
-                  <Option value="PRIVATE">Riêng tư</Option>
                   <Option value="PUBLIC">Công khai</Option>
+                  <Option value="PRIVATE">Riêng tư</Option>
                 </Select>
               </Form.Item>
             </div>

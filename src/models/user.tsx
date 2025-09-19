@@ -13,6 +13,7 @@ export interface User {
   last_organization_change?: string;
   follower?: string[];
   following?: string[];
+  doc_count?: number;
   field_of_study?: string[];
   point?: number;
   rank_point?: number;
@@ -46,6 +47,7 @@ export const defaultUser: User = {
   contact_email: "",
   follower: [],
   following: [],
+  doc_count: 0,
   field_of_study: [],
   point: 0,
   rank_point: 0,

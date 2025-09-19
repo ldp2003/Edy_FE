@@ -29,7 +29,7 @@ const UserRoute: React.FC = () => {
           <Route path="personal-profile" element={<PersonalProfile />} />
           <Route path="upload-document" element={<UploadPage />} />
           <Route path="edit-profile" element={<EditProfile />} />
-          <Route path="document-detail" element={<DocumentDetail />} />
+          <Route path="document-detail/:id" element={<DocumentDetail />} />
         </Route>
       </Routes>
     </AuthRoute>

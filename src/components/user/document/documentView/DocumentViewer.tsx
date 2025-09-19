@@ -10,6 +10,7 @@ interface DocumentViewerProps {
   onPageChange?: (currentPage: number, totalPages: number) => void;
   currentPage?: number;
   onPageUpdate?: (page: number) => void;
+  zoom?: number;
 }
 
 const VideoViewer: React.FC<{ url: string }> = ({ url }) => {
@@ -53,6 +54,7 @@ const DocumentViewer: React.FC<DocumentViewerProps> = ({
   onPageChange,
   currentPage,
   onPageUpdate,
+  zoom,
 }) => {
   if (type === "pdf") {
     return (
@@ -61,6 +63,7 @@ const DocumentViewer: React.FC<DocumentViewerProps> = ({
         onPageChange={onPageChange}
         currentPage={currentPage}
         onPageUpdate={onPageUpdate}
+        zoom={zoom}
       />
     );
   }
