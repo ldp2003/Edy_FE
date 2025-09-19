@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import type { UserRole } from "../../../models/role";
 import RoleCard from "./RoleCard";
 import { USER_ROLES } from "../../../constants/RoleConstants";
+import { setCookie } from "../../../utils/CookieUtils";
 
 const RoleSelectionForm: React.FC = () => {
   const [selectedRole, setSelectedRole] = useState<UserRole | null>(null);
@@ -14,14 +15,19 @@ const RoleSelectionForm: React.FC = () => {
 
   const handleContinue = () => {
     if (selectedRole) {
-      // Lưu role vào localStorage hoặc context
-      localStorage.setItem("selectedRole", JSON.stringify(selectedRole));
+      // Lưu chế độ admin vào cookie (boolean)
+      const isAdminMode =
+        selectedRole.role === "SUPER_ADMIN" ||
+        selectedRole.role === "DOCUMENT_ADMIN";
+
+      // Lưu vào cookie với thời hạn 7 ngày
+      setCookie("isAdminMode", isAdminMode.toString(), 7);
 
       // Chuyển hướng dựa trên role
-      if (selectedRole.role === "SUPER_ADMIN") {
+      if (isAdminMode) {
         navigate("/admin");
       } else {
-        navigate("/user");
+        navigate("/");
       }
     }
   };

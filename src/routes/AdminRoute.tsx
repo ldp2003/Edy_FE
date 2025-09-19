@@ -2,6 +2,7 @@ import React from "react";
 import { Routes, Route } from "react-router-dom";
 import AdminLayout from "../layouts/AdminLayout";
 import AdminHomePage from "../pages/admin/home/AdminHomePage";
+import AllDocumentsPage from "../pages/admin/document/AllDocumentsPage";
 import AuthRoute from "./AuthRoute";
 
 const AdminRoute: React.FC = () => {
@@ -17,8 +18,8 @@ const AdminRoute: React.FC = () => {
                 <Route path="statistics/general" element={<GeneralStatisticsPage />} /> */}
 
           {/* Document management routes */}
-          {/* <Route path="documents/all" element={<AllDocumentsPage />} />
-                <Route path="documents/pending" element={<PendingDocumentsPage />} /> */}
+          <Route path="documents/all" element={<AllDocumentsPage />} />
+          {/* <Route path="documents/pending" element={<PendingDocumentsPage />} /> */}
 
           {/* User management routes */}
           {/* <Route path="users/all" element={<AllUsersPage />} />
