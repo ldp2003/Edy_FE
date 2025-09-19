@@ -6,6 +6,7 @@ import type { User } from "../models/user";
 import { defaultUser } from "../models/user";
 import { ROLE_CODES } from "../constants/RoleConstants";
 import type { RoleCode } from "../models/role";
+import { getIsAdminMode } from "../utils/CookieUtils";
 
 const AuthRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const navigate = useNavigate();
@@ -58,11 +59,17 @@ const AuthRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
               );
 
             if (hasAdminRole) {
-              // User has admin role, check if they need to select role
-              const selectedRole = localStorage.getItem("selectedRole");
-              if (!selectedRole && location.pathname !== "/role-selection") {
+              // User có admin role, nhưng vẫn có thể truy cập trang user
+              const isAdminMode = getIsAdminMode();
+
+              // Chỉ redirect đến role selection khi chưa có lựa chọn role
+              if (
+                isAdminMode === null &&
+                location.pathname !== "/role-selection"
+              ) {
                 navigate("/role-selection");
               }
+              // Admin có thể tự do truy cập trang user hoặc admin sau khi đã chọn role
             }
             // If user doesn't have admin role, continue normally without role selection
           }

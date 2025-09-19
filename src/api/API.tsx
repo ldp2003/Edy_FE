@@ -122,6 +122,34 @@ export const UserAPI = {
       throw error;
     }
   },
+
+  updateProfile: async (data: {
+    first_name?: string;
+    last_name?: string;
+    organization?: string;
+    avatar?: string;
+  }) => {
+    try {
+      const response = await apiClient.put("/users/profile", data);
+      return response.data;
+    } catch (error) {
+      console.error("Error updating profile:", error);
+      throw error;
+    }
+  },
+
+  changePassword: async (data: {
+    current_password: string;
+    new_password: string;
+  }) => {
+    try {
+      const response = await apiClient.put("/users/change-password", data);
+      return response.data;
+    } catch (error) {
+      console.error("Error changing password:", error);
+      throw error;
+    }
+  },
 };
 
 export const DocumentAPI = {
