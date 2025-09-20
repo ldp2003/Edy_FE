@@ -63,11 +63,8 @@ const DocumentInfo: React.FC<DocumentInfoProps> = ({ document }) => {
           <FolderClosed size={15} />
           <span className="text-sm font-medium">Môn:</span>
         </div>
-        <span
-          className="font-bold text-xs"
-          style={{ color: "var(--primary-color)" }}
-        >
-          {document.subject.name}
+        <span className="font-bold text-xs text-[var(--primary-color)]">
+          {document.subject?.name}
         </span>
       </div>
 

@@ -18,18 +18,29 @@ const AdminDocumentTable: React.FC = () => {
   const [documents, setDocuments] = useState<Document[]>([]);
   const [loading, setLoading] = useState(false);
   const [totalDocuments, setTotalDocuments] = useState(0);
+  const [viewMode, setViewMode] = useState<"all" | "pending">("pending");
 
   // Fetch documents from API
   useEffect(() => {
     const fetchDocuments = async () => {
       setLoading(true);
       try {
-        const response = await DocumentService.fetchNewestDocuments({
-          page: currentPage,
-          limit: pageSize,
-          ordering: "createdAt",
-          order: -1,
-        });
+        let response;
+        if (viewMode === "pending") {
+          response = await DocumentService.getPendingDocuments({
+            page: currentPage,
+            limit: pageSize,
+            ordering: "createdAt",
+            order: -1,
+          });
+        } else {
+          response = await DocumentService.fetchNewestDocuments({
+            page: currentPage,
+            limit: pageSize,
+            ordering: "createdAt",
+            order: -1,
+          });
+        }
 
         setDocuments(response.documents || []);
         setTotalDocuments(response.total || 0);
@@ -44,7 +55,7 @@ const AdminDocumentTable: React.FC = () => {
     };
 
     fetchDocuments();
-  }, [currentPage, pageSize]);
+  }, [currentPage, pageSize, viewMode]);
 
   // Create a display interface that extends Document with display-specific fields
   interface DocumentDisplay extends Document {
@@ -226,6 +237,15 @@ const AdminDocumentTable: React.FC = () => {
       {/* Header Controls */}
       <div className="flex justify-between items-center">
         <div className="flex items-center space-x-2">
+          <Select
+            value={viewMode}
+            onChange={setViewMode}
+            size="small"
+            style={{ width: 150 }}
+          >
+            <Option value="pending">Chờ duyệt</Option>
+            <Option value="all">Tất cả</Option>
+          </Select>
           <Select defaultValue="2025" size="small" style={{ width: 80 }}>
             <Option value="2025">2025</Option>
             <Option value="2024">2024</Option>

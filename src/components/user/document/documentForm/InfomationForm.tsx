@@ -1,7 +1,9 @@
-import { useState, useEffect } from "react";
-import { Form, Input, Select, InputNumber, Button, message } from "antd";
+import { useState, useEffect, useContext, useCallback } from "react";
+import { Form, Input, Select, InputNumber, Button, message, Modal } from "antd";
 import { Plus, Minus } from "lucide-react";
 import { DocumentService } from "../../../../utils/DocumentService";
+import { SubjectService, type Subject } from "../../../../utils/SubjectService";
+import { UserContext } from "../../../../contexts/UserContext";
 
 const { TextArea } = Input;
 const { Option } = Select;
@@ -44,6 +46,49 @@ const InformationForm = ({
   const [form] = Form.useForm();
   const [authors, setAuthors] = useState<string[]>([""]);
   const [submitting, setSubmitting] = useState(false);
+  const [subjects, setSubjects] = useState<Subject[]>([]);
+  const [subjectsLoading, setSubjectsLoading] = useState(false);
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [newSubjectForm] = Form.useForm();
+
+  const { user } = useContext(UserContext);
+
+  // Load subjects when user organization is available
+  const loadSubjects = useCallback(async () => {
+    if (
+      user?.organization &&
+      typeof user.organization === "object" &&
+      user.organization._id
+    ) {
+      setSubjectsLoading(true);
+      try {
+        const subjectsData = await SubjectService.getSubjectsByOrganization(
+          user.organization._id
+        );
+        console.log("Loaded subjects:", subjectsData);
+        console.log("First subject ID:", subjectsData[0]?._id);
+        setSubjects(subjectsData);
+      } catch (error) {
+        console.error("Error loading subjects:", error);
+        message.error("Không thể tải danh sách môn học");
+      } finally {
+        setSubjectsLoading(false);
+      }
+    }
+  }, [user]);
+
+  useEffect(() => {
+    loadSubjects();
+  }, [loadSubjects]);
+
+  // Set default organization when user is available
+  useEffect(() => {
+    if (user?.organization && typeof user.organization === "object") {
+      form.setFieldsValue({
+        organization: user.organization._id,
+      });
+    }
+  }, [user, form]);
 
   // Auto-fill form when file is uploaded
   useEffect(() => {
@@ -99,7 +144,50 @@ const InformationForm = ({
     form.setFieldsValue({ authors: newAuthors });
   };
 
+  // Handle create new subject
+  const handleCreateSubject = async (values: {
+    name: string;
+    code: string;
+    description?: string;
+  }) => {
+    if (!user?.organization || typeof user.organization !== "object") {
+      message.error("Không xác định được tổ chức của bạn");
+      return;
+    }
+
+    try {
+      await SubjectService.createSubject({
+        ...values,
+        organization: user.organization._id,
+      });
+
+      message.success("Tạo môn học mới thành công!");
+
+      // Close modal and reset form
+      setIsModalVisible(false);
+      newSubjectForm.resetFields();
+
+      // Reload subjects list
+      await loadSubjects();
+    } catch (error) {
+      console.error("Error creating subject:", error);
+      message.error("Không thể tạo môn học mới");
+    }
+  };
+
+  const showAddSubjectModal = () => {
+    setIsModalVisible(true);
+  };
+
+  const handleModalCancel = () => {
+    setIsModalVisible(false);
+    newSubjectForm.resetFields();
+  };
+
   const onFinish = async (values: FormData) => {
+    console.log("Form values received:", values);
+    console.log("Subject value:", values.subject);
+
     if (!fileInfo) {
       message.error("Vui lòng tải lên file trước khi đăng tải!");
       return;
@@ -294,18 +382,62 @@ const InformationForm = ({
                 style={{ marginBottom: 13.5 }}
                 name="subject"
                 label={<span className="text-xs">Môn học</span>}
-                rules={[{ required: true, message: "Vui lòng nhập môn học!" }]}
+                rules={[{ required: true, message: "Vui lòng chọn môn học!" }]}
               >
-                <Input placeholder="Nhập môn học" disabled={isUploading} />
+                <div className="flex gap-2">
+                  <Select
+                    placeholder="Chọn hoặc nhập môn học"
+                    disabled={isUploading || subjectsLoading}
+                    showSearch
+                    allowClear
+                    notFoundContent={
+                      subjectsLoading ? "Đang tải..." : "Không có dữ liệu"
+                    }
+                    optionFilterProp="children"
+                    filterOption={(input, option) =>
+                      String(option?.children || "")
+                        .toLowerCase()
+                        .includes(input.toLowerCase())
+                    }
+                    style={{ flex: 1 }}
+                    onChange={(value) => {
+                      console.log("Subject selected:", value);
+                      form.setFieldsValue({ subject: value });
+                    }}
+                  >
+                    {subjects.map((subject) => (
+                      <Option key={subject._id} value={subject._id}>
+                        {subject.name}
+                      </Option>
+                    ))}
+                  </Select>
+                  <Button
+                    type="primary"
+                    icon={<Plus size={16} />}
+                    onClick={showAddSubjectModal}
+                    disabled={isUploading}
+                    title="Thêm môn học mới"
+                  />
+                </div>
               </Form.Item>
 
               <Form.Item
                 style={{ marginBottom: 13.5 }}
                 name="organization"
                 label={<span className="text-xs">Tổ chức</span>}
-                rules={[{ required: true, message: "Vui lòng nhập tổ chức!" }]}
+                rules={[{ required: true, message: "Vui lòng chọn tổ chức!" }]}
               >
-                <Input placeholder="Tổ chức" disabled={isUploading} />
+                <Select
+                  placeholder="Tổ chức"
+                  disabled={true} // Disable because it's auto-set from user context
+                >
+                  {user?.organization &&
+                    typeof user.organization === "object" && (
+                      <Option value={user.organization._id}>
+                        {user.organization.name}
+                      </Option>
+                    )}
+                </Select>
               </Form.Item>
 
               <Form.Item
@@ -475,6 +607,15 @@ const InformationForm = ({
                 Hủy
               </Button>
               <Button
+                onClick={() => {
+                  console.log("Current form values:", form.getFieldsValue());
+                  console.log("Subjects list:", subjects);
+                }}
+                disabled={isUploading || submitting}
+              >
+                Debug
+              </Button>
+              <Button
                 type="primary"
                 htmlType="submit"
                 loading={submitting}
@@ -498,6 +639,62 @@ const InformationForm = ({
             )}
           </div>
         </Form>
+
+        {/* Modal for adding new subject */}
+        <Modal
+          title="Thêm môn học mới"
+          open={isModalVisible}
+          onCancel={handleModalCancel}
+          footer={null}
+          width={600}
+        >
+          <Form
+            form={newSubjectForm}
+            layout="vertical"
+            onFinish={handleCreateSubject}
+            className="mt-4"
+          >
+            <Form.Item
+              name="name"
+              label="Tên môn học"
+              rules={[
+                { required: true, message: "Vui lòng nhập tên môn học!" },
+                { min: 2, message: "Tên môn học phải có ít nhất 2 ký tự!" },
+              ]}
+            >
+              <Input placeholder="Nhập tên môn học" />
+            </Form.Item>
+
+            <Form.Item
+              name="code"
+              label="Mã môn học"
+              rules={[
+                { required: true, message: "Vui lòng nhập mã môn học!" },
+                {
+                  pattern: /^[A-Z0-9]+$/,
+                  message: "Mã môn học chỉ được chứa chữ cái in hoa và số!",
+                },
+              ]}
+            >
+              <Input placeholder="Nhập mã môn học (VD: MATH101)" />
+            </Form.Item>
+
+            <Form.Item name="description" label="Mô tả (tùy chọn)">
+              <TextArea
+                placeholder="Nhập mô tả về môn học"
+                rows={3}
+                style={{ resize: "none" }}
+              />
+            </Form.Item>
+
+            <div className="flex justify-end gap-2 mt-6">
+              <Button onClick={handleModalCancel}>Hủy</Button>
+              <Button type="primary" htmlType="submit">
+                Tạo môn học
+              </Button>
+            </div>
+          </Form>
+        </Modal>
       </div>
     </div>
   );

@@ -35,58 +35,37 @@ const DocumentReviewPage: React.FC = () => {
     fetchDocument();
   }, [id, navigate]);
 
-  const handleApprove = async (documentId: string) => {
+  const handleApprove = async () => {
     try {
-      // TODO: Implement approve API call
-      // await DocumentService.approveDocument(documentId);
-      console.log("Approving document:", documentId);
-
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-
-      // Navigate back to admin documents list
+      await DocumentService.approveDocument(id!);
+      message.success("Tài liệu đã được duyệt thành công!");
       navigate("/admin/documents");
     } catch (error) {
       console.error("Error approving document:", error);
-      throw error;
+      message.error("Có lỗi xảy ra khi duyệt tài liệu!");
     }
   };
 
-  const handleReject = async (documentId: string, reason?: string) => {
+  const handleReject = async (reason: string) => {
     try {
-      // TODO: Implement reject API call
-      // await DocumentService.rejectDocument(documentId, reason);
-      console.log("Rejecting document:", documentId, "Reason:", reason);
-
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-
-      // Navigate back to admin documents list
+      await DocumentService.rejectDocument(id!, reason);
+      message.success("Tài liệu đã được từ chối!");
       navigate("/admin/documents");
     } catch (error) {
       console.error("Error rejecting document:", error);
+      message.error("Có lỗi xảy ra khi từ chối tài liệu!");
       throw error;
     }
   };
 
-  const handleRequestEdit = async (documentId: string, reason?: string) => {
+  const handleDelete = async (reason: string) => {
     try {
-      // TODO: Implement request edit API call
-      // await DocumentService.requestEditDocument(documentId, reason);
-      console.log(
-        "Requesting edit for document:",
-        documentId,
-        "Reason:",
-        reason
-      );
-
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-
-      // Navigate back to admin documents list
+      await DocumentService.deleteDocument(id!, reason);
+      message.success("Tài liệu đã được xóa!");
       navigate("/admin/documents");
     } catch (error) {
-      console.error("Error requesting edit for document:", error);
+      console.error("Error deleting document:", error);
+      message.error("Có lỗi xảy ra khi xóa tài liệu!");
       throw error;
     }
   };
@@ -120,7 +99,7 @@ const DocumentReviewPage: React.FC = () => {
         document={document}
         onApprove={handleApprove}
         onReject={handleReject}
-        onRequestEdit={handleRequestEdit}
+        onDelete={handleDelete}
       />
     </div>
   );

@@ -5,20 +5,70 @@ import PostListView from "./PostListView";
 import PostGridView from "./PostGridView";
 import UploadButton from "../../common/buttons/UploadButton";
 
+interface Post {
+  key: string;
+  index: number;
+  title: string;
+  views: number;
+  comments: number;
+  rating: string;
+  status: string;
+  mode: string;
+  public_mode: string;
+  url: string;
+  createdAt: string;
+}
+
 const PersonalPostList: React.FC = () => {
   const [viewMode, setViewMode] = useState("table");
+  const [documents, setDocuments] = useState<Post[]>([]);
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+
+  React.useEffect(() => {
+    let mounted = true;
+    setLoading(true);
+    import("../../../utils/DocumentService").then(({ DocumentService }) => {
+      DocumentService.getMyDocuments()
+        .then((data) => {
+          if (mounted) {
+            // Map dữ liệu BE sang Post[]
+            const docs = Array.isArray(data?.documents)
+              ? data.documents.map((doc: any, idx: number) => ({
+                  key: doc._id,
+                  index: idx + 1,
+                  title: doc.title,
+                  views: doc.view,
+                  comments: doc.comment_count,
+                  rating: "0%", // Nếu có trường rating thì lấy, không thì để mặc định
+                  status: doc.status,
+                  mode: doc.file_type,
+                  public_mode: doc.public_mode,
+                  url: doc.url,
+                  createdAt: doc.createdAt,
+                }))
+              : [];
+            setDocuments(docs);
+          }
+        })
+        .catch(() => setDocuments([]))
+        .finally(() => mounted && setLoading(false));
+    });
+    return () => {
+      mounted = false;
+    };
+  }, []);
 
   const renderContent = () => {
     switch (viewMode) {
       case "table":
-        return <PostTable />;
+        return <PostTable data={documents} loading={loading} />;
       case "list":
-        return <PostListView />;
+        return <PostListView data={documents} loading={loading} />;
       case "grid":
-        return <PostGridView />;
+        return <PostGridView data={documents} loading={loading} />;
       default:
-        return <PostTable />;
+        return <PostTable data={documents} loading={loading} />;
     }
   };
 

@@ -13,10 +13,15 @@ interface Post {
   comments: number;
   rating: string;
   status: string;
-  mode: string;
+  public_mode: string;
 }
 
-const PostTable: React.FC = () => {
+interface PostTableProps {
+  data: Post[];
+  loading?: boolean;
+}
+
+const PostTable: React.FC<PostTableProps> = ({ data, loading }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(5);
 
@@ -58,8 +63,8 @@ const PostTable: React.FC = () => {
     },
     {
       title: "Chế độ",
-      dataIndex: "mode",
-      key: "mode",
+      dataIndex: "public_mode",
+      key: "public_mode",
       align: "center",
     },
     {
@@ -85,96 +90,15 @@ const PostTable: React.FC = () => {
     },
   ];
 
-  // Extended data for demonstration
-  const data: Post[] = [
-    {
-      key: "1",
-      index: 1,
-      title: "Tài liệu tổng hợp Kinh tế chính trị Mác Lênin",
-      views: 0,
-      comments: 0,
-      rating: "0%",
-      status: "Đã duyệt",
-      mode: "Công khai",
-    },
-    {
-      key: "2",
-      index: 2,
-      title: "Tài liệu tổng hợp Triết học Mác Lênin",
-      views: 10,
-      comments: 2,
-      rating: "80%",
-      status: "Đã duyệt",
-      mode: "Công khai",
-    },
-    {
-      key: "3",
-      index: 3,
-      title: "Tài liệu tổng hợp Lịch sử Đảng",
-      views: 5,
-      comments: 1,
-      rating: "60%",
-      status: "Đang chờ duyệt",
-      mode: "Công khai",
-    },
-    {
-      key: "4",
-      index: 4,
-      title: "Tài liệu tổng hợp Kinh tế học",
-      views: 20,
-      comments: 5,
-      rating: "90%",
-      status: "Đã duyệt",
-      mode: "Cá nhân",
-    },
-    {
-      key: "5",
-      index: 5,
-      title: "Tài liệu tổng hợp Văn học Việt Nam",
-      views: 15,
-      comments: 3,
-      rating: "70%",
-      status: "Từ chối duyệt",
-      mode: "Chia sẻ giới hạn",
-    },
-    {
-      key: "6",
-      index: 6,
-      title: "Tài liệu tổng hợp Toán học cao cấp",
-      views: 25,
-      comments: 7,
-      rating: "95%",
-      status: "Đã duyệt",
-      mode: "Công khai",
-    },
-    {
-      key: "7",
-      index: 7,
-      title: "Tài liệu tổng hợp Vật lý đại cương",
-      views: 12,
-      comments: 4,
-      rating: "85%",
-      status: "Đã duyệt",
-      mode: "Công khai",
-    },
-    {
-      key: "8",
-      index: 8,
-      title: "Tài liệu tổng hợp Hóa học hữu cơ",
-      views: 8,
-      comments: 2,
-      rating: "75%",
-      status: "Đang chờ duyệt",
-      mode: "Cá nhân",
-    },
-  ];
+  // Nếu loading, hiển thị skeleton hoặc rỗng
+  const displayData = loading ? [] : data;
 
   // Calculate pagination
-  const totalItems = data.length;
+  const totalItems = displayData.length;
   const totalPages = Math.ceil(totalItems / pageSize);
   const startIndex = (currentPage - 1) * pageSize;
   const endIndex = Math.min(startIndex + pageSize, totalItems);
-  const currentData = data.slice(startIndex, endIndex);
+  const currentData = displayData.slice(startIndex, endIndex);
 
   const handlePageSizeChange = (value: number) => {
     setPageSize(value);
