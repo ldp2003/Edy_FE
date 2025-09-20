@@ -96,7 +96,7 @@ const PostTable: React.FC<PostTableProps> = ({ data, loading }) => {
         <div className="flex gap-2 justify-center">
           <button
             className="p-2 text-xs text-[var(--primary-color)] rounded-lg border-[var(--primary-color)] cursor-pointer border-1 transition-all duration-300 hover:bg-blue-600 hover:text-white hover:shadow-lg transform hover:scale-105"
-            onClick={() => navigate(`/personal-posts/${record.key}`)}
+            onClick={() => navigate(`/personal-posts/document-detail/${record.key}`)}
             title="Xem chi tiết tài liệu"
           >
             <Eye size={15} color="var(--primary-color)" />
