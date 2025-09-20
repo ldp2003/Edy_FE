@@ -169,6 +169,7 @@ const UploadDocument: React.FC<UploadDocumentProps> = ({
 
       let thumbnailUrl;
       if (data.format === "pdf") {
+        // Create thumbnail URL for display only, keep original URL for form
         thumbnailUrl = data.secure_url.replace(
           "/upload/",
           "/upload/c_thumb,w_300,h_400,f_jpg/"
@@ -179,8 +180,8 @@ const UploadDocument: React.FC<UploadDocumentProps> = ({
       }
 
       return {
-        url: data.secure_url,
-        thumbnail: thumbnailUrl,
+        url: data.secure_url, // Original Cloudinary URL for form submission
+        thumbnail: thumbnailUrl, // Thumbnail URL for display
       };
     } catch (error) {
       console.error("Cloudinary upload error:", error);
@@ -231,7 +232,7 @@ const UploadDocument: React.FC<UploadDocumentProps> = ({
 
     try {
       const uploadResult = await uploadToCloudinary(file as File);
-
+      console.log("Upload result:", uploadResult);
       const fileInfo = {
         url: uploadResult.url,
         originalName: (file as File).name,
