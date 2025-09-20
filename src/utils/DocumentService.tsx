@@ -67,4 +67,33 @@ export const DocumentService = {
       throw error;
     }
   },
+
+  async rejectDocument(documentId: string, reason?: string) {
+    try {
+      // TODO: Add reject API call when backend is ready
+      // return await DocumentAPI.rejectDocument(documentId, reason);
+      console.log("Rejecting document:", documentId, "with reason:", reason);
+      return { success: true };
+    } catch (error) {
+      console.error("Error in DocumentService.rejectDocument:", error);
+      throw error;
+    }
+  },
+
+  async requestEditDocument(documentId: string, reason?: string) {
+    try {
+      // TODO: Add request edit API call when backend is ready
+      // return await DocumentAPI.requestEditDocument(documentId, reason);
+      console.log(
+        "Requesting edit for document:",
+        documentId,
+        "with reason:",
+        reason
+      );
+      return { success: true };
+    } catch (error) {
+      console.error("Error in DocumentService.requestEditDocument:", error);
+      throw error;
+    }
+  },
 };
