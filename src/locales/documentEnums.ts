@@ -85,3 +85,10 @@ export const documentTypeColors = {
   LECTURE: "#faad14", // Gold
   OTHER: "#8c8c8c", // Gray
 };
+
+// Vietnamese translations for user roles
+export const roleTranslations = {
+  SUPER_ADMIN: "Quản trị cao cấp", // toàn quyền hệ thống
+  REVIEW_ADMIN: "Quản trị duyệt nội dung", // chuyên duyệt tài liệu
+  USER_ADMIN: "Quản trị người dùng", // quản lý user
+};

@@ -6,4 +6,5 @@ export const UserContext = createContext({
   isLoggedIn: false,
   user: null as User | null,
   account: null as Account | null,
+  role: null as string | null,
 });
