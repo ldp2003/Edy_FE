@@ -133,6 +133,7 @@ const InformationForm = ({
           : [],
         description: values.summary,
         page: values.pageCount,
+        cover_page: fileInfo.thumbnail
       };
 
       const response = await DocumentAPI.uploadDocument(documentData);
