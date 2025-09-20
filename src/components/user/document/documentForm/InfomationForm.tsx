@@ -1,5 +1,6 @@
 import { useState, useEffect, useContext, useCallback } from "react";
 import { Form, Input, Select, InputNumber, Button, message, Modal } from "antd";
+import type { MessageInstance } from "antd/es/message/interface";
 import { Plus, Minus } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { DocumentService } from "../../../../utils/DocumentService";
@@ -38,12 +39,14 @@ interface InformationFormProps {
   fileInfo?: FileInfo;
   isUploading?: boolean;
   onUploadSuccess?: () => void;
+  messageApi?: MessageInstance;
 }
 
 const InformationForm = ({
   fileInfo,
   isUploading,
   onUploadSuccess,
+  messageApi,
 }: InformationFormProps) => {
   const [form] = Form.useForm();
   const [authors, setAuthors] = useState<string[]>([""]);
@@ -245,34 +248,44 @@ const InformationForm = ({
 
       const response = await DocumentService.uploadDocument(documentData);
 
-      if (response.status !== 201) {
+      // Kiểm tra status 201 để xác nhận tải lên thành công
+      console.log("Upload response:", response);
+      if (response.status === 201) {
+        // Sử dụng messageApi được truyền từ parent hoặc fallback về message global
+        const showMessage = messageApi || message;
+
+        showMessage.success("🎉 Đăng tải tài liệu thành công!");
+
+        // Reset form sau khi thành công
+        form.resetFields();
+        setAuthors([""]);
+
+        if (onUploadSuccess) {
+          onUploadSuccess();
+        }
+
+        // Hiển thị thông báo và chuyển hướng sau 2 giây
+        showMessage.info("Đang chuyển hướng đến trang tài liệu cá nhân...", 1);
+
+        setTimeout(() => {
+          navigate("/personal-posts");
+        }, 2000);
+      } else {
         throw new Error("Đăng tải tài liệu thất bại!");
       }
-
-      message.success("Đăng tải tài liệu thành công!");
-
-      // Reset form sau khi thành công
-      form.resetFields();
-      setAuthors([""]);
-
-      if (onUploadSuccess) {
-        onUploadSuccess();
-      }
-
-      // Chuyển hướng đến trang tài liệu cá nhân sau 1.5 giây
-      setTimeout(() => {
-        navigate("/user/personal-posts");
-      }, 1500);
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       console.error("Document upload error:", error);
 
+      // Sử dụng messageApi được truyền từ parent hoặc fallback về message global
+      const showMessage = messageApi || message;
+
       if (error.response?.data?.message) {
-        message.error(`Lỗi: ${error.response.data.message}`);
+        showMessage.error(`Lỗi: ${error.response.data.message}`);
       } else if (error.message) {
-        message.error(`Lỗi: ${error.message}`);
+        showMessage.error(`Lỗi: ${error.message}`);
       } else {
-        message.error("Có lỗi xảy ra khi đăng tải tài liệu!");
+        showMessage.error("Có lỗi xảy ra khi đăng tải tài liệu!");
       }
     } finally {
       setSubmitting(false);

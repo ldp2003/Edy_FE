@@ -1,6 +1,15 @@
 import React from "react";
 import { Button, Avatar } from "antd";
-import { Edit, Eye, EyeOff, Users, Lock, Share, Globe } from "lucide-react";
+import {
+  Edit,
+  Eye,
+  EyeOff,
+  Users,
+  Lock,
+  Share,
+  Globe,
+  School,
+} from "lucide-react";
 import type { Document } from "../../../models/document";
 
 interface PersonalPostHeaderProps {
@@ -56,8 +65,6 @@ const PersonalPostHeader: React.FC<PersonalPostHeaderProps> = ({
         };
     }
   };
-
-  const visibilityInfo = getVisibilityInfo(document.public_mode || "PRIVATE");
 
   // Get buttons based on public_mode
   const renderActionButtons = () => {
@@ -122,51 +129,68 @@ const PersonalPostHeader: React.FC<PersonalPostHeaderProps> = ({
   };
 
   return (
-    <div className="ml-[24%] bg-white rounded-lg shadow-sm border p-6 mb-4">
+    <div className="ml-[24%] bg-white rounded-2xl shadow-lg p-6 mb-4">
       {/* User Info Section */}
-      <div className="flex items-center gap-4 mb-4">
-        <Avatar size={64} src={document.user.avatar} className="flex-shrink-0">
-          {document.user.first_name?.[0]}
-          {document.user.last_name?.[0]}
-        </Avatar>
-
-        <div className="flex-1">
-          <h2 className="text-lg font-semibold text-gray-900 mb-1">
-            {document.user.first_name} {document.user.last_name}
-          </h2>
-
-          <div className="flex items-center gap-2 text-sm text-gray-600 mb-2">
-            <span className="flex items-center gap-1">
-              🏢 {document.organization?.name || "Không xác định"}
-            </span>
-          </div>
-
-          {/* Document Stats */}
-          <div className="flex items-center gap-4 text-sm text-gray-500">
-            <span>📊 {document.user.doc_count || 0} tài liệu</span>
-            <span>👥 {document.user.follower?.length || 0} người theo dõi</span>
-            <span>📖 {document.user.following?.length || 0} đang theo dõi</span>
-          </div>
-        </div>
-
-        {/* Visibility Status */}
-        <div className="flex items-center gap-2">
-          <div
-            className="flex items-center gap-2 px-3 py-2 rounded-full text-sm font-medium"
-            style={{
-              color: visibilityInfo.color,
-              backgroundColor: visibilityInfo.bgColor,
-            }}
-          >
-            {visibilityInfo.icon}
-            {visibilityInfo.text}
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-4">
+          <Avatar size={80} className="bg-gray-200">
+            {document.user.avatar ? (
+              <img
+                src={document.user.avatar}
+                alt="Avatar"
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              <img
+                src="/placeholder.svg?height=100&width=100"
+                alt="Avatar"
+                className="w-full h-full object-cover"
+              />
+            )}
+          </Avatar>
+          <div className="flex flex-col gap-3">
+            <h3 className="font-semibold text-base text-[var(--primary-color)]">
+              {document.user.first_name} {document.user.last_name}
+            </h3>
+            <div className="flex flex-row gap-2 items-center">
+              <School size={16} />
+              <p className="text-sm font-semibold">
+                {document.organization.name}
+              </p>
+            </div>
           </div>
         </div>
-      </div>
 
-      {/* Action Buttons */}
-      <div className="flex items-center justify-end gap-3 pt-4 border-t border-gray-100">
-        {renderActionButtons()}
+        {/* Action Buttons - Vertical Layout */}
+        <div className="flex flex-col gap-3">
+          {/* Action Buttons */}
+          {renderActionButtons()}
+          {/* Current Status Display */}
+          {(() => {
+            const visibilityInfo = getVisibilityInfo(
+              document.public_mode || "PRIVATE"
+            );
+            return (
+              <div
+                className="flex items-center gap-2 px-3 py-2 rounded-lg"
+                style={{
+                  backgroundColor: visibilityInfo.bgColor,
+                  border: `1px solid ${visibilityInfo.color}20`,
+                }}
+              >
+                <span style={{ color: visibilityInfo.color }}>
+                  {visibilityInfo.icon}
+                </span>
+                <span
+                  className="text-sm font-medium"
+                  style={{ color: visibilityInfo.color }}
+                >
+                  {visibilityInfo.text}
+                </span>
+              </div>
+            );
+          })()}
+        </div>
       </div>
     </div>
   );
