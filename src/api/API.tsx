@@ -152,6 +152,81 @@ export const UserAPI = {
   },
 };
 
+export const SubjectAPI = {
+  // Get subjects by organization
+  getSubjectsByOrganization: async (organizationId: string) => {
+    try {
+      const response = await apiClient.get("/subjects", {
+        params: { organizationId },
+      });
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching subjects by organization:", error);
+      throw error;
+    }
+  },
+
+  // Create new subject
+  createSubject: async (subjectData: {
+    name: string;
+    code: string;
+    description?: string;
+    organization: string;
+  }) => {
+    try {
+      const response = await apiClient.post("/subjects", subjectData);
+      return response.data;
+    } catch (error) {
+      console.error("Error creating subject:", error);
+      throw error;
+    }
+  },
+
+  // Get subject by ID
+  getSubjectById: async (subjectId: string) => {
+    try {
+      const response = await apiClient.get(`/subjects/${subjectId}`);
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching subject by ID:", error);
+      throw error;
+    }
+  },
+
+  // Update subject
+  updateSubject: async (
+    subjectId: string,
+    subjectData: {
+      name?: string;
+      code?: string;
+      description?: string;
+      organization?: string;
+    }
+  ) => {
+    try {
+      const response = await apiClient.put(
+        `/subjects/${subjectId}`,
+        subjectData
+      );
+      return response.data;
+    } catch (error) {
+      console.error("Error updating subject:", error);
+      throw error;
+    }
+  },
+
+  // Delete subject
+  deleteSubject: async (subjectId: string) => {
+    try {
+      const response = await apiClient.delete(`/subjects/${subjectId}`);
+      return response.data;
+    } catch (error) {
+      console.error("Error deleting subject:", error);
+      throw error;
+    }
+  },
+};
+
 export const DocumentAPI = {
   // Fetch newest documents
   fetchNewestDocuments: async (params: {
