@@ -19,6 +19,7 @@ const DocumentActions: React.FC<DocumentActionsProps> = ({
 
   return (
     <div className="flex items-center justify-between p-2">
+      
       <DownloadButton point={6} />
 
       <div className="flex items-center space-x-4">

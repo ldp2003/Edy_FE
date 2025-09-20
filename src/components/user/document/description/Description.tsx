@@ -4,9 +4,13 @@ import type { Document } from "../../../../models/document";
 
 interface DescriptionProps {
   document: Document;
+  isUser?: boolean;
 }
 
-const Description: React.FC<DescriptionProps> = ({ document }) => {
+const Description: React.FC<DescriptionProps> = ({
+  document,
+  isUser = false,
+}) => {
   const [activeTab, setActiveTab] = useState<"original" | "ai">("original");
 
   return (
@@ -54,7 +58,7 @@ const Description: React.FC<DescriptionProps> = ({ document }) => {
         </div>
       </div>
 
-      <DescriptionModal />
+      {!isUser && <DescriptionModal />}
     </div>
   );
 };

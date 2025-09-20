@@ -192,7 +192,6 @@ const PersonalPostDetail: React.FC = () => {
     <div className="p-4 text-left">
       {contextHolder}
 
-      {/* Personal Post Header */}
       <PersonalPostHeader
         document={document}
         onEdit={handleEdit}
@@ -201,7 +200,7 @@ const PersonalPostDetail: React.FC = () => {
       />
 
       {/* Document Side Panel */}
-      <DocumentSide document={document} />
+      <DocumentSide document={document} isUser={true} />
 
       <div className="!ml-[23%]">
         {/* Document Actions with isUser flag to disable description modal */}

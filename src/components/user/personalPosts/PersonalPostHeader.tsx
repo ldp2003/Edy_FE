@@ -122,7 +122,7 @@ const PersonalPostHeader: React.FC<PersonalPostHeaderProps> = ({
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-sm border p-6 mb-4">
+    <div className="ml-[24%] bg-white rounded-lg shadow-sm border p-6 mb-4">
       {/* User Info Section */}
       <div className="flex items-center gap-4 mb-4">
         <Avatar size={64} src={document.user.avatar} className="flex-shrink-0">
