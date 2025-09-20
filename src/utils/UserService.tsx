@@ -25,3 +25,33 @@ export const getUsers = async (): Promise<User[]> => {
     throw error;
   }
 };
+
+export const updateProfile = async (profileData: {
+  first_name?: string;
+  last_name?: string;
+  organization?: string;
+  avatar?: string;
+}) => {
+  try {
+    const result = await UserAPI.updateProfile(profileData);
+    console.log("Profile updated successfully:", result);
+    return result;
+  } catch (error) {
+    console.error("Failed to update profile:", error);
+    throw error;
+  }
+};
+
+export const changePassword = async (passwordData: {
+  current_password: string;
+  new_password: string;
+}) => {
+  try {
+    const result = await UserAPI.changePassword(passwordData);
+    console.log("Password changed successfully:", result);
+    return result;
+  } catch (error) {
+    console.error("Failed to change password:", error);
+    throw error;
+  }
+};

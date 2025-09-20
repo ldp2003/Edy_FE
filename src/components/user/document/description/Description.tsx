@@ -1,8 +1,14 @@
 import React, { useState } from "react";
 import DescriptionModal from "./DescriptionModal";
+import type { Document } from "../../../../models/document";
 
-const Description: React.FC = () => {
+interface DescriptionProps {
+  document: Document;
+}
+
+const Description: React.FC<DescriptionProps> = ({ document }) => {
   const [activeTab, setActiveTab] = useState<"original" | "ai">("original");
+
   return (
     <div className="mt-4">
       <h4 className="font-medium text-sm mb-2">Tóm tắt</h4>
@@ -36,20 +42,13 @@ const Description: React.FC = () => {
         <div className="text-[10px] text-gray-600 leading-relaxed">
           {activeTab === "original" ? (
             <p className="p-4">
-              Kinh tế chính trị Mác - Lênin nghiên cứu quy luật sinh lý của xã
-              hội, nhất là trong chế nghĩa tư bản và con đường đi lên CNXH. Nội
-              dung là học thuyết về giá trị thặng dư và bản chất của chế độ tư
-              bản chủ nghĩa, về giai cấp vô sản và sứ mệnh lịch sử của CNTB, về
-              tổ chức xã hội giai cấp công nhân và những hướng xây dựng nền kinh
-              tế CNXH.
+              {document.description?.summary_by_user ||
+                "Chưa có tóm tắt từ người tải lên. Hãy xem tab Bản AI để có thông tin tóm tắt tự động."}
             </p>
           ) : (
             <p className="p-4">
-              Tài liệu này tổng hợp các khái niệm cốt lõi về kinh tế chính trị
-              Mác-Lênin, bao gồm lý thuyết giá trị lao động, thặng dư giá trị,
-              và quá trình phát triển của chủ nghĩa tư bản. Nội dung được trình
-              bày một cách có hệ thống, phù hợp cho sinh viên đại học nghiên cứu
-              về kinh tế chính trị.
+              {document.description?.summary_by_ai ||
+                "Tóm tắt AI chưa được tạo cho tài liệu này. Hệ thống sẽ tự động tạo tóm tắt trong thời gian tới."}
             </p>
           )}
         </div>

@@ -3,7 +3,6 @@ import { Route, Routes } from "react-router-dom";
 import UserLayout from "../layouts/UserLayout";
 import AuthLayout from "../layouts/AuthLayout";
 import HomePage from "../pages/user/home/Home";
-import PresonalPost from "../pages/user/presonalPosts/PresonalPost";
 import PersonalProfile from "../pages/user/personalProfile/PersonalProfile";
 import UploadPage from "../pages/user/upload/UploadPage";
 import AccountActivation from "../pages/auth/AccountActivation";
@@ -11,6 +10,7 @@ import EditProfile from "../pages/user/personalProfile/EditProfile";
 import DocumentDetail from "../pages/user/document/DocumentDetail";
 import RoleSelectionPage from "../pages/auth/RoleSelectionPage";
 import AuthRoute from "./AuthRoute";
+import PersonalPost from "../pages/user/presonalPosts/PersonalPost";
 
 const UserRoute: React.FC = () => {
   return (
@@ -25,11 +25,11 @@ const UserRoute: React.FC = () => {
         {/* Main app pages with UserLayout */}
         <Route path="/" element={<UserLayout />}>
           <Route index element={<HomePage />} />
-          <Route path="personal-posts" element={<PresonalPost />} />
+          <Route path="personal-posts" element={<PersonalPost />} />
           <Route path="personal-profile" element={<PersonalProfile />} />
           <Route path="upload-document" element={<UploadPage />} />
           <Route path="edit-profile" element={<EditProfile />} />
-          <Route path="document-detail" element={<DocumentDetail />} />
+          <Route path="document-detail/:id" element={<DocumentDetail />} />
         </Route>
       </Routes>
     </AuthRoute>

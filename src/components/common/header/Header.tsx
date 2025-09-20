@@ -49,7 +49,9 @@ export function Header() {
                 <div className="flex items-center gap-2 cursor-pointer">
                   <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden">
                     <img
-                      src="/placeholder.svg?height=32&width=32"
+                      src={
+                        user?.avatar || "/placeholder.svg?height=32&width=32"
+                      }
                       alt="Avatar"
                       className="w-full h-full object-cover"
                       onError={(e) => {

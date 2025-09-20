@@ -282,7 +282,7 @@ const UploadDocument: React.FC<UploadDocumentProps> = ({
 
     try {
       const uploadResult = await uploadToCloudinary(file as File);
-
+      console.log("Upload result:", uploadResult);
       const fileInfo = {
         url: uploadResult.url,
         originalName: (file as File).name,

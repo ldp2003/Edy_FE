@@ -122,6 +122,109 @@ export const UserAPI = {
       throw error;
     }
   },
+
+  updateProfile: async (data: {
+    first_name?: string;
+    last_name?: string;
+    organization?: string;
+    avatar?: string;
+  }) => {
+    try {
+      const response = await apiClient.put("/users/profile", data);
+      return response.data;
+    } catch (error) {
+      console.error("Error updating profile:", error);
+      throw error;
+    }
+  },
+
+  changePassword: async (data: {
+    current_password: string;
+    new_password: string;
+  }) => {
+    try {
+      const response = await apiClient.put("/users/change-password", data);
+      return response.data;
+    } catch (error) {
+      console.error("Error changing password:", error);
+      throw error;
+    }
+  },
+};
+
+export const SubjectAPI = {
+  // Get subjects by organization
+  getSubjectsByOrganization: async (organizationId: string) => {
+    try {
+      const response = await apiClient.get("/subjects", {
+        params: { organizationId },
+      });
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching subjects by organization:", error);
+      throw error;
+    }
+  },
+
+  // Create new subject
+  createSubject: async (subjectData: {
+    name: string;
+    code: string;
+    description?: string;
+    organization: string;
+  }) => {
+    try {
+      const response = await apiClient.post("/subjects", subjectData);
+      return response.data;
+    } catch (error) {
+      console.error("Error creating subject:", error);
+      throw error;
+    }
+  },
+
+  // Get subject by ID
+  getSubjectById: async (subjectId: string) => {
+    try {
+      const response = await apiClient.get(`/subjects/${subjectId}`);
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching subject by ID:", error);
+      throw error;
+    }
+  },
+
+  // Update subject
+  updateSubject: async (
+    subjectId: string,
+    subjectData: {
+      name?: string;
+      code?: string;
+      description?: string;
+      organization?: string;
+    }
+  ) => {
+    try {
+      const response = await apiClient.put(
+        `/subjects/${subjectId}`,
+        subjectData
+      );
+      return response.data;
+    } catch (error) {
+      console.error("Error updating subject:", error);
+      throw error;
+    }
+  },
+
+  // Delete subject
+  deleteSubject: async (subjectId: string) => {
+    try {
+      const response = await apiClient.delete(`/subjects/${subjectId}`);
+      return response.data;
+    } catch (error) {
+      console.error("Error deleting subject:", error);
+      throw error;
+    }
+  },
 };
 
 export const DocumentAPI = {
@@ -148,6 +251,16 @@ export const DocumentAPI = {
       return response.data;
     } catch (error) {
       console.error("Error fetching newest documents:", error);
+      throw error;
+    }
+  },
+  // Get documents of current user
+  getMyDocuments: async () => {
+    try {
+      const response = await apiClient.get("/documents/my-documents");
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching my documents:", error);
       throw error;
     }
   },
@@ -179,6 +292,17 @@ export const DocumentAPI = {
     }
   },
 
+  // Get document by ID
+  getDocumentById: async (documentId: string) => {
+    try {
+      const response = await apiClient.get(`/documents/${documentId}`);
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching document by ID:", error);
+      throw error;
+    }
+  },
+
   // Approve a document
   approveDocument: async (documentId: string) => {
     try {
@@ -186,6 +310,64 @@ export const DocumentAPI = {
       return response.data;
     } catch (error) {
       console.error("Error approving document:", error);
+      throw error;
+    }
+  },
+
+  // Reject a document
+  rejectDocument: async (documentId: string, reason?: string) => {
+    try {
+      const response = await apiClient.put(`/documents/reject/${documentId}`, {
+        reason,
+      });
+      return response.data;
+    } catch (error) {
+      console.error("Error rejecting document:", error);
+      throw error;
+    }
+  },
+
+  // Request edit for a document
+  requestEditDocument: async (documentId: string, reason?: string) => {
+    try {
+      const response = await apiClient.put(
+        `/documents/request-edit/${documentId}`,
+        {
+          reason,
+        }
+      );
+      return response.data;
+    } catch (error) {
+      console.error("Error requesting edit for document:", error);
+      throw error;
+    }
+  },
+
+  // Delete a document
+  deleteDocument: async (documentId: string, reason?: string) => {
+    try {
+      const response = await apiClient.delete(`/documents/${documentId}`, {
+        data: { reason },
+      });
+      return response.data;
+    } catch (error) {
+      console.error("Error deleting document:", error);
+      throw error;
+    }
+  },
+
+  // Get pending documents (for admin)
+  getPendingDocuments: async (params?: {
+    page?: number;
+    limit?: number;
+    ordering?: string;
+    order?: 1 | -1;
+  }) => {
+    try {
+      const response = await apiClient.get("/documents/pending", { params });
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching pending documents:", error);
       throw error;
     }
   },

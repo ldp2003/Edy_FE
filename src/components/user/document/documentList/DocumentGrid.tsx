@@ -1,11 +1,5 @@
 import DocumentCard from "../documentCard/DocumentCard";
-
-interface Document {
-  id: string;
-  title: string;
-  description: string;
-  imageUrl?: string;
-}
+import type { Document } from "../../../../models/document";
 
 interface DocumentGridProps {
   title: string;
@@ -29,10 +23,11 @@ const DocumentGrid: React.FC<DocumentGridProps> = ({ title, documents }) => {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
         {documents.map((doc) => (
           <DocumentCard
-            key={doc.id}
+            key={doc._id}
             title={doc.title}
-            description={doc.description}
-            imageUrl={doc.imageUrl}
+            description={doc.subject?.name || "Chưa có môn học"}
+            imageUrl={doc.cover_page}
+            document={doc}
           />
         ))}
       </div>

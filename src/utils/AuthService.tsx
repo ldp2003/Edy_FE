@@ -1,4 +1,5 @@
 import { AuthAPI } from "../api/API";
+import { deleteCookie } from "./CookieUtils";
 
 /**
  * Utility functions to interact with auth APIs
@@ -21,7 +22,18 @@ export const register = async (
 
 // Logout function
 export const logout = async () => {
-  return AuthAPI.logout();
+  try {
+    const result = await AuthAPI.logout();
+
+    // Delete the isAdminMode cookie when logging out
+    deleteCookie("isAdminMode");
+
+    return result;
+  } catch (error) {
+    // Even if the API call fails, we should still clean up local cookies
+    deleteCookie("isAdminMode");
+    throw error;
+  }
 };
 
 // Refresh token function
