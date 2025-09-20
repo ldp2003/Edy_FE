@@ -371,4 +371,41 @@ export const DocumentAPI = {
       throw error;
     }
   },
+
+  // Get pending requests by document ID
+  getPendingRequestsByDocument: async (documentId: string) => {
+    try {
+      const response = await apiClient.get(
+        `/documents/pending-requests/${documentId}`
+      );
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching pending requests by document:", error);
+      throw error;
+    }
+  },
+
+  // Approve document by request ID
+  approveDocumentByRequestId: async (requestId: string) => {
+    try {
+      const response = await apiClient.put(`/documents/approve/${requestId}`);
+      return response.data;
+    } catch (error) {
+      console.error("Error approving document by request ID:", error);
+      throw error;
+    }
+  },
+
+  // Reject document by request ID
+  rejectDocumentByRequestId: async (requestId: string, reason?: string) => {
+    try {
+      const response = await apiClient.put(`/documents/reject/${requestId}`, {
+        message: reason,
+      });
+      return response.data;
+    } catch (error) {
+      console.error("Error rejecting document by request ID:", error);
+      throw error;
+    }
+  },
 };

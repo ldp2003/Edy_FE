@@ -13,6 +13,7 @@ const AuthRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const location = useLocation();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [user, setUser] = useState<User>(defaultUser);
+  const [role, setRole] = useState<RoleCode | null>(null);
   const [account, setAccount] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isInitialLoad, setIsInitialLoad] = useState(true);
@@ -30,6 +31,7 @@ const AuthRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
         if (data) {
           setIsLoggedIn(true);
           setUser(data.user); // Full user data
+          setRole(data.role); // User role
           setAccount(data.account); // Account data
 
           // Check if user needs account activation
@@ -78,12 +80,14 @@ const AuthRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
           setUser(defaultUser);
           setAccount(null);
           navigate("/");
+          setRole(null);
         }
       } catch (error) {
         console.error("Error during auth check:", error);
         setIsLoggedIn(false);
         setUser(defaultUser);
         setAccount(null);
+        setRole(null);
         navigate("/");
       } finally {
         if (isInitialLoad) {
@@ -106,7 +110,7 @@ const AuthRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   }
 
   return (
-    <UserContext.Provider value={{ isLoggedIn, user, account }}>
+    <UserContext.Provider value={{ isLoggedIn, user, account, role }}>
       {children}
     </UserContext.Provider>
   );

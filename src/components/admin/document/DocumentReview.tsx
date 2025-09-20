@@ -9,18 +9,21 @@ const { Option } = Select;
 
 interface DocumentReviewProps {
   document: Document;
-  onApprove: () => void;
-  onReject: (reason: string) => void;
+  requestId?: string; // Thêm requestId
+  onApprove: (requestId?: string) => void;
+  onReject: (reason: string, requestId?: string) => void;
   onDelete: (reason: string) => void;
 }
 
 const DocumentReview: React.FC<DocumentReviewProps> = ({
   document,
+  requestId,
   onApprove,
   onReject,
   onDelete,
 }) => {
   const [form] = Form.useForm();
+  const [messageApi, contextHolder] = message.useMessage();
   const [authors, setAuthors] = useState<string[]>([]);
   const [rejectModalVisible, setRejectModalVisible] = useState(false);
   const [deleteModalVisible, setDeleteModalVisible] = useState(false);
@@ -80,11 +83,15 @@ const DocumentReview: React.FC<DocumentReviewProps> = ({
   const handleApprove = async () => {
     setProcessing(true);
     try {
-      await onApprove();
-      message.success("Tài liệu đã được duyệt thành công!");
+      await onApprove(requestId);
+      messageApi.success("Tài liệu đã được duyệt thành công!");
+      // Chờ 2 giây trước khi chuyển trang
+      setTimeout(() => {
+        // Navigation will be handled by parent component
+      }, 2000);
     } catch (error) {
       console.error("Approve error:", error);
-      message.error("Có lỗi xảy ra khi duyệt tài liệu!");
+      messageApi.error("Có lỗi xảy ra khi duyệt tài liệu!");
     } finally {
       setProcessing(false);
     }
@@ -92,19 +99,23 @@ const DocumentReview: React.FC<DocumentReviewProps> = ({
 
   const handleReject = async () => {
     if (!rejectReason.trim()) {
-      message.error("Vui lòng nhập lý do từ chối!");
+      messageApi.error("Vui lòng nhập lý do từ chối!");
       return;
     }
 
     setProcessing(true);
     try {
-      await onReject(rejectReason);
-      message.success("Tài liệu đã được từ chối!");
+      await onReject(rejectReason, requestId);
+      messageApi.success("Tài liệu đã được từ chối!");
       setRejectModalVisible(false);
       setRejectReason("");
+      // Chờ 2 giây trước khi chuyển trang
+      setTimeout(() => {
+        // Navigation will be handled by parent component
+      }, 2000);
     } catch (error) {
       console.error("Reject error:", error);
-      message.error("Có lỗi xảy ra khi từ chối tài liệu!");
+      messageApi.error("Có lỗi xảy ra khi từ chối tài liệu!");
     } finally {
       setProcessing(false);
     }
@@ -112,19 +123,23 @@ const DocumentReview: React.FC<DocumentReviewProps> = ({
 
   const handleDelete = async () => {
     if (!deleteReason.trim()) {
-      message.error("Vui lòng nhập lý do xóa bài!");
+      messageApi.error("Vui lòng nhập lý do xóa bài!");
       return;
     }
 
     setProcessing(true);
     try {
       await onDelete(deleteReason);
-      message.success("Tài liệu đã được xóa!");
+      messageApi.success("Tài liệu đã được xóa!");
       setDeleteModalVisible(false);
       setDeleteReason("");
+      // Chờ 2 giây trước khi chuyển trang
+      setTimeout(() => {
+        // Navigation will be handled by parent component
+      }, 2000);
     } catch (error) {
       console.error("Delete error:", error);
-      message.error("Có lỗi xảy ra khi xóa tài liệu!");
+      messageApi.error("Có lỗi xảy ra khi xóa tài liệu!");
     } finally {
       setProcessing(false);
     }
@@ -135,12 +150,15 @@ const DocumentReview: React.FC<DocumentReviewProps> = ({
 
   return (
     <div className="py-6 min-h-screen text-left">
+      {contextHolder}
       {/* User Info Header */}
       <UserInfoHeader user={document.user} />
 
       <div className="font-bold text-base mb-6 text-[var(--primary-text-color)]">
         Thông tin tài liệu
-        <span className="ml-3 text-xs text-black font-medium">Id: {document._id}</span>
+        <span className="ml-3 text-xs text-black font-medium">
+          Id: {document._id}
+        </span>
       </div>
       <div className="mx-auto bg-white rounded-lg shadow-sm p-6">
         <Form

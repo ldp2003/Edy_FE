@@ -9,6 +9,24 @@ import { DocumentService } from "../../../utils/DocumentService";
 
 const { Option } = Select;
 
+// Interface cho ApprovalRequest
+interface ApprovalRequest {
+  _id: string;
+  doc: string;
+  requester: string;
+  reviewed_by: string | null;
+  reviewed_at: Date | null;
+  is_summary: boolean;
+  status: "PENDING" | "APPROVED" | "REJECTED";
+  message: string;
+  ai_checked: boolean;
+  ai_violation_level: "NONE" | "LOW" | "MEDIUM" | "HIGH";
+  ai_action_suggest: "AUTO_APPROVE" | "MANUAL_REVIEW" | "REJECT";
+  ai_reason: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
 const AdminDocumentTable: React.FC = () => {
   const navigate = useNavigate();
   const [currentPage, setCurrentPage] = useState(1);
@@ -60,10 +78,35 @@ const AdminDocumentTable: React.FC = () => {
   // Create a display interface that extends Document with display-specific fields
   interface DocumentDisplay extends Document {
     index: number;
+    requestId?: string; // Thêm requestId để lưu ID của đơn duyệt
   }
 
-  const handleRowClick = (record: DocumentDisplay) => {
-    navigate(`/admin/documents/review/${record._id}`);
+  const handleRowClick = async (record: DocumentDisplay) => {
+    try {
+      // Lấy danh sách đơn duyệt của tài liệu này
+      const response = await DocumentService.getPendingRequestsByDocument(
+        record._id
+      );
+      const requests = response.requests || [];
+
+      // Lấy đơn duyệt đầu tiên (thường chỉ có 1 đơn PENDING)
+      const pendingRequest = requests.find(
+        (req: ApprovalRequest) => req.status === "PENDING"
+      );
+      const requestId = pendingRequest?._id || requests[0]?._id;
+
+      if (requestId) {
+        navigate(
+          `/admin/documents/review/${record._id}?requestId=${requestId}`
+        );
+      } else {
+        navigate(`/admin/documents/review/${record._id}`);
+      }
+    } catch (error) {
+      console.error("Error fetching pending requests:", error);
+      // Fallback về URL cũ nếu có lỗi
+      navigate(`/admin/documents/review/${record._id}`);
+    }
   };
 
   const columns: ColumnsType<DocumentDisplay> = [

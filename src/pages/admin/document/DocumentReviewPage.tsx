@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useSearchParams } from "react-router-dom";
 import { message, Spin } from "antd";
 import DocumentReview from "../../../components/admin/document/DocumentReview";
 import { DocumentService } from "../../../utils/DocumentService";
@@ -8,6 +8,8 @@ import type { Document } from "../../../models/document";
 const DocumentReviewPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const requestId = searchParams.get("requestId");
   const [document, setDocument] = useState<Document | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -15,7 +17,7 @@ const DocumentReviewPage: React.FC = () => {
     const fetchDocument = async () => {
       if (!id) {
         message.error("ID tài liệu không hợp lệ!");
-        navigate("/admin/documents");
+        navigate("/admin/documents/all");
         return;
       }
 
@@ -26,7 +28,7 @@ const DocumentReviewPage: React.FC = () => {
       } catch (error) {
         console.error("Error fetching document:", error);
         message.error("Không thể tải thông tin tài liệu!");
-        navigate("/admin/documents");
+        navigate("/admin/documents/all");
       } finally {
         setLoading(false);
       }
@@ -35,22 +37,38 @@ const DocumentReviewPage: React.FC = () => {
     fetchDocument();
   }, [id, navigate]);
 
-  const handleApprove = async () => {
+  const handleApprove = async (reqId?: string) => {
+    const targetRequestId = reqId || requestId;
+    if (!targetRequestId) {
+      message.error("Không có thông tin yêu cầu duyệt!");
+      return;
+    }
+
     try {
-      await DocumentService.approveDocument(id!);
-      message.success("Tài liệu đã được duyệt thành công!");
-      navigate("/admin/documents");
+      await DocumentService.approveDocumentByRequestId(targetRequestId);
+      // Message will be shown by child component, delay navigation
+      setTimeout(() => {
+        navigate("/admin/documents/all");
+      }, 2000);
     } catch (error) {
       console.error("Error approving document:", error);
       message.error("Có lỗi xảy ra khi duyệt tài liệu!");
     }
   };
 
-  const handleReject = async (reason: string) => {
+  const handleReject = async (reason: string, reqId?: string) => {
+    const targetRequestId = reqId || requestId;
+    if (!targetRequestId) {
+      message.error("Không có thông tin yêu cầu duyệt!");
+      return;
+    }
+
     try {
-      await DocumentService.rejectDocument(id!, reason);
-      message.success("Tài liệu đã được từ chối!");
-      navigate("/admin/documents");
+      await DocumentService.rejectDocumentByRequestId(targetRequestId, reason);
+      // Message will be shown by child component, delay navigation
+      setTimeout(() => {
+        navigate("/admin/documents/all");
+      }, 2000);
     } catch (error) {
       console.error("Error rejecting document:", error);
       message.error("Có lỗi xảy ra khi từ chối tài liệu!");
@@ -61,8 +79,10 @@ const DocumentReviewPage: React.FC = () => {
   const handleDelete = async (reason: string) => {
     try {
       await DocumentService.deleteDocument(id!, reason);
-      message.success("Tài liệu đã được xóa!");
-      navigate("/admin/documents");
+      // Message will be shown by child component, delay navigation
+      setTimeout(() => {
+        navigate("/admin/documents/all");
+      }, 2000);
     } catch (error) {
       console.error("Error deleting document:", error);
       message.error("Có lỗi xảy ra khi xóa tài liệu!");
@@ -97,6 +117,7 @@ const DocumentReviewPage: React.FC = () => {
     <div className="max-w-7xl mx-auto">
       <DocumentReview
         document={document}
+        requestId={requestId || undefined}
         onApprove={handleApprove}
         onReject={handleReject}
         onDelete={handleDelete}
