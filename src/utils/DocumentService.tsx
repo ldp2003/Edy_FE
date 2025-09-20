@@ -26,6 +26,15 @@ export const DocumentService = {
     }
   },
 
+  async getMyDocuments() {
+    try {
+      return await DocumentAPI.getMyDocuments();
+    } catch (error) {
+      console.error("Error in DocumentService.getMyDocuments:", error);
+      throw error;
+    }
+  },
+
   async uploadDocument(documentData: {
     url: string;
     title: string;
@@ -70,10 +79,7 @@ export const DocumentService = {
 
   async rejectDocument(documentId: string, reason?: string) {
     try {
-      // TODO: Add reject API call when backend is ready
-      // return await DocumentAPI.rejectDocument(documentId, reason);
-      console.log("Rejecting document:", documentId, "with reason:", reason);
-      return { success: true };
+      return await DocumentAPI.rejectDocument(documentId, reason);
     } catch (error) {
       console.error("Error in DocumentService.rejectDocument:", error);
       throw error;
@@ -82,17 +88,32 @@ export const DocumentService = {
 
   async requestEditDocument(documentId: string, reason?: string) {
     try {
-      // TODO: Add request edit API call when backend is ready
-      // return await DocumentAPI.requestEditDocument(documentId, reason);
-      console.log(
-        "Requesting edit for document:",
-        documentId,
-        "with reason:",
-        reason
-      );
-      return { success: true };
+      return await DocumentAPI.requestEditDocument(documentId, reason);
     } catch (error) {
       console.error("Error in DocumentService.requestEditDocument:", error);
+      throw error;
+    }
+  },
+
+  async deleteDocument(documentId: string, reason?: string) {
+    try {
+      return await DocumentAPI.deleteDocument(documentId, reason);
+    } catch (error) {
+      console.error("Error in DocumentService.deleteDocument:", error);
+      throw error;
+    }
+  },
+
+  async getPendingDocuments(params?: {
+    page?: number;
+    limit?: number;
+    ordering?: string;
+    order?: 1 | -1;
+  }) {
+    try {
+      return await DocumentAPI.getPendingDocuments(params);
+    } catch (error) {
+      console.error("Error in DocumentService.getPendingDocuments:", error);
       throw error;
     }
   },

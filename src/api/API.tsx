@@ -179,6 +179,16 @@ export const DocumentAPI = {
       throw error;
     }
   },
+  // Get documents of current user
+  getMyDocuments: async () => {
+    try {
+      const response = await apiClient.get("/documents/my-documents");
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching my documents:", error);
+      throw error;
+    }
+  },
 
   // Upload a new document
   uploadDocument: async (documentData: {
@@ -224,6 +234,64 @@ export const DocumentAPI = {
       return response.data;
     } catch (error) {
       console.error("Error approving document:", error);
+      throw error;
+    }
+  },
+
+  // Reject a document
+  rejectDocument: async (documentId: string, reason?: string) => {
+    try {
+      const response = await apiClient.put(`/documents/reject/${documentId}`, {
+        reason,
+      });
+      return response.data;
+    } catch (error) {
+      console.error("Error rejecting document:", error);
+      throw error;
+    }
+  },
+
+  // Request edit for a document
+  requestEditDocument: async (documentId: string, reason?: string) => {
+    try {
+      const response = await apiClient.put(
+        `/documents/request-edit/${documentId}`,
+        {
+          reason,
+        }
+      );
+      return response.data;
+    } catch (error) {
+      console.error("Error requesting edit for document:", error);
+      throw error;
+    }
+  },
+
+  // Delete a document
+  deleteDocument: async (documentId: string, reason?: string) => {
+    try {
+      const response = await apiClient.delete(`/documents/${documentId}`, {
+        data: { reason },
+      });
+      return response.data;
+    } catch (error) {
+      console.error("Error deleting document:", error);
+      throw error;
+    }
+  },
+
+  // Get pending documents (for admin)
+  getPendingDocuments: async (params?: {
+    page?: number;
+    limit?: number;
+    ordering?: string;
+    order?: 1 | -1;
+  }) => {
+    try {
+      const response = await apiClient.get("/documents/pending", { params });
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching pending documents:", error);
       throw error;
     }
   },

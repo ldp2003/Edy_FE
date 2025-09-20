@@ -16,9 +16,7 @@ const RoleSelectionForm: React.FC = () => {
   const handleContinue = () => {
     if (selectedRole) {
       // Lưu chế độ admin vào cookie (boolean)
-      const isAdminMode =
-        selectedRole.role === "SUPER_ADMIN" ||
-        selectedRole.role === "DOCUMENT_ADMIN";
+      const isAdminMode = selectedRole.role === "SUPER_ADMIN";
 
       // Lưu vào cookie với thời hạn 7 ngày
       setCookie("isAdminMode", isAdminMode.toString(), 7);

@@ -25,7 +25,7 @@ const DocumentGrid: React.FC<DocumentGridProps> = ({ title, documents }) => {
           <DocumentCard
             key={doc._id}
             title={doc.title}
-            description={doc.description?.summary_by_user || doc.subject.name}
+            description={doc.subject?.name || "Chưa có môn học"}
             imageUrl={doc.cover_page}
             document={doc}
           />
