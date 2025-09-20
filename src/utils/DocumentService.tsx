@@ -117,4 +117,43 @@ export const DocumentService = {
       throw error;
     }
   },
+
+  // Lấy danh sách đơn duyệt của một tài liệu
+  async getPendingRequestsByDocument(documentId: string) {
+    try {
+      return await DocumentAPI.getPendingRequestsByDocument(documentId);
+    } catch (error) {
+      console.error(
+        "Error in DocumentService.getPendingRequestsByDocument:",
+        error
+      );
+      throw error;
+    }
+  },
+
+  // Duyệt đơn bằng requestId
+  async approveDocumentByRequestId(requestId: string) {
+    try {
+      return await DocumentAPI.approveDocumentByRequestId(requestId);
+    } catch (error) {
+      console.error(
+        "Error in DocumentService.approveDocumentByRequestId:",
+        error
+      );
+      throw error;
+    }
+  },
+
+  // Từ chối đơn bằng requestId
+  async rejectDocumentByRequestId(requestId: string, reason?: string) {
+    try {
+      return await DocumentAPI.rejectDocumentByRequestId(requestId, reason);
+    } catch (error) {
+      console.error(
+        "Error in DocumentService.rejectDocumentByRequestId:",
+        error
+      );
+      throw error;
+    }
+  },
 };
