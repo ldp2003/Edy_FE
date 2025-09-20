@@ -1,10 +1,12 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import { Menu, message, Modal } from "antd";
 import { logout } from "../../../utils/AuthService";
+import { UserContext } from "../../../contexts/UserContext";
 
 const UserDropdown: React.FC = () => {
   const [messageApi, contextHolder] = message.useMessage();
   const [isLogoutModalVisible, setLogoutModalVisible] = useState(false);
+  const { account } = useContext(UserContext);
 
   const handleMenuClick = (e: { key: string }) => {
     switch (e.key) {
@@ -22,6 +24,9 @@ const UserDropdown: React.FC = () => {
         break;
       case "stats":
         window.location.href = "/stats";
+        break;
+      case "switch-to-admin":
+        window.location.href = "/admin";
         break;
       case "logout":
         setLogoutModalVisible(true);
@@ -70,6 +75,19 @@ const UserDropdown: React.FC = () => {
         },
         { key: "stats", label: "Thống kê", icon: <i className="icon-stats" /> },
         {
+          type: "divider",
+        },
+        // Only show admin switch if user is admin
+        ...(account?.is_admin
+          ? [
+              {
+                key: "switch-to-admin",
+                label: "Chuyển sang trang quản trị",
+                icon: <i className="icon-admin" />,
+              },
+            ]
+          : []),
+        {
           key: "logout",
           label: "Đăng xuất",
           icon: <i className="icon-logout" />,
@@ -84,7 +102,7 @@ const UserDropdown: React.FC = () => {
       {menu}
       <Modal
         title="Xác nhận đăng xuất"
-        visible={isLogoutModalVisible}
+        open={isLogoutModalVisible}
         onOk={handleLogout}
         onCancel={() => setLogoutModalVisible(false)}
         okText="Đăng xuất"

@@ -1,14 +1,28 @@
-import { Search, Bell } from "lucide-react";
+import { Search, Bell, Shield, User } from "lucide-react";
 import { Dropdown } from "antd";
 import logo from "/public/image/Logo.png";
 import AvatarDropdown from "../dropdown/AvatarDropdown";
 import UploadHeaderButton from "../buttons/UploadHeaderButton";
 import { useContext } from "react";
 import UserDropdown from "../dropdown/UserDropdown";
+import AdminDropdown from "../dropdown/AdminDropdown";
 import { UserContext } from "../../../contexts/UserContext";
 
 export function Header() {
-  const { isLoggedIn, user } = useContext(UserContext);
+  const { isLoggedIn, user, account } = useContext(UserContext);
+
+  // Detect if we're on admin page
+  const isOnAdminPage = window.location.pathname.startsWith("/admin");
+
+  const handleModeToggle = () => {
+    if (isOnAdminPage) {
+      // Currently on admin page, switch to user page
+      window.location.href = "/";
+    } else {
+      // Currently on user page, switch to admin page
+      window.location.href = "/admin";
+    }
+  };
 
   return (
     <header className="bg-white border-b border-gray-200 px-6 py-4 fixed left-0 top-0 w-full z-50 shadow-b shadow-sm">
@@ -42,10 +56,44 @@ export function Header() {
           {isLoggedIn ? (
             <>
               <UploadHeaderButton></UploadHeaderButton>
+
+              {/* Admin/User Mode Toggle Button - Only show for admins */}
+              {account?.is_admin && (
+                <button
+                  onClick={handleModeToggle}
+                  className={`flex items-center gap-2 px-3 py-2 rounded-full text-xs font-medium cursor-pointer transition-colors ${
+                    isOnAdminPage
+                      ? "bg-[var(--secondary-background-color)] text-[var(--primary-color)] hover:bg-blue-200"
+                      : "bg-red-100 text-red-700 hover:bg-red-200"
+                  }`}
+                  title={
+                    isOnAdminPage
+                      ? "Chuyển sang trang người dùng"
+                      : "Chuyển sang trang quản trị"
+                  }
+                >
+                  {isOnAdminPage ? (
+                    <>
+                      <User className="w-4 h-4" />
+                      <span>User</span>
+                    </>
+                  ) : (
+                    <>
+                      <Shield className="w-4 h-4" />
+                      <span>Admin</span>
+                    </>
+                  )}
+                </button>
+              )}
+
               <button className="p-2 hover:bg-gray-100 rounded-md transition-colors">
                 <Bell className="w-5 h-5" />
               </button>
-              <Dropdown overlay={<UserDropdown />}>
+              <Dropdown
+                overlay={
+                  account?.is_admin ? <AdminDropdown /> : <UserDropdown />
+                }
+              >
                 <div className="flex items-center gap-2 cursor-pointer">
                   <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden">
                     <img
@@ -67,12 +115,26 @@ export function Header() {
                       NA
                     </span>
                   </div>
-                  <span
-                    className="text-sm font-medium "
-                    style={{ color: "var(--primary-color)" }}
-                  >
-                    {user?.first_name} {user?.last_name}
-                  </span>
+                  <div className="flex flex-col items-start">
+                    <span
+                      className="text-sm font-medium"
+                      style={{ color: "var(--primary-color)" }}
+                    >
+                      {user?.first_name} {user?.last_name}
+                    </span>
+                    <div className="flex gap-1">
+                      {account?.is_admin && (
+                        <span className="text-xs bg-red-100 text-red-700 px-1 rounded font-medium">
+                          Admin
+                        </span>
+                      )}
+                      {account?.is_vip && (
+                        <span className="text-xs bg-yellow-100 text-yellow-700 px-1 rounded font-medium">
+                          VIP
+                        </span>
+                      )}
+                    </div>
+                  </div>
                 </div>
               </Dropdown>
             </>
