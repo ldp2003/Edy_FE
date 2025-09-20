@@ -16,6 +16,7 @@ interface UploadDocumentProps {
     size: number;
     type: string;
     thumbnail?: string;
+    pageCount?: number;
   }) => void;
   onUploadStart?: () => void;
   onUploadError?: () => void;
@@ -61,7 +62,7 @@ const UploadDocument: React.FC<UploadDocumentProps> = ({
       // Create canvas
       const canvas = document.createElement("canvas");
       const context = canvas.getContext("2d");
-      
+
       if (!context) {
         throw new Error("Could not get canvas context");
       }
@@ -73,18 +74,42 @@ const UploadDocument: React.FC<UploadDocumentProps> = ({
       const renderContext = {
         canvasContext: context,
         viewport: viewport,
-        canvas: canvas
+        canvas: canvas,
       };
 
       await page.render(renderContext).promise;
 
       // Convert to JPEG with good quality
       const thumbnailDataUrl = canvas.toDataURL("image/jpeg", 0.3);
-      
+
       console.log("PDF thumbnail generated successfully");
       return thumbnailDataUrl;
     } catch (error) {
       console.error("Error creating PDF thumbnail:", error);
+      return null;
+    }
+  };
+
+  const getPdfPageCount = async (file: File): Promise<number | null> => {
+    try {
+      if (!isPdfDocument(file)) {
+        return null;
+      }
+
+      console.log("Counting PDF pages...");
+
+      // Convert file to ArrayBuffer
+      const arrayBuffer = await file.arrayBuffer();
+
+      // Load PDF document
+      const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+
+      const pageCount = pdf.numPages;
+      console.log("PDF page count:", pageCount);
+
+      return pageCount;
+    } catch (error) {
+      console.error("Error counting PDF pages:", error);
       return null;
     }
   };
@@ -103,11 +128,20 @@ const UploadDocument: React.FC<UploadDocumentProps> = ({
     );
   };
 
+  const isPdfFile = (file: File): boolean => {
+    return (
+      file.type === "application/pdf" ||
+      file.name.toLowerCase().endsWith(".pdf")
+    );
+  };
+
   const createWordThumbnail = async (file: File): Promise<string | null> => {
     try {
       if (!isWordDocument(file)) {
         return null;
       }
+
+      console.log("Generating Word document thumbnail...");
 
       // Create container for rendering
       const container = document.createElement("div");
@@ -167,11 +201,104 @@ const UploadDocument: React.FC<UploadDocumentProps> = ({
     }
   };
 
+  const getWordPageCount = async (file: File): Promise<number | null> => {
+    try {
+      if (!isWordDocument(file)) {
+        return null;
+      }
+
+      console.log("Counting Word document pages...");
+
+      // Create container for rendering
+      const container = document.createElement("div");
+      container.style.position = "absolute";
+      container.style.left = "-9999px";
+      container.style.top = "-9999px";
+      container.style.width = "816px"; // A4 width
+      container.style.backgroundColor = "white";
+      container.style.padding = "72px"; // 1 inch margins
+      container.style.boxSizing = "border-box";
+      container.style.fontFamily = "Times, serif";
+      container.style.fontSize = "12pt";
+      container.style.lineHeight = "1.5";
+      document.body.appendChild(container);
+
+      // Convert file to ArrayBuffer
+      const arrayBuffer = await file.arrayBuffer();
+
+      // Render document using docx-preview
+      await renderAsync(arrayBuffer, container, undefined, {
+        className: "docx-wrapper",
+        inWrapper: false,
+        ignoreWidth: false,
+        ignoreHeight: false,
+        ignoreFonts: false,
+        breakPages: true,
+        ignoreLastRenderedPageBreak: true,
+        experimental: false,
+        trimXmlDeclaration: true,
+        useBase64URL: false,
+        debug: false,
+      });
+
+      // Wait for rendering to complete
+      await new Promise((resolve) => setTimeout(resolve, 500));
+
+      // Count page breaks (pages are usually separated by page-break elements)
+      const pageBreaks = container.querySelectorAll(
+        '.docx-wrapper .page-break, .docx-wrapper [style*="page-break"]'
+      );
+      let pageCount = pageBreaks.length + 1; // +1 for the first page
+
+      // Alternative: count by estimated height
+      if (pageCount <= 1) {
+        const containerHeight = container.scrollHeight;
+        const pageHeight = 1056; // A4 height in pixels
+        pageCount = Math.max(1, Math.ceil(containerHeight / pageHeight));
+      }
+
+      // Clean up
+      document.body.removeChild(container);
+
+      console.log("Word document page count:", pageCount);
+      return pageCount;
+    } catch (error) {
+      console.error("Error counting Word document pages:", error);
+      return null;
+    }
+  };
+
   const uploadToCloudinary = async (
     file: File
-  ): Promise<{ url: string; thumbnail?: string }> => {
+  ): Promise<{ url: string; thumbnail?: string; pageCount?: number }> => {
     console.log("Starting upload to Cloudinary...");
     console.log("File:", file.name, file.size, file.type);
+
+    // Count pages for PDF and Word documents
+    let pageCount: number | undefined;
+    if (isPdfFile(file)) {
+      try {
+        console.log("Counting PDF pages...");
+        const pdfPageCount = await getPdfPageCount(file);
+        if (pdfPageCount !== null) {
+          pageCount = pdfPageCount;
+          console.log("PDF page count:", pageCount);
+        }
+      } catch (error) {
+        console.error("Failed to count PDF pages:", error);
+      }
+    } else if (isWordDocument(file)) {
+      try {
+        console.log("Counting Word document pages...");
+        const wordPageCount = await getWordPageCount(file);
+        if (wordPageCount !== null) {
+          pageCount = wordPageCount;
+          console.log("Word page count:", pageCount);
+        }
+      } catch (error) {
+        console.error("Failed to count Word pages:", error);
+      }
+    }
 
     // Generate Word thumbnail if it's a Word document
     let wordThumbnail: string | null = null;
@@ -187,8 +314,9 @@ const UploadDocument: React.FC<UploadDocumentProps> = ({
       }
     }
 
-    const uploadUrl = `https://api.cloudinary.com/v1_1/${import.meta.env.VITE_CLOUDINARY_NAME
-      }/auto/upload`;
+    const uploadUrl = `https://api.cloudinary.com/v1_1/${
+      import.meta.env.VITE_CLOUDINARY_NAME
+    }/auto/upload`;
 
     const formData = new FormData();
     formData.append("file", file);
@@ -227,11 +355,13 @@ const UploadDocument: React.FC<UploadDocumentProps> = ({
       }
 
       const data = await response.json();
-      console.log("Upload success:", data);      
+      console.log("Upload success:", data);
 
       return {
         url: data.secure_url,
-        thumbnail: wordThumbnail || (await createPdfThumbnail(file)) || undefined,
+        thumbnail:
+          wordThumbnail || (await createPdfThumbnail(file)) || undefined,
+        pageCount,
       };
     } catch (error) {
       console.error("Cloudinary upload error:", error);
@@ -289,6 +419,7 @@ const UploadDocument: React.FC<UploadDocumentProps> = ({
         size: (file as File).size,
         type: getFileType((file as File).name),
         thumbnail: uploadResult.thumbnail,
+        pageCount: uploadResult.pageCount,
       };
 
       if (onFileUploaded) {
