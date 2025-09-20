@@ -1,22 +1,59 @@
-import React, { useState } from "react";
-import { Table, Select, Button, Input } from "antd";
+import React, { useState, useEffect } from "react";
+import { Table, Select, Button, Input, message } from "antd";
+import { useNavigate } from "react-router-dom";
 import type { ColumnsType } from "antd/es/table";
 import { Download, Printer, Search, Filter } from "lucide-react";
 import type { Document } from "../../../models/document";
 import DocumentFilterDrawer from "./DocumentFilterDrawer";
+import { DocumentService } from "../../../utils/DocumentService";
 
 const { Option } = Select;
 
 const AdminDocumentTable: React.FC = () => {
+  const navigate = useNavigate();
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(5);
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
   const [filterVisible, setFilterVisible] = useState(false);
+  const [documents, setDocuments] = useState<Document[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [totalDocuments, setTotalDocuments] = useState(0);
+
+  // Fetch documents from API
+  useEffect(() => {
+    const fetchDocuments = async () => {
+      setLoading(true);
+      try {
+        const response = await DocumentService.fetchNewestDocuments({
+          page: currentPage,
+          limit: pageSize,
+          ordering: "createdAt",
+          order: -1,
+        });
+
+        setDocuments(response.documents || []);
+        setTotalDocuments(response.total || 0);
+      } catch (error) {
+        console.error("Error fetching documents:", error);
+        message.error("Không thể tải danh sách tài liệu!");
+        setDocuments([]);
+        setTotalDocuments(0);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchDocuments();
+  }, [currentPage, pageSize]);
 
   // Create a display interface that extends Document with display-specific fields
   interface DocumentDisplay extends Document {
     index: number;
   }
+
+  const handleRowClick = (record: DocumentDisplay) => {
+    navigate(`/admin/documents/review/${record._id}`);
+  };
 
   const columns: ColumnsType<DocumentDisplay> = [
     {
@@ -31,6 +68,16 @@ const AdminDocumentTable: React.FC = () => {
       dataIndex: "title",
       key: "title",
       width: 200,
+      render: (text: string, record: DocumentDisplay) => (
+        <Button
+          type="link"
+          onClick={() => handleRowClick(record)}
+          className="text-left p-0 h-auto"
+          style={{ whiteSpace: "normal", textAlign: "left" }}
+        >
+          {text}
+        </Button>
+      ),
     },
     {
       title: "Loại tài liệu",
@@ -38,6 +85,20 @@ const AdminDocumentTable: React.FC = () => {
       key: "doc_type",
       align: "center",
       width: 100,
+      render: (type: string) => {
+        const typeMap: { [key: string]: string } = {
+          RESEARCH_REPORT: "Nghiên cứu",
+          VIDEO: "Video",
+          STUDY_GUIDE: "Đề cương",
+          TEXTBOOK: "Giáo trình",
+          ESSAY: "Tiểu luận",
+          SOLUTION_SET: "Bài giải",
+          THESIS: "Luận văn",
+          LECTURE: "Bài giảng",
+          OTHER: "Khác",
+        };
+        return typeMap[type] || type;
+      },
     },
     {
       title: "Trình độ",
@@ -45,6 +106,16 @@ const AdminDocumentTable: React.FC = () => {
       key: "level",
       align: "center",
       width: 80,
+      render: (level: string) => {
+        const levelMap: { [key: string]: string } = {
+          STUDENT: "Học sinh",
+          UNIVERSITY: "Đại học",
+          LECTURER: "Giảng viên",
+          RESEARCHER: "Nghiên cứu sinh",
+          OTHER: "Khác",
+        };
+        return levelMap[level] || level;
+      },
     },
     {
       title: "Chuyên sâu",
@@ -91,15 +162,15 @@ const AdminDocumentTable: React.FC = () => {
       render: (status: string) => {
         const getStatusDisplay = (status: string) => {
           switch (status) {
-            case "pending":
+            case "PENDING":
               return { text: "Chờ duyệt", color: "text-yellow-600" };
-            case "approved":
+            case "APPROVED":
               return { text: "Đã duyệt", color: "text-green-600" };
-            case "pending_summary":
+            case "PENDING_SUMMARY":
               return { text: "Chờ tóm tắt", color: "text-blue-600" };
-            case "rejected":
+            case "REJECTED":
               return { text: "Đã từ chối", color: "text-red-600" };
-            case "requested_edit":
+            case "REQUESTED_EDIT":
               return { text: "Chờ chỉnh sửa", color: "text-orange-600" };
             default:
               return { text: status, color: "text-gray-600" };
@@ -112,151 +183,19 @@ const AdminDocumentTable: React.FC = () => {
     },
   ];
 
-  // Sample data matching the Document interface
-  const data: DocumentDisplay[] = [
-    {
-      index: 1,
-      id: "1",
-      user: "user1",
-      description: { summary_by_user: "Tài liệu tổng hợp" },
-      author: ["Tác giả 1"],
-      url: "https://example.com/doc1",
-      published_year: 2025,
-      publisher: "NXB Giáo dục",
-      intensive: false,
-      organization: "Đại học Công nghiệp TP.HCM",
-      level: "University",
-      subject: "Kinh tế chính trị",
-      status: "pending",
-      public_mode: "public",
-      page: 100,
-      file_type: "PDF",
-      keyword: ["kinh tế", "chính trị"],
-      title: "Tài liệu tổng hợp Kinh tế chính trị Mác Lênin",
-      doc_type: "Textbook",
-      view: 0,
-      comment_count: 0,
-      download_count: 0,
-      is_deleted: false,
-      createdAt: "2025-01-01",
-      updatedAt: "2025-01-01",
-    },
-    {
-      index: 2,
-      id: "2",
-      user: "user2",
-      description: { summary_by_user: "Tài liệu tổng hợp" },
-      author: ["Tác giả 2"],
-      url: "https://example.com/doc2",
-      published_year: 2025,
-      publisher: "NXB Giáo dục",
-      intensive: false,
-      organization: "Đại học Công nghiệp TP.HCM",
-      level: "University",
-      subject: "Kinh tế chính trị",
-      status: "approved",
-      public_mode: "public",
-      page: 120,
-      file_type: "PDF",
-      keyword: ["kinh tế", "chính trị"],
-      title: "Tài liệu tổng hợp Kinh tế chính trị Mác Lênin",
-      doc_type: "Textbook",
-      view: 0,
-      comment_count: 0,
-      download_count: 0,
-      is_deleted: false,
-      createdAt: "2025-01-01",
-      updatedAt: "2025-01-01",
-    },
-    {
-      index: 3,
-      id: "3",
-      user: "user3",
-      description: { summary_by_user: "Tài liệu tổng hợp" },
-      author: ["Tác giả 3"],
-      url: "https://example.com/doc3",
-      published_year: 2025,
-      publisher: "NXB Giáo dục",
-      intensive: false,
-      organization: "Đại học Công nghiệp TP.HCM",
-      level: "University",
-      subject: "Kinh tế chính trị",
-      status: "requested_edit",
-      public_mode: "public",
-      page: 95,
-      file_type: "PDF",
-      keyword: ["kinh tế", "chính trị"],
-      title: "Tài liệu tổng hợp Kinh tế chính trị Mác Lênin",
-      doc_type: "Textbook",
-      view: 0,
-      comment_count: 0,
-      download_count: 0,
-      is_deleted: false,
-      createdAt: "2025-01-01",
-      updatedAt: "2025-01-01",
-    },
-    {
-      index: 4,
-      id: "4",
-      user: "user4",
-      description: { summary_by_user: "Tài liệu tổng hợp" },
-      author: ["Tác giả 4"],
-      url: "https://example.com/doc4",
-      published_year: 2025,
-      publisher: "NXB Giáo dục",
-      intensive: false,
-      organization: "Đại học Công nghiệp TP.HCM",
-      level: "University",
-      subject: "Kinh tế chính trị",
-      status: "rejected",
-      public_mode: "public",
-      page: 110,
-      file_type: "PDF",
-      keyword: ["kinh tế", "chính trị"],
-      title: "Tài liệu tổng hợp Kinh tế chính trị Mác Lênin",
-      doc_type: "Textbook",
-      view: 0,
-      comment_count: 0,
-      download_count: 0,
-      is_deleted: false,
-      createdAt: "2025-01-01",
-      updatedAt: "2025-01-01",
-    },
-    {
-      index: 5,
-      id: "5",
-      user: "user5",
-      description: { summary_by_user: "Tài liệu tổng hợp" },
-      author: ["Tác giả 5"],
-      url: "https://example.com/doc5",
-      published_year: 2025,
-      publisher: "NXB Giáo dục",
-      intensive: false,
-      organization: "Đại học Công nghiệp TP.HCM",
-      level: "University",
-      subject: "Kinh tế chính trị",
-      status: "pending_summary",
-      public_mode: "public",
-      page: 85,
-      file_type: "PDF",
-      keyword: ["kinh tế", "chính trị"],
-      title: "Tài liệu tổng hợp Kinh tế chính trị Mác Lênin",
-      doc_type: "Textbook",
-      view: 0,
-      comment_count: 0,
-      download_count: 0,
-      is_deleted: true,
-      createdAt: "2025-01-01",
-      updatedAt: "2025-01-01",
-    },
-  ];
+  // Transform API data to display format
+  const getDisplayData = (): DocumentDisplay[] => {
+    return documents.map((doc, index) => ({
+      ...doc,
+      index: (currentPage - 1) * pageSize + index + 1,
+    }));
+  };
 
   // Calculate pagination
-  const totalItems = data.length;
-  const totalPages = Math.ceil(totalItems / pageSize);
+  const currentData = getDisplayData();
+  const totalPages = Math.ceil(totalDocuments / pageSize);
   const startIndex = (currentPage - 1) * pageSize;
-  const endIndex = Math.min(startIndex + pageSize, totalItems);
-  const currentData = data.slice(startIndex, endIndex);
+  const endIndex = Math.min(startIndex + pageSize, totalDocuments);
 
   const handlePageSizeChange = (value: number) => {
     setPageSize(value);
@@ -347,8 +286,12 @@ const AdminDocumentTable: React.FC = () => {
           dataSource={currentData}
           pagination={false}
           size="small"
-          //   scroll={{ x: 1200 }}
-          rowKey="id"
+          loading={loading}
+          rowKey="_id"
+          onRow={(record) => ({
+            style: { cursor: "pointer" },
+            onClick: () => handleRowClick(record),
+          })}
         />
 
         {/* Footer with pagination */}
@@ -370,7 +313,7 @@ const AdminDocumentTable: React.FC = () => {
 
           <div className="flex items-center gap-3">
             <span className="text-sm text-gray-700">
-              {startIndex + 1}-{endIndex} of {totalItems}
+              {startIndex + 1}-{endIndex} of {totalDocuments}
             </span>
             <div className="flex items-center gap-1">
               <button

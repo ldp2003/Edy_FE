@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Form, Input, Select, InputNumber, Button, message } from "antd";
 import { Plus, Minus } from "lucide-react";
-import { DocumentAPI } from "../../../../api/API";
+import { DocumentService } from "../../../../utils/DocumentService";
 
 const { TextArea } = Input;
 const { Option } = Select;
@@ -135,7 +135,7 @@ const InformationForm = ({
         page: values.pageCount,
       };
 
-      const response = await DocumentAPI.uploadDocument(documentData);
+      const response = await DocumentService.uploadDocument(documentData);
 
       if (response.status !== 201) {
         throw new Error("Đăng tải tài liệu thất bại!");
