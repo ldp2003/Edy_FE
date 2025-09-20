@@ -4,6 +4,10 @@ import React, { useState } from "react";
 import type { UploadFile, UploadProps } from "antd";
 import { renderAsync } from "docx-preview";
 import html2canvas from "html2canvas";
+import * as pdfjsLib from "pdfjs-dist";
+
+// Set up PDF.js worker
+pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
 
 interface UploadDocumentProps {
   onFileUploaded?: (fileInfo: {
@@ -25,6 +29,65 @@ const UploadDocument: React.FC<UploadDocumentProps> = ({
   const [uploading, setUploading] = useState(false);
   const [fileList, setFileList] = useState<UploadFile[]>([]);
   const [uploadProgress, setUploadProgress] = useState(0);
+
+  const isPdfDocument = (file: File): boolean => {
+    return (
+      file.type === "application/pdf" ||
+      file.name.toLowerCase().endsWith(".pdf")
+    );
+  };
+
+  const createPdfThumbnail = async (file: File): Promise<string | null> => {
+    try {
+      if (!isPdfDocument(file)) {
+        return null;
+      }
+
+      console.log("Generating PDF thumbnail...");
+
+      // Convert file to ArrayBuffer
+      const arrayBuffer = await file.arrayBuffer();
+
+      // Load PDF document
+      const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+
+      // Get first page
+      const page = await pdf.getPage(1);
+
+      // Set scale for good quality thumbnail
+      const scale = 0.5;
+      const viewport = page.getViewport({ scale });
+
+      // Create canvas
+      const canvas = document.createElement("canvas");
+      const context = canvas.getContext("2d");
+      
+      if (!context) {
+        throw new Error("Could not get canvas context");
+      }
+
+      canvas.height = viewport.height;
+      canvas.width = viewport.width;
+
+      // Render page to canvas
+      const renderContext = {
+        canvasContext: context,
+        viewport: viewport,
+        canvas: canvas
+      };
+
+      await page.render(renderContext).promise;
+
+      // Convert to JPEG with good quality
+      const thumbnailDataUrl = canvas.toDataURL("image/jpeg", 0.3);
+      
+      console.log("PDF thumbnail generated successfully");
+      return thumbnailDataUrl;
+    } catch (error) {
+      console.error("Error creating PDF thumbnail:", error);
+      return null;
+    }
+  };
 
   // Word thumbnail generation utilities
   const isWordDocument = (file: File): boolean => {
@@ -124,9 +187,8 @@ const UploadDocument: React.FC<UploadDocumentProps> = ({
       }
     }
 
-    const uploadUrl = `https://api.cloudinary.com/v1_1/${
-      import.meta.env.VITE_CLOUDINARY_NAME
-    }/auto/upload`;
+    const uploadUrl = `https://api.cloudinary.com/v1_1/${import.meta.env.VITE_CLOUDINARY_NAME
+      }/auto/upload`;
 
     const formData = new FormData();
     formData.append("file", file);
@@ -165,23 +227,11 @@ const UploadDocument: React.FC<UploadDocumentProps> = ({
       }
 
       const data = await response.json();
-      console.log("Upload success:", data);
-
-      let thumbnailUrl;
-      if (data.format === "pdf") {
-        // Create thumbnail URL for display only, keep original URL for form
-        thumbnailUrl = data.secure_url.replace(
-          "/upload/",
-          "/upload/c_thumb,w_300,h_400,f_jpg/"
-        );
-      } else if (wordThumbnail) {
-        // Use generated Word thumbnail
-        thumbnailUrl = wordThumbnail;
-      }
+      console.log("Upload success:", data);      
 
       return {
-        url: data.secure_url, // Original Cloudinary URL for form submission
-        thumbnail: thumbnailUrl, // Thumbnail URL for display
+        url: data.secure_url,
+        thumbnail: wordThumbnail || (await createPdfThumbnail(file)) || undefined,
       };
     } catch (error) {
       console.error("Cloudinary upload error:", error);

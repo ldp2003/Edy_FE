@@ -281,6 +281,7 @@ export const DocumentAPI = {
     keyword?: string[];
     description?: string;
     page?: number;
+    cover_page?: string;
   }) => {
     try {
       const response = await apiClient.post("/documents", documentData);

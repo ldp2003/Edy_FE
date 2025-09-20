@@ -221,6 +221,7 @@ const InformationForm = ({
           : [],
         description: values.summary,
         page: values.pageCount,
+        cover_page: fileInfo.thumbnail
       };
 
       console.log("Document data being submitted:", documentData);
