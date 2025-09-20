@@ -179,9 +179,9 @@ const UploadDocument: React.FC<UploadDocumentProps> = ({
       // Wait for rendering to complete
       await new Promise((resolve) => setTimeout(resolve, 500));
 
-      // Take screenshot with high quality
+      // Take screenshot with moderate quality
       const canvas = await html2canvas(container, {
-        scale: 2,
+        scale: 0.8,
         useCORS: true,
         allowTaint: true,
         backgroundColor: "#ffffff",
@@ -192,8 +192,8 @@ const UploadDocument: React.FC<UploadDocumentProps> = ({
       // Clean up
       document.body.removeChild(container);
 
-      // Convert to JPEG with good quality
-      const thumbnailDataUrl = canvas.toDataURL("image/jpeg", 0.8);
+      // Convert to JPEG with lower quality to reduce size
+      const thumbnailDataUrl = canvas.toDataURL("image/jpeg", 0.3);
       return thumbnailDataUrl;
     } catch (error) {
       console.error("Error creating Word thumbnail:", error);

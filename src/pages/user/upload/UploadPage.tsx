@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import UploadDocument from "../../../components/user/upload/UploadDocument";
 import InfomationForm from "../../../components/user/document/documentForm/InfomationForm";
+import { message } from "antd";
 
 interface FileInfo {
   url: string;
@@ -16,7 +17,7 @@ const UploadPage: React.FC = () => {
     undefined
   );
   const [isUploading, setIsUploading] = useState(false);
-
+  const [messageApi, contextHolder] = message.useMessage();
   const handleFileUploaded = (fileInfo: FileInfo) => {
     setUploadedFile(fileInfo);
     setIsUploading(false);
@@ -38,6 +39,7 @@ const UploadPage: React.FC = () => {
 
   return (
     <div>
+      {contextHolder}
       <h1 className="text-base text-left font-bold mb-4">Tải lên tài liệu</h1>
       <UploadDocument
         onFileUploaded={handleFileUploaded}
@@ -48,6 +50,7 @@ const UploadPage: React.FC = () => {
         fileInfo={uploadedFile}
         isUploading={isUploading}
         onUploadSuccess={handleUploadSuccess}
+        messageApi={messageApi}
       />
     </div>
   );

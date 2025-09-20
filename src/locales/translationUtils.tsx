@@ -44,13 +44,29 @@ export const getDocumentTypeText = (docType: string) => {
   );
 };
 
-// Utility functions to create colored tags
+// Utility function to create light background from dark color
+const getLightBackground = (color: string, opacity: number = 0.1) => {
+  return `${color}${Math.round(opacity * 255)
+    .toString(16)
+    .padStart(2, "0")}`;
+};
+
+// Utility functions to create colored tags with dark border and light background
 export const createStatusTag = (status: string) => {
   const text = getStatusText(status);
   const color = statusColors[status as keyof typeof statusColors] || "#8c8c8c";
 
   return (
-    <Tag color={color} className="font-medium">
+    <Tag
+      className="font-medium"
+      style={{
+        backgroundColor: getLightBackground(color, 0.1),
+        borderColor: color,
+        color: color,
+        borderWidth: "1.5px",
+        borderStyle: "solid",
+      }}
+    >
       {text}
     </Tag>
   );
@@ -62,7 +78,16 @@ export const createPublicModeTag = (mode: string) => {
     publicModeColors[mode as keyof typeof publicModeColors] || "#8c8c8c";
 
   return (
-    <Tag color={color} className="font-medium">
+    <Tag
+      className="font-medium"
+      style={{
+        backgroundColor: getLightBackground(color, 0.1),
+        borderColor: color,
+        color: color,
+        borderWidth: "1.5px",
+        borderStyle: "solid",
+      }}
+    >
       {text}
     </Tag>
   );
@@ -73,7 +98,16 @@ export const createLevelTag = (level: string) => {
   const color = levelColors[level as keyof typeof levelColors] || "#8c8c8c";
 
   return (
-    <Tag color={color} className="font-medium">
+    <Tag
+      className="font-medium"
+      style={{
+        backgroundColor: getLightBackground(color, 0.1),
+        borderColor: color,
+        color: color,
+        borderWidth: "1.5px",
+        borderStyle: "solid",
+      }}
+    >
       {text}
     </Tag>
   );
@@ -85,7 +119,16 @@ export const createFileTypeTag = (fileType: string) => {
     fileTypeColors[fileType as keyof typeof fileTypeColors] || "#8c8c8c";
 
   return (
-    <Tag color={color} className="font-medium">
+    <Tag
+      className="font-medium"
+      style={{
+        backgroundColor: getLightBackground(color, 0.1),
+        borderColor: color,
+        color: color,
+        borderWidth: "1.5px",
+        borderStyle: "solid",
+      }}
+    >
       {text}
     </Tag>
   );
@@ -97,7 +140,16 @@ export const createDocumentTypeTag = (docType: string) => {
     documentTypeColors[docType as keyof typeof documentTypeColors] || "#8c8c8c";
 
   return (
-    <Tag color={color} className="font-medium">
+    <Tag
+      className="font-medium"
+      style={{
+        backgroundColor: getLightBackground(color, 0.1),
+        borderColor: color,
+        color: color,
+        borderWidth: "1.5px",
+        borderStyle: "solid",
+      }}
+    >
       {text}
     </Tag>
   );
