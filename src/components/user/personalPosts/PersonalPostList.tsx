@@ -4,6 +4,8 @@ import PostTable from "./PostTable";
 import PostListView from "./PostListView";
 import PostGridView from "./PostGridView";
 import UploadButton from "../../common/buttons/UploadButton";
+import type { Document } from "../../../models/document";
+import { DocumentService } from "../../../utils/DocumentService";
 
 interface Post {
   key: string;
@@ -28,37 +30,39 @@ const PersonalPostList: React.FC = () => {
   React.useEffect(() => {
     let mounted = true;
     setLoading(true);
-    import("../../../utils/DocumentService").then(({ DocumentService }) => {
-      DocumentService.getMyDocuments()
-        .then((data) => {
-          if (mounted) {
-            // Map dữ liệu BE sang Post[]
-            const docs = Array.isArray(data?.documents)
-              ? data.documents.map((doc: any, idx: number) => ({
-                  key: doc._id,
-                  index: idx + 1,
-                  title: doc.title,
-                  views: doc.view,
-                  comments: doc.comment_count,
-                  rating: "0%", // Nếu có trường rating thì lấy, không thì để mặc định
-                  status: doc.status,
-                  mode: doc.file_type,
-                  public_mode: doc.public_mode,
-                  url: doc.url,
-                  createdAt: doc.createdAt,
-                }))
-              : [];
-            setDocuments(docs);
-          }
-        })
-        .catch(() => setDocuments([]))
-        .finally(() => mounted && setLoading(false));
-    });
+
+    DocumentService.getMyDocuments()
+      .then((data) => {
+        if (mounted) {
+          // Map dữ liệu BE sang Post[]
+          const docs = Array.isArray(data?.documents)
+            ? data.documents.map((doc: Document, idx: number) => ({
+                key: doc._id,
+                index: idx + 1,
+                title: doc.title,
+                views: doc.view || 0,
+                comments: doc.comment_count || 0,
+                rating: "0%", // Nếu có trường rating thì lấy, không thì để mặc định
+                status: doc.status || "PENDING",
+                mode: doc.file_type || "PDF",
+                public_mode: doc.public_mode || "PRIVATE",
+                url: doc.url,
+                createdAt: doc.createdAt,
+              }))
+            : [];
+          setDocuments(docs);
+        }
+      })
+      .catch((error) => {
+        console.error("Error fetching documents:", error);
+        setDocuments([]);
+      })
+      .finally(() => mounted && setLoading(false));
+
     return () => {
       mounted = false;
     };
   }, []);
-
   const renderContent = () => {
     switch (viewMode) {
       case "table":

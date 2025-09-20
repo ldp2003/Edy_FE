@@ -8,6 +8,7 @@ interface FileInfo {
   size: number;
   type: string;
   thumbnail?: string;
+  pageCount?: number;
 }
 
 const UploadPage: React.FC = () => {
@@ -38,13 +39,13 @@ const UploadPage: React.FC = () => {
   return (
     <div>
       <h1 className="text-base text-left font-bold mb-4">Tải lên tài liệu</h1>
-      <UploadDocument 
+      <UploadDocument
         onFileUploaded={handleFileUploaded}
         onUploadStart={handleUploadStart}
         onUploadError={handleUploadError}
       />
-      <InfomationForm 
-        fileInfo={uploadedFile} 
+      <InfomationForm
+        fileInfo={uploadedFile}
         isUploading={isUploading}
         onUploadSuccess={handleUploadSuccess}
       />

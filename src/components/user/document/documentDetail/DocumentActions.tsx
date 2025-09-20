@@ -8,9 +8,13 @@ import type { Document } from "../../../../models/document";
 
 interface DocumentActionsProps {
   document: Document;
+  isUser?: boolean;
 }
 
-const DocumentActions: React.FC<DocumentActionsProps> = ({ document }) => {
+const DocumentActions: React.FC<DocumentActionsProps> = ({
+  document,
+  isUser = false,
+}) => {
   console.log("Document for actions:", document._id);
 
   return (
@@ -18,7 +22,7 @@ const DocumentActions: React.FC<DocumentActionsProps> = ({ document }) => {
       <DownloadButton point={6} />
 
       <div className="flex items-center space-x-4">
-        <ReportButton />
+        {!isUser && <ReportButton />}
         <LikeButton likeCount={0} />
         <DislikeButton dislikeCount={0} />
         <FavoriteButton />

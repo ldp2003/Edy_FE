@@ -59,9 +59,7 @@ export function UserProfile({ isCompact }: UserProfileProps) {
             <div className="text-[10px] ">Điểm hạng</div>
           </div>
           <div>
-            <div className="text-xs font-bold ">
-              {user?.shared_documents.length}
-            </div>
+            <div className="text-xs font-bold ">{user?.doc_count}</div>
             <div className="text-[10px] ">Bài đăng</div>
           </div>
         </div>

@@ -1,4 +1,5 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import RecentItem from "../document/documentCard/RecentItem";
 
 interface Post {
@@ -10,6 +11,9 @@ interface Post {
   rating: string;
   status: string;
   mode: string;
+  public_mode: string;
+  url: string;
+  createdAt: string;
 }
 
 interface PostListViewProps {
@@ -18,6 +22,8 @@ interface PostListViewProps {
 }
 
 const PostListView: React.FC<PostListViewProps> = ({ data, loading }) => {
+  const navigate = useNavigate();
+
   // Nếu loading, hiển thị skeleton hoặc rỗng
   const displayData = loading ? [] : data;
 
@@ -26,14 +32,19 @@ const PostListView: React.FC<PostListViewProps> = ({ data, loading }) => {
       {/* List content */}
       <div className="space-y-2">
         {displayData.map((post) => (
-          <RecentItem
+          <div
             key={post.key}
-            title={post.title}
-            views={post.views}
-            rating={parseInt(post.rating.replace("%", ""))}
-            pages={Math.floor(Math.random() * 50) + 10}
-            date="2024-09-18"
-          />
+            className="cursor-pointer transition-transform hover:scale-[1.02]"
+            onClick={() => navigate(`/personal-posts/${post.key}`)}
+          >
+            <RecentItem
+              title={post.title}
+              views={post.views}
+              rating={parseInt(post.rating.replace("%", ""))}
+              pages={Math.floor(Math.random() * 50) + 10}
+              date="2024-09-18"
+            />
+          </div>
         ))}
       </div>
     </div>

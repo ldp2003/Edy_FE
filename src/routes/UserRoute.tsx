@@ -11,6 +11,7 @@ import DocumentDetail from "../pages/user/document/DocumentDetail";
 import RoleSelectionPage from "../pages/auth/RoleSelectionPage";
 import AuthRoute from "./AuthRoute";
 import PersonalPost from "../pages/user/presonalPosts/PersonalPost";
+import PersonalPostDetail from "../pages/user/personalPosts/PersonalPostDetail";
 
 const UserRoute: React.FC = () => {
   return (
@@ -26,6 +27,7 @@ const UserRoute: React.FC = () => {
         <Route path="/" element={<UserLayout />}>
           <Route index element={<HomePage />} />
           <Route path="personal-posts" element={<PersonalPost />} />
+          <Route path="personal-posts/:id" element={<PersonalPostDetail />} />
           <Route path="personal-profile" element={<PersonalProfile />} />
           <Route path="upload-document" element={<UploadPage />} />
           <Route path="edit-profile" element={<EditProfile />} />

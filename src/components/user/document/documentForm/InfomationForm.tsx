@@ -1,6 +1,7 @@
 import { useState, useEffect, useContext, useCallback } from "react";
 import { Form, Input, Select, InputNumber, Button, message, Modal } from "antd";
 import { Plus, Minus } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import { DocumentService } from "../../../../utils/DocumentService";
 import { SubjectService, type Subject } from "../../../../utils/SubjectService";
 import { UserContext } from "../../../../contexts/UserContext";
@@ -30,6 +31,7 @@ interface FileInfo {
   size: number;
   type: string;
   thumbnail?: string;
+  pageCount?: number;
 }
 
 interface InformationFormProps {
@@ -50,6 +52,7 @@ const InformationForm = ({
   const [subjectsLoading, setSubjectsLoading] = useState(false);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [newSubjectForm] = Form.useForm();
+  const navigate = useNavigate();
 
   const { user } = useContext(UserContext);
 
@@ -118,12 +121,24 @@ const InformationForm = ({
         return "OTHER";
       };
 
-      form.setFieldsValue({
+      const formValues: Partial<FormData> = {
         documentName: nameWithoutExtension,
         documentType: getDocumentType(fileName),
-      });
+      };
 
-      message.success(`Đã tải lên thành công file: ${fileName}`);
+      // Auto-fill page count if available
+      if (fileInfo.pageCount && fileInfo.pageCount > 0) {
+        formValues.pageCount = fileInfo.pageCount;
+        console.log("Auto-filled page count:", fileInfo.pageCount);
+      }
+
+      form.setFieldsValue(formValues);
+
+      message.success(
+        `Đã tải lên thành công file: ${fileName}${
+          fileInfo.pageCount ? ` (${fileInfo.pageCount} trang)` : ""
+        }`
+      );
     }
   }, [fileInfo, form]);
 
@@ -221,7 +236,7 @@ const InformationForm = ({
           : [],
         description: values.summary,
         page: values.pageCount,
-        cover_page: fileInfo.thumbnail
+        cover_page: fileInfo.thumbnail,
       };
 
       console.log("Document data being submitted:", documentData);
@@ -243,6 +258,11 @@ const InformationForm = ({
       if (onUploadSuccess) {
         onUploadSuccess();
       }
+
+      // Chuyển hướng đến trang tài liệu cá nhân sau 1.5 giây
+      setTimeout(() => {
+        navigate("/user/personal-posts");
+      }, 1500);
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       console.error("Document upload error:", error);

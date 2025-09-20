@@ -18,7 +18,7 @@ const UserInfoHeader: React.FC = () => {
         <div className="flex flex-row text-left items-center gap-2">
           <div className="w-15 h-15 mt-4 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden">
             <img
-              src="/placeholder.svg?height=64&width=64"
+              src={user?.avatar || "/default-avatar.png"}
               alt="Avatar"
               className="w-full h-full object-cover"
             />
@@ -69,7 +69,7 @@ const UserInfoHeader: React.FC = () => {
               {isLoading ? (
                 <span className="animate-pulse bg-gray-200 rounded w-8 h-4 inline-block"></span>
               ) : (
-                user?.shared_documents.length
+                user?.doc_count ?? 0
               )}
             </div>
             <div className="text-[10px]">Tài liệu</div>
