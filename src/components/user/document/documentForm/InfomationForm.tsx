@@ -203,7 +203,7 @@ const InformationForm = ({
     try {
       // Chuẩn bị dữ liệu theo format API
       const documentData = {
-        url: fileInfo.url,
+        url: fileInfo.url, // Original Cloudinary URL for submission
         title: values.documentName,
         doc_type: values.documentType,
         file_type: fileInfo.type,
@@ -222,6 +222,10 @@ const InformationForm = ({
         description: values.summary,
         page: values.pageCount,
       };
+
+      console.log("Document data being submitted:", documentData);
+      console.log("Original file URL:", fileInfo.url);
+      console.log("Thumbnail URL (for display):", fileInfo.thumbnail);
 
       const response = await DocumentService.uploadDocument(documentData);
 
@@ -268,10 +272,12 @@ const InformationForm = ({
   };
 
   const getPreviewImage = () => {
+    // Priority 1: Use provided thumbnail
     if (fileInfo?.thumbnail) {
       return fileInfo.thumbnail;
     }
 
+    // Priority 2: Generate PDF thumbnail from original URL
     if (
       fileInfo?.type === "PDF" &&
       fileInfo?.url &&
@@ -283,19 +289,17 @@ const InformationForm = ({
       );
     }
 
-    if (
-      fileInfo?.type === "WORD" &&
-      fileInfo?.url &&
-      typeof fileInfo.url === "string"
-    ) {
-      // For Word documents without thumbnail, show document icon
+    // Priority 3: For Word documents without thumbnail, show document icon
+    if (fileInfo?.type === "WORD") {
       return "https://cdn-icons-png.flaticon.com/512/337/337946.png";
     }
 
+    // Priority 4: Use original URL if available
     if (fileInfo?.url && typeof fileInfo.url === "string") {
       return fileInfo.url;
     }
 
+    // Priority 5: Default fallback icon
     return "https://cdn-icons-png.flaticon.com/512/2425/2425541.png";
   };
 
