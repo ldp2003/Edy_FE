@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Form, Input, Select, InputNumber, Button, message, Modal } from "antd";
-import { Plus, Minus } from "lucide-react";
+import { Plus, Minus, Eye, X } from "lucide-react";
 import type { Document } from "../../../models/document";
 import UserInfoHeader from "./UserInfoHeader";
 
@@ -27,6 +27,7 @@ const DocumentReview: React.FC<DocumentReviewProps> = ({
   const [authors, setAuthors] = useState<string[]>([]);
   const [rejectModalVisible, setRejectModalVisible] = useState(false);
   const [deleteModalVisible, setDeleteModalVisible] = useState(false);
+  const [documentViewModalVisible, setDocumentViewModalVisible] = useState(false);
   const [rejectReason, setRejectReason] = useState("");
   const [deleteReason, setDeleteReason] = useState("");
   const [processing, setProcessing] = useState(false);
@@ -78,6 +79,38 @@ const DocumentReview: React.FC<DocumentReviewProps> = ({
     }
 
     return "https://cdn-icons-png.flaticon.com/512/2425/2425541.png";
+  };
+
+  const getDocumentViewerUrl = () => {
+    if (!document?.url) return null;
+
+    // For PDF files, we can use Cloudinary's built-in PDF viewer or embed directly
+    if (document.file_type === "PDF") {
+      return document.url;
+    }
+
+    // For Word documents, convert to viewable format
+    if (document.file_type === "WORD") {
+      // Option 1: Use Cloudinary's document conversion
+      // return document.url.replace(
+      //   "/upload/",
+      //   "/upload/f_auto,q_auto/"
+      // );
+
+      // Option 2: Use Google Docs Viewer (alternative)
+      return `https://docs.google.com/viewer?url=${encodeURIComponent(document.url)}&embedded=true`;
+    }
+
+    return document.url;
+  };
+
+  const handleOpenDocumentViewer = () => {
+    const viewerUrl = getDocumentViewerUrl();
+    if (viewerUrl) {
+      setDocumentViewModalVisible(true);
+    } else {
+      messageApi.error("Không thể xem tài liệu này!");
+    }
   };
 
   const handleApprove = async () => {
@@ -176,15 +209,29 @@ const DocumentReview: React.FC<DocumentReviewProps> = ({
           >
             {/* Column 1 - Image and privacy */}
             <div className="space-y-4">
-              <div className="mb-0">
+              <div className="mb-0 relative group">
                 <img
                   src={getPreviewImage()}
                   alt="Document preview"
-                  className="border border-gray-200 rounded object-cover"
-                  style={{ maxHeight: "300px" }}
+                  className="border border-gray-200 rounded object-cover cursor-pointer hover:opacity-90 transition-opacity"
+                  style={{ maxHeight: "300px", width: "100%" }}
+                  onClick={handleOpenDocumentViewer}
                 />
+                {/* Overlay with view icon */}
+                <div
+                  className="absolute inset-0 bg-black/30 bg-opacity-0 group-hover:bg-opacity-30 transition-all duration-200 flex items-center justify-center cursor-pointer rounded opacity-0 group-hover:opacity-100"
+                  onClick={handleOpenDocumentViewer}
+                >
+                  <Eye
+                    size={32}
+                    className="text-white"
+                  />
+                </div>
                 <div className="text-xs text-gray-500 mt-1">
                   {formatFileSize(estimatedFileSize)}
+                  <span className="ml-2 text-blue-600 cursor-pointer hover:underline" onClick={handleOpenDocumentViewer}>
+                    Xem tài liệu
+                  </span>
                 </div>
               </div>
 
@@ -409,6 +456,64 @@ const DocumentReview: React.FC<DocumentReviewProps> = ({
           </div>
         </Form>
       </div>
+
+      {/* Document Viewer Modal */}
+      <Modal
+        title={`Xem tài liệu: ${document.title}`}
+        open={documentViewModalVisible}
+        onCancel={() => setDocumentViewModalVisible(false)}
+        footer={[
+          <Button key="close" onClick={() => setDocumentViewModalVisible(false)}>
+            Đóng
+          </Button>,
+          <Button
+            key="download"
+            type="primary"
+            onClick={() => window.open(document.url, '_blank')}
+          >
+            Tải xuống
+          </Button>
+        ]}
+        width="90vw"
+        style={{ maxWidth: "1200px" }}
+        bodyStyle={{ padding: 0, height: "80vh" }}
+        destroyOnClose={true}
+      >
+        <div className="w-full h-full">
+          {document.file_type === "PDF" ? (
+            // For PDF files - direct embed
+            <iframe
+              src={`${getDocumentViewerUrl()}#toolbar=1&navpanes=1&scrollbar=1`}
+              width="100%"
+              height="100%"
+              style={{ border: "none" }}
+              title="Document Viewer"
+            />
+          ) : document.file_type === "WORD" ? (
+            // For Word files - use Google Docs Viewer
+            <iframe
+              src={`https://docs.google.com/viewer?url=${encodeURIComponent(document.url)}&embedded=true`}
+              width="100%"
+              height="100%"
+              style={{ border: "none" }}
+              title="Document Viewer"
+            />
+          ) : (
+            // For other file types
+            <div className="flex items-center justify-center h-full bg-gray-100">
+              <div className="text-center">
+                <p className="text-gray-600 mb-4">Không thể xem trước file này</p>
+                <Button
+                  type="primary"
+                  onClick={() => window.open(document.url, '_blank')}
+                >
+                  Mở file trong tab mới
+                </Button>
+              </div>
+            </div>
+          )}
+        </div>
+      </Modal>
 
       {/* Reject Modal */}
       <Modal
