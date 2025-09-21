@@ -644,7 +644,7 @@ const InformationForm = ({
               >
                 Hủy
               </Button>
-              <Button
+              {/* <Button
                 onClick={() => {
                   console.log("Current form values:", form.getFieldsValue());
                   console.log("Subjects list:", subjects);
@@ -652,7 +652,7 @@ const InformationForm = ({
                 disabled={isUploading || submitting}
               >
                 Debug
-              </Button>
+              </Button> */}
               <Button
                 type="primary"
                 htmlType="submit"
