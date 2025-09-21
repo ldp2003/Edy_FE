@@ -11,6 +11,7 @@ interface DocumentViewerProps {
   currentPage?: number;
   onPageUpdate?: (page: number) => void;
   zoom?: number;
+  allowFullAccess?: boolean; // Allow viewing all pages without limit
 }
 
 const VideoViewer: React.FC<{ url: string }> = ({ url }) => {
@@ -55,6 +56,7 @@ const DocumentViewer: React.FC<DocumentViewerProps> = ({
   currentPage,
   onPageUpdate,
   zoom,
+  allowFullAccess = false,
 }) => {
   if (type === "pdf") {
     return (
@@ -64,6 +66,7 @@ const DocumentViewer: React.FC<DocumentViewerProps> = ({
         currentPage={currentPage}
         onPageUpdate={onPageUpdate}
         zoom={zoom}
+        allowFullAccess={allowFullAccess}
       />
     );
   }

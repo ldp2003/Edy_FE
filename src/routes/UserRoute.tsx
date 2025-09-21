@@ -23,9 +23,13 @@ const UserRoute: React.FC = () => {
           <Route path="account-activation" element={<AccountActivation />} />
         </Route>
 
-        {/* Main app pages with UserLayout */}
+        {/* All app pages with UserLayout - some are public, some require auth */}
         <Route path="/" element={<UserLayout />}>
+          {/* Public pages - accessible by anyone */}
           <Route index element={<HomePage />} />
+          <Route path="document-detail/:id" element={<DocumentDetail />} />
+
+          {/* Protected pages - will be handled by individual components */}
           <Route path="personal-posts" element={<PersonalPost />} />
           <Route
             path="personal-posts/document-detail/:id"
@@ -34,7 +38,6 @@ const UserRoute: React.FC = () => {
           <Route path="personal-profile" element={<PersonalProfile />} />
           <Route path="upload-document" element={<UploadPage />} />
           <Route path="edit-profile" element={<EditProfile />} />
-          <Route path="document-detail/:id" element={<DocumentDetail />} />
         </Route>
       </Routes>
     </AuthRoute>
