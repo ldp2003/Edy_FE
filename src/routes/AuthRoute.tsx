@@ -76,11 +76,24 @@ const AuthRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
             // If user doesn't have admin role, continue normally without role selection
           }
         } else {
+          // User not authenticated
           setIsLoggedIn(false);
           setUser(defaultUser);
           setAccount(null);
-          navigate("/");
           setRole(null);
+
+          // Allow access to public pages without redirecting
+          const publicPages = ["/", "/document-detail"];
+          const isPublicPage = publicPages.some(
+            (page) =>
+              location.pathname === page ||
+              (page === "/document-detail" &&
+                location.pathname.startsWith("/document-detail/"))
+          );
+
+          if (!isPublicPage) {
+            navigate("/");
+          }
         }
       } catch (error) {
         console.error("Error during auth check:", error);
@@ -88,7 +101,19 @@ const AuthRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
         setUser(defaultUser);
         setAccount(null);
         setRole(null);
-        navigate("/");
+
+        // Allow access to public pages even when auth fails
+        const publicPages = ["/", "/document-detail"];
+        const isPublicPage = publicPages.some(
+          (page) =>
+            location.pathname === page ||
+            (page === "/document-detail" &&
+              location.pathname.startsWith("/document-detail/"))
+        );
+
+        if (!isPublicPage) {
+          navigate("/");
+        }
       } finally {
         if (isInitialLoad) {
           setIsLoading(false);

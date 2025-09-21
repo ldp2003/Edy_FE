@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { Form, Input, Select, InputNumber, Button, message, Modal } from "antd";
-import { Plus, Minus } from "lucide-react";
+import { Plus, Minus, Eye } from "lucide-react";
 import type { Document } from "../../../models/document";
 import UserInfoHeader from "./UserInfoHeader";
+import DocumentViewer from "../../user/document/documentView/DocumentViewer";
+import DocumentPagination from "../../user/document/documentView/DocumentPagination";
 
 const { TextArea } = Input;
 const { Option } = Select;
@@ -30,6 +32,12 @@ const DocumentReview: React.FC<DocumentReviewProps> = ({
   const [rejectReason, setRejectReason] = useState("");
   const [deleteReason, setDeleteReason] = useState("");
   const [processing, setProcessing] = useState(false);
+
+  // Document viewer modal states
+  const [documentViewerVisible, setDocumentViewerVisible] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [zoom, setZoom] = useState(1.5);
 
   // Fill form with document data
   useEffect(() => {
@@ -78,6 +86,64 @@ const DocumentReview: React.FC<DocumentReviewProps> = ({
     }
 
     return "https://cdn-icons-png.flaticon.com/512/2425/2425541.png";
+  };
+
+  // Document viewer helper functions
+  const getDocumentType = (): "pdf" | "ppt" | "excel" | "video" | "word" => {
+    switch (document.file_type?.toUpperCase()) {
+      case "PDF":
+        return "pdf";
+      case "WORD":
+      case "DOCX":
+        return "word";
+      case "EXCEL":
+      case "XLSX":
+        return "excel";
+      case "PPT":
+      case "PPTX":
+        return "ppt";
+      case "VIDEO":
+      case "MP4":
+        return "video";
+      default:
+        return "pdf";
+    }
+  };
+
+  const handleOpenDocumentViewer = () => {
+    setDocumentViewerVisible(true);
+    setCurrentPage(1);
+  };
+
+  const handlePageChange = (current: number, total: number) => {
+    setCurrentPage(current);
+    setTotalPages(total);
+  };
+
+  const handlePrevPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage(currentPage - 1);
+    }
+  };
+
+  const handleNextPage = () => {
+    if (currentPage < totalPages) {
+      setCurrentPage(currentPage + 1);
+    }
+  };
+
+  const handleGoToPage = (page: number) => {
+    if (page >= 1 && page <= totalPages) {
+      setCurrentPage(page);
+    }
+  };
+
+  const handleZoomIn = () => {
+    setZoom((prev) => Math.min(prev + 0.25, 3));
+  };
+
+  const handleZoomOut = () => {
+    setZoom((prev) => Math.max(prev - 0.25, 0.5));
   };
 
   const handleApprove = async () => {
@@ -177,12 +243,27 @@ const DocumentReview: React.FC<DocumentReviewProps> = ({
             {/* Column 1 - Image and privacy */}
             <div className="space-y-4">
               <div className="mb-0">
-                <img
-                  src={getPreviewImage()}
-                  alt="Document preview"
-                  className="border border-gray-200 rounded object-cover"
-                  style={{ maxHeight: "300px" }}
-                />
+                <div
+                  className="relative cursor-pointer group"
+                  onClick={handleOpenDocumentViewer}
+                >
+                  <img
+                    src={getPreviewImage()}
+                    alt="Document preview"
+                    className="border border-gray-200 rounded object-cover transition-all duration-200 group-hover:shadow-lg"
+                    style={{ maxHeight: "300px" }}
+                  />
+                  {/* Overlay with eye icon */}
+                  <div className="absolute inset-0 bg-black/10 bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-200 rounded flex items-center justify-center">
+                    <Eye
+                      size={32}
+                      className="text-white opacity-0 group-hover:opacity-100 transition-opacity duration-200"
+                    />
+                  </div>
+                  <div className="absolute bottom-2 left-2 bg-black bg-opacity-60 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                    Click để xem tài liệu
+                  </div>
+                </div>
                 <div className="text-xs text-gray-500 mt-1">
                   {formatFileSize(estimatedFileSize)}
                 </div>
@@ -409,6 +490,51 @@ const DocumentReview: React.FC<DocumentReviewProps> = ({
           </div>
         </Form>
       </div>
+
+      {/* Document Viewer Modal */}
+      <Modal
+        title={`Xem tài liệu: ${document.title}`}
+        open={documentViewerVisible}
+        onCancel={() => setDocumentViewerVisible(false)}
+        footer={null}
+        width="90vw"
+        style={{ top: 20 }}
+        bodyStyle={{
+          padding: 0,
+          height: "80vh",
+          overflow: "hidden",
+        }}
+        destroyOnClose
+      >
+        <div className="relative h-full">
+          <div className="h-full overflow-auto">
+            <DocumentViewer
+              url={document.url}
+              type={getDocumentType()}
+              onPageChange={handlePageChange}
+              currentPage={currentPage}
+              onPageUpdate={setCurrentPage}
+              zoom={zoom}
+              allowFullAccess={true}
+            />
+          </div>
+
+          {/* Document Pagination Controls */}
+          {(getDocumentType() === "pdf" || getDocumentType() === "word") && (
+            <DocumentPagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPrevPage={handlePrevPage}
+              onNextPage={handleNextPage}
+              onGoToPage={handleGoToPage}
+              onZoomIn={handleZoomIn}
+              onZoomOut={handleZoomOut}
+              zoom={zoom}
+              disabled={false}
+            />
+          )}
+        </div>
+      </Modal>
 
       {/* Reject Modal */}
       <Modal
