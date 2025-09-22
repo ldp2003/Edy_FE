@@ -1,6 +1,7 @@
-import React, { useState, useCallback, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import React, { useState, useCallback, useEffect, useContext } from "react";
+import { useParams, useNavigate } from "react-router-dom";
 import { message } from "antd";
+import { UserContext } from "../../../contexts/UserContext";
 import DocumentSide from "../../../components/user/document/documentDetail/DocumentSide";
 import DocumentActions from "../../../components/user/document/documentDetail/DocumentActions";
 import AuthorInfo from "../../../components/common/userInfo/AuthorInfo";
@@ -11,6 +12,8 @@ import type { Document } from "../../../models/document";
 
 const DocumentDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
+  const { user } = useContext(UserContext);
   const [document, setDocument] = useState<Document | null>(null);
   const [loading, setLoading] = useState(true);
   const [messageApi, contextHolder] = message.useMessage();
@@ -32,6 +35,14 @@ const DocumentDetail: React.FC = () => {
       try {
         setLoading(true);
         const documentData = await DocumentService.getDocumentById(id);
+
+        // Kiểm tra xem tài liệu có thuộc về người dùng hiện tại không
+        if (user && documentData.user._id === user._id) {
+          // Nếu là tài liệu của người dùng, chuyển hướng sang PersonalPostDetail
+          navigate(`/personal-posts/document-detail/${id}`, { replace: true });
+          return;
+        }
+
         setDocument(documentData);
       } catch (error) {
         console.error("Error fetching document:", error);
@@ -42,7 +53,7 @@ const DocumentDetail: React.FC = () => {
     };
 
     fetchDocument();
-  }, [id, messageApi]);
+  }, [id, messageApi, user, navigate]);
 
   // Handle page change from document viewer
   const handlePageChange = useCallback((current: number, total: number) => {

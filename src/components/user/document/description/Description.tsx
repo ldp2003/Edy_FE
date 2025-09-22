@@ -14,11 +14,11 @@ const Description: React.FC<DescriptionProps> = ({
   const [activeTab, setActiveTab] = useState<"original" | "ai">("original");
 
   return (
-    <div className="mt-4">
+    <div className="mt-4 relative">
       <h4 className="font-medium text-sm mb-2">Tóm tắt</h4>
       <div
         style={{ backgroundColor: "var(--field-background-color)" }}
-        className="rounded-lg shadow-xl"
+        className="rounded-lg shadow-xl relative"
       >
         <div className="flex bg-blue-50 rounded-lg p-1 mb-3 ">
           <button
@@ -43,7 +43,7 @@ const Description: React.FC<DescriptionProps> = ({
           </button>
         </div>
 
-        <div className="text-[10px] text-gray-600 leading-relaxed">
+        <div className="text-[10px] text-gray-600 leading-relaxed relative">
           {activeTab === "original" ? (
             <p className="p-4">
               {document.description?.summary_by_user ||
@@ -55,10 +55,9 @@ const Description: React.FC<DescriptionProps> = ({
                 "Tóm tắt AI chưa được tạo cho tài liệu này. Hệ thống sẽ tự động tạo tóm tắt trong thời gian tới."}
             </p>
           )}
+          {!isUser && <DescriptionModal />}
         </div>
       </div>
-
-      {!isUser && <DescriptionModal />}
     </div>
   );
 };

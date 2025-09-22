@@ -25,14 +25,14 @@ export function Header() {
   };
 
   return (
-    <header className="bg-white border-b border-gray-200 px-6 py-4 fixed left-0 top-0 w-full z-50 shadow-b shadow-sm">
+    <header className="bg-white border-b border-gray-200 px-6 py-2 fixed left-0 top-0 w-full z-50 shadow-b shadow-sm">
       <div className="flex items-center justify-between">
         {/* Logo */}
         <div className="flex items-center gap-2">
-          <div className="w-12 h-12 rounded flex items-center justify-center">
+          <div className="w-10 h-10 rounded flex items-center justify-center">
             <img src={logo} alt="Logo" />
           </div>
-          <span className="text-3xl font-bold bg-gradient-to-b from-[#50C4FE] to-[#3586DB] bg-clip-text text-transparent">
+          <span className="text-[29px] font-bold bg-gradient-to-b from-[#50C4FE] to-[#3586DB] bg-clip-text text-transparent">
             EDY
           </span>
         </div>
@@ -45,7 +45,7 @@ export function Header() {
               placeholder="Nhập từ khóa tìm kiếm: Tên tài liệu, trường, môn học, tác giả..."
               className="pl-10 text-sm pr-24 py-2 w-full border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
-            <button className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-gray-600 hover:bg-gray-700 text-white px-4 py-1 text-xs rounded transition-colors">
+            <button className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-[var(--primary-color)] hover:bg-gray-700 text-white px-4 py-1 text-xs rounded transition-colors">
               Tìm kiếm
             </button>
           </div>

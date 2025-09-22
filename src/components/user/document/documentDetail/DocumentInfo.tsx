@@ -1,5 +1,13 @@
 import React from "react";
-import { Backpack, FolderClosed, School } from "lucide-react";
+import {
+  Backpack,
+  FolderClosed,
+  School,
+  Globe,
+  Lock,
+  Users,
+  Share,
+} from "lucide-react";
 import IntensiveMark from "../documentElement/IntensiveMark";
 import type { Document } from "../../../../models/document";
 
@@ -8,6 +16,47 @@ interface DocumentInfoProps {
 }
 
 const DocumentInfo: React.FC<DocumentInfoProps> = ({ document }) => {
+  // Helper function to get visibility info
+  const getVisibilityInfo = (mode?: string) => {
+    switch (mode) {
+      case "PUBLIC":
+        return {
+          icon: <Globe size={12} />,
+          text: "Công khai",
+          color: "#52c41a",
+          bgColor: "#f6ffed",
+        };
+      case "PRIVATE":
+        return {
+          icon: <Lock size={12} />,
+          text: "Riêng tư",
+          color: "#ff4d4f",
+          bgColor: "#fff2f0",
+        };
+      case "SHARE_ORGANIZATION":
+        return {
+          icon: <Users size={12} />,
+          text: "Chia sẻ tổ chức",
+          color: "#1890ff",
+          bgColor: "#f0f8ff",
+        };
+      case "PRIVATE_SHARED":
+        return {
+          icon: <Share size={12} />,
+          text: "Chia sẻ riêng tư",
+          color: "#fa8c16",
+          bgColor: "#fff7e6",
+        };
+      default:
+        return {
+          icon: <Lock size={12} />,
+          text: "Riêng tư",
+          color: "#8c8c8c",
+          bgColor: "#f5f5f5",
+        };
+    }
+  };
+
   // Helper function to format level
   const formatLevel = (level: string): string => {
     const levelMap: { [key: string]: string } = {
@@ -33,16 +82,31 @@ const DocumentInfo: React.FC<DocumentInfoProps> = ({ document }) => {
     });
   };
 
+  const visibilityInfo = getVisibilityInfo(document.public_mode);
+
   return (
     <div className="space-y-4 text-sm document-info">
-      <div
-        className="text-sm font-bold"
-        style={{
-          color: "var(--secondary-text-color)",
-        }}
-      >
-        {document.title}
+      <div className="space-y-2">
+        <div className="text-sm font-bold text-[var(--primary-text-color)]">
+          {document.title}
+        </div>
+
+        {/* Hiển thị chế độ công khai */}
+        <div className="flex items-center gap-2">
+          <div
+            className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium"
+            style={{
+              color: visibilityInfo.color,
+              backgroundColor: visibilityInfo.bgColor,
+              border: `1px solid ${visibilityInfo.color}20`,
+            }}
+          >
+            {visibilityInfo.icon}
+            {visibilityInfo.text}
+          </div>
+        </div>
       </div>
+
       {document.intensive && <IntensiveMark label="Chuyên sâu" />}
 
       <div className="flex flex-col gap-1">
