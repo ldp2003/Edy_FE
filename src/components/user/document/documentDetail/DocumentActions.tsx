@@ -1,3 +1,4 @@
+import React, { useState, useEffect } from "react";
 import DownloadButton from "../../../common/buttons/DownloadButton";
 import ReportButton from "../../../common/buttons/ReportButton";
 import LikeButton from "../../../common/buttons/LikeButton";
@@ -15,11 +16,37 @@ const DocumentActions: React.FC<DocumentActionsProps> = ({
   document,
   isUser = false,
 }) => {
+  const [isFixed, setIsFixed] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+
+      // Cố định vị trí khi cuộn xuống quá 100px
+      if (currentScrollY > 100) {
+        setIsFixed(true);
+      } else {
+        setIsFixed(false);
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
+
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, []);
+
   console.log("Document for actions:", document._id);
 
   return (
-    <div className="flex items-center justify-between p-2">
-      
+    <div
+      className={`flex items-center justify-between p-2 transition-all duration-300 ${
+        isFixed
+          ? "fixed top-20 left-[23%] bg-[var(--secondary-background-color)] right-0 px-[10%] shadow-md z-1"
+          : ""
+      }`}
+    >
       <DownloadButton point={6} />
 
       <div className="flex items-center space-x-4">

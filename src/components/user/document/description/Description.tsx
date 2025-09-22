@@ -14,11 +14,11 @@ const Description: React.FC<DescriptionProps> = ({
   const [activeTab, setActiveTab] = useState<"original" | "ai">("original");
 
   return (
-    <div className="mt-4">
+    <div className="mt-4 relative">
       <h4 className="font-medium text-sm mb-2">Tóm tắt</h4>
       <div
         style={{ backgroundColor: "var(--field-background-color)" }}
-        className="rounded-lg shadow-xl"
+        className="rounded-lg shadow-xl relative"
       >
         <div className="flex bg-blue-50 rounded-lg p-1 mb-3 ">
           <button
@@ -56,9 +56,9 @@ const Description: React.FC<DescriptionProps> = ({
             </p>
           )}
         </div>
-      </div>
 
-      {!isUser && <DescriptionModal />}
+        {!isUser && <DescriptionModal />}
+      </div>
     </div>
   );
 };

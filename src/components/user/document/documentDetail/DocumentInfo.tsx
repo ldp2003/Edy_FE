@@ -35,12 +35,7 @@ const DocumentInfo: React.FC<DocumentInfoProps> = ({ document }) => {
 
   return (
     <div className="space-y-4 text-sm document-info">
-      <div
-        className="text-sm font-bold"
-        style={{
-          color: "var(--secondary-text-color)",
-        }}
-      >
+      <div className="text-sm font-bold text-[var(--primary-text-color)]">
         {document.title}
       </div>
       {document.intensive && <IntensiveMark label="Chuyên sâu" />}
