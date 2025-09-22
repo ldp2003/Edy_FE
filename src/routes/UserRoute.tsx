@@ -10,7 +10,7 @@ import EditProfile from "../pages/user/personalProfile/EditProfile";
 import DocumentDetail from "../pages/user/document/DocumentDetail";
 import RoleSelectionPage from "../pages/auth/RoleSelectionPage";
 import AuthRoute from "./AuthRoute";
-import PersonalPost from "../pages/user/presonalPosts/PersonalPost";
+import PersonalPost from "../pages/user/personalPosts/PersonalPost";
 import PersonalPostDetail from "../pages/user/personalPosts/PersonalPostDetail";
 
 const UserRoute: React.FC = () => {

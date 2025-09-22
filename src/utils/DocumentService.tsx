@@ -26,9 +26,26 @@ export const DocumentService = {
     }
   },
 
-  async getMyDocuments() {
+  async getMyDocuments(params?: {
+    search?: string;
+    ordering?: string;
+    order?: 1 | -1;
+    page?: number;
+    limit?: number;
+    organization?: string;
+    publisher?: string;
+    published_year?: number;
+    intensive?: boolean;
+    author?: string;
+    keyword?: string;
+    doc_type?: string;
+    level?: string;
+    subject?: string;
+    status?: string;
+  }) {
     try {
-      return await DocumentAPI.getMyDocuments();
+      const response = await DocumentAPI.getMyDocuments(params);
+      return response;
     } catch (error) {
       console.error("Error in DocumentService.getMyDocuments:", error);
       throw error;
