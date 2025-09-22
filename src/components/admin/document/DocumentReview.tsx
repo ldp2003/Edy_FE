@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { Form, Input, Select, InputNumber, Button, message, Modal } from "antd";
 
-import { Plus, Minus, Eye, X } from "lucide-react";
+import { Plus, Minus, Eye } from "lucide-react";
 import type { Document } from "../../../models/document";
 import UserInfoHeader from "./UserInfoHeader";
-
 
 const { TextArea } = Input;
 const { Option } = Select;
@@ -29,7 +28,8 @@ const DocumentReview: React.FC<DocumentReviewProps> = ({
   const [authors, setAuthors] = useState<string[]>([]);
   const [rejectModalVisible, setRejectModalVisible] = useState(false);
   const [deleteModalVisible, setDeleteModalVisible] = useState(false);
-  const [documentViewModalVisible, setDocumentViewModalVisible] = useState(false);
+  const [documentViewModalVisible, setDocumentViewModalVisible] =
+    useState(false);
   const [rejectReason, setRejectReason] = useState("");
   const [deleteReason, setDeleteReason] = useState("");
   const [processing, setProcessing] = useState(false);
@@ -83,7 +83,6 @@ const DocumentReview: React.FC<DocumentReviewProps> = ({
     return "https://cdn-icons-png.flaticon.com/512/2425/2425541.png";
   };
 
-
   const getDocumentViewerUrl = () => {
     if (!document?.url) return null;
 
@@ -101,7 +100,9 @@ const DocumentReview: React.FC<DocumentReviewProps> = ({
       // );
 
       // Option 2: Use Google Docs Viewer (alternative)
-      return `https://docs.google.com/viewer?url=${encodeURIComponent(document.url)}&embedded=true`;
+      return `https://docs.google.com/viewer?url=${encodeURIComponent(
+        document.url
+      )}&embedded=true`;
     }
 
     return document.url;
@@ -225,14 +226,14 @@ const DocumentReview: React.FC<DocumentReviewProps> = ({
                   className="absolute inset-0 bg-black/30 bg-opacity-0 group-hover:bg-opacity-30 transition-all duration-200 flex items-center justify-center cursor-pointer rounded opacity-0 group-hover:opacity-100"
                   onClick={handleOpenDocumentViewer}
                 >
-                  <Eye
-                    size={32}
-                    className="text-white"
-                  />
+                  <Eye size={32} className="text-white" />
                 </div>
                 <div className="text-xs text-gray-500 mt-1">
                   {formatFileSize(estimatedFileSize)}
-                  <span className="ml-2 text-blue-600 cursor-pointer hover:underline" onClick={handleOpenDocumentViewer}>
+                  <span
+                    className="ml-2 text-blue-600 cursor-pointer hover:underline"
+                    onClick={handleOpenDocumentViewer}
+                  >
                     Xem tài liệu
                   </span>
                 </div>
@@ -466,16 +467,12 @@ const DocumentReview: React.FC<DocumentReviewProps> = ({
         open={documentViewModalVisible}
         onCancel={() => setDocumentViewModalVisible(false)}
         footer={[
-          <Button key="close" onClick={() => setDocumentViewModalVisible(false)}>
+          <Button
+            key="close"
+            onClick={() => setDocumentViewModalVisible(false)}
+          >
             Đóng
           </Button>,
-          <Button
-            key="download"
-            type="primary"
-            onClick={() => window.open(document.url, '_blank')}
-          >
-            Tải xuống
-          </Button>
         ]}
         width="90vw"
         style={{ maxWidth: "1200px" }}
@@ -486,7 +483,7 @@ const DocumentReview: React.FC<DocumentReviewProps> = ({
           {document.file_type === "PDF" ? (
             // For PDF files - direct embed
             <iframe
-              src={`${getDocumentViewerUrl()}#toolbar=1&navpanes=1&scrollbar=1`}
+              src={`${getDocumentViewerUrl()}#toolbar=0&navpanes=1&scrollbar=1`}
               width="100%"
               height="100%"
               style={{ border: "none" }}
@@ -495,7 +492,9 @@ const DocumentReview: React.FC<DocumentReviewProps> = ({
           ) : document.file_type === "WORD" ? (
             // For Word files - use Google Docs Viewer
             <iframe
-              src={`https://docs.google.com/viewer?url=${encodeURIComponent(document.url)}&embedded=true`}
+              src={`https://docs.google.com/viewer?url=${encodeURIComponent(
+                document.url
+              )}&embedded=true`}
               width="100%"
               height="100%"
               style={{ border: "none" }}
@@ -505,10 +504,12 @@ const DocumentReview: React.FC<DocumentReviewProps> = ({
             // For other file types
             <div className="flex items-center justify-center h-full bg-gray-100">
               <div className="text-center">
-                <p className="text-gray-600 mb-4">Không thể xem trước file này</p>
+                <p className="text-gray-600 mb-4">
+                  Không thể xem trước file này
+                </p>
                 <Button
                   type="primary"
-                  onClick={() => window.open(document.url, '_blank')}
+                  onClick={() => window.open(document.url, "_blank")}
                 >
                   Mở file trong tab mới
                 </Button>

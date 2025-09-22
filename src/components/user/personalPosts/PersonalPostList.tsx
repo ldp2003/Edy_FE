@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { Pagination } from "antd";
 import PostTable from "./PostTable";
 import PostListView from "./PostListView";
 import PostGridView from "./PostGridView";
@@ -25,20 +26,31 @@ const PersonalPostList: React.FC = () => {
   const [viewMode, setViewMode] = useState("table");
   const [documents, setDocuments] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
+  const [total, setTotal] = useState(0);
   const navigate = useNavigate();
 
   React.useEffect(() => {
     let mounted = true;
     setLoading(true);
 
-    DocumentService.getMyDocuments()
+    const apiParams = {
+      page: currentPage,
+      limit: pageSize,
+    };
+
+    console.log("API Params:", apiParams); // Debug log
+
+    DocumentService.getMyDocuments(apiParams)
       .then((data) => {
+        console.log("API Response:", data); // Debug log
         if (mounted) {
           // Map dữ liệu BE sang Post[]
           const docs = Array.isArray(data?.documents)
             ? data.documents.map((doc: Document, idx: number) => ({
                 key: doc._id,
-                index: idx + 1,
+                index: (currentPage - 1) * pageSize + idx + 1,
                 title: doc.title,
                 views: doc.view || 0,
                 comments: doc.comment_count || 0,
@@ -51,18 +63,20 @@ const PersonalPostList: React.FC = () => {
               }))
             : [];
           setDocuments(docs);
+          setTotal(data?.total || 0);
         }
       })
       .catch((error) => {
         console.error("Error fetching documents:", error);
         setDocuments([]);
+        setTotal(0);
       })
       .finally(() => mounted && setLoading(false));
 
     return () => {
       mounted = false;
     };
-  }, []);
+  }, [currentPage, pageSize]);
   const renderContent = () => {
     switch (viewMode) {
       case "table":
@@ -74,6 +88,20 @@ const PersonalPostList: React.FC = () => {
       default:
         return <PostTable data={documents} loading={loading} />;
     }
+  };
+
+  // Cấu hình locale tiếng Việt cho Pagination
+  const paginationLocale = {
+    items_per_page: "/ trang",
+    jump_to: "Đến trang",
+    jump_to_confirm: "xác nhận",
+    page: "Trang",
+    prev_page: "Trang trước",
+    next_page: "Trang tiếp",
+    prev_5: "5 trang trước",
+    next_5: "5 trang tiếp",
+    prev_3: "3 trang trước",
+    next_3: "3 trang tiếp",
   };
 
   return (
@@ -97,6 +125,32 @@ const PersonalPostList: React.FC = () => {
         <UploadButton onClick={() => navigate("/upload-document")} />
       </div>
       {renderContent()}
+
+      {/* Pagination */}
+      {total > 0 && (
+        <div className="flex justify-center mt-6">
+          <Pagination
+            current={currentPage}
+            total={total}
+            pageSize={pageSize}
+            showSizeChanger={true}
+            showQuickJumper={true}
+            locale={paginationLocale}
+            showTotal={(total, range) =>
+              `Hiển thị ${range[0]}-${range[1]} của ${total} tài liệu`
+            }
+            onChange={(page, size) => {
+              setCurrentPage(page);
+              if (size !== pageSize) {
+                setPageSize(size);
+                setCurrentPage(1); // Reset to first page when changing page size
+                console.log("Page size changed to:", size);
+              }
+            }}
+            pageSizeOptions={["5", "10", "20", "50"]}
+          />
+        </div>
+      )}
     </div>
   );
 };

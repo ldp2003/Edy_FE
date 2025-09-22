@@ -255,9 +255,27 @@ export const DocumentAPI = {
     }
   },
   // Get documents of current user
-  getMyDocuments: async () => {
+  getMyDocuments: async (params?: {
+    search?: string;
+    ordering?: string;
+    order?: 1 | -1;
+    page?: number;
+    limit?: number;
+    organization?: string;
+    publisher?: string;
+    published_year?: number;
+    intensive?: boolean;
+    author?: string;
+    keyword?: string;
+    doc_type?: string;
+    level?: string;
+    subject?: string;
+    status?: string;
+  }) => {
     try {
-      const response = await apiClient.get("/documents/my-documents");
+      const response = await apiClient.get("/documents/my-documents", {
+        params,
+      });
       return response.data;
     } catch (error) {
       console.error("Error fetching my documents:", error);

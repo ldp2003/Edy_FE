@@ -12,8 +12,6 @@ interface WordViewerProps {
 const WordViewer: React.FC<WordViewerProps> = ({
   url,
   onPageChange,
-  currentPage = 1,
-  onPageUpdate,
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [loading, setLoading] = useState(true);
