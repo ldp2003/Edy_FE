@@ -53,7 +53,7 @@ const WordViewer: React.FC<WordViewerProps> = ({
   }, [url, onPageChange]);
 
   return (
-    <div style={{ minHeight: 200 }}>
+    <div className="lg:max-w-[1400px]" style={{ minHeight: 200 }}>
       {loading && <div>Đang tải file Word...</div>}
       {error && <div style={{ color: "red" }}>{error}</div>}
       <div

@@ -56,7 +56,6 @@ const DocumentViewer: React.FC<DocumentViewerProps> = ({
   currentPage,
   onPageUpdate,
   zoom,
-  allowFullAccess = false,
 }) => {
   if (type === "pdf") {
     return (
@@ -66,7 +65,6 @@ const DocumentViewer: React.FC<DocumentViewerProps> = ({
         currentPage={currentPage}
         onPageUpdate={onPageUpdate}
         zoom={zoom}
-        allowFullAccess={allowFullAccess}
       />
     );
   }
