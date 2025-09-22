@@ -1,15 +1,6 @@
 import React from "react";
 import { Button, Avatar } from "antd";
-import {
-  Edit,
-  Eye,
-  EyeOff,
-  Users,
-  Lock,
-  Share,
-  Globe,
-  School,
-} from "lucide-react";
+import { Edit, Eye, EyeOff, Share, School } from "lucide-react";
 import type { Document } from "../../../models/document";
 
 interface PersonalPostHeaderProps {
@@ -25,47 +16,6 @@ const PersonalPostHeader: React.FC<PersonalPostHeaderProps> = ({
   onChangeVisibility,
   onShare,
 }) => {
-  // Get icon and text based on public_mode
-  const getVisibilityInfo = (mode: string) => {
-    switch (mode) {
-      case "PUBLIC":
-        return {
-          icon: <Globe size={16} />,
-          text: "Công khai",
-          color: "#52c41a",
-          bgColor: "#f6ffed",
-        };
-      case "PRIVATE":
-        return {
-          icon: <Lock size={16} />,
-          text: "Riêng tư",
-          color: "#ff4d4f",
-          bgColor: "#fff2f0",
-        };
-      case "SHARE_ORGANIZATION":
-        return {
-          icon: <Users size={16} />,
-          text: "Chia sẻ tổ chức",
-          color: "#1890ff",
-          bgColor: "#f0f8ff",
-        };
-      case "PRIVATE_SHARED":
-        return {
-          icon: <Share size={16} />,
-          text: "Chia sẻ riêng tư",
-          color: "#fa8c16",
-          bgColor: "#fff7e6",
-        };
-      default:
-        return {
-          icon: <Lock size={16} />,
-          text: "Riêng tư",
-          color: "#8c8c8c",
-          bgColor: "#f5f5f5",
-        };
-    }
-  };
-
   // Get buttons based on public_mode
   const renderActionButtons = () => {
     const buttons = [];
@@ -75,11 +25,11 @@ const PersonalPostHeader: React.FC<PersonalPostHeaderProps> = ({
       <Button
         key="edit"
         type="default"
-        icon={<Edit size={16} />}
+        icon={<Edit size={13} />}
         onClick={onEdit}
-        className="flex items-center gap-2"
+        className="flex items-center text-xs gap-2"
       >
-        Chỉnh sửa
+        <div className="text-xs">Chỉnh sửa</div>
       </Button>
     );
 
@@ -89,11 +39,11 @@ const PersonalPostHeader: React.FC<PersonalPostHeaderProps> = ({
         <Button
           key="visibility"
           type="default"
-          icon={<EyeOff size={16} />}
+          icon={<EyeOff size={13} />}
           onClick={onChangeVisibility}
-          className="flex items-center gap-2"
+          className="flex items-center text-xs gap-2"
         >
-          Đặt riêng tư
+          <div className="text-xs">Đặt riêng tư</div>
         </Button>
       );
     } else {
@@ -101,11 +51,11 @@ const PersonalPostHeader: React.FC<PersonalPostHeaderProps> = ({
         <Button
           key="visibility"
           type="primary"
-          icon={<Eye size={16} />}
+          icon={<Eye size={13} />}
           onClick={onChangeVisibility}
-          className="flex items-center gap-2"
+          className="flex items-center text-xs gap-2"
         >
-          Công khai
+          <div className="text-xs">Công khai</div>
         </Button>
       );
     }
@@ -116,11 +66,11 @@ const PersonalPostHeader: React.FC<PersonalPostHeaderProps> = ({
         <Button
           key="share"
           type="default"
-          icon={<Share size={16} />}
+          icon={<Share size={13} />}
           onClick={onShare}
-          className="flex items-center gap-2"
+          className="flex items-center text-xs gap-2"
         >
-          Chia sẻ
+          <div className="text-xs">Chia sẻ</div>
         </Button>
       );
     }
@@ -129,7 +79,7 @@ const PersonalPostHeader: React.FC<PersonalPostHeaderProps> = ({
   };
 
   return (
-    <div className="ml-[24%] bg-white rounded-2xl shadow-lg p-6 mb-4">
+    <div className="ml-[24%] bg-white rounded-2xl shadow-lg px-6 py-2 mb-4">
       {/* User Info Section */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
@@ -153,7 +103,7 @@ const PersonalPostHeader: React.FC<PersonalPostHeaderProps> = ({
               {document.user.first_name} {document.user.last_name}
             </h3>
             <div className="flex flex-row gap-2 items-center">
-              <School size={16} />
+              <School size={13} />
               <p className="text-sm font-semibold">
                 {document.organization.name}
               </p>
@@ -165,31 +115,6 @@ const PersonalPostHeader: React.FC<PersonalPostHeaderProps> = ({
         <div className="flex flex-col gap-3">
           {/* Action Buttons */}
           {renderActionButtons()}
-          {/* Current Status Display */}
-          {(() => {
-            const visibilityInfo = getVisibilityInfo(
-              document.public_mode || "PRIVATE"
-            );
-            return (
-              <div
-                className="flex items-center gap-2 px-3 py-2 rounded-lg"
-                style={{
-                  backgroundColor: visibilityInfo.bgColor,
-                  border: `1px solid ${visibilityInfo.color}20`,
-                }}
-              >
-                <span style={{ color: visibilityInfo.color }}>
-                  {visibilityInfo.icon}
-                </span>
-                <span
-                  className="text-sm font-medium"
-                  style={{ color: visibilityInfo.color }}
-                >
-                  {visibilityInfo.text}
-                </span>
-              </div>
-            );
-          })()}
         </div>
       </div>
     </div>
