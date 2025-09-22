@@ -25,14 +25,14 @@ export function Header() {
   };
 
   return (
-    <header className="bg-white border-b border-gray-200 px-6 py-4 fixed left-0 top-0 w-full z-50 shadow-b shadow-sm">
+    <header className="bg-white border-b border-gray-200 px-6 py-2 fixed left-0 top-0 w-full z-50 shadow-b shadow-sm">
       <div className="flex items-center justify-between">
         {/* Logo */}
         <div className="flex items-center gap-2">
-          <div className="w-12 h-12 rounded flex items-center justify-center">
+          <div className="w-10 h-10 rounded flex items-center justify-center">
             <img src={logo} alt="Logo" />
           </div>
-          <span className="text-3xl font-bold bg-gradient-to-b from-[#50C4FE] to-[#3586DB] bg-clip-text text-transparent">
+          <span className="text-[29px] font-bold bg-gradient-to-b from-[#50C4FE] to-[#3586DB] bg-clip-text text-transparent">
             EDY
           </span>
         </div>

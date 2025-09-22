@@ -39,7 +39,7 @@ const AuthorInfo: React.FC<AuthorInfoProps> = ({ document }) => {
       </div>
 
       <div
-        className="flex flex-col items-center space-y-6"
+        className="flex flex-col items-center space-y-2"
         style={{ color: "var(--primary-text-color)" }}
       >
         <div className="flex flex-row space-x-6">

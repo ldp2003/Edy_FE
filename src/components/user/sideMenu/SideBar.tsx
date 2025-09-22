@@ -21,7 +21,7 @@ export function Sidebar({ isVisible, setIsVisible }: SidebarProps) {
 
   return (
     <aside
-      className={`border-r top-20 fixed z-30 border-gray-200 min-h-screen bg-white transition-all duration-300 flex flex-col  ${
+      className={`border-r top-15 fixed z-30 border-gray-200 min-h-screen bg-white transition-all duration-300 flex flex-col  ${
         isVisible ? "w-fit" : "w-16"
       }`}
     >

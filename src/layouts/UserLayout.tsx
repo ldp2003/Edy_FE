@@ -35,7 +35,7 @@ const UserLayout: React.FC = () => {
           )}
 
           <div
-            className={`flex-grow mt-24 transition-all duration-300 ${
+            className={`flex-grow mt-20 transition-all duration-300 ${
               isDocumentDetailPage
                 ? "mx-[2%]" // Fixed margin for document detail page
                 : isSidebarVisible

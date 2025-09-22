@@ -166,7 +166,7 @@ const PDFViewer: React.FC<PDFViewerProps> = ({
   }, [visiblePage, onPageUpdate]);
 
   return (
-    <div className="max-w-full mx-auto">
+    <div className="max-w-full mx-auto z-0">
       {loading && (
         <div className="flex flex-col items-center justify-center py-20">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mb-4"></div>

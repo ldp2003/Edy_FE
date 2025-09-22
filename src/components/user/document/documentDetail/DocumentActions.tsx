@@ -43,7 +43,7 @@ const DocumentActions: React.FC<DocumentActionsProps> = ({
     <div
       className={`flex items-center justify-between p-2 transition-all duration-300 ${
         isFixed
-          ? "fixed top-20 left-[23%] bg-[var(--secondary-background-color)] right-0 px-[10%] shadow-md z-1"
+          ? "fixed top-15 left-[23%] bg-[var(--secondary-background-color)] right-0 px-[10%] shadow-md z-10"
           : ""
       }`}
     >
