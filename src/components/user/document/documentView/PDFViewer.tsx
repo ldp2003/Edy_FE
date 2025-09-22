@@ -15,7 +15,6 @@ interface PDFViewerProps {
   currentPage?: number;
   onPageUpdate?: (page: number) => void;
   zoom?: number;
-  allowFullAccess?: boolean; // Allow viewing all pages without limit
 }
 
 const PDFViewer: React.FC<PDFViewerProps> = ({
@@ -24,7 +23,6 @@ const PDFViewer: React.FC<PDFViewerProps> = ({
   currentPage = 1,
   onPageUpdate,
   zoom = 1.5,
-  allowFullAccess = false,
 }) => {
   const [pdfDocument, setPdfDocument] =
     useState<pdfjsLib.PDFDocumentProxy | null>(null);
@@ -98,10 +96,7 @@ const PDFViewer: React.FC<PDFViewerProps> = ({
 
   const renderPages = useCallback(
     async (pdf: pdfjsLib.PDFDocumentProxy) => {
-      // Allow full access or limit to 10 pages for preview
-      const pageCount = allowFullAccess
-        ? pdf.numPages
-        : Math.min(pdf.numPages, 10);
+      const pageCount = Math.min(pdf.numPages, 10); // Giới hạn chỉ 10 trang đầu
       const canvasImages: string[] = [];
 
       for (let i = 1; i <= pageCount; i++) {
@@ -119,14 +114,14 @@ const PDFViewer: React.FC<PDFViewerProps> = ({
 
       setCanvases(canvasImages);
 
-      // Notify parent about current page count (limited or full)
+      // Notify parent about limited pages (not total pages)
       if (onPageChange) {
         onPageChange(1, pageCount);
       }
 
       console.log("Rendered canvases:", canvasImages.length);
     },
-    [zoom, onPageChange, allowFullAccess]
+    [zoom, onPageChange]
   );
 
   const scrollToPage = (pageNumber: number) => {
@@ -229,8 +224,8 @@ const PDFViewer: React.FC<PDFViewerProps> = ({
               </div>
             ))}
 
-            {/* Thông báo giới hạn xem - chỉ hiển thị khi không có quyền full access */}
-            {!allowFullAccess && canvases.length >= 10 && (
+            {/* Thông báo giới hạn xem */}
+            {canvases.length >= 10 && (
               <Card className="border-orange-200 bg-orange-50 text-center">
                 <div className="flex flex-col items-center space-y-3">
                   <div className="flex items-center space-x-2">

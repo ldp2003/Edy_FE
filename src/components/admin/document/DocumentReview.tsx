@@ -4,8 +4,7 @@ import { Form, Input, Select, InputNumber, Button, message, Modal } from "antd";
 import { Plus, Minus, Eye, X } from "lucide-react";
 import type { Document } from "../../../models/document";
 import UserInfoHeader from "./UserInfoHeader";
-import DocumentViewer from "../../user/document/documentView/DocumentViewer";
-import DocumentPagination from "../../user/document/documentView/DocumentPagination";
+
 
 const { TextArea } = Input;
 const { Option } = Select;
@@ -34,12 +33,6 @@ const DocumentReview: React.FC<DocumentReviewProps> = ({
   const [rejectReason, setRejectReason] = useState("");
   const [deleteReason, setDeleteReason] = useState("");
   const [processing, setProcessing] = useState(false);
-
-  // Document viewer modal states
-  const [documentViewerVisible, setDocumentViewerVisible] = useState(false);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
-  const [zoom, setZoom] = useState(1.5);
 
   // Fill form with document data
   useEffect(() => {
