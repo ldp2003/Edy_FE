@@ -469,13 +469,6 @@ const DocumentReview: React.FC<DocumentReviewProps> = ({
           <Button key="close" onClick={() => setDocumentViewModalVisible(false)}>
             Đóng
           </Button>,
-          <Button
-            key="download"
-            type="primary"
-            onClick={() => window.open(document.url, '_blank')}
-          >
-            Tải xuống
-          </Button>
         ]}
         width="90vw"
         style={{ maxWidth: "1200px" }}
@@ -486,7 +479,7 @@ const DocumentReview: React.FC<DocumentReviewProps> = ({
           {document.file_type === "PDF" ? (
             // For PDF files - direct embed
             <iframe
-              src={`${getDocumentViewerUrl()}#toolbar=1&navpanes=1&scrollbar=1`}
+              src={`${getDocumentViewerUrl()}#toolbar=0&navpanes=1&scrollbar=1`}
               width="100%"
               height="100%"
               style={{ border: "none" }}
