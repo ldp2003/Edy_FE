@@ -15,7 +15,7 @@ const UserInfoHeader: React.FC = () => {
   return (
     <div className="flex items-start justify-between p-4 rounded-md mb-4 bg-[var(--field-background-color)]">
       <div className="flex flex-col items-center gap-2">
-        <div className="flex flex-row text-left items-center gap-2">
+        <div className="flex flex-row justify-start w-full text-left items-center gap-2">
           <div className="w-15 h-15 mt-4 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden">
             <img
               src={user?.avatar || "/default-avatar.png"}

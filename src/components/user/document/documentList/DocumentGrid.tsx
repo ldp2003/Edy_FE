@@ -11,8 +11,7 @@ const DocumentGrid: React.FC<DocumentGridProps> = ({ title, documents }) => {
     <section className="mb-8">
       <div className="flex justify-between items-center mb-4">
         <h2
-          className="text-xl font-bold text-gray-800"
-          style={{ color: "var(--primary-text-color)" }}
+          className="text-base font-bold text-[var(--primary-text-color)]"
         >
           {title}
         </h2>

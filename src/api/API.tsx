@@ -225,6 +225,17 @@ export const SubjectAPI = {
       throw error;
     }
   },
+
+  // Get documents by subject
+  getDocumentsBySubject: async (subjectId: string) => {
+    try {
+      const response = await apiClient.get(`/subjects/${subjectId}/documents`);
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching documents by subject:", error);
+      throw error;
+    }
+  },
 };
 
 export const DocumentAPI = {

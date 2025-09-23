@@ -4,8 +4,9 @@ import type { MessageInstance } from "antd/es/message/interface";
 import { Plus, Minus } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { DocumentService } from "../../../../utils/DocumentService";
-import { SubjectService, type Subject } from "../../../../utils/SubjectService";
 import { UserContext } from "../../../../contexts/UserContext";
+import SubjectService from "../../../../utils/SubjectService";
+import type { Subject } from "../../../../models/subject";
 
 const { TextArea } = Input;
 const { Option } = Select;
