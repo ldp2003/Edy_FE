@@ -127,7 +127,7 @@ const UserDetailPage: React.FC = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* User Profile and Stats */}
-        <div className="lg:col-span-1">
+        <div className="lg:col-span-1 shadow-sm border border-gray-200 rounded-lg bg-white">
           <UserProfileCard
             user={user}
             getStatusColor={getStatusColor}
@@ -139,7 +139,7 @@ const UserDetailPage: React.FC = () => {
         </div>
 
         {/* Detailed Info */}
-        <div className="lg:col-span-2">
+        <div className="lg:col-span-2 shadow-sm border border-gray-200 rounded-lg bg-white">
           <UserDetailInfo
             user={user}
             getStatusColor={getStatusColor}

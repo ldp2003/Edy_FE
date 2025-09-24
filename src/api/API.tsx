@@ -457,7 +457,9 @@ export const DocumentAPI = {
   // Get pending requests by document ID
   getPendingRequests: async (documentId: string) => {
     try {
-      const response = await apiClient.get(`/documents/pending-requests/${documentId}`);
+      const response = await apiClient.get(
+        `/documents/pending-requests/${documentId}`
+      );
       return response.data;
     } catch (error) {
       console.error("Error getting pending requests:", error);
@@ -466,23 +468,28 @@ export const DocumentAPI = {
   },
 
   // Approve document by request ID
-  approveDocumentByRequestId: async (requestId: string, data?: {
-    isIntensive?: boolean;
-  }) => {
+  approveDocumentByRequestId: async (
+    requestId: string,
+    data?: {
+      isIntensive?: boolean;
+    }
+  ) => {
     try {
-      const response = await apiClient.put(`/documents/approve/${requestId}`, data);
+      const response = await apiClient.put(
+        `/documents/approve/${requestId}`,
+        data
+      );
       return response.data;
     } catch (error) {
       console.error("Error approving document request:", error);
       throw error;
     }
   },
-
   // Reject document by request ID
   rejectDocumentByRequestId: async (requestId: string, reason: string) => {
     try {
       const response = await apiClient.put(`/documents/reject/${requestId}`, {
-        message: reason
+        message: reason,
       });
       return response.data;
     } catch (error) {

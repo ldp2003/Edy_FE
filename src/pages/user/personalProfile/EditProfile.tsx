@@ -3,7 +3,7 @@ import UserProfileHeader from "../../../components/common/userInfo/UserProfileHe
 import ResetPassword from "../../../components/common/userInfo/ResetPassword";
 import StudyList from "../../../components/user/studyField/StudyList";
 import { UserContext } from "../../../contexts/UserContext";
-import { getOrganizations } from "../../../utils/OrganizationService";
+import { OrganizationService } from "../../../utils/OrganizationService";
 import type { OrganizationDetailed } from "../../../models/organization";
 import { message } from "antd";
 
@@ -17,7 +17,7 @@ const EditProfile: React.FC = () => {
   useEffect(() => {
     const fetchOrganizations = async () => {
       try {
-        const orgs = await getOrganizations();
+        const orgs = await OrganizationService.getOrganizations();
         setOrganizations(orgs);
       } catch (error) {
         console.error("Failed to fetch organizations:", error);
