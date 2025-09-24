@@ -123,6 +123,59 @@ export const UserAPI = {
     }
   },
 
+  getAllUsers: async () => {
+    try {
+      const response = await apiClient.get("/users");
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching all users:", error);
+      throw error;
+    }
+  },
+
+  getUserById: async (userId: string) => {
+    try {
+      const response = await apiClient.get(`/users/${userId}`);
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching user by ID:", error);
+      throw error;
+    }
+  },
+
+  updateUserStatus: async (userId: string, status: string) => {
+    try {
+      const response = await apiClient.put(`/users/${userId}/status`, {
+        status,
+      });
+      return response.data;
+    } catch (error) {
+      console.error("Error updating user status:", error);
+      throw error;
+    }
+  },
+
+  updateUser: async (
+    userId: string,
+    userData: {
+      first_name?: string;
+      last_name?: string;
+      contact_email?: string;
+      organization?: string;
+      field_of_study?: string[];
+      status?: string;
+      avatar?: string;
+    }
+  ) => {
+    try {
+      const response = await apiClient.put(`/users/${userId}`, userData);
+      return response.data;
+    } catch (error) {
+      console.error("Error updating user:", error);
+      throw error;
+    }
+  },
+
   updateProfile: async (data: {
     first_name?: string;
     last_name?: string;

@@ -189,32 +189,35 @@ const PersonalPostDetail: React.FC = () => {
   }
 
   return (
-    <div className="p-4 text-left">
+    <div className="h-screen flex overflow-hidden">
       {contextHolder}
 
-      <PersonalPostHeader
-        document={document}
-        onEdit={handleEdit}
-        onChangeVisibility={handleChangeVisibility}
-        onShare={handleShare}
-      />
-
-      {/* Document Side Panel */}
+      {/* Document Side - cố định bên trái như sidebar */}
       <DocumentSide document={document} isUser={true} />
 
-      <div className="!ml-[23%]">
-        {/* Document Actions with isUser flag to disable description modal */}
-        <DocumentActions document={document} isUser={true} />
+      {/* Main content - có thể scroll */}
+      <div className="flex-1 overflow-y-auto">
+        <div className="p-4">
+          <PersonalPostHeader
+            document={document}
+            onEdit={handleEdit}
+            onChangeVisibility={handleChangeVisibility}
+            onShare={handleShare}
+          />
 
-        {/* Document Viewer */}
-        <DocumentViewer
-          url={document.url}
-          type={getViewerFileType(document.file_type)}
-          onPageChange={handlePageChange}
-          currentPage={currentPage}
-          onPageUpdate={handlePageUpdate}
-          zoom={zoom}
-        />
+          {/* Document Actions with isUser flag to disable description modal */}
+          <DocumentActions document={document} isUser={true} />
+
+          {/* Document Viewer */}
+          <DocumentViewer
+            url={document.url}
+            type={getViewerFileType(document.file_type)}
+            onPageChange={handlePageChange}
+            currentPage={currentPage}
+            onPageUpdate={handlePageUpdate}
+            zoom={zoom}
+          />
+        </div>
       </div>
 
       {/* Fixed Pagination Bar */}

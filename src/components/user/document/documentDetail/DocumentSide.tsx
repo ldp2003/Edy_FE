@@ -15,13 +15,15 @@ const DocumentSide: React.FC<DocumentSideProps> = ({
   isUser = false,
 }) => {
   return (
-    <div className="fixed left-15 border-l top-0 pt-[90px] bg-white z-20 pl-8 p-6 w-[20%] border-r border-gray-200 h-screen overflow-y-auto box-sizing:border-box">
-      <DocumentInfo document={document} />
-      <Description document={document} isUser={isUser} />
-      <div className="mt-14"></div>
-      <Comment />
-      <RelatedDocument />
-    </div>
+    <aside className="w-80 text-left bg-white border-r border-gray-200 h-screen overflow-y-auto relative flex-shrink-0">
+      <div className="pl-8 p-6">
+        <DocumentInfo document={document} />
+        <Description document={document} isUser={isUser} />
+        <div className="mt-14"></div>
+        <Comment />
+        <RelatedDocument />
+      </div>
+    </aside>
   );
 };
 

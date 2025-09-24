@@ -11,42 +11,39 @@ const UserLayout: React.FC = () => {
 
   return (
     <div
-      className="w-full h-full overflow-x-hidden"
+      className="h-screen flex flex-col overflow-hidden"
       style={{
         backgroundColor: isDocumentDetailPage
           ? "var(--secondary-background-color)"
           : "var(--primary-background-color)",
       }}
     >
-      <Header />
-      <main className="w-full min-h-screen">
-        <div className="flex min-h-screen">
-          <Sidebar
-            isVisible={isSidebarVisible}
-            setIsVisible={setIsSidebarVisible}
-          />
+      {/* Header - cố định ở trên cùng */}
+      <div className="relative z-10 flex-shrink-0">
+        <Header />
+      </div>
 
-          {/* Modal overlay for document-detail page when sidebar is visible */}
-          {isDocumentDetailPage && isSidebarVisible && (
-            <div
-              className="fixed inset-0 bg-black/50 bg-opacity-50 z-20"
-              onClick={() => setIsSidebarVisible(false)}
-            />
-          )}
+      {/* Content area bên dưới header */}
+      <div className="flex flex-1 overflow-hidden">
+        {/* Sidebar - cố định bên trái, dưới header */}
+        <Sidebar
+          isVisible={isSidebarVisible}
+          setIsVisible={setIsSidebarVisible}
+        />
 
+        {/* Page content - có thể scroll */}
+        <main className="flex-1 relative overflow-y-auto focus:outline-none">
           <div
-            className={`flex-grow mt-20 transition-all duration-300 ${
+            className={`transition-all duration-300 ${
               isDocumentDetailPage
-                ? "mx-[2%]" // Fixed margin for document detail page
-                : isSidebarVisible
-                ? "ml-[18%] mr-[1%]"
-                : "mx-[10%]"
+                ? "" // Padding for document detail page
+                : "p-4"
             }`}
           >
             <Outlet />
           </div>
-        </div>
-      </main>
+        </main>
+      </div>
     </div>
   );
 };

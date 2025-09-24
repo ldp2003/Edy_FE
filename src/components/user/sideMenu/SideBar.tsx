@@ -21,12 +21,13 @@ export function Sidebar({ isVisible, setIsVisible }: SidebarProps) {
 
   return (
     <aside
-      className={`border-r top-15 fixed z-30 border-gray-200 min-h-screen bg-white transition-all duration-300 flex flex-col  ${
-        isVisible ? "w-fit" : "w-16"
+      className={`border-r border-gray-200 bg-white transition-all duration-300 flex flex-col relative ${
+        isVisible ? "w-64 flex-shrink-0" : "w-16 flex-shrink-0"
       }`}
+      style={{ minHeight: "calc(100vh - 80px)" }}
     >
       <button
-        className="absolute top-4 -right-4 text-white bg-white p-2 z-30 rounded-full shadow-md cursor-pointer border border-gray-300 transition-all duration-300"
+        className="absolute top-4 -right-3 text-gray-600 bg-white p-1.5 z-10 rounded-full shadow-md cursor-pointer border border-gray-300 transition-all duration-300 hover:bg-gray-50"
         onClick={() => setIsVisible(!isVisible)}
       >
         {isVisible ? (

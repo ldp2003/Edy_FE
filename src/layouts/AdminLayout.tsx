@@ -8,28 +8,31 @@ const AdminLayout: React.FC = () => {
 
   return (
     <div
-      className="w-full h-full overflow-x-hidden"
+      className="h-screen flex flex-col overflow-hidden"
       style={{
         backgroundColor: "var(--primary-background-color)",
       }}
     >
-      <Header />
-      <main className="w-full min-h-screen">
-        <div className="flex min-h-screen">
-          <AdminSidebar
-            isVisible={isSidebarVisible}
-            setIsVisible={setIsSidebarVisible}
-          />
+      {/* Header - cố định ở trên cùng */}
+      <div className="relative z-10 flex-shrink-0">
+        <Header />
+      </div>
 
-          <div
-            className={`flex-grow mt-24 transition-all duration-300 ${
-              isSidebarVisible ? "ml-[18%] mr-[1%]" : "mx-[10%]"
-            }`}
-          >
+      {/* Content area bên dưới header */}
+      <div className="flex flex-1 overflow-hidden">
+        {/* Sidebar - cố định bên trái, dưới header */}
+        <AdminSidebar
+          isVisible={isSidebarVisible}
+          setIsVisible={setIsSidebarVisible}
+        />
+
+        {/* Page content - có thể scroll */}
+        <main className="flex-1 relative overflow-y-auto focus:outline-none">
+          <div className="p-4">
             <Outlet />
           </div>
-        </div>
-      </main>
+        </main>
+      </div>
     </div>
   );
 };
