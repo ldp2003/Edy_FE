@@ -225,6 +225,17 @@ export const SubjectAPI = {
       throw error;
     }
   },
+
+  // Get documents by subject
+  getDocumentsBySubject: async (subjectId: string) => {
+    try {
+      const response = await apiClient.get(`/subjects/${subjectId}/documents`);
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching documents by subject:", error);
+      throw error;
+    }
+  },
 };
 
 export const DocumentAPI = {
@@ -404,9 +415,28 @@ export const DocumentAPI = {
   },
 
   // Approve document by request ID
-  approveDocumentByRequestId: async (requestId: string) => {
+  approveDocumentByRequestId: async (
+    requestId: string,
+    summaryApproved?: boolean,
+    isIntensive?: boolean
+  ) => {
     try {
-      const response = await apiClient.put(`/documents/approve/${requestId}`);
+      const requestBody: {
+        summaryApproved?: boolean;
+        isIntensive?: boolean;
+      } = {};
+
+      if (summaryApproved !== undefined) {
+        requestBody.summaryApproved = summaryApproved;
+      }
+      if (isIntensive !== undefined) {
+        requestBody.isIntensive = isIntensive;
+      }
+
+      const response = await apiClient.put(
+        `/documents/approve/${requestId}`,
+        requestBody
+      );
       return response.data;
     } catch (error) {
       console.error("Error approving document by request ID:", error);

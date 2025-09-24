@@ -105,10 +105,8 @@ const DocumentInfo: React.FC<DocumentInfoProps> = ({ document }) => {
             {visibilityInfo.text}
           </div>
         </div>
+        {document.intensive == true && <IntensiveMark label="Chuyên sâu" />}
       </div>
-
-      {document.intensive && <IntensiveMark label="Chuyên sâu" />}
-
       <div className="flex flex-col gap-1">
         <div className="flex gap-1 flex-row items-center">
           <School size={15} />

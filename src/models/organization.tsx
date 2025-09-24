@@ -1,4 +1,4 @@
-export interface Organization {
+export interface OrganizationDetailed {
   _id?: string; // Made optional to handle cases where _id is not provided
   name: string;
   code: string;

@@ -1,15 +1,15 @@
+export interface Organization {
+  _id: string;
+  name: string;
+}
+
 export interface User {
   _id: string;
   first_name: string;
   last_name: string;
   contact_email: string;
   avatar?: string;
-  organization:
-    | {
-        _id: string;
-        name: string;
-      }
-    | string;
+  organization: Organization | string;
   last_organization_change?: string;
   follower?: string[];
   following?: string[];
@@ -63,5 +63,5 @@ export const defaultUser: User = {
   organization: {
     _id: "",
     name: "No Organization",
-  },
+  } as Organization,
 };

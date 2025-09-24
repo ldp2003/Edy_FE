@@ -27,7 +27,7 @@ const PersonalPostList: React.FC = () => {
   const [documents, setDocuments] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize, setPageSize] = useState(10);
+  const [pageSize, setPageSize] = useState(5);
   const [total, setTotal] = useState(0);
   const navigate = useNavigate();
 

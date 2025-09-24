@@ -1,17 +1,61 @@
 import React, { useState, useEffect } from "react";
-import { Form, Input, Select, InputNumber, Button, message, Modal } from "antd";
+import {
+  Form,
+  Input,
+  Select,
+  InputNumber,
+  Button,
+  message,
+  Modal,
+  Checkbox,
+} from "antd";
 
 import { Plus, Minus, Eye } from "lucide-react";
 import type { Document } from "../../../models/document";
+import type { User } from "../../../models/user";
 import UserInfoHeader from "./UserInfoHeader";
+import type { UserInfo } from "./UserInfoHeader";
 
 const { TextArea } = Input;
 const { Option } = Select;
 
+// Helper function to convert User to UserInfo
+const convertUserToUserInfo = (user: User): UserInfo => {
+  let organizationInfo: { _id: string; name: string } | undefined;
+
+  if (user.organization) {
+    if (typeof user.organization === "string") {
+      // If organization is a string (ID), we can't get the name, so set undefined
+      organizationInfo = undefined;
+    } else {
+      // If organization is an object, extract _id and name
+      organizationInfo = {
+        _id: user.organization._id || "",
+        name: user.organization.name || "",
+      };
+    }
+  }
+
+  return {
+    _id: user._id,
+    first_name: user.first_name,
+    last_name: user.last_name,
+    organization: organizationInfo,
+    avatar: user.avatar,
+    follower: user.follower,
+    following: user.following,
+    doc_count: user.doc_count,
+  };
+};
+
 interface DocumentReviewProps {
   document: Document;
   requestId?: string; // Thêm requestId
-  onApprove: (requestId?: string) => void;
+  onApprove: (approvalData: {
+    requestId?: string;
+    summaryApproved: boolean;
+    isIntensive: boolean;
+  }) => void;
   onReject: (reason: string, requestId?: string) => void;
   onDelete: (reason: string) => void;
 }
@@ -33,6 +77,8 @@ const DocumentReview: React.FC<DocumentReviewProps> = ({
   const [rejectReason, setRejectReason] = useState("");
   const [deleteReason, setDeleteReason] = useState("");
   const [processing, setProcessing] = useState(false);
+  const [summaryApproved, setSummaryApproved] = useState(false);
+  const [isIntensive, setIsIntensive] = useState(false);
 
   // Fill form with document data
   useEffect(() => {
@@ -120,7 +166,13 @@ const DocumentReview: React.FC<DocumentReviewProps> = ({
   const handleApprove = async () => {
     setProcessing(true);
     try {
-      await onApprove(requestId);
+      // Tạo object chứa thông tin duyệt
+      const approvalData = {
+        requestId,
+        summaryApproved,
+        isIntensive,
+      };
+      await onApprove(approvalData);
       messageApi.success("Tài liệu đã được duyệt thành công!");
       // Chờ 2 giây trước khi chuyển trang
       setTimeout(() => {
@@ -189,7 +241,7 @@ const DocumentReview: React.FC<DocumentReviewProps> = ({
     <div className="py-6 min-h-screen text-left">
       {contextHolder}
       {/* User Info Header */}
-      <UserInfoHeader user={document.user} />
+      <UserInfoHeader user={convertUserToUserInfo(document.user)} />
 
       <div className="font-bold text-base mb-6 text-[var(--primary-text-color)]">
         Thông tin tài liệu
@@ -249,6 +301,16 @@ const DocumentReview: React.FC<DocumentReviewProps> = ({
                   <Option value="PRIVATE">Riêng tư</Option>
                 </Select>
               </Form.Item>
+
+              <div className="mt-3">
+                <Checkbox
+                  checked={isIntensive}
+                  onChange={(e) => setIsIntensive(e.target.checked)}
+                  className="text-sm"
+                >
+                  Tài liệu chuyên sâu
+                </Checkbox>
+              </div>
             </div>
 
             {/* Column 2 - Main form fields */}
@@ -342,6 +404,15 @@ const DocumentReview: React.FC<DocumentReviewProps> = ({
                   disabled
                 />
               </Form.Item>
+              <div className="mt-3">
+                <Checkbox
+                  checked={summaryApproved}
+                  onChange={(e) => setSummaryApproved(e.target.checked)}
+                  className="text-sm"
+                >
+                  Duyệt tóm tắt này
+                </Checkbox>
+              </div>
             </div>
           </div>
 

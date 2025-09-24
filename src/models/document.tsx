@@ -1,23 +1,5 @@
 // TypeScript interfaces for Document
-
-export interface User {
-  _id: string;
-  first_name: string;
-  last_name: string;
-  doc_count?: number;
-  follower?: string[];
-  following?: string[];
-  organization?: {
-    _id: string;
-    name: string;
-  };
-  avatar?: string;
-}
-
-export interface Organization {
-  _id: string;
-  name: string;
-}
+import type { User, Organization } from "./user";
 
 export interface Subject {
   _id: string;
