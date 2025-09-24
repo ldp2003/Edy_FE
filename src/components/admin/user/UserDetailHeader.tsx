@@ -22,13 +22,11 @@ const UserDetailHeader: React.FC<UserDetailHeaderProps> = ({
         <Button icon={<ArrowLeft size={16} />} onClick={onBack}>
           Quay lại
         </Button>
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">
-            Chi tiết người dùng
+        <div className="flex flex-row gap-3 items-center">
+          <h1 className="text-base font-bold text-gray-900">
+            Thông tin người dùng{" "}
           </h1>
-          <p className="text-gray-600">
-            {user.first_name} {user.last_name}
-          </p>
+          <p className="text-gray-600">{"ID: " + user._id}</p>
         </div>
       </div>
 
