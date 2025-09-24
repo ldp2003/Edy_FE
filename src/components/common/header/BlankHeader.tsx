@@ -8,7 +8,7 @@ export function BlankHeader() {
   const { isLoggedIn, user } = useContext(UserContext);
 
   return (
-    <header className="bg-white shadow-b shadow-sm border-b border-gray-200 px-6 py-4 fixed left-0 top-0 w-full z-50">
+    <header className="bg-white shadow-sm border-b border-gray-200 px-6 py-4 w-full flex-shrink-0">
       <div className="flex items-center justify-between">
         {/* Logo */}
         <div className="flex items-center gap-2">

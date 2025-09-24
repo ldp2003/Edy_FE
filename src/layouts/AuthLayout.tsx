@@ -10,7 +10,7 @@ const AuthLayout: React.FC = () => {
 
   return (
     <div
-      className="w-full h-full overflow-x-hidden"
+      className="w-full h-full overflow-x-hidden flex flex-col"
       style={{
         backgroundColor: isRoleSelectionPage
           ? "transparent" // Role selection has its own gradient background
@@ -18,11 +18,11 @@ const AuthLayout: React.FC = () => {
       }}
     >
       <BlankHeader />
-      <main className="w-full min-h-screen">
+      <main className="flex-1 overflow-auto">
         <div
           className={`
-          ${isAccountActivationPage ? "mt-24" : ""} 
-          ${isRoleSelectionPage ? "mt-0" : ""}
+          ${isAccountActivationPage ? "p-6" : ""} 
+          ${isRoleSelectionPage ? "p-0" : ""}
         `}
         >
           <Outlet />
