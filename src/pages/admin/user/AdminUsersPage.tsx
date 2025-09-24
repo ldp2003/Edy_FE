@@ -1,18 +1,16 @@
 import React from "react";
 import AdminUserTable from "../../../components/admin/user/AdminUserTable";
+import { AdminBreadcrumb } from "../../../components/admin/common/AdminBreadcrumb";
 
 const AdminUsersPage: React.FC = () => {
-  return (
-    <div className="p-6">
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-900 mb-2">
-          Quản lý người dùng
-        </h1>
-        <p className="text-gray-600">
-          Quản lý danh sách người dùng trong hệ thống
-        </p>
-      </div>
+  const breadcrumbItems = [
+    { label: "Người dùng" },
+    { label: "Tất cả người dùng" },
+  ];
 
+  return (
+    <div className="p-6 h-full">
+      <AdminBreadcrumb items={breadcrumbItems} />
       <AdminUserTable />
     </div>
   );

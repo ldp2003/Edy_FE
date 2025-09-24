@@ -21,7 +21,7 @@ const PersonalAvatar: React.FC = () => {
           <div className="text-gray-500">Đang theo dõi</div>
         </div>
         <div className="flex flex-col items-center mx-1">
-          <div className="font-bold">{user?.shared_documents.length}</div>
+          <div className="font-bold">{user?.doc_count}</div>
           <div className="text-gray-500">Bài đăng</div>
         </div>
       </div>

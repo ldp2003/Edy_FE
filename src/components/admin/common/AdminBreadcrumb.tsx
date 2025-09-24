@@ -13,21 +13,23 @@ interface AdminBreadcrumbProps {
 
 export function AdminBreadcrumb({ items }: AdminBreadcrumbProps) {
   return (
-    <nav className="flex items-center space-x-2 text-sm text-gray-600 mb-6">
+    <nav className="flex items-center space-x-2 text-sm text-[var(--third-text-color)] mb-6">
       {items.map((item, index) => (
         <React.Fragment key={index}>
-          {index > 0 && <ChevronRight className="w-4 h-4 text-gray-400" />}
+          {index > 0 && <ChevronRight className="w-4 h-4 font-light text-gray-400" />}
           {item.path && index < items.length - 1 ? (
             <Link
               to={item.path}
-              className="hover:text-blue-600 transition-colors cursor-pointer"
+              className="hover:text-[var(--link-color)] transition-colors cursor-pointer"
             >
               {item.label}
             </Link>
           ) : (
             <span
               className={
-                index === items.length - 1 ? "text-gray-900 font-medium" : ""
+                index === items.length - 1
+                  ? "text-[var(--third-text-color)] font-medium"
+                  : ""
               }
             >
               {item.label}

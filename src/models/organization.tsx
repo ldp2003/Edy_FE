@@ -18,3 +18,4 @@ export interface OrganizationDetailed {
   createdAt?: string;
   updatedAt?: string;
 }
+
