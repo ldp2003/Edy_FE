@@ -7,7 +7,6 @@ import {
   Button,
   message,
   Modal,
-  Checkbox,
   Radio,
 } from "antd";
 
@@ -16,7 +15,7 @@ import type { Document } from "../../../models/document";
 import type { User } from "../../../models/user";
 import UserInfoHeader from "./UserInfoHeader";
 import type { UserInfo } from "./UserInfoHeader";
-import { DocumentAPI } from "../../../api/API";
+import { DocumentService } from "../../../utils/DocumentService";
 
 const { TextArea } = Input;
 const { Option } = Select;
@@ -67,7 +66,7 @@ interface DocumentReviewProps {
     documentRequestId: string;
     summaryRequestId?: string;
     isIntensive: boolean;
-    summaryAction?: 'approve' | 'reject';
+    summaryAction?: "approve" | "reject";
     summaryRejectReason?: string;
   }) => void;
   onReject: (reason: string, requestId: string) => void;
@@ -85,7 +84,8 @@ const DocumentReview: React.FC<DocumentReviewProps> = ({
   const [authors, setAuthors] = useState<string[]>([]);
   const [rejectModalVisible, setRejectModalVisible] = useState(false);
   const [deleteModalVisible, setDeleteModalVisible] = useState(false);
-  const [documentViewModalVisible, setDocumentViewModalVisible] = useState(false);
+  const [documentViewModalVisible, setDocumentViewModalVisible] =
+    useState(false);
   const [rejectReason, setRejectReason] = useState("");
   const [deleteReason, setDeleteReason] = useState("");
   const [processing, setProcessing] = useState(false);
@@ -93,9 +93,15 @@ const DocumentReview: React.FC<DocumentReviewProps> = ({
 
   // New states for handling requests
   const [pendingRequests, setPendingRequests] = useState<PendingRequest[]>([]);
-  const [documentRequest, setDocumentRequest] = useState<PendingRequest | null>(null);
-  const [summaryRequest, setSummaryRequest] = useState<PendingRequest | null>(null);
-  const [summaryAction, setSummaryAction] = useState<'approve' | 'reject'>('approve');
+  const [documentRequest, setDocumentRequest] = useState<PendingRequest | null>(
+    null
+  );
+  const [summaryRequest, setSummaryRequest] = useState<PendingRequest | null>(
+    null
+  );
+  const [summaryAction, setSummaryAction] = useState<"approve" | "reject">(
+    "approve"
+  );
   const [summaryRejectReason, setSummaryRejectReason] = useState("");
   const [loading, setLoading] = useState(true);
 
@@ -104,7 +110,9 @@ const DocumentReview: React.FC<DocumentReviewProps> = ({
     const loadPendingRequests = async () => {
       try {
         setLoading(true);
-        const response = await DocumentAPI.getPendingRequests(document._id);
+        const response = await DocumentService.getPendingRequestsByDocument(
+          document._id
+        );
         const requests = response.requests || [];
 
         setPendingRequests(requests);
@@ -219,7 +227,11 @@ const DocumentReview: React.FC<DocumentReviewProps> = ({
     }
 
     // Validate summary rejection reason if needed
-    if (summaryRequest && summaryAction === 'reject' && !summaryRejectReason.trim()) {
+    if (
+      summaryRequest &&
+      summaryAction === "reject" &&
+      !summaryRejectReason.trim()
+    ) {
       messageApi.error("Vui lòng nhập lý do từ chối tóm tắt!");
       return;
     }
@@ -231,7 +243,8 @@ const DocumentReview: React.FC<DocumentReviewProps> = ({
         summaryRequestId: summaryRequest?._id,
         isIntensive,
         summaryAction: summaryRequest ? summaryAction : undefined,
-        summaryRejectReason: summaryAction === 'reject' ? summaryRejectReason : undefined,
+        summaryRejectReason:
+          summaryAction === "reject" ? summaryRejectReason : undefined,
       };
 
       await onApprove(approvalData);
@@ -384,17 +397,21 @@ const DocumentReview: React.FC<DocumentReviewProps> = ({
 
               <div className="mt-3">
                 <div
-                  className={`p-3 rounded-lg border-2 transition-all duration-200 cursor-pointer ${isIntensive
-                      ? 'bg-gradient-to-r from-purple-50 to-indigo-50 border-purple-300 shadow-sm'
-                      : 'bg-gray-50 border-gray-200 hover:border-purple-200 hover:bg-purple-50'
-                    }`}
+                  className={`p-3 rounded-lg border-2 transition-all duration-200 cursor-pointer ${
+                    isIntensive
+                      ? "bg-gradient-to-r from-purple-50 to-indigo-50 border-purple-300 shadow-sm"
+                      : "bg-gray-50 border-gray-200 hover:border-purple-200 hover:bg-purple-50"
+                  }`}
                   onClick={() => setIsIntensive(!isIntensive)}
                 >
                   <div className="flex items-center space-x-3">
-                    <div className={`relative flex items-center justify-center w-5 h-5 rounded border-2 transition-all duration-200 ${isIntensive
-                        ? 'bg-purple-600 border-purple-600'
-                        : 'bg-white border-gray-300'
-                      }`}>
+                    <div
+                      className={`relative flex items-center justify-center w-5 h-5 rounded border-2 transition-all duration-200 ${
+                        isIntensive
+                          ? "bg-purple-600 border-purple-600"
+                          : "bg-white border-gray-300"
+                      }`}
+                    >
                       {isIntensive && (
                         <svg
                           className="w-3 h-3 text-white animate-in fade-in duration-200"
@@ -410,8 +427,11 @@ const DocumentReview: React.FC<DocumentReviewProps> = ({
                       )}
                     </div>
                     <div className="flex items-center space-x-2">
-                      <span className={`text-sm font-medium transition-colors ${isIntensive ? 'text-purple-800' : 'text-gray-700'
-                        }`}>
+                      <span
+                        className={`text-sm font-medium transition-colors ${
+                          isIntensive ? "text-purple-800" : "text-gray-700"
+                        }`}
+                      >
                         🎓 Tài liệu chuyên sâu
                       </span>
                       {isIntensive && (
@@ -421,11 +441,14 @@ const DocumentReview: React.FC<DocumentReviewProps> = ({
                       )}
                     </div>
                   </div>
-                  <div className={`mt-2 text-xs transition-colors ${isIntensive ? 'text-purple-600' : 'text-gray-500'
-                    }`}>
+                  <div
+                    className={`mt-2 text-xs transition-colors ${
+                      isIntensive ? "text-purple-600" : "text-gray-500"
+                    }`}
+                  >
                     {isIntensive
-                      ? 'Tài liệu này sẽ được đánh dấu là chuyên sâu và có thể yêu cầu điểm cao hơn để tải xuống'
-                      : 'Đánh dấu tài liệu này là nội dung chuyên sâu nếu nó có chất lượng cao và chi tiết hơn'}
+                      ? "Tài liệu này sẽ được đánh dấu là chuyên sâu và có thể yêu cầu điểm cao hơn để tải xuống"
+                      : "Đánh dấu tài liệu này là nội dung chuyên sâu nếu nó có chất lượng cao và chi tiết hơn"}
                   </div>
                 </div>
               </div>
@@ -530,7 +553,9 @@ const DocumentReview: React.FC<DocumentReviewProps> = ({
                   <div className="bg-gradient-to-r from-blue-500 to-blue-600 px-4 py-3">
                     <div className="flex items-center text-white">
                       <div className="w-2 h-2 bg-white rounded-full mr-2 animate-pulse"></div>
-                      <span className="text-sm font-semibold">Tóm tắt cần duyệt</span>
+                      <span className="text-sm font-semibold">
+                        Tóm tắt cần duyệt
+                      </span>
                     </div>
                   </div>
 
@@ -540,7 +565,7 @@ const DocumentReview: React.FC<DocumentReviewProps> = ({
                       value={summaryAction}
                       onChange={(e) => {
                         setSummaryAction(e.target.value);
-                        if (e.target.value === 'approve') {
+                        if (e.target.value === "approve") {
                           setSummaryRejectReason("");
                         }
                       }}
@@ -582,7 +607,7 @@ const DocumentReview: React.FC<DocumentReviewProps> = ({
                     </Radio.Group>
 
                     {/* Rejection reason */}
-                    {summaryAction === 'reject' && (
+                    {summaryAction === "reject" && (
                       <div className="mt-4 p-4 bg-red-50 border border-red-200 rounded-lg">
                         <label className="block text-sm font-semibold text-red-800 mb-2">
                           📝 Lý do từ chối:
@@ -590,7 +615,9 @@ const DocumentReview: React.FC<DocumentReviewProps> = ({
                         <TextArea
                           rows={3}
                           value={summaryRejectReason}
-                          onChange={(e) => setSummaryRejectReason(e.target.value)}
+                          onChange={(e) =>
+                            setSummaryRejectReason(e.target.value)
+                          }
                           placeholder="Vui lòng nhập lý do cụ thể..."
                           style={{ resize: "none" }}
                           className="border-red-300 focus:border-red-400 focus:ring-red-200"
@@ -600,11 +627,16 @@ const DocumentReview: React.FC<DocumentReviewProps> = ({
 
                     {/* Status badge */}
                     <div className="flex justify-end mt-4">
-                      <span className={`px-3 py-1 rounded-full text-xs font-semibold ${summaryAction === 'approve'
-                        ? 'bg-green-100 text-green-800 border border-green-200'
-                        : 'bg-red-100 text-red-800 border border-red-200'
-                        }`}>
-                        {summaryAction === 'approve' ? 'Sẽ được duyệt' : 'Sẽ bị từ chối'}
+                      <span
+                        className={`px-3 py-1 rounded-full text-xs font-semibold ${
+                          summaryAction === "approve"
+                            ? "bg-green-100 text-green-800 border border-green-200"
+                            : "bg-red-100 text-red-800 border border-red-200"
+                        }`}
+                      >
+                        {summaryAction === "approve"
+                          ? "Sẽ được duyệt"
+                          : "Sẽ bị từ chối"}
                       </span>
                     </div>
                   </div>

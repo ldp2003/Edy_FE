@@ -14,9 +14,9 @@ import {
 } from "antd";
 import { ArrowLeft, Upload as UploadIcon, X } from "lucide-react";
 import { UserService } from "../../../utils/UserService";
-import { OrganizationAPI } from "../../../api/API";
 import type { User } from "../../../models/user";
 import type { OrganizationDetailed } from "../../../models/organization";
+import { OrganizationService } from "../../../utils/OrganizationService";
 
 const { Option } = Select;
 
@@ -57,12 +57,12 @@ const UserEditPage: React.FC = () => {
         // Fetch user data and organizations in parallel
         const [userData, orgsData] = await Promise.all([
           UserService.getUserById(id),
-          OrganizationAPI.getOrganizations(),
+          OrganizationService.getOrganizations(),
         ]);
 
         const userInfo = userData.user || userData;
         setUser(userInfo);
-        setOrganizations(orgsData.organizations || orgsData || []);
+        setOrganizations(orgsData || []);
         setFieldOfStudy(userInfo.field_of_study || []);
 
         // Set form values
