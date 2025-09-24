@@ -79,7 +79,7 @@ const PersonalPostHeader: React.FC<PersonalPostHeaderProps> = ({
   };
 
   return (
-    <div className="ml-[24%] bg-white rounded-2xl shadow-lg px-6 py-2 mb-4">
+    <div className=" bg-white rounded-2xl shadow-lg px-6 py-2 mb-4">
       {/* User Info Section */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
