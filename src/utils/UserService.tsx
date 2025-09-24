@@ -103,3 +103,4 @@ export const verifyUser = UserService.verifyUser;
 export const getUsers = UserService.getAllUsers;
 export const updateProfile = UserService.updateProfile;
 export const changePassword = UserService.changePassword;
+export const getUserById = UserService.getUserById;

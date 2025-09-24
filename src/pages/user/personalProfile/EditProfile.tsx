@@ -4,12 +4,14 @@ import ResetPassword from "../../../components/common/userInfo/ResetPassword";
 import StudyList from "../../../components/user/studyField/StudyList";
 import { UserContext } from "../../../contexts/UserContext";
 import { getOrganizations } from "../../../utils/OrganizationService";
-import type { Organization } from "../../../models/organization";
+import type { OrganizationDetailed } from "../../../models/organization";
 import { message } from "antd";
 
 const EditProfile: React.FC = () => {
   const { user } = useContext(UserContext);
-  const [organizations, setOrganizations] = useState<Organization[]>([]);
+  const [organizations, setOrganizations] = useState<OrganizationDetailed[]>(
+    []
+  );
   const [messageApi, contextHolder] = message.useMessage();
 
   useEffect(() => {

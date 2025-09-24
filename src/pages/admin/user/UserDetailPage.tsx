@@ -1,29 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import {
-  Card,
-  Avatar,
-  Tag,
-  Button,
-  Descriptions,
-  Spin,
-  message,
-  Popconfirm,
-} from "antd";
-import {
-  ArrowLeft,
-  Edit,
-  Lock,
-  Unlock,
-  Mail,
-  Calendar,
-  MapPin,
-  BookOpen,
-  Award,
-  Users,
-} from "lucide-react";
+import { Button, Spin, message } from "antd";
 import { UserService } from "../../../utils/UserService";
 import type { User } from "../../../models/user";
+import UserDetailHeader from "../../../components/admin/user/UserDetailHeader";
+import UserProfileCard from "../../../components/admin/user/UserProfileCard";
+import UserStatsCard from "../../../components/admin/user/UserStatsCard";
+import UserDetailInfo from "../../../components/admin/user/UserDetailInfo";
 
 const UserDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -135,201 +118,34 @@ const UserDetailPage: React.FC = () => {
   return (
     <div className="p-6 max-w-6xl mx-auto">
       {/* Header */}
-      <div className="flex items-center justify-between mb-6">
-        <div className="flex items-center space-x-4">
-          <Button
-            icon={<ArrowLeft size={16} />}
-            onClick={() => navigate("/admin/users")}
-          >
-            Quay lại
-          </Button>
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900">
-              Chi tiết người dùng
-            </h1>
-            <p className="text-gray-600">ID: {user._id}</p>
-          </div>
-        </div>
-
-        <div className="flex space-x-2">
-          <Button
-            icon={<Edit size={16} />}
-            onClick={() => navigate(`/admin/users/edit/${id}`)}
-          >
-            Chỉnh sửa
-          </Button>
-
-          <Popconfirm
-            title={
-              user.status === "ACTIVE"
-                ? "Bạn có chắc muốn khóa tài khoản này?"
-                : "Bạn có chắc muốn mở khóa tài khoản này?"
-            }
-            onConfirm={handleToggleStatus}
-            okText="Có"
-            cancelText="Không"
-          >
-            <Button
-              icon={
-                user.status === "ACTIVE" ? (
-                  <Lock size={16} />
-                ) : (
-                  <Unlock size={16} />
-                )
-              }
-              danger={user.status === "ACTIVE"}
-            >
-              {user.status === "ACTIVE" ? "Khóa tài khoản" : "Mở khóa"}
-            </Button>
-          </Popconfirm>
-        </div>
-      </div>
+      <UserDetailHeader
+        user={user}
+        onBack={() => navigate("/admin/users")}
+        onEdit={() => navigate(`/admin/users/edit/${id}`)}
+        onToggleStatus={handleToggleStatus}
+      />
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* User Info Card */}
+        {/* User Profile and Stats */}
         <div className="lg:col-span-1">
-          <Card>
-            <div className="text-center">
-              <Avatar size={120} src={user.avatar} className="mb-4">
-                {user.first_name.charAt(0)}
-                {user.last_name.charAt(0)}
-              </Avatar>
+          <UserProfileCard
+            user={user}
+            getStatusColor={getStatusColor}
+            getStatusText={getStatusText}
+            formatDate={formatDate}
+          />
 
-              <h2 className="text-xl font-bold mb-2">
-                {user.first_name} {user.last_name}
-              </h2>
-
-              <Tag color={getStatusColor(user.status)} className="mb-4">
-                {getStatusText(user.status)}
-              </Tag>
-
-              <div className="space-y-2 text-left">
-                <div className="flex items-center space-x-2 text-gray-600">
-                  <Mail size={16} />
-                  <span className="text-sm">{user.contact_email}</span>
-                </div>
-
-                {typeof user.organization === "object" && user.organization && (
-                  <div className="flex items-center space-x-2 text-gray-600">
-                    <MapPin size={16} />
-                    <span className="text-sm">{user.organization.name}</span>
-                  </div>
-                )}
-
-                <div className="flex items-center space-x-2 text-gray-600">
-                  <Calendar size={16} />
-                  <span className="text-sm">
-                    Tham gia: {formatDate(user.createdAt)}
-                  </span>
-                </div>
-              </div>
-            </div>
-          </Card>
-
-          {/* Stats Card */}
-          <Card title="Thống kê" className="mt-4">
-            <div className="space-y-3">
-              <div className="flex justify-between">
-                <span className="flex items-center space-x-2">
-                  <BookOpen size={16} />
-                  <span>Số tài liệu:</span>
-                </span>
-                <span className="font-semibold">{user.doc_count || 0}</span>
-              </div>
-
-              <div className="flex justify-between">
-                <span className="flex items-center space-x-2">
-                  <Award size={16} />
-                  <span>Điểm:</span>
-                </span>
-                <span className="font-semibold">{user.point || 0}</span>
-              </div>
-
-              <div className="flex justify-between">
-                <span className="flex items-center space-x-2">
-                  <Users size={16} />
-                  <span>Người theo dõi:</span>
-                </span>
-                <span className="font-semibold">
-                  {user.follower?.length || 0}
-                </span>
-              </div>
-
-              <div className="flex justify-between">
-                <span className="flex items-center space-x-2">
-                  <Users size={16} />
-                  <span>Đang theo dõi:</span>
-                </span>
-                <span className="font-semibold">
-                  {user.following?.length || 0}
-                </span>
-              </div>
-            </div>
-          </Card>
+          <UserStatsCard user={user} />
         </div>
 
         {/* Detailed Info */}
         <div className="lg:col-span-2">
-          <Card title="Thông tin chi tiết">
-            <Descriptions column={2} bordered size="small">
-              <Descriptions.Item label="Tên">
-                {user.first_name}
-              </Descriptions.Item>
-              <Descriptions.Item label="Họ">{user.last_name}</Descriptions.Item>
-              <Descriptions.Item label="Email">
-                {user.contact_email}
-              </Descriptions.Item>
-              <Descriptions.Item label="Trạng thái">
-                <Tag color={getStatusColor(user.status)}>
-                  {getStatusText(user.status)}
-                </Tag>
-              </Descriptions.Item>
-              <Descriptions.Item label="Tổ chức" span={2}>
-                {typeof user.organization === "object" && user.organization
-                  ? user.organization.name
-                  : "Chưa có tổ chức"}
-              </Descriptions.Item>
-              <Descriptions.Item label="Lĩnh vực nghiên cứu" span={2}>
-                {user.field_of_study && user.field_of_study.length > 0
-                  ? user.field_of_study.join(", ")
-                  : "Chưa có"}
-              </Descriptions.Item>
-              <Descriptions.Item label="Điểm">
-                {user.point || 0}
-              </Descriptions.Item>
-              <Descriptions.Item label="Điểm xếp hạng">
-                {user.rank_point || 0}
-              </Descriptions.Item>
-              <Descriptions.Item label="Cảnh cáo">
-                {user.strike || 0}
-              </Descriptions.Item>
-              <Descriptions.Item label="Lượt tải miễn phí">
-                {user.free_download_count || 0}
-              </Descriptions.Item>
-              <Descriptions.Item label="Ngày tạo">
-                {formatDate(user.createdAt)}
-              </Descriptions.Item>
-              <Descriptions.Item label="Cập nhật cuối">
-                {formatDate(user.updatedAt)}
-              </Descriptions.Item>
-              <Descriptions.Item label="Thay đổi tổ chức cuối" span={2}>
-                {formatDate(user.last_organization_change)}
-              </Descriptions.Item>
-            </Descriptions>
-          </Card>
-
-          {/* Field of Study */}
-          {user.field_of_study && user.field_of_study.length > 0 && (
-            <Card title="Lĩnh vực quan tâm" className="mt-4">
-              <div className="flex flex-wrap gap-2">
-                {user.field_of_study.map((field, index) => (
-                  <Tag key={index} color="blue">
-                    {field}
-                  </Tag>
-                ))}
-              </div>
-            </Card>
-          )}
+          <UserDetailInfo
+            user={user}
+            getStatusColor={getStatusColor}
+            getStatusText={getStatusText}
+            formatDate={formatDate}
+          />
         </div>
       </div>
     </div>
