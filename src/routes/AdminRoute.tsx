@@ -4,6 +4,9 @@ import AdminLayout from "../layouts/AdminLayout";
 import AdminHomePage from "../pages/admin/home/AdminHomePage";
 import AllDocumentsPage from "../pages/admin/document/AllDocumentsPage";
 import DocumentReviewPage from "../pages/admin/document/DocumentReviewPage";
+import AdminUsersPage from "../pages/admin/user/AdminUsersPage";
+import UserDetailPage from "../pages/admin/user/UserDetailPage";
+import UserEditPage from "../pages/admin/user/UserEditPage";
 import AuthRoute from "./AuthRoute";
 
 const AdminRoute: React.FC = () => {
@@ -24,8 +27,10 @@ const AdminRoute: React.FC = () => {
           {/* <Route path="documents/pending" element={<PendingDocumentsPage />} /> */}
 
           {/* User management routes */}
-          {/* <Route path="users/all" element={<AllUsersPage />} />
-                <Route path="users/assign-roles" element={<AssignRolesPage />} />
+          <Route path="users" element={<AdminUsersPage />} />
+          <Route path="users/detail/:id" element={<UserDetailPage />} />
+          <Route path="users/edit/:id" element={<UserEditPage />} />
+          {/* <Route path="users/assign-roles" element={<AssignRolesPage />} />
                 <Route path="users/manage-roles" element={<ManageRolesPage />} /> */}
 
           {/* Reports routes */}

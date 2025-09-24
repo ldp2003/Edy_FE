@@ -22,7 +22,7 @@ const AdminLayout: React.FC = () => {
           />
 
           <div
-            className={`flex-grow mt-24 transition-all duration-300 ${
+            className={`flex-grow mt-20 transition-all duration-300 ${
               isSidebarVisible ? "ml-[18%] mr-[1%]" : "mx-[10%]"
             }`}
           >

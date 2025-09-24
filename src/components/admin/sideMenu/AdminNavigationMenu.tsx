@@ -57,7 +57,7 @@ export function AdminNavigationMenu({ isCompact }: AdminNavigationMenuProps) {
       icon: Users,
       label: "Người dùng",
       children: [
-        { label: "Tất cả người dùng", path: "/admin/users/all" },
+        { label: "Tất cả người dùng", path: "/admin/users" },
         { label: "Phân quyền", path: "/admin/users/assign-roles" },
         { label: "Quản lý quyền", path: "/admin/users/manage-roles" },
       ],
