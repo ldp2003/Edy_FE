@@ -415,9 +415,28 @@ export const DocumentAPI = {
   },
 
   // Approve document by request ID
-  approveDocumentByRequestId: async (requestId: string) => {
+  approveDocumentByRequestId: async (
+    requestId: string,
+    summaryApproved?: boolean,
+    isIntensive?: boolean
+  ) => {
     try {
-      const response = await apiClient.put(`/documents/approve/${requestId}`);
+      const requestBody: {
+        summaryApproved?: boolean;
+        isIntensive?: boolean;
+      } = {};
+
+      if (summaryApproved !== undefined) {
+        requestBody.summaryApproved = summaryApproved;
+      }
+      if (isIntensive !== undefined) {
+        requestBody.isIntensive = isIntensive;
+      }
+
+      const response = await apiClient.put(
+        `/documents/approve/${requestId}`,
+        requestBody
+      );
       return response.data;
     } catch (error) {
       console.error("Error approving document by request ID:", error);

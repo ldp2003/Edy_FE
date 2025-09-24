@@ -149,9 +149,17 @@ export const DocumentService = {
   },
 
   // Duyệt đơn bằng requestId
-  async approveDocumentByRequestId(requestId: string) {
+  async approveDocumentByRequestId(
+    requestId: string,
+    summaryApproved?: boolean,
+    isIntensive?: boolean
+  ) {
     try {
-      return await DocumentAPI.approveDocumentByRequestId(requestId);
+      return await DocumentAPI.approveDocumentByRequestId(
+        requestId,
+        summaryApproved,
+        isIntensive
+      );
     } catch (error) {
       console.error(
         "Error in DocumentService.approveDocumentByRequestId:",

@@ -2,7 +2,7 @@ import type React from "react";
 import { Avatar } from "antd";
 import { School } from "lucide-react";
 
-interface UserInfo {
+export interface UserInfo {
   _id: string;
   first_name: string;
   last_name: string;

@@ -37,15 +37,24 @@ const DocumentReviewPage: React.FC = () => {
     fetchDocument();
   }, [id, navigate]);
 
-  const handleApprove = async (reqId?: string) => {
-    const targetRequestId = reqId || requestId;
+  const handleApprove = async (approvalData: {
+    requestId?: string;
+    summaryApproved: boolean;
+    isIntensive: boolean;
+  }) => {
+    const targetRequestId = approvalData.requestId || requestId;
+
     if (!targetRequestId) {
       message.error("Không có thông tin yêu cầu duyệt!");
       return;
     }
 
     try {
-      await DocumentService.approveDocumentByRequestId(targetRequestId);
+      await DocumentService.approveDocumentByRequestId(
+        targetRequestId,
+        approvalData.summaryApproved,
+        approvalData.isIntensive
+      );
       // Message will be shown by child component, delay navigation
       setTimeout(() => {
         navigate("/admin/documents/all");
