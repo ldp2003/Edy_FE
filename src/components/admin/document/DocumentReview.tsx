@@ -8,6 +8,7 @@ import {
   message,
   Modal,
   Checkbox,
+  Radio,
 } from "antd";
 
 import { Plus, Minus, Eye } from "lucide-react";
@@ -15,6 +16,7 @@ import type { Document } from "../../../models/document";
 import type { User } from "../../../models/user";
 import UserInfoHeader from "./UserInfoHeader";
 import type { UserInfo } from "./UserInfoHeader";
+import { DocumentAPI } from "../../../api/API";
 
 const { TextArea } = Input;
 const { Option } = Select;
@@ -48,21 +50,32 @@ const convertUserToUserInfo = (user: User): UserInfo => {
   };
 };
 
+interface PendingRequest {
+  _id: string;
+  doc: string;
+  requester: string;
+  is_summary: boolean;
+  status: string;
+  message: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
 interface DocumentReviewProps {
   document: Document;
-  requestId?: string; // Thêm requestId
   onApprove: (approvalData: {
-    requestId?: string;
-    summaryApproved: boolean;
+    documentRequestId: string;
+    summaryRequestId?: string;
     isIntensive: boolean;
+    summaryAction?: 'approve' | 'reject';
+    summaryRejectReason?: string;
   }) => void;
-  onReject: (reason: string, requestId?: string) => void;
+  onReject: (reason: string, requestId: string) => void;
   onDelete: (reason: string) => void;
 }
 
 const DocumentReview: React.FC<DocumentReviewProps> = ({
   document,
-  requestId,
   onApprove,
   onReject,
   onDelete,
@@ -72,15 +85,51 @@ const DocumentReview: React.FC<DocumentReviewProps> = ({
   const [authors, setAuthors] = useState<string[]>([]);
   const [rejectModalVisible, setRejectModalVisible] = useState(false);
   const [deleteModalVisible, setDeleteModalVisible] = useState(false);
-  const [documentViewModalVisible, setDocumentViewModalVisible] =
-    useState(false);
+  const [documentViewModalVisible, setDocumentViewModalVisible] = useState(false);
   const [rejectReason, setRejectReason] = useState("");
   const [deleteReason, setDeleteReason] = useState("");
   const [processing, setProcessing] = useState(false);
-  const [summaryApproved, setSummaryApproved] = useState(false);
   const [isIntensive, setIsIntensive] = useState(false);
 
-  // Fill form with document data
+  // New states for handling requests
+  const [pendingRequests, setPendingRequests] = useState<PendingRequest[]>([]);
+  const [documentRequest, setDocumentRequest] = useState<PendingRequest | null>(null);
+  const [summaryRequest, setSummaryRequest] = useState<PendingRequest | null>(null);
+  const [summaryAction, setSummaryAction] = useState<'approve' | 'reject'>('approve');
+  const [summaryRejectReason, setSummaryRejectReason] = useState("");
+  const [loading, setLoading] = useState(true);
+
+  // Load pending requests for the document
+  useEffect(() => {
+    const loadPendingRequests = async () => {
+      try {
+        setLoading(true);
+        const response = await DocumentAPI.getPendingRequests(document._id);
+        const requests = response.requests || [];
+
+        setPendingRequests(requests);
+
+        // Separate document and summary requests
+        const docReq = requests.find((req: PendingRequest) => !req.is_summary);
+        const sumReq = requests.find((req: PendingRequest) => req.is_summary);
+
+        setDocumentRequest(docReq || null);
+        setSummaryRequest(sumReq || null);
+
+        console.log("Loaded requests:", { docReq, sumReq });
+      } catch (error) {
+        console.error("Error loading pending requests:", error);
+        messageApi.error("Không thể tải thông tin requests!");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (document._id) {
+      loadPendingRequests();
+    }
+  }, [document._id, messageApi]);
+
   useEffect(() => {
     if (document) {
       const documentAuthors = document.author || [""];
@@ -164,20 +213,29 @@ const DocumentReview: React.FC<DocumentReviewProps> = ({
   };
 
   const handleApprove = async () => {
+    if (!documentRequest) {
+      messageApi.error("Không tìm thấy request tài liệu!");
+      return;
+    }
+
+    // Validate summary rejection reason if needed
+    if (summaryRequest && summaryAction === 'reject' && !summaryRejectReason.trim()) {
+      messageApi.error("Vui lòng nhập lý do từ chối tóm tắt!");
+      return;
+    }
+
     setProcessing(true);
     try {
-      // Tạo object chứa thông tin duyệt
       const approvalData = {
-        requestId,
-        summaryApproved,
+        documentRequestId: documentRequest._id,
+        summaryRequestId: summaryRequest?._id,
         isIntensive,
+        summaryAction: summaryRequest ? summaryAction : undefined,
+        summaryRejectReason: summaryAction === 'reject' ? summaryRejectReason : undefined,
       };
+
       await onApprove(approvalData);
       messageApi.success("Tài liệu đã được duyệt thành công!");
-      // Chờ 2 giây trước khi chuyển trang
-      setTimeout(() => {
-        // Navigation will be handled by parent component
-      }, 2000);
     } catch (error) {
       console.error("Approve error:", error);
       messageApi.error("Có lỗi xảy ra khi duyệt tài liệu!");
@@ -187,6 +245,11 @@ const DocumentReview: React.FC<DocumentReviewProps> = ({
   };
 
   const handleReject = async () => {
+    if (!documentRequest) {
+      messageApi.error("Không tìm thấy request tài liệu!");
+      return;
+    }
+
     if (!rejectReason.trim()) {
       messageApi.error("Vui lòng nhập lý do từ chối!");
       return;
@@ -194,14 +257,10 @@ const DocumentReview: React.FC<DocumentReviewProps> = ({
 
     setProcessing(true);
     try {
-      await onReject(rejectReason, requestId);
+      await onReject(rejectReason, documentRequest._id);
       messageApi.success("Tài liệu đã được từ chối!");
       setRejectModalVisible(false);
       setRejectReason("");
-      // Chờ 2 giây trước khi chuyển trang
-      setTimeout(() => {
-        // Navigation will be handled by parent component
-      }, 2000);
     } catch (error) {
       console.error("Reject error:", error);
       messageApi.error("Có lỗi xảy ra khi từ chối tài liệu!");
@@ -234,6 +293,17 @@ const DocumentReview: React.FC<DocumentReviewProps> = ({
     }
   };
 
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="mt-2 text-gray-600">Đang tải thông tin...</p>
+        </div>
+      </div>
+    );
+  }
+
   // Calculate estimated file size (placeholder since we don't have actual size)
   const estimatedFileSize = 1024 * 1024; // 1MB placeholder
 
@@ -248,7 +318,17 @@ const DocumentReview: React.FC<DocumentReviewProps> = ({
         <span className="ml-3 text-xs text-black font-medium">
           Id: {document._id}
         </span>
+        {/* Show request info */}
+        {/* {documentRequest && (
+          <div className="text-xs text-gray-600 mt-2">
+            Request ID: {documentRequest._id}
+            {summaryRequest && (
+              <span className="ml-4">Summary Request ID: {summaryRequest._id}</span>
+            )}
+          </div>
+        )} */}
       </div>
+
       <div className="mx-auto bg-white rounded-lg shadow-sm p-6">
         <Form
           form={form}
@@ -303,13 +383,51 @@ const DocumentReview: React.FC<DocumentReviewProps> = ({
               </Form.Item>
 
               <div className="mt-3">
-                <Checkbox
-                  checked={isIntensive}
-                  onChange={(e) => setIsIntensive(e.target.checked)}
-                  className="text-sm"
+                <div
+                  className={`p-3 rounded-lg border-2 transition-all duration-200 cursor-pointer ${isIntensive
+                      ? 'bg-gradient-to-r from-purple-50 to-indigo-50 border-purple-300 shadow-sm'
+                      : 'bg-gray-50 border-gray-200 hover:border-purple-200 hover:bg-purple-50'
+                    }`}
+                  onClick={() => setIsIntensive(!isIntensive)}
                 >
-                  Tài liệu chuyên sâu
-                </Checkbox>
+                  <div className="flex items-center space-x-3">
+                    <div className={`relative flex items-center justify-center w-5 h-5 rounded border-2 transition-all duration-200 ${isIntensive
+                        ? 'bg-purple-600 border-purple-600'
+                        : 'bg-white border-gray-300'
+                      }`}>
+                      {isIntensive && (
+                        <svg
+                          className="w-3 h-3 text-white animate-in fade-in duration-200"
+                          fill="currentColor"
+                          viewBox="0 0 20 20"
+                        >
+                          <path
+                            fillRule="evenodd"
+                            d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                            clipRule="evenodd"
+                          />
+                        </svg>
+                      )}
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <span className={`text-sm font-medium transition-colors ${isIntensive ? 'text-purple-800' : 'text-gray-700'
+                        }`}>
+                        🎓 Tài liệu chuyên sâu
+                      </span>
+                      {isIntensive && (
+                        <span className="px-2 py-1 text-xs font-semibold text-purple-700 bg-purple-100 rounded-full animate-in fade-in duration-300">
+                          Đã chọn
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                  <div className={`mt-2 text-xs transition-colors ${isIntensive ? 'text-purple-600' : 'text-gray-500'
+                    }`}>
+                    {isIntensive
+                      ? 'Tài liệu này sẽ được đánh dấu là chuyên sâu và có thể yêu cầu điểm cao hơn để tải xuống'
+                      : 'Đánh dấu tài liệu này là nội dung chuyên sâu nếu nó có chất lượng cao và chi tiết hơn'}
+                  </div>
+                </div>
               </div>
             </div>
 
@@ -404,15 +522,94 @@ const DocumentReview: React.FC<DocumentReviewProps> = ({
                   disabled
                 />
               </Form.Item>
-              <div className="mt-3">
-                <Checkbox
-                  checked={summaryApproved}
-                  onChange={(e) => setSummaryApproved(e.target.checked)}
-                  className="text-sm"
-                >
-                  Duyệt tóm tắt này
-                </Checkbox>
-              </div>
+
+              {/* Summary approval section - only show if there's a summary request */}
+              {summaryRequest && (
+                <div className="mt-4 border border-blue-200 rounded-xl overflow-hidden shadow-sm">
+                  {/* Header */}
+                  <div className="bg-gradient-to-r from-blue-500 to-blue-600 px-4 py-3">
+                    <div className="flex items-center text-white">
+                      <div className="w-2 h-2 bg-white rounded-full mr-2 animate-pulse"></div>
+                      <span className="text-sm font-semibold">Tóm tắt cần duyệt</span>
+                    </div>
+                  </div>
+
+                  {/* Content */}
+                  <div className="bg-white p-4 space-y-4">
+                    <Radio.Group
+                      value={summaryAction}
+                      onChange={(e) => {
+                        setSummaryAction(e.target.value);
+                        if (e.target.value === 'approve') {
+                          setSummaryRejectReason("");
+                        }
+                      }}
+                      className="w-full"
+                    >
+                      <div className="grid gap-3">
+                        {/* Approve Option - Expanded clickable area */}
+                        <label
+                          className="flex items-center p-3 border border-green-200 rounded-lg hover:bg-green-50 transition-all cursor-pointer w-full"
+                          htmlFor="approve-radio"
+                        >
+                          <Radio
+                            id="approve-radio"
+                            value="approve"
+                            className="text-sm pointer-events-none"
+                          >
+                            <span className="flex items-center font-medium text-green-700 pointer-events-none">
+                              ✅ Duyệt tóm tắt
+                            </span>
+                          </Radio>
+                        </label>
+
+                        {/* Reject Option - Expanded clickable area */}
+                        <label
+                          className="flex items-center p-3 border border-red-200 rounded-lg hover:bg-red-50 transition-all cursor-pointer w-full"
+                          htmlFor="reject-radio"
+                        >
+                          <Radio
+                            id="reject-radio"
+                            value="reject"
+                            className="text-sm pointer-events-none"
+                          >
+                            <span className="flex items-center font-medium text-red-700 pointer-events-none">
+                              ❌ Từ chối tóm tắt
+                            </span>
+                          </Radio>
+                        </label>
+                      </div>
+                    </Radio.Group>
+
+                    {/* Rejection reason */}
+                    {summaryAction === 'reject' && (
+                      <div className="mt-4 p-4 bg-red-50 border border-red-200 rounded-lg">
+                        <label className="block text-sm font-semibold text-red-800 mb-2">
+                          📝 Lý do từ chối:
+                        </label>
+                        <TextArea
+                          rows={3}
+                          value={summaryRejectReason}
+                          onChange={(e) => setSummaryRejectReason(e.target.value)}
+                          placeholder="Vui lòng nhập lý do cụ thể..."
+                          style={{ resize: "none" }}
+                          className="border-red-300 focus:border-red-400 focus:ring-red-200"
+                        />
+                      </div>
+                    )}
+
+                    {/* Status badge */}
+                    <div className="flex justify-end mt-4">
+                      <span className={`px-3 py-1 rounded-full text-xs font-semibold ${summaryAction === 'approve'
+                        ? 'bg-green-100 text-green-800 border border-green-200'
+                        : 'bg-red-100 text-red-800 border border-red-200'
+                        }`}>
+                        {summaryAction === 'approve' ? 'Sẽ được duyệt' : 'Sẽ bị từ chối'}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
 
