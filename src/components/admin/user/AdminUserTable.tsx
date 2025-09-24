@@ -22,11 +22,13 @@ import {
 } from "lucide-react";
 import type { User } from "../../../models/user";
 import { UserService } from "../../../utils/UserService";
+import { getRoleDisplayName } from "../../../constants/RoleConstants";
 
 const { Option } = Select;
 
 interface UserDisplay extends User {
   index: number;
+  role_names?: string[];
 }
 
 const AdminUserTable: React.FC = () => {
@@ -153,6 +155,40 @@ const AdminUserTable: React.FC = () => {
       },
     },
     {
+      title: "Vai trò",
+      key: "role_names",
+      width: 100,
+      ellipsis: true,
+      render: (_, record: UserDisplay) => {
+        const getRoleDisplay = (roleNames: string[]) => {
+          if (!roleNames || roleNames.length === 0) {
+            return "Người dùng";
+          }
+
+          const translatedRoles = roleNames.map((role) =>
+            getRoleDisplayName(role)
+          );
+
+          return translatedRoles.join(", ");
+        };
+
+        const roleText = getRoleDisplay(record.role_names || []);
+        const isAdmin = record.role_names && record.role_names.length > 0;
+
+        return (
+          <Tooltip title={roleText}>
+            <span
+              className={`text-xs ${
+                isAdmin ? "text-blue-600 font-medium" : "text-gray-600"
+              }`}
+            >
+              {roleText}
+            </span>
+          </Tooltip>
+        );
+      },
+    },
+    {
       title: "Lĩnh vực",
       dataIndex: "field_of_study",
       key: "field_of_study",
@@ -247,28 +283,6 @@ const AdminUserTable: React.FC = () => {
           }`}
         >
           {strike || 0}
-        </span>
-      ),
-    },
-    {
-      title: "Free DL",
-      dataIndex: "free_download_count",
-      key: "free_download_count",
-      align: "center",
-      width: 70,
-      render: (count: number) => (
-        <span className="text-xs text-teal-600 font-medium">{count || 0}</span>
-      ),
-    },
-    {
-      title: "Yêu thích",
-      dataIndex: "favorites",
-      key: "favorites",
-      align: "center",
-      width: 70,
-      render: (favorites: { document: string; added_at: string }[]) => (
-        <span className="text-xs text-pink-600 font-medium">
-          {favorites ? favorites.length : 0}
         </span>
       ),
     },

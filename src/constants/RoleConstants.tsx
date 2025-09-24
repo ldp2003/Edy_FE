@@ -32,9 +32,53 @@ export const USER_ROLES: UserRole[] = [
   },
   {
     role: "DOCUMENT_ADMIN",
-    displayName: "Người dùng hệ thống",
-    description: "Sử dụng và quản lý tài liệu",
+    displayName: "Quản lý tài liệu",
+    description: "Quản lý tài liệu và bình luận",
     icon: "📚",
     permissions: ["MANAGE_DOCUMENT", "MANAGE_COMMENT"],
   },
+  {
+    role: "USER_ADMIN",
+    displayName: "Quản lý người dùng",
+    description: "Quản lý tài khoản người dùng",
+    icon: "👥",
+    permissions: ["MANAGE_USER"],
+  },
+  {
+    role: "SYSTEM_ADMIN",
+    displayName: "Quản trị hệ thống",
+    description: "Quản lý máy chủ và hệ thống",
+    icon: "⚙️",
+    permissions: ["MANAGE_SERVER"],
+  },
+  {
+    role: "ENTITY_ADMIN",
+    displayName: "Quản lý thực thể",
+    description: "Quản lý các thực thể trong hệ thống",
+    icon: "🏢",
+    permissions: ["MANAGE_ENTITY"],
+  },
+  {
+    role: "CUSTOM_ROLE",
+    displayName: "Vai trò tùy chỉnh",
+    description: "Vai trò được tùy chỉnh",
+    icon: "🔧",
+    permissions: [],
+  },
 ];
+
+// Role mapping for display
+export const ROLE_DISPLAY_NAMES: Record<string, string> = {
+  Admin: "Quản trị viên",
+  SUPER_ADMIN: "Quản trị viên",
+  DOCUMENT_ADMIN: "Quản lý tài liệu",
+  USER_ADMIN: "Quản lý người dùng",
+  SYSTEM_ADMIN: "Quản trị hệ thống",
+  ENTITY_ADMIN: "Quản lý thực thể",
+  CUSTOM_ROLE: "Vai trò tùy chỉnh",
+};
+
+// Function to get role display name
+export const getRoleDisplayName = (roleName: string): string => {
+  return ROLE_DISPLAY_NAMES[roleName] || roleName;
+};
