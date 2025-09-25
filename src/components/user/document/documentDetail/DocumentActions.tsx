@@ -91,7 +91,7 @@ const DocumentActions: React.FC<DocumentActionsProps> = ({
         {!isUser && <ReportButton />}
         <LikeButton likeCount={0} />
         <DislikeButton dislikeCount={0} />
-        <FavoriteButton />
+        <FavoriteButton documentId={document._id} />
         <ShareButton />
       </div>
     </div>

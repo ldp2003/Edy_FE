@@ -14,13 +14,11 @@ const PostsPointBox: React.FC<PostsPointBoxProps> = ({
   loading = false,
 }) => {
   if (loading) {
-    return (
-      <div className="w-40 h-24 bg-gray-200 animate-pulse rounded" />
-    );
+    return <div className="w-40 h-24 bg-gray-200 animate-pulse rounded" />;
   }
-  
+
   return (
-    <div className="p-4 bg-white w-[30%] rounded-md text-left shadow-md ">
+    <div className="p-4 bg-[var(--field-background-color)] w-[30%] rounded-md text-left shadow-md ">
       <div className="flex flex-col justify-between text-left">
         <div className="flex flex-row justify-between">
           <p className="text-xs text-gray-600">Điểm hạng (RP)</p>

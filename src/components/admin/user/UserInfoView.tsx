@@ -1,0 +1,139 @@
+import React from "react";
+import { Avatar, Tag } from "antd";
+import type { User } from "../../../models/user";
+
+interface UserInfoViewProps {
+  user: User;
+}
+
+const UserInfoView: React.FC<UserInfoViewProps> = ({ user }) => {
+  const getOrganizationName = () => {
+    if (typeof user.organization === "object" && user.organization) {
+      return user.organization.name;
+    }
+    return user.organization || "Chưa có tổ chức";
+  };
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case "ACTIVE":
+        return "green";
+      case "INACTIVE":
+        return "orange";
+      case "BANNED":
+        return "red";
+      default:
+        return "default";
+    }
+  };
+
+  const getStatusText = (status: string) => {
+    switch (status) {
+      case "ACTIVE":
+        return "Hoạt động";
+      case "INACTIVE":
+        return "Không hoạt động";
+      case "BANNED":
+        return "Bị khóa";
+      default:
+        return status;
+    }
+  };
+
+  return (
+    <div className="bg-white p-6 rounded-lg border border-gray-300">
+      <h2 className="font-bold text-sm mb-6">
+        Thông tin người dùng{" "}
+        <span className="text-gray-500">ID: {user._id}</span>
+      </h2>
+
+      <div className="flex items-start space-x-6">
+        {/* Avatar */}
+        <div className="flex flex-col items-center">
+          <Avatar size={80} src={user.avatar}>
+            {user.last_name?.charAt(0)}
+            {user.first_name?.charAt(0)}
+          </Avatar>
+          <p className="text-xs text-gray-500 mt-2">ID: {user._id}</p>
+        </div>
+
+        {/* User Info */}
+        <div className="flex-1 grid grid-cols-2 gap-4">
+          <div>
+            <label className="block text-xs font-medium text-gray-500 mb-1">
+              Họ
+            </label>
+            <input
+              type="text"
+              value={user.last_name || ""}
+              readOnly
+              className="w-full p-1 border border-gray-300 rounded text-sm text-gray-900"
+            />
+          </div>
+
+          <div>
+            <label className="block text-xs font-medium text-gray-500 mb-1">
+              Tên
+            </label>
+            <input
+              type="text"
+              value={user.first_name || ""}
+              readOnly
+              className="w-full p-1 border border-gray-300 rounded text-sm text-gray-900"
+            />
+          </div>
+
+          <div>
+            <label className="block text-xs font-medium text-gray-500 mb-1">
+              Email
+            </label>
+            <input
+              type="email"
+              value={user.contact_email || ""}
+              readOnly
+              className="w-full p-1 border border-gray-300 rounded text-sm text-gray-900"
+            />
+          </div>
+
+          <div>
+            <label className="block text-xs font-medium text-gray-500 mb-1">
+              Học tập tại việc tại
+            </label>
+            <input
+              type="text"
+              value={getOrganizationName()}
+              readOnly
+              className="w-full p-1 border border-gray-300 rounded text-sm text-gray-900"
+            />
+          </div>
+
+          <div>
+            <label className="block text-xs font-medium text-gray-500 mb-1">
+              Tài khoản
+            </label>
+            <input
+              type="text"
+              value="Thường"
+              readOnly
+              className="w-full p-1 border border-gray-300 rounded text-sm text-gray-900"
+            />
+          </div>
+
+          <div>
+            <label className="block text-xs font-medium text-gray-500 mb-1">
+              Trạng thái
+            </label>
+            <Tag
+              color={getStatusColor(user.status || "ACTIVE")}
+              className="text-xs"
+            >
+              {getStatusText(user.status || "ACTIVE")}
+            </Tag>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default UserInfoView;
