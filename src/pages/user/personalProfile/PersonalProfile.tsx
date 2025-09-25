@@ -5,7 +5,7 @@ import ProfileTab from "../../../components/user/personalProfile/ProfileTab";
 
 const PersonalProfile: React.FC = () => {
   return (
-    <div className="">
+    <div className="bg-white rounded-lg p-6 border border-[var(--border-color)]">
       <PersonalHeader></PersonalHeader>
       <div className="flex w-full flex-row mt-8 gap-6">
         <div className="w-1/4">

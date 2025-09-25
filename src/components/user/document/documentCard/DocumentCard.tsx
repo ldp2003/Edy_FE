@@ -65,7 +65,7 @@ const DocumentCard: React.FC<DocumentCardProps> = ({
         setIsFavorite(true);
         messageApi.success("Đã lưu tài liệu vào mục yêu thích!");
       }
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
       messageApi.error("Có lỗi xảy ra, vui lòng thử lại!");
     }
@@ -78,11 +78,11 @@ const DocumentCard: React.FC<DocumentCardProps> = ({
 
   return (
     <div
-      className="text-left  rounded-lg border border-gray-200 bg-[var(--card-background-color)] overflow-hidden hover:shadow-md transition-shadow cursor-pointer"
+      className="text-left  rounded-lg border border-[var(--border-color)]  overflow-hidden hover:shadow-md transition-shadow cursor-pointer"
       onClick={handleCardClick}
     >
       {contextHolder}
-      <div className="relative flex justify-center items-center">
+      <div className="bg-[var(--card-background-color)] rounded-md relative flex justify-center items-center">
         <img
           src={imageUrl || "/public/image/thumb_1200_1553.png"}
           alt={title}

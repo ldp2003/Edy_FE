@@ -14,10 +14,7 @@ const PointBox: React.FC<PointBoxProps> = ({
   violations,
 }) => {
   return (
-    <div
-      className="p-4  w-full rounded-md text-left shadow-md"
-      style={{ backgroundColor: "var( --field-background-color)" }}
-    >
+    <div className="p-4 bg-[var(--field-background-color)] w-full rounded-md text-left shadow-md">
       <div
         className="flex flex-col justify-between text-left gap-3"
         style={{ color: "var(--third-text-color)" }}

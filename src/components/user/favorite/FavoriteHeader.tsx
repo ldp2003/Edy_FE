@@ -18,7 +18,7 @@ const FavoriteHeader: React.FC<FavoriteHeaderProps> = ({
   return (
     <div className="mb-6 flex items-center text-left justify-between">
       <div>
-        <h2 className="text-base text-left font-bold text-gray-900 mb-2">
+        <h2 className="text-base text-left font-bold text-[var(--primary-text-color)] mb-2">
           Tài liệu yêu thích của bạn
         </h2>
         <p className="text-sm text-gray-600">
