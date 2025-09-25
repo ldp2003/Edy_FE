@@ -203,6 +203,36 @@ export const UserAPI = {
       throw error;
     }
   },
+
+  getListFavorites: async () => {
+    try {
+      const response = await apiClient.get("/users/favorites");
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching favorite documents:", error);
+      throw error;
+    }
+  },
+
+  addToFavorites: async (documentId: string) => {
+    try {
+      const response = await apiClient.post(`/users/favorites/${documentId}`);
+      return response.data;
+    } catch (error) {
+      console.error("Error adding document to favorites:", error);
+      throw error;
+    }
+  },
+
+  removeFromFavorites: async (documentId: string) => {
+    try {
+      const response = await apiClient.delete(`/users/favorites/${documentId}`);
+      return response.data;
+    } catch (error) {
+      console.error("Error removing document from favorites:", error);
+      throw error;
+    }
+  },
 };
 
 export const SubjectAPI = {

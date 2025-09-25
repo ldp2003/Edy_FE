@@ -36,8 +36,10 @@ const UserLayout: React.FC = () => {
           <div
             className={`transition-all duration-300 ${
               isDocumentDetailPage
-                ? "" // Padding for document detail page
-                : "p-4"
+                ? "" // No padding for document detail page
+                : isSidebarVisible
+                ? "p-4" // Normal padding when sidebar is open
+                : "p-4 mx-auto max-w-7xl" // Center content when sidebar is closed
             }`}
           >
             <Outlet />
