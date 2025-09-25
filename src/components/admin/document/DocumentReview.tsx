@@ -92,6 +92,7 @@ const DocumentReview: React.FC<DocumentReviewProps> = ({
   const [isIntensive, setIsIntensive] = useState(false);
 
   // New states for handling requests
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [pendingRequests, setPendingRequests] = useState<PendingRequest[]>([]);
   const [documentRequest, setDocumentRequest] = useState<PendingRequest | null>(
     null

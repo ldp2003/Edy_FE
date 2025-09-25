@@ -2,8 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Row, Col, Spin, Empty, message, Button } from "antd";
 import { RefreshCw } from "lucide-react";
 import { UserService } from "../../../utils/UserService";
-import DocumentCard from "../../common/cards/DocumentCard";
-
+import FavoriteCard from "./FavoriteCard";
 
 const FavoriteDocuments: React.FC = () => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -82,7 +81,7 @@ const FavoriteDocuments: React.FC = () => {
       <Row gutter={[24, 24]}>
         {documents.map((document) => (
           <Col key={document._id} xs={24} sm={12} md={8} lg={6} xxl={4}>
-            <DocumentCard
+            <FavoriteCard
               document={document}
               onRemove={handleRemoveFromFavorites}
             />

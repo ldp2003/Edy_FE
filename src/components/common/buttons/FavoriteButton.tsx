@@ -1,7 +1,8 @@
 import { Heart } from "lucide-react";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { message } from "antd";
 import { UserService } from "../../../utils/UserService";
+import type { Document } from "../../../models/document";
 
 interface FavoriteButtonProps {
   documentId: string;
@@ -16,6 +17,25 @@ const FavoriteButton: React.FC<FavoriteButtonProps> = ({
 }) => {
   const [isFavorited, setIsFavorited] = useState(initialFavorited);
   const [isLoading, setIsLoading] = useState(false);
+
+  // Check if document is in favorites when component mounts
+  useEffect(() => {
+    const checkFavoriteStatus = async () => {
+      try {
+        const favoritesResponse = await UserService.getListFavorites();
+        const favoriteIds =
+          favoritesResponse.documents?.map((doc: Document) => doc._id) || [];
+        const isFav = favoriteIds.includes(documentId);
+        setIsFavorited(isFav);
+      } catch (error) {
+        console.error("Failed to fetch favorites:", error);
+      }
+    };
+
+    if (!initialFavorited) {
+      checkFavoriteStatus();
+    }
+  }, [documentId, initialFavorited]);
 
   const handleToggleFavorite = async () => {
     try {
