@@ -32,7 +32,7 @@ const UserDetailHeader: React.FC<UserDetailHeaderProps> = ({
 
       <div className="flex space-x-2">
         <Button icon={<Edit size={16} />} onClick={onEdit}>
-          Chỉnh sửa
+          Thao tác
         </Button>
 
         <Popconfirm

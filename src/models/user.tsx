@@ -36,6 +36,7 @@ export interface User {
     added_at: string;
   }[];
   status?: "ACTIVE" | "INACTIVE" | "BANNED";
+  role?: "USER" | "MODERATOR" | "ADMIN";
   createdAt?: string;
   updatedAt?: string;
 }
@@ -58,6 +59,7 @@ export const defaultUser: User = {
   shared_documents: [],
   favorites: [],
   status: "ACTIVE",
+  role: "USER",
   createdAt: "",
   updatedAt: "",
   organization: {
