@@ -10,14 +10,7 @@ const UserLayout: React.FC = () => {
   const isDocumentDetailPage = location.pathname.includes("/document-detail");
 
   return (
-    <div
-      className="h-screen flex flex-col overflow-hidden"
-      style={{
-        backgroundColor: isDocumentDetailPage
-          ? "var(--secondary-background-color)"
-          : "var(--primary-background-color)",
-      }}
-    >
+    <div className="h-screen bg-[var(--secondary-background-color)] flex flex-col overflow-hidden">
       {/* Header - cố định ở trên cùng */}
       <div className="relative z-10 flex-shrink-0">
         <Header />
@@ -38,8 +31,8 @@ const UserLayout: React.FC = () => {
               isDocumentDetailPage
                 ? "" // No padding for document detail page
                 : isSidebarVisible
-                ? "p-4" // Normal padding when sidebar is open
-                : "p-4 mx-auto max-w-7xl" // Center content when sidebar is closed
+                ? "px-20" // Normal padding when sidebar is open
+                : "px-20 mx-auto max-w-7xl" // Center content when sidebar is closed
             }`}
           >
             <Outlet />

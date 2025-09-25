@@ -1,13 +1,16 @@
 import React, { useState, useEffect } from "react";
-import { Row, Col, Spin, Empty, message, Button } from "antd";
-import { RefreshCw } from "lucide-react";
+import { Row, Col, message } from "antd";
 import { UserService } from "../../../utils/UserService";
 import FavoriteCard from "./FavoriteCard";
+import FavoriteListItem from "./FavoriteListItem";
+import FavoriteHeader from "./FavoriteHeader";
+import { FavoriteLoading, FavoriteEmpty } from "./FavoriteStates";
+import type { Document } from "../../../models/document";
 
 const FavoriteDocuments: React.FC = () => {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const [documents, setDocuments] = useState<any[]>([]);
+  const [documents, setDocuments] = useState<Document[]>([]);
   const [loading, setLoading] = useState(true);
+  const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
 
   const fetchFavoriteDocuments = async () => {
     try {
@@ -38,56 +41,48 @@ const FavoriteDocuments: React.FC = () => {
     fetchFavoriteDocuments();
   }, []);
 
+  // Show loading state
   if (loading) {
-    return (
-      <div className="flex justify-center items-center min-h-64">
-        <Spin size="large" />
-      </div>
-    );
+    return <FavoriteLoading loading={loading} />;
   }
 
+  // Show empty state
   if (!documents || documents.length === 0) {
-    return (
-      <div className="min-h-96 flex items-center justify-center">
-        <Empty
-          description="Chưa có tài liệu yêu thích nào"
-          image={Empty.PRESENTED_IMAGE_SIMPLE}
-        >
-          <Button type="primary" onClick={() => (window.location.href = "/")}>
-            Khám phá tài liệu
-          </Button>
-        </Empty>
-      </div>
-    );
+    return <FavoriteEmpty isEmpty={true} />;
   }
 
   return (
-    <div className="bg-white min-h-screen">
-      <div className="mb-6 flex items-center text-left justify-between">
-        <div>
-          <h2 className="text-base text-left font-bold text-gray-900 mb-2">
-            Tài liệu yêu thích của bạn
-          </h2>
-          <p className="text-sm text-gray-600">
-            Bạn đã lưu {documents.length} tài liệu vào danh sách yêu thích
-          </p>
-        </div>
+    <div className="bg-white border border-[var(--border-color)] rounded-md max-h-screen h-fit p-6">
+      <FavoriteHeader
+        documentsCount={documents.length}
+        viewMode={viewMode}
+        onViewModeChange={setViewMode}
+        onRefresh={fetchFavoriteDocuments}
+      />
 
-        <Button icon={<RefreshCw size={16} />} onClick={fetchFavoriteDocuments}>
-          Làm mới
-        </Button>
-      </div>
-
-      <Row gutter={[24, 24]}>
-        {documents.map((document) => (
-          <Col key={document._id} xs={24} sm={12} md={8} lg={6} xxl={4}>
-            <FavoriteCard
+      {/* Documents Display */}
+      {viewMode === "grid" ? (
+        <Row gutter={[16, 16]}>
+          {documents.map((document) => (
+            <Col key={document._id} xs={12} sm={10} md={6} lg={4} xxl={3}>
+              <FavoriteCard
+                document={document}
+                onRemove={handleRemoveFromFavorites}
+              />
+            </Col>
+          ))}
+        </Row>
+      ) : (
+        <div className="space-y-4">
+          {documents.map((document) => (
+            <FavoriteListItem
+              key={document._id}
               document={document}
               onRemove={handleRemoveFromFavorites}
             />
-          </Col>
-        ))}
-      </Row>
+          ))}
+        </div>
+      )}
     </div>
   );
 };

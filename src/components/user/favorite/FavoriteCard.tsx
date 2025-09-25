@@ -65,11 +65,11 @@ const FavoriteCard: React.FC<FavoriteCardProps> = ({ document, onRemove }) => {
       onClick={handleCardClick}
     >
       {/* Image with heart icon */}
-      <div className="relative">
+      <div className="relative bg-[var(--card-background-color)] flex justify-center items-center py-2">
         <img
           src={document.cover_page || "/public/image/thumb_1200_1553.png"}
           alt={document.title}
-          className="h-40 w-full object-cover"
+          className="w-[90%] object-fill h-32 shadow-sm rounded-lg"
           onError={handleImageError}
         />
 
@@ -102,14 +102,13 @@ const FavoriteCard: React.FC<FavoriteCardProps> = ({ document, onRemove }) => {
         <div className="space-y-2">
           {document.subject && (
             <div className="text-xs text-gray-600">
-              <span className="font-medium">Môn:</span> {document.subject.name}
+              <span className="font-medium"></span> {document.subject.name}
             </div>
           )}
 
           {document.organization && (
-            <div className="text-xs text-gray-600 truncate">
-              <span className="font-medium">Trường:</span>{" "}
-              {document.organization.name}
+            <div className="text-xs text-[var(--primary-color)] truncate">
+              <span className="font-medium"></span> {document.organization.name}
             </div>
           )}
         </div>
