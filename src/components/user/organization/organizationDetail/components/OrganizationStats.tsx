@@ -11,7 +11,7 @@ const OrganizationStats: React.FC<OrganizationStatsProps> = ({
   documents,
 }) => {
   return (
-    <div className="bg-white rounded-lg border border-[var(--border-color)] p-6 mb-6">
+    <div className="bg-white rounded-lg border border-[var(--border-color)] p-6">
       <h3 className="text-base font-semibold text-[var(--primary-text-color)] mb-4">
         Danh sách tài liệu
       </h3>
