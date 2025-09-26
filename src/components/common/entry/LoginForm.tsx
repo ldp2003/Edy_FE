@@ -2,7 +2,15 @@ import React, { useState } from "react";
 import { Form, Input, Button, message } from "antd";
 import { login } from "../../../utils/AuthService";
 
-const LoginForm: React.FC<{ onSuccess: () => void }> = ({ onSuccess }) => {
+interface LoginFormProps {
+  onSuccess: () => void;
+  onSwitchToRegister?: () => void;
+}
+
+const LoginForm: React.FC<LoginFormProps> = ({
+  onSuccess,
+  onSwitchToRegister,
+}) => {
   const [loading, setLoading] = useState(false);
   const [form] = Form.useForm();
   const [messageApi, contextHolder] = message.useMessage();
@@ -14,12 +22,11 @@ const LoginForm: React.FC<{ onSuccess: () => void }> = ({ onSuccess }) => {
       const result = await login(email, password);
       if (result) {
         messageApi.success("Đăng nhập thành công");
-        form.resetFields(); // Clear form data
-        onSuccess(); // Call the success handler
-        window.location.reload(); // Reload the page
+        form.resetFields();
+        onSuccess();
+        window.location.reload();
       }
     } catch (error: unknown) {
-      // Extract error message from API response
       let errorMessage = "Đăng nhập thất bại. Vui lòng kiểm tra lại thông tin.";
 
       if (error && typeof error === "object" && "response" in error) {
@@ -40,37 +47,94 @@ const LoginForm: React.FC<{ onSuccess: () => void }> = ({ onSuccess }) => {
   };
 
   return (
-    <div className="bg-white p-6 w-full text-center">
+    <div
+      className="w-full h-full min-h-[400px] flex items-center justify-center p-4"
+  
+    >
       {contextHolder}
-      <h2 className="text-2xl mb-4">Đăng Nhập</h2>
-      <Form form={form} name="login" layout="vertical" onFinish={onFinish}>
-        <Form.Item
-          label="Email"
-          name="email"
-          rules={[{ required: true, message: "Vui lòng nhập email!" }]}
+      <div className="bg-white w-full max-w-sm">
+        <h2
+          className="text-2xl mb-6 text-center font-bold"
+          style={{ color: "var(--primary-text-color)" }}
         >
-          <Input placeholder="Email" />
-        </Form.Item>
-
-        <Form.Item
-          label="Mật khẩu"
-          name="password"
-          rules={[{ required: true, message: "Vui lòng nhập mật khẩu!" }]}
+          Đăng Nhập
+        </h2>
+        <Form
+          form={form}
+          name="login"
+          layout="vertical"
+          onFinish={onFinish}
+          className="w-full"
         >
-          <Input.Password placeholder="Mật khẩu" />
-        </Form.Item>
-
-        <Form.Item>
-          <Button
-            type="primary"
-            htmlType="submit"
-            className="w-full"
-            loading={loading}
+          <Form.Item
+            label="Tên đăng nhập"
+            name="username"
+            rules={[
+              { required: true, message: "Vui lòng nhập tên đăng nhập!" },
+            ]}
           >
-            Đăng Nhập
-          </Button>
-        </Form.Item>
-      </Form>
+            <Input
+              placeholder="Tên đăng nhập"
+              style={{
+                borderColor: "var(--primary-color)",
+                borderRadius: "8px",
+                padding: "12px",
+              }}
+            />
+          </Form.Item>
+
+          <Form.Item
+            label="Mật khẩu"
+            name="password"
+            rules={[{ required: true, message: "Vui lòng nhập mật khẩu!" }]}
+          >
+            <Input.Password
+              placeholder="Mật khẩu"
+              style={{
+                borderColor: "var(--primary-color)",
+                borderRadius: "8px",
+                padding: "12px",
+              }}
+            />
+          </Form.Item>
+
+          <Form.Item>
+            <Button
+              type="primary"
+              htmlType="submit"
+              className="w-full"
+              loading={loading}
+              style={{
+                backgroundColor: "var(--primary-color)",
+                borderColor: "var(--primary-color)",
+                height: "48px",
+                borderRadius: "8px",
+                fontSize: "16px",
+                fontWeight: "bold",
+              }}
+            >
+              Đăng Nhập
+            </Button>
+          </Form.Item>
+        </Form>
+        <p
+          className="mt-4 text-center"
+          style={{ color: "var(--primary-text-color)" }}
+        >
+          Chưa có tài khoản?{" "}
+          <button
+            type="button"
+            onClick={onSwitchToRegister}
+            className="bg-transparent border-none p-0 cursor-pointer font-medium"
+            style={{
+              color: "var(--primary-color)",
+              textDecoration: "underline",
+            }}
+          >
+            Đăng Ký
+          </button>
+        </p>
+      </div>
     </div>
   );
 };
