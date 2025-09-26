@@ -1,4 +1,5 @@
 import { useContext } from "react";
+import { useNavigate } from "react-router-dom";
 import { UserContext } from "../../../contexts/UserContext";
 
 interface UserProfileProps {
@@ -7,6 +8,17 @@ interface UserProfileProps {
 
 export function UserProfile({ isCompact }: UserProfileProps) {
   const { user } = useContext(UserContext);
+  const navigate = useNavigate();
+
+  const handleOrganizationClick = () => {
+    if (
+      user?.organization &&
+      typeof user.organization === "object" &&
+      user.organization._id
+    ) {
+      navigate(`/organization/${user.organization._id}`);
+    }
+  };
 
   console.log("User in UserProfile:", user);
   return (
@@ -38,8 +50,9 @@ export function UserProfile({ isCompact }: UserProfileProps) {
               {user?.first_name} {user?.last_name}
             </a>
             <p
-              className="text-[10px] font-bold overflow-hidden whitespace-nowrap text-ellipsis"
+              className="text-[10px] font-bold overflow-hidden whitespace-nowrap text-ellipsis cursor-pointer hover:underline"
               style={{ color: "var(--primary-color)", maxWidth: "150px" }}
+              onClick={handleOrganizationClick}
             >
               {typeof user?.organization === "object"
                 ? user.organization?.name

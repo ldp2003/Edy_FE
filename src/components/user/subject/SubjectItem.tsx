@@ -28,7 +28,7 @@ const SubjectItem: React.FC<SubjectItemProps> = ({ subject, onClick }) => {
       </div>
 
       {/* Tên môn học */}
-      <h3 className="font-semibold text-gray-900 mb-2 line-clamp-2">
+      <h3 className="text-sm font-semibold text-gray-900 mb-2 truncate">
         {subject.name}
       </h3>
 
