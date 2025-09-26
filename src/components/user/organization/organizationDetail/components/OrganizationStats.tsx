@@ -17,7 +17,7 @@ const OrganizationStats: React.FC<OrganizationStatsProps> = ({
       </h3>
 
       <div className="space-y-4">
-        <div className="flex justify-between items-center">
+        <div className="flex justify-between items-center text-sm border-b pb-2">
           <span className="text-[var(--secondary-text-color)]">
             Tổng tài liệu:
           </span>
@@ -26,7 +26,7 @@ const OrganizationStats: React.FC<OrganizationStatsProps> = ({
           </span>
         </div>
 
-        <div className="flex justify-between items-center">
+        <div className="flex text-sm  border-b pb-2 justify-between items-center">
           <span className="text-[var(--secondary-text-color)]">
             Báo cáo nghiên cứu khoa học:
           </span>
@@ -38,7 +38,7 @@ const OrganizationStats: React.FC<OrganizationStatsProps> = ({
           </span>
         </div>
 
-        <div className="flex justify-between items-center">
+        <div className="flex text-sm  border-b pb-2 justify-between items-center">
           <span className="text-[var(--secondary-text-color)]">
             Giáo trình:
           </span>
@@ -47,14 +47,14 @@ const OrganizationStats: React.FC<OrganizationStatsProps> = ({
           </span>
         </div>
 
-        <div className="flex justify-between items-center">
+        <div className="flex justify-between items-center text-sm  border-b pb-2">
           <span className="text-[var(--secondary-text-color)]">Bài giảng:</span>
           <span className="font-semibold text-[var(--primary-text-color)]">
             {documents.filter((doc) => doc.doc_type === "LECTURE").length}
           </span>
         </div>
 
-        <div className="flex justify-between items-center">
+        <div className="flex justify-between items-center text-sm  border-b pb-2">
           <span className="text-[var(--secondary-text-color)]">
             Luận văn / Khóa luận:
           </span>
@@ -63,14 +63,14 @@ const OrganizationStats: React.FC<OrganizationStatsProps> = ({
           </span>
         </div>
 
-        <div className="flex justify-between items-center">
+        <div className="flex justify-between items-center  text-sm  border-b pb-2">
           <span className="text-[var(--secondary-text-color)]">Video:</span>
           <span className="font-semibold text-[var(--primary-text-color)]">
             {documents.filter((doc) => doc.doc_type === "VIDEO").length}
           </span>
         </div>
 
-        <div className="flex justify-between items-center">
+        <div className="flex justify-between items-center  text-sm  border-b pb-2">
           <span className="text-[var(--secondary-text-color)]">Khác:</span>
           <span className="font-semibold text-[var(--primary-text-color)]">
             {documents.filter((doc) => doc.doc_type === "OTHER").length}

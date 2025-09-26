@@ -19,7 +19,7 @@ const OrganizationInfo: React.FC<OrganizationInfoProps> = ({
           <span className="text-sm text-[var(--secondary-text-color)]">
             Trụ sở chính
           </span>
-          <p className="font-medium text-[var(--primary-text-color)]">
+          <p className="font-medium text-xs text-[var(--primary-text-color)]">
             {organization.address || "Chưa cập nhật"}
           </p>
         </div>
@@ -34,7 +34,7 @@ const OrganizationInfo: React.FC<OrganizationInfoProps> = ({
                 href={organization.website}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-[var(--primary-color)] hover:underline"
+                className="text-[var(--primary-color)] text-xs hover:underline"
               >
                 {organization.website}
               </a>
