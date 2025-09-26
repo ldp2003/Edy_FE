@@ -173,14 +173,16 @@ const OrganizationDetail: React.FC = () => {
 
           {/* Sidebar */}
           <div className="w-80">
-            {/* Statistics */}
-            <OrganizationStats
-              totalDocuments={stats.totalDocuments}
-              documents={documents}
-            />
+            <div className="sticky top-6 space-y-6">
+              {/* Statistics */}
+              <OrganizationStats
+                totalDocuments={stats.totalDocuments}
+                documents={documents}
+              />
 
-            {/* Organization Info */}
-            <OrganizationInfo organization={organization} />
+              {/* Organization Info */}
+              <OrganizationInfo organization={organization} />
+            </div>
           </div>
         </div>
       </div>
