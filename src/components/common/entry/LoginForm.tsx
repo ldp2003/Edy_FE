@@ -47,10 +47,7 @@ const LoginForm: React.FC<LoginFormProps> = ({
   };
 
   return (
-    <div
-      className="w-full h-full min-h-[400px] flex items-center justify-center p-4"
-  
-    >
+    <div className="w-full h-full min-h-[400px] flex items-center justify-center p-4">
       {contextHolder}
       <div className="bg-white w-full max-w-sm">
         <h2
@@ -67,20 +64,11 @@ const LoginForm: React.FC<LoginFormProps> = ({
           className="w-full"
         >
           <Form.Item
-            label="Tên đăng nhập"
-            name="username"
-            rules={[
-              { required: true, message: "Vui lòng nhập tên đăng nhập!" },
-            ]}
+            label="Email"
+            name="email"
+            rules={[{ required: true, message: "Vui lòng nhập email!" }]}
           >
-            <Input
-              placeholder="Tên đăng nhập"
-              style={{
-                borderColor: "var(--primary-color)",
-                borderRadius: "8px",
-                padding: "12px",
-              }}
-            />
+            <Input placeholder="Email" />
           </Form.Item>
 
           <Form.Item

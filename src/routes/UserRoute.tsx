@@ -13,6 +13,8 @@ import AuthRoute from "./AuthRoute";
 import PersonalPost from "../pages/user/personalPosts/PersonalPost";
 import PersonalPostDetail from "../pages/user/personalPosts/PersonalPostDetail";
 import FavoritePage from "../pages/user/favorite/FavoritePage";
+import OrganizationDetailPage from "../pages/user/organization/OrganizationDetailPage";
+import OrganizationListPage from "../pages/user/organization/OrganizationListPage";
 import NotFoundPage from "../pages/NotFoundPage";
 
 const UserRoute: React.FC = () => {
@@ -30,6 +32,8 @@ const UserRoute: React.FC = () => {
           {/* Public pages - accessible by anyone */}
           <Route index element={<HomePage />} />
           <Route path="document-detail/:id" element={<DocumentDetail />} />
+          <Route path="organizations" element={<OrganizationListPage />} />
+          <Route path="organization/:id" element={<OrganizationDetailPage />} />
 
           {/* Protected pages - will be handled by individual components */}
           <Route path="personal-posts" element={<PersonalPost />} />

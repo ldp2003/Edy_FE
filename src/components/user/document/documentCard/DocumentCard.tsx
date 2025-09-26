@@ -78,7 +78,7 @@ const DocumentCard: React.FC<DocumentCardProps> = ({
 
   return (
     <div
-      className="text-left  rounded-lg border border-[var(--border-color)]  overflow-hidden hover:shadow-md transition-shadow cursor-pointer"
+      className="text-left rounded-lg border border-[var(--border-color)]  overflow-hidden hover:shadow-md transition-shadow cursor-pointer"
       onClick={handleCardClick}
     >
       {contextHolder}
@@ -93,13 +93,11 @@ const DocumentCard: React.FC<DocumentCardProps> = ({
       {/* Nội dung dưới ảnh: dùng flex-col, justify-between để nút luôn ở dưới */}
       <div className="flex flex-col justify-between p-4 text-[var(--primary-text-color)]">
         <div>
-          <h3 className="font-bold lg:text-xs mb-2 line-clamp-2 min-h-[2.5rem]">
-            {title}
-          </h3>
-          <p className="text-xs mb-3">{description}</p>
+          <h3 className="font-bold lg:text-xs mb-2 line-clamp-2 min-h-8">{title}</h3>
+          <p className="text-xs mb-3 truncate">{description}</p>
         </div>
         <button
-          className="w-full flex bg-white items-center justify-center gap-2 px-3 py-1 font-bold text-xs border border-gray-300 rounded-md cursor-pointer hover:bg-gray-50 transition-colors"
+          className="w-full  flex bg-white items-center justify-center gap-2 px-3 py-1 font-bold text-xs border border-gray-300 rounded-md cursor-pointer hover:bg-gray-50 transition-colors"
           style={{ color: "var(--secondary-text-color)" }}
           onClick={handleSaveClick}
         >
