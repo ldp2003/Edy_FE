@@ -12,6 +12,7 @@ import RoleSelectionPage from "../pages/auth/RoleSelectionPage";
 import AuthRoute from "./AuthRoute";
 import PersonalPost from "../pages/user/personalPosts/PersonalPost";
 import PersonalPostDetail from "../pages/user/personalPosts/PersonalPostDetail";
+import DirectDownload from '../pages/user/download/DirectDownload';
 
 const UserRoute: React.FC = () => {
   return (
@@ -39,6 +40,9 @@ const UserRoute: React.FC = () => {
           <Route path="upload-document" element={<UploadPage />} />
           <Route path="edit-profile" element={<EditProfile />} />
         </Route>
+        
+        {/* Download page without layout - standalone */}
+        <Route path="download/:linkId" element={<DirectDownload />} />
       </Routes>
     </AuthRoute>
   );

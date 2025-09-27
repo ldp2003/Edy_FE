@@ -79,13 +79,16 @@ const DocumentActions: React.FC<DocumentActionsProps> = ({
   return (
     <div
       data-document-actions={document._id}
-      className={`flex items-center justify-between p-2 transition-all duration-300 ${
-        isFixed
+      className={`flex items-center justify-between p-2 transition-all duration-300 ${isFixed
           ? "sticky top-0 bg-[var(--secondary-background-color)] shadow-md z-10 mx-[-16px] px-4"
           : ""
-      }`}
+        }`}
     >
-      <DownloadButton point={6} />
+      <DownloadButton
+        point={document.intensive ? 6 : 4}
+        documentId={document._id}
+        documentTitle={document.title}
+      />
 
       <div className="flex items-center space-x-4">
         {!isUser && <ReportButton />}

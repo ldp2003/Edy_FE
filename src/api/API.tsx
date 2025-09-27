@@ -438,6 +438,27 @@ export const DocumentAPI = {
     }
   },
 
+   createDownloadLink: async (documentId: string) => {
+    try {
+      const response = await apiClient.post(`/documents/${documentId}/download`);
+      return response.data;
+    } catch (error) {
+      console.error("Error creating download link:", error);
+      throw error;
+    }
+  },
+
+  // Download file using link
+  downloadFile: async (linkId: string) => {
+    try {
+      const response = await apiClient.get(`/documents/download/${linkId}`);
+      return response;
+    } catch (error) {
+      console.error("Error downloading file:", error);
+      throw error;
+    }
+  },
+
   // Get pending documents (for admin)
   getPendingDocuments: async (params?: {
     page?: number;
