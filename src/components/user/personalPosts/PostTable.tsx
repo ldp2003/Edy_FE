@@ -1,7 +1,7 @@
 import React from "react";
 import { Table } from "antd";
 import type { ColumnsType } from "antd/es/table";
-import { Trash, Edit, Eye } from "lucide-react";
+import { Trash, Edit } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import {
   createStatusTag,
@@ -43,6 +43,17 @@ const PostTable: React.FC<PostTableProps> = ({ data, loading }) => {
       title: "Tên tài liệu",
       dataIndex: "title",
       key: "title",
+      render: (text: string, record: Post) => (
+        <span
+          onClick={() =>
+            navigate(`/personal-posts/document-detail/${record.key}`)
+          }
+          className="text-[var(--primary-text-color)] font-medium cursor-pointer"
+        >
+          {text}
+        </span>
+      ),
+      width: "30%",
     },
     {
       title: "Lượt xem",
@@ -91,17 +102,8 @@ const PostTable: React.FC<PostTableProps> = ({ data, loading }) => {
       render: (_, record) => (
         <div className="flex gap-2 justify-center">
           <button
-            className="p-2 text-xs text-[var(--primary-color)] rounded-lg border-[var(--primary-color)] cursor-pointer border-1 transition-all duration-300 hover:bg-blue-600 hover:text-white hover:shadow-lg transform hover:scale-105"
-            onClick={() =>
-              navigate(`/personal-posts/document-detail/${record.key}`)
-            }
-            title="Xem chi tiết tài liệu"
-          >
-            <Eye size={15} color="var(--primary-color)" />
-          </button>
-          <button
             className="p-2 text-xs text-white rounded bg-[var(--green-button-color)] transition-all duration-300 hover:bg-blue-600 hover:shadow-lg transform hover:scale-105"
-            onClick={() => console.log("Edit action triggered")}
+            onClick={() => navigate(`/personal-posts/edit/${record.key}`)}
             title="Chỉnh sửa tài liệu"
           >
             <Edit size={15} />

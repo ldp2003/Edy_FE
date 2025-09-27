@@ -127,7 +127,7 @@ const AdminDocumentTable: React.FC = () => {
           type="link"
           onClick={() => handleRowClick(record)}
           className="text-left p-0 h-auto"
-          style={{ whiteSpace: "normal", textAlign: "left" }}
+          style={{ whiteSpace: "normal", textAlign: "left", color: "black" }}
         >
           {text}
         </Button>
