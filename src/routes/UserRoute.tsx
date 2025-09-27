@@ -16,6 +16,7 @@ import FavoritePage from "../pages/user/favorite/FavoritePage";
 import OrganizationDetailPage from "../pages/user/organization/OrganizationDetailPage";
 import OrganizationListPage from "../pages/user/organization/OrganizationListPage";
 import NotFoundPage from "../pages/NotFoundPage";
+import DirectDownload from '../pages/user/download/DirectDownload';
 
 const UserRoute: React.FC = () => {
   return (
@@ -49,6 +50,9 @@ const UserRoute: React.FC = () => {
           {/* 404 Page */}
           <Route path="*" element={<NotFoundPage />} />
         </Route>
+        
+        {/* Download page without layout - standalone */}
+        <Route path="download/:linkId" element={<DirectDownload />} />
       </Routes>
     </AuthRoute>
   );
