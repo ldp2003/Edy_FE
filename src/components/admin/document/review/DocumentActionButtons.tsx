@@ -160,7 +160,7 @@ const DocumentActionButtons: React.FC<DocumentActionButtonsProps> = ({
             onClick={() => setDeleteModalVisible(true)}
             disabled={processing}
           >
-            Xóa bài
+            Yêu cầu chỉnh sửa
           </Button>
         </div>
       </div>

@@ -11,10 +11,13 @@ interface DocumentViewerProps {
   currentPage?: number;
   onPageUpdate?: (page: number) => void;
   zoom?: number;
-  allowFullAccess?: boolean; // Allow viewing all pages without limit
+  isUser?: boolean; // True if document belongs to current user (no limitations)
 }
 
-const VideoViewer: React.FC<{ url: string }> = ({ url }) => {
+const VideoViewer: React.FC<{ url: string; isUser?: boolean }> = ({
+  url,
+  isUser = false,
+}) => {
   const [paused, setPaused] = useState(false);
 
   return (
@@ -27,7 +30,8 @@ const VideoViewer: React.FC<{ url: string }> = ({ url }) => {
         onContextMenu={(e) => e.preventDefault()}
         onTimeUpdate={(e) => {
           const video = e.currentTarget;
-          if (video.currentTime >= 60) {
+          // Only limit video time if not user's own document
+          if (!isUser && video.currentTime >= 60) {
             video.pause();
             video.currentTime = 60;
             setPaused(true);
@@ -36,7 +40,7 @@ const VideoViewer: React.FC<{ url: string }> = ({ url }) => {
       >
         Trình duyệt của bạn không hỗ trợ video.
       </video>
-      {paused && (
+      {paused && !isUser && (
         <div className="absolute top-0 left-0 w-full h-full bg-black bg-opacity-70 flex flex-col items-center justify-center text-white z-10">
           <div className="mb-4 text-lg font-semibold">
             Bạn chỉ được xem trước 1 phút đầu.
@@ -56,6 +60,7 @@ const DocumentViewer: React.FC<DocumentViewerProps> = ({
   currentPage,
   onPageUpdate,
   zoom,
+  isUser = false,
 }) => {
   if (type === "pdf") {
     return (
@@ -65,6 +70,7 @@ const DocumentViewer: React.FC<DocumentViewerProps> = ({
         currentPage={currentPage}
         onPageUpdate={onPageUpdate}
         zoom={zoom}
+        isUser={isUser}
       />
     );
   }
@@ -75,6 +81,7 @@ const DocumentViewer: React.FC<DocumentViewerProps> = ({
         onPageChange={onPageChange}
         currentPage={currentPage}
         onPageUpdate={onPageUpdate}
+        isUser={isUser}
       />
     );
   }
@@ -87,10 +94,10 @@ const DocumentViewer: React.FC<DocumentViewerProps> = ({
     );
   }
   if (type === "excel") {
-    return <ExcelTable url={url} />;
+    return <ExcelTable url={url} isUser={isUser} />;
   }
   if (type === "video") {
-    return <VideoViewer url={url} />;
+    return <VideoViewer url={url} isUser={isUser} />;
   }
   return <div>Unsupported document type</div>;
 };

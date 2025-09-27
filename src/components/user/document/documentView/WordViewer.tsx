@@ -7,11 +7,13 @@ interface WordViewerProps {
   onPageChange?: (currentPage: number, totalPages: number) => void;
   currentPage?: number;
   onPageUpdate?: (page: number) => void;
+  isUser?: boolean; // True if document belongs to current user
 }
 
 const WordViewer: React.FC<WordViewerProps> = ({
   url,
   onPageChange,
+  isUser = false, // eslint-disable-line @typescript-eslint/no-unused-vars
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [loading, setLoading] = useState(true);
