@@ -18,7 +18,7 @@ const SubjectGrid: React.FC<SubjectGridProps> = ({
   }
 
   return (
-    <div className="mb-8 text-left">
+    <div className="mb-8 text-left bg-white p-4 rounded-lg border border-[var(--border-color)]">
       <h2 className="text-base font-bold text-[var(--primary-text-color)] mb-4">
         {title}
       </h2>

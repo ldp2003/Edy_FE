@@ -26,6 +26,16 @@ const AvatarDropdown: React.FC = () => {
     setLoginModalVisible(false);
   };
 
+  const switchToRegister = () => {
+    setLoginModalVisible(false);
+    setRegisterModalVisible(true);
+  };
+
+  const switchToLogin = () => {
+    setRegisterModalVisible(false);
+    setLoginModalVisible(true);
+  };
+
   const menu = (
     <Menu onClick={handleMenuClick}>
       <Menu.Item key="login">Đăng nhập</Menu.Item>
@@ -41,16 +51,36 @@ const AvatarDropdown: React.FC = () => {
         open={isLoginModalVisible}
         onCancel={() => setLoginModalVisible(false)}
         footer={null}
+        width={450}
+        centered
+        styles={{
+          body: { padding: 0, overflow: "hidden" },
+          content: { padding: 0 },
+        }}
+        destroyOnClose
       >
-        <LoginForm onSuccess={handleLoginSuccess} />
+        <LoginForm
+          onSuccess={handleLoginSuccess}
+          onSwitchToRegister={switchToRegister}
+        />
       </Modal>
 
       <Modal
         open={isRegisterModalVisible}
         onCancel={() => setRegisterModalVisible(false)}
         footer={null}
+        width={450}
+        centered
+        styles={{
+          body: { padding: 0, overflow: "hidden" },
+          content: { padding: 0 },
+        }}
+        destroyOnClose
       >
-        <RegisterForm onSuccess={handleRegisterSuccess} />
+        <RegisterForm
+          onSuccess={handleRegisterSuccess}
+          onSwitchToLogin={switchToLogin}
+        />
       </Modal>
     </>
   );

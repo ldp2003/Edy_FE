@@ -138,7 +138,7 @@ export const DocumentService = {
   // Lấy danh sách đơn duyệt của một tài liệu
   async getPendingRequestsByDocument(documentId: string) {
     try {
-      return await DocumentAPI.getPendingRequestsByDocument(documentId);
+      return await DocumentAPI.getPendingRequests(documentId);
     } catch (error) {
       console.error(
         "Error in DocumentService.getPendingRequestsByDocument:",
@@ -151,15 +151,12 @@ export const DocumentService = {
   // Duyệt đơn bằng requestId
   async approveDocumentByRequestId(
     requestId: string,
-    summaryApproved?: boolean,
-    isIntensive?: boolean
+    data?: {
+      isIntensive?: boolean;
+    }
   ) {
     try {
-      return await DocumentAPI.approveDocumentByRequestId(
-        requestId,
-        summaryApproved,
-        isIntensive
-      );
+      return await DocumentAPI.approveDocumentByRequestId(requestId, data);
     } catch (error) {
       console.error(
         "Error in DocumentService.approveDocumentByRequestId:",
@@ -170,7 +167,7 @@ export const DocumentService = {
   },
 
   // Từ chối đơn bằng requestId
-  async rejectDocumentByRequestId(requestId: string, reason?: string) {
+  async rejectDocumentByRequestId(requestId: string, reason: string) {
     try {
       return await DocumentAPI.rejectDocumentByRequestId(requestId, reason);
     } catch (error) {

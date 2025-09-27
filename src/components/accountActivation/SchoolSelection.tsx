@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { AutoComplete, Modal } from "antd";
 import InsertOrganization from "../user/organization/InsertOrganization";
-import { getOrganizations } from "../../utils/OrganizationService";
+import { OrganizationService } from "../../utils/OrganizationService";
 
 const SchoolSelection: React.FC<{
   onOrganizationChange: (id: string) => void;
@@ -14,7 +14,7 @@ const SchoolSelection: React.FC<{
   useEffect(() => {
     const fetchSchools = async () => {
       try {
-        const organizations = await getOrganizations();
+        const organizations = await OrganizationService.getOrganizations();
         console.log("Fetched organizations in SchoolSelection:", organizations);
         if (Array.isArray(organizations)) {
           const options = organizations

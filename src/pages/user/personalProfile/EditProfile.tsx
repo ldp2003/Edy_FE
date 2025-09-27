@@ -3,19 +3,21 @@ import UserProfileHeader from "../../../components/common/userInfo/UserProfileHe
 import ResetPassword from "../../../components/common/userInfo/ResetPassword";
 import StudyList from "../../../components/user/studyField/StudyList";
 import { UserContext } from "../../../contexts/UserContext";
-import { getOrganizations } from "../../../utils/OrganizationService";
-import type { Organization } from "../../../models/organization";
+import { OrganizationService } from "../../../utils/OrganizationService";
+import type { OrganizationDetailed } from "../../../models/organization";
 import { message } from "antd";
 
 const EditProfile: React.FC = () => {
   const { user } = useContext(UserContext);
-  const [organizations, setOrganizations] = useState<Organization[]>([]);
+  const [organizations, setOrganizations] = useState<OrganizationDetailed[]>(
+    []
+  );
   const [messageApi, contextHolder] = message.useMessage();
 
   useEffect(() => {
     const fetchOrganizations = async () => {
       try {
-        const orgs = await getOrganizations();
+        const orgs = await OrganizationService.getOrganizations();
         setOrganizations(orgs);
       } catch (error) {
         console.error("Failed to fetch organizations:", error);
@@ -28,7 +30,7 @@ const EditProfile: React.FC = () => {
   return (
     <div className="p-4 text-left">
       {contextHolder}
-      <div>
+      <div className="bg-white p-6 rounded-lg border border-[var(--border-color)]">
         <h2 className="font-bold text-sm mb-6">Cập nhật thông tin cá nhân</h2>
         <UserProfileHeader
           firstName={user?.first_name || "Chưa đặt tên"}
@@ -40,7 +42,7 @@ const EditProfile: React.FC = () => {
           avatar={user?.avatar || ""}
         />
       </div>
-      <div className="mt-8 flex flex-row">
+      <div className="mt-8 flex flex-row bg-white p-6 rounded-lg border border-[var(--border-color)]">
         <div className="w-1/2 pr-2 flex flex-col gap-4">
           <div className="font-bold text-sm">Cập nhật mật khẩu</div>
           <ResetPassword messageApi={messageApi} />

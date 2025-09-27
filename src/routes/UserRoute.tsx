@@ -12,6 +12,10 @@ import RoleSelectionPage from "../pages/auth/RoleSelectionPage";
 import AuthRoute from "./AuthRoute";
 import PersonalPost from "../pages/user/personalPosts/PersonalPost";
 import PersonalPostDetail from "../pages/user/personalPosts/PersonalPostDetail";
+import FavoritePage from "../pages/user/favorite/FavoritePage";
+import OrganizationDetailPage from "../pages/user/organization/OrganizationDetailPage";
+import OrganizationListPage from "../pages/user/organization/OrganizationListPage";
+import NotFoundPage from "../pages/NotFoundPage";
 import DirectDownload from '../pages/user/download/DirectDownload';
 
 const UserRoute: React.FC = () => {
@@ -29,6 +33,8 @@ const UserRoute: React.FC = () => {
           {/* Public pages - accessible by anyone */}
           <Route index element={<HomePage />} />
           <Route path="document-detail/:id" element={<DocumentDetail />} />
+          <Route path="organizations" element={<OrganizationListPage />} />
+          <Route path="organization/:id" element={<OrganizationDetailPage />} />
 
           {/* Protected pages - will be handled by individual components */}
           <Route path="personal-posts" element={<PersonalPost />} />
@@ -39,6 +45,10 @@ const UserRoute: React.FC = () => {
           <Route path="personal-profile" element={<PersonalProfile />} />
           <Route path="upload-document" element={<UploadPage />} />
           <Route path="edit-profile" element={<EditProfile />} />
+          <Route path="favorites" element={<FavoritePage />} />
+
+          {/* 404 Page */}
+          <Route path="*" element={<NotFoundPage />} />
         </Route>
         
         {/* Download page without layout - standalone */}

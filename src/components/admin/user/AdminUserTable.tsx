@@ -22,11 +22,13 @@ import {
 } from "lucide-react";
 import type { User } from "../../../models/user";
 import { UserService } from "../../../utils/UserService";
+import { getRoleDisplayName } from "../../../constants/RoleConstants";
 
 const { Option } = Select;
 
 interface UserDisplay extends User {
   index: number;
+  role_names?: string[];
 }
 
 const AdminUserTable: React.FC = () => {
@@ -119,14 +121,14 @@ const AdminUserTable: React.FC = () => {
                 className="w-full h-full object-cover"
               />
             ) : (
-              <span className="text-xs font-medium">
+              <span className="text-xs ">
                 {record.first_name.charAt(0)}
                 {record.last_name.charAt(0)}
               </span>
             )}
           </div>
           <div className="min-w-0">
-            <div className="text-xs font-medium truncate">
+            <div className="font-semibold text-xs truncate">
               {record.first_name} {record.last_name}
             </div>
             <div className="text-xs text-gray-500 truncate">
@@ -150,6 +152,40 @@ const AdminUserTable: React.FC = () => {
           );
         }
         return <span className="text-xs text-gray-400">Chưa có</span>;
+      },
+    },
+    {
+      title: "Vai trò",
+      key: "role_names",
+      width: 100,
+      ellipsis: true,
+      render: (_, record: UserDisplay) => {
+        const getRoleDisplay = (roleNames: string[]) => {
+          if (!roleNames || roleNames.length === 0) {
+            return "Người dùng";
+          }
+
+          const translatedRoles = roleNames.map((role) =>
+            getRoleDisplayName(role)
+          );
+
+          return translatedRoles.join(", ");
+        };
+
+        const roleText = getRoleDisplay(record.role_names || []);
+        const isAdmin = record.role_names && record.role_names.length > 0;
+
+        return (
+          <Tooltip title={roleText}>
+            <span
+              className={`text-xs ${
+                isAdmin ? "text-blue-600" : "text-gray-600"
+              }`}
+            >
+              {roleText}
+            </span>
+          </Tooltip>
+        );
       },
     },
     {
@@ -183,7 +219,7 @@ const AdminUserTable: React.FC = () => {
       align: "center",
       width: 70,
       render: (follower: string[]) => (
-        <span className="text-xs text-blue-600 font-medium">
+        <span className="text-xs text-black">
           {follower ? follower.length : 0}
         </span>
       ),
@@ -195,7 +231,7 @@ const AdminUserTable: React.FC = () => {
       align: "center",
       width: 70,
       render: (following: string[]) => (
-        <span className="text-xs text-purple-600 font-medium">
+        <span className="text-xs text-black">
           {following ? following.length : 0}
         </span>
       ),
@@ -207,7 +243,7 @@ const AdminUserTable: React.FC = () => {
       align: "center",
       width: 70,
       render: (count: number) => (
-        <span className="text-xs text-green-600 font-medium">{count || 0}</span>
+        <span className="text-xs text-black">{count || 0}</span>
       ),
     },
     {
@@ -217,9 +253,7 @@ const AdminUserTable: React.FC = () => {
       align: "center",
       width: 60,
       render: (point: number) => (
-        <span className="text-xs text-orange-600 font-medium">
-          {point || 0}
-        </span>
+        <span className="text-xs text-black">{point || 0}</span>
       ),
     },
     {
@@ -229,9 +263,7 @@ const AdminUserTable: React.FC = () => {
       align: "center",
       width: 60,
       render: (rankPoint: number) => (
-        <span className="text-xs text-indigo-600 font-medium">
-          {rankPoint || 0}
-        </span>
+        <span className="text-xs text-black">{rankPoint || 0}</span>
       ),
     },
     {
@@ -242,33 +274,9 @@ const AdminUserTable: React.FC = () => {
       width: 60,
       render: (strike: number) => (
         <span
-          className={`text-xs font-medium ${
-            strike > 0 ? "text-red-600" : "text-gray-400"
-          }`}
+          className={`text-xs ${strike > 0 ? "text-red-600" : "text-black"}`}
         >
           {strike || 0}
-        </span>
-      ),
-    },
-    {
-      title: "Free DL",
-      dataIndex: "free_download_count",
-      key: "free_download_count",
-      align: "center",
-      width: 70,
-      render: (count: number) => (
-        <span className="text-xs text-teal-600 font-medium">{count || 0}</span>
-      ),
-    },
-    {
-      title: "Yêu thích",
-      dataIndex: "favorites",
-      key: "favorites",
-      align: "center",
-      width: 70,
-      render: (favorites: { document: string; added_at: string }[]) => (
-        <span className="text-xs text-pink-600 font-medium">
-          {favorites ? favorites.length : 0}
         </span>
       ),
     },
@@ -325,9 +333,7 @@ const AdminUserTable: React.FC = () => {
 
         const { text, color, bg } = getStatusDisplay(status);
         return (
-          <span
-            className={`px-1 py-0.5 rounded text-xs font-medium ${color} ${bg}`}
-          >
+          <span className={`px-1 py-0.5 rounded text-xs ${color} ${bg}`}>
             {text}
           </span>
         );
@@ -451,47 +457,49 @@ const AdminUserTable: React.FC = () => {
 
   return (
     <div className="w-full max-w-full overflow-hidden">
-      <div className="space-y-4">
-        {/* Header Controls */}
-        <div className="flex justify-between items-center">
-          <div className="flex items-center space-x-2">
-            <Select defaultValue="2025" size="small" style={{ width: 80 }}>
-              <Option value="2025">2025</Option>
-              <Option value="2024">2024</Option>
-            </Select>
-            <Button icon={<Download size={14} />} size="small">
-              Download
-            </Button>
-            <Button icon={<Printer size={14} />} size="small">
-              Print
-            </Button>
+      <div className="space-y-6">
+        {/* Filter and Search Section */}
+        <div className="border border-gray-200 rounded-lg p-4 bg-white shadow-sm">
+          {/* Header Controls */}
+          <div className="flex justify-between items-center mb-4">
+            <div className="flex items-center space-x-2">
+              <Select defaultValue="2025" size="small" style={{ width: 80 }}>
+                <Option value="2025">2025</Option>
+                <Option value="2024">2024</Option>
+              </Select>
+              <Button icon={<Download size={14} />} size="small">
+                Download
+              </Button>
+              <Button icon={<Printer size={14} />} size="small">
+                Print
+              </Button>
+            </div>
+
+            <div className="flex items-center space-x-2">
+              <button
+                className="flex items-center text-xs gap-1 border border-gray-300 rounded-md px-2 py-1 hover:bg-gray-100 cursor-pointer"
+                onClick={() =>
+                  message.info("Tính năng bộ lọc đang được phát triển")
+                }
+              >
+                <Filter size={14} />
+                Bộ lọc
+              </button>
+            </div>
           </div>
 
+          {/* Search Bar */}
           <div className="flex items-center space-x-2">
-            <Button
-              icon={<Filter size={14} />}
-              size="small"
-              type="text"
-              onClick={() =>
-                message.info("Tính năng bộ lọc đang được phát triển")
-              }
-            >
-              Bộ lọc
-            </Button>
-          </div>
-        </div>
-
-        {/* Search Bar */}
-        <div className="flex items-center space-x-2">
-          <div className="relative flex-1 max-w-sm">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-            <Input
-              placeholder="Tìm kiếm theo tên, email..."
-              className="pl-10"
-              size="small"
-              value={searchText}
-              onChange={(e) => handleSearch(e.target.value)}
-            />
+            <div className="relative flex-1 max-w-sm">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+              <Input
+                placeholder="Tìm kiếm theo tên, email..."
+                className="pl-10"
+                size="small"
+                value={searchText}
+                onChange={(e) => handleSearch(e.target.value)}
+              />
+            </div>
           </div>
         </div>
 
@@ -537,10 +545,10 @@ const AdminUserTable: React.FC = () => {
               columns={columns}
               dataSource={currentData}
               pagination={false}
-              size="small"
+              size="middle"
               loading={loading}
               rowKey="_id"
-              scroll={{ x: 800 }}
+              scroll={{ x: "max-content", y: 600 }}
               className="compact-table"
             />
 

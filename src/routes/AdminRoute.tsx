@@ -8,6 +8,7 @@ import AdminUsersPage from "../pages/admin/user/AdminUsersPage";
 import UserDetailPage from "../pages/admin/user/UserDetailPage";
 import UserEditPage from "../pages/admin/user/UserEditPage";
 import AuthRoute from "./AuthRoute";
+import NotFoundPage from "../pages/NotFoundPage";
 
 const AdminRoute: React.FC = () => {
   return (
@@ -35,6 +36,9 @@ const AdminRoute: React.FC = () => {
 
           {/* Reports routes */}
           {/* <Route path="reports" element={<ReportsPage />} /> */}
+
+          {/* 404 Page */}
+          <Route path="*" element={<NotFoundPage />} />
         </Route>
       </Routes>
     </AuthRoute>

@@ -1,7 +1,7 @@
 import React from "react";
 import { Form, Input, Button, message } from "antd";
 import type { ValidateErrorEntity } from "rc-field-form/lib/interface";
-import { createOrganization } from "../../../utils/OrganizationService";
+import { OrganizationService } from "../../../utils/OrganizationService";
 
 const InsertOrganization: React.FC = () => {
   const [messageApi, contextHolder] = message.useMessage();
@@ -14,7 +14,7 @@ const InsertOrganization: React.FC = () => {
     website: string;
   }) => {
     try {
-      await createOrganization({
+      await OrganizationService.createOrganization({
         name: values.name,
         code: values.code,
         address: values.location, // Map location to address

@@ -96,6 +96,38 @@ export const UserService = {
       throw error;
     }
   },
+  async getListFavorites() {
+    try {
+      const favorites = await UserAPI.getListFavorites();
+      console.log("Fetched favorite documents:", favorites);
+      return favorites;
+    } catch (error) {
+      console.error("Failed to fetch favorite documents:", error);
+      throw error;
+    }
+  },
+
+  async addToFavorites(documentId: string) {
+    try {
+      const result = await UserAPI.addToFavorites(documentId);
+      console.log("Document added to favorites:", result);
+      return result;
+    } catch (error) {
+      console.error("Failed to add document to favorites:", error);
+      throw error;
+    }
+  },
+
+  async removeFromFavorites(documentId: string) {
+    try {
+      const result = await UserAPI.removeFromFavorites(documentId);
+      console.log("Document removed from favorites:", result);
+      return result;
+    } catch (error) {
+      console.error("Failed to remove document from favorites:", error);
+      throw error;
+    }
+  },
 };
 
 // Legacy exports for backward compatibility
@@ -103,3 +135,9 @@ export const verifyUser = UserService.verifyUser;
 export const getUsers = UserService.getAllUsers;
 export const updateProfile = UserService.updateProfile;
 export const changePassword = UserService.changePassword;
+export const getUserById = UserService.getUserById;
+export const updateUserStatus = UserService.updateUserStatus;
+export const updateUser = UserService.updateUser;
+export const getListFavorites = UserService.getListFavorites;
+export const addToFavorites = UserService.addToFavorites;
+export const removeFromFavorites = UserService.removeFromFavorites;

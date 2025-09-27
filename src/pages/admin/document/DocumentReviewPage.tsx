@@ -4,7 +4,6 @@ import { message, Spin } from "antd";
 import DocumentReview from "../../../components/admin/document/DocumentReview";
 import { DocumentService } from "../../../utils/DocumentService";
 import type { Document } from "../../../models/document";
-import { DocumentAPI } from "../../../api/API";
 
 const DocumentReviewPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -38,63 +37,68 @@ const DocumentReviewPage: React.FC = () => {
     fetchDocument();
   }, [id, navigate]);
 
- const handleApprove = async (approvalData: {
-  documentRequestId: string;
-  summaryRequestId?: string;
-  isIntensive: boolean;
-  summaryAction?: 'approve' | 'reject';
-  summaryRejectReason?: string;
-}) => {
-  try {
-    // Approve document request - Fixed method name
-    await DocumentAPI.approveDocumentByRequestId(approvalData.documentRequestId, {
-      isIntensive: approvalData.isIntensive
-    });
+  const handleApprove = async (approvalData: {
+    documentRequestId: string;
+    summaryRequestId?: string;
+    isIntensive: boolean;
+    summaryAction?: "approve" | "reject";
+    summaryRejectReason?: string;
+  }) => {
+    try {
+      // Approve document request - Fixed method name
+      await DocumentService.approveDocumentByRequestId(
+        approvalData.documentRequestId,
+        {
+          isIntensive: approvalData.isIntensive,
+        }
+      );
 
-    // Handle summary request if exists
-    if (approvalData.summaryRequestId) {
-      if (approvalData.summaryAction === 'approve') {
-        await DocumentAPI.approveDocumentByRequestId(approvalData.summaryRequestId);
-      } else if (approvalData.summaryAction === 'reject') {
-        await DocumentAPI.rejectDocumentByRequestId(
-          approvalData.summaryRequestId, 
-          approvalData.summaryRejectReason || "Tóm tắt không phù hợp"
-        );
+      // Handle summary request if exists
+      if (approvalData.summaryRequestId) {
+        if (approvalData.summaryAction === "approve") {
+          await DocumentService.approveDocumentByRequestId(
+            approvalData.summaryRequestId
+          );
+        } else if (approvalData.summaryAction === "reject") {
+          await DocumentService.rejectDocumentByRequestId(
+            approvalData.summaryRequestId,
+            approvalData.summaryRejectReason || "Tóm tắt không phù hợp"
+          );
+        }
       }
+
+      message.success("Xử lý thành công!");
+      // Navigate back to documents list
+      setTimeout(() => {
+        navigate("/admin/documents/all");
+      }, 1500);
+    } catch (error) {
+      console.error("Error handling approval:", error);
+      message.error("Có lỗi xảy ra khi xử lý!");
+      throw error;
+    }
+  };
+
+  const handleReject = async (reason: string, reqId?: string) => {
+    const targetRequestId = reqId || requestId;
+    if (!targetRequestId) {
+      message.error("Không có thông tin yêu cầu duyệt!");
+      return;
     }
 
-    message.success("Xử lý thành công!");
-    // Navigate back to documents list
-    setTimeout(() => {
-      navigate("/admin/documents/all");
-    }, 1500);
-  } catch (error) {
-    console.error("Error handling approval:", error);
-    message.error("Có lỗi xảy ra khi xử lý!");
-    throw error;
-  }
-};
-
-const handleReject = async (reason: string, reqId?: string) => {
-  const targetRequestId = reqId || requestId;
-  if (!targetRequestId) {
-    message.error("Không có thông tin yêu cầu duyệt!");
-    return;
-  }
-
-  try {
-    // Using DocumentAPI instead of DocumentService for consistency
-    await DocumentAPI.rejectDocumentByRequestId(targetRequestId, reason);
-    message.success("Đã từ chối tài liệu!");
-    setTimeout(() => {
-      navigate("/admin/documents/all");
-    }, 1500);
-  } catch (error) {
-    console.error("Error rejecting document:", error);
-    message.error("Có lỗi xảy ra khi từ chối tài liệu!");
-    throw error;
-  }
-};
+    try {
+      // Using DocumentService instead of DocumentService for consistency
+      await DocumentService.rejectDocumentByRequestId(targetRequestId, reason);
+      message.success("Đã từ chối tài liệu!");
+      setTimeout(() => {
+        navigate("/admin/documents/all");
+      }, 1500);
+    } catch (error) {
+      console.error("Error rejecting document:", error);
+      message.error("Có lỗi xảy ra khi từ chối tài liệu!");
+      throw error;
+    }
+  };
 
   const handleDelete = async (reason: string) => {
     try {
@@ -137,7 +141,6 @@ const handleReject = async (reason: string, reqId?: string) => {
     <div className="max-w-7xl mx-auto">
       <DocumentReview
         document={document}
-        requestId={requestId || undefined}
         onApprove={handleApprove}
         onReject={handleReject}
         onDelete={handleDelete}

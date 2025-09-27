@@ -8,10 +8,7 @@ const AdminLayout: React.FC = () => {
 
   return (
     <div
-      className="h-screen flex flex-col overflow-hidden"
-      style={{
-        backgroundColor: "var(--primary-background-color)",
-      }}
+      className="h-screen flex flex-col overflow-hidden bg-[var(--secondary-background-color)]"
     >
       {/* Header - cố định ở trên cùng */}
       <div className="relative z-10 flex-shrink-0">

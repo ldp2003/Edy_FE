@@ -40,12 +40,17 @@ const UploadPage: React.FC = () => {
   return (
     <div>
       {contextHolder}
-      <h1 className="text-base text-left font-bold mb-4">Tải lên tài liệu</h1>
-      <UploadDocument
-        onFileUploaded={handleFileUploaded}
-        onUploadStart={handleUploadStart}
-        onUploadError={handleUploadError}
-      />
+      <div className="bg-white p-6 rounded-lg border border-[var(--border-color)] my-6">
+        <h1 className="text-base text-[var(--primary-text-color)] text-left font-bold">
+          Tải lên tài liệu
+        </h1>
+        <UploadDocument
+          onFileUploaded={handleFileUploaded}
+          onUploadStart={handleUploadStart}
+          onUploadError={handleUploadError}
+        />
+      </div>
+
       <InfomationForm
         fileInfo={uploadedFile}
         isUploading={isUploading}

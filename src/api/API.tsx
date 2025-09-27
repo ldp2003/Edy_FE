@@ -203,6 +203,36 @@ export const UserAPI = {
       throw error;
     }
   },
+
+  getListFavorites: async () => {
+    try {
+      const response = await apiClient.get("/users/favorites");
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching favorite documents:", error);
+      throw error;
+    }
+  },
+
+  addToFavorites: async (documentId: string) => {
+    try {
+      const response = await apiClient.post(`/users/favorites/${documentId}`);
+      return response.data;
+    } catch (error) {
+      console.error("Error adding document to favorites:", error);
+      throw error;
+    }
+  },
+
+  removeFromFavorites: async (documentId: string) => {
+    try {
+      const response = await apiClient.delete(`/users/favorites/${documentId}`);
+      return response.data;
+    } catch (error) {
+      console.error("Error removing document from favorites:", error);
+      throw error;
+    }
+  },
 };
 
 export const SubjectAPI = {
@@ -478,7 +508,9 @@ export const DocumentAPI = {
   // Get pending requests by document ID
   getPendingRequests: async (documentId: string) => {
     try {
-      const response = await apiClient.get(`/documents/pending-requests/${documentId}`);
+      const response = await apiClient.get(
+        `/documents/pending-requests/${documentId}`
+      );
       return response.data;
     } catch (error) {
       console.error("Error getting pending requests:", error);
@@ -487,23 +519,28 @@ export const DocumentAPI = {
   },
 
   // Approve document by request ID
-  approveDocumentByRequestId: async (requestId: string, data?: {
-    isIntensive?: boolean;
-  }) => {
+  approveDocumentByRequestId: async (
+    requestId: string,
+    data?: {
+      isIntensive?: boolean;
+    }
+  ) => {
     try {
-      const response = await apiClient.put(`/documents/approve/${requestId}`, data);
+      const response = await apiClient.put(
+        `/documents/approve/${requestId}`,
+        data
+      );
       return response.data;
     } catch (error) {
       console.error("Error approving document request:", error);
       throw error;
     }
   },
-
   // Reject document by request ID
   rejectDocumentByRequestId: async (requestId: string, reason: string) => {
     try {
       const response = await apiClient.put(`/documents/reject/${requestId}`, {
-        message: reason
+        message: reason,
       });
       return response.data;
     } catch (error) {

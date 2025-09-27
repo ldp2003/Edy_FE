@@ -19,6 +19,7 @@
   --primary-background-color: #ffffff;
   --secondary-background-color: #f6f7fb;
   --third-background-color: #cce4ff;
+  --border-color: #e6ebef;
 }
 /* src/docx-preview.css */
 .docx-wrapper {
