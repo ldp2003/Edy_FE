@@ -105,7 +105,7 @@ const PersonalPostList: React.FC = () => {
   };
 
   return (
-    <div className="">
+    <div className="bg-white p-6 rounded-lg shadow-md">
       <div className="flex flex-row justify-between items-center gap-4 mb-4">
         <div className="flex flex-row items-center gap-4">
           <h1 className="text-base font-bold text-[var(--primary-text-color)]">

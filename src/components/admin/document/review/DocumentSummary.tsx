@@ -105,7 +105,7 @@ const DocumentSummary: React.FC<DocumentSummaryProps> = ({
             {/* Rejection reason */}
             {summaryAction === "reject" && (
               <div className="mt-4 p-4 bg-red-50 border border-red-200 rounded-lg">
-                <label className="block text-sm font-semibold text-red-800 mb-2">
+                <label className="block text-sm font-semibold text-[var(--red-button-color)] mb-2">
                   Lý do từ chối:
                 </label>
                 <TextArea
@@ -131,8 +131,8 @@ const DocumentSummary: React.FC<DocumentSummaryProps> = ({
                 }`}
               >
                 {summaryAction === "approve"
-                  ? "Sẽ được duyệt"
-                  : "Sẽ bị từ chối"}
+                  ? "Tóm tắt sẽ được duyệt"
+                  : "Tóm tắt sẽ bị từ chối"}
               </span>
             </div>
           </div>
