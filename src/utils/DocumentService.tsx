@@ -42,6 +42,9 @@ export const DocumentService = {
     level?: string;
     subject?: string;
     status?: string;
+    public_mode?: string;
+    created_from?: string;
+    created_to?: string;
   }) {
     try {
       const response = await DocumentAPI.getMyDocuments(params);

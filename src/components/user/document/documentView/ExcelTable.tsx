@@ -3,6 +3,7 @@ import * as XLSX from "xlsx";
 
 interface ExcelTableProps {
   url: string;
+  isUser?: boolean; // True if document belongs to current user
 }
 
 interface SheetData {
@@ -10,7 +11,10 @@ interface SheetData {
   data: (string | number | null)[][];
 }
 
-const ExcelTable: React.FC<ExcelTableProps> = ({ url }) => {
+const ExcelTable: React.FC<ExcelTableProps> = ({
+  url,
+  isUser = false, // eslint-disable-line @typescript-eslint/no-unused-vars
+}) => {
   const [sheets, setSheets] = useState<SheetData[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [activeSheet, setActiveSheet] = useState(0);

@@ -1,6 +1,7 @@
 import React from "react";
 import { Button, Avatar } from "antd";
 import { Edit, Eye, EyeOff, Share, School } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import type { Document } from "../../../models/document";
 
 interface PersonalPostHeaderProps {
@@ -16,6 +17,15 @@ const PersonalPostHeader: React.FC<PersonalPostHeaderProps> = ({
   onChangeVisibility,
   onShare,
 }) => {
+  const navigate = useNavigate();
+
+  const handleEditClick = () => {
+    if (onEdit) {
+      onEdit();
+    } else {
+      navigate(`/personal-posts/edit/${document._id}`);
+    }
+  };
   // Get buttons based on public_mode
   const renderActionButtons = () => {
     const buttons = [];
@@ -26,7 +36,7 @@ const PersonalPostHeader: React.FC<PersonalPostHeaderProps> = ({
         key="edit"
         type="default"
         icon={<Edit size={13} />}
-        onClick={onEdit}
+        onClick={handleEditClick}
         className="flex items-center text-xs gap-2"
       >
         <div className="text-xs">Chỉnh sửa</div>

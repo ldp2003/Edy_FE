@@ -1,11 +1,7 @@
 import React from "react";
-import { useNavigate } from "react-router-dom";
-import { Row, Col, Spin, Card, Tag } from "antd";
-import { Eye, MessageCircle, Star, Clock } from "lucide-react";
-import {
-  getStatusText,
-  getPublicModeText,
-} from "../../../locales/translationUtils";
+import { Row, Col, Spin } from "antd";
+import DocumentCard from "../document/documentCard/DocumentCard";
+import type { Document } from "../../../models/document";
 interface Post {
   key: string;
   index: number;
@@ -27,36 +23,50 @@ interface PostGridViewProps {
 }
 
 const PostGridView: React.FC<PostGridViewProps> = ({ data, loading }) => {
-  const navigate = useNavigate();
-
   const displayData = loading ? [] : data;
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "APPROVED":
-        return "green";
-      case "PENDING":
-        return "orange";
-      case "REJECTED":
-        return "red";
-      default:
-        return "default";
-    }
-  };
-
-  const getModeColor = (mode: string) => {
-    switch (mode) {
-      case "PUBLIC":
-        return "blue";
-      case "PRIVATE":
-        return "red";
-      case "PRIVATE_SHARED":
-        return "purple";
-      case "SHARE_ORGANIZATION":
-        return "cyan";
-      default:
-        return "default";
-    }
+  // Transform Post to Document format for DocumentCard
+  const transformPostToDocument = (post: Post): Document => {
+    return {
+      _id: post.key,
+      title: post.title,
+      url: post.url,
+      cover_page: post.cover_page,
+      view: post.views,
+      comment_count: post.comments,
+      createdAt: post.createdAt,
+      status: post.status as
+        | "PENDING"
+        | "APPROVED"
+        | "PENDING_SUMMARY"
+        | "REJECTED"
+        | "REQUESTED_EDIT",
+      public_mode: post.public_mode as
+        | "PUBLIC"
+        | "PRIVATE"
+        | "PRIVATE_SHARED"
+        | "SHARE_ORGANIZATION",
+      // Required fields for Document interface
+      user: {
+        _id: "",
+        first_name: "",
+        last_name: "",
+        contact_email: "",
+        organization: { _id: "", name: "" },
+        shared_documents: [],
+      },
+      author: [],
+      file_type: "PDF",
+      organization: { _id: "", name: "" },
+      level: "STUDENT",
+      subject: { _id: "", name: "" },
+      doc_type: "OTHER",
+      intensive: false,
+      download_count: 0,
+      description: {
+        summary_by_user: `${post.views} lượt xem • ${post.comments} bình luận • Đánh giá: ${post.rating}`,
+      },
+    };
   };
 
   if (loading) {
@@ -69,85 +79,30 @@ const PostGridView: React.FC<PostGridViewProps> = ({ data, loading }) => {
 
   return (
     <div className="w-full">
-      <Row gutter={[16, 16]}>
-        {displayData.map((post) => (
-          <Col key={post.key} xs={24} sm={12} md={8} lg={6} xl={4}>
-            <Card
-              hoverable
-              className="h-full"
-              cover={
-                <div className="h-48 bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center relative">
-                  {post.cover_page ? (
-                    <img
-                      src={post.cover_page}
-                      alt={post.title}
-                      className="h-full w-full object-cover"
-                    />
-                  ) : (
-                    <div className="text-center">
-                      <div className="text-6xl text-blue-200 mb-2">📄</div>
-                      <div className="text-sm text-blue-400 font-medium">
-                        Bài đăng
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Status badge */}
-                  <div className="absolute top-2 left-2">
-                    <Tag color={getStatusColor(post.status)}>
-                      {getStatusText(post.status)}
-                    </Tag>
-                  </div>
-
-                  {/* Mode badge */}
-                  <div className="absolute top-2 right-2">
-                    <Tag color={getModeColor(post.public_mode)}>
-                      {getPublicModeText(post.public_mode)}
-                    </Tag>
-                  </div>
-                </div>
-              }
-              onClick={() =>
-                navigate(`/personal-posts/document-detail/${post.key}`)
-              }
+      <Row gutter={[16, 16]} justify="start">
+        {displayData.map((post) => {
+          const documentData = transformPostToDocument(post);
+          return (
+            <Col
+              key={post.key}
+              xs={24}
+              sm={12}
+              md={12}
+              lg={8}
+              xl={4}
+              xxl={4}
+              style={{ maxWidth: "20%", flex: "0 0 20%" }}
             >
-              <Card.Meta
-                title={
-                  <div className="line-clamp-2 h-12 text-sm font-semibold">
-                    {post.title}
-                  </div>
-                }
-                description={
-                  <div className="space-y-2">
-                    {/* Stats */}
-                    <div className="flex items-center justify-between text-xs text-gray-500">
-                      <span className="flex items-center gap-1">
-                        <Eye size={12} />
-                        {post.views} lượt xem
-                      </span>
-                      <span className="flex items-center gap-1">
-                        <MessageCircle size={12} />
-                        {post.comments} bình luận
-                      </span>
-                    </div>
-
-                    {/* Rating */}
-                    <div className="flex items-center gap-1 text-xs">
-                      <Star size={12} className="text-yellow-500" />
-                      <span>Đánh giá: {post.rating}</span>
-                    </div>
-
-                    {/* Created date */}
-                    <div className="flex items-center gap-1 text-xs text-gray-400">
-                      <Clock size={12} />
-                      {new Date(post.createdAt).toLocaleDateString("vi-VN")}
-                    </div>
-                  </div>
-                }
+              <DocumentCard
+                title={post.title}
+                description={`${post.views} lượt xem • ${post.comments} bình luận • Đánh giá: ${post.rating}`}
+                imageUrl={post.cover_page}
+                document={documentData}
+                navigationPath={`/personal-posts/document-detail/${post.key}`}
               />
-            </Card>
-          </Col>
-        ))}
+            </Col>
+          );
+        })}
       </Row>
     </div>
   );

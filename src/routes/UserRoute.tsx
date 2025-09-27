@@ -12,6 +12,7 @@ import RoleSelectionPage from "../pages/auth/RoleSelectionPage";
 import AuthRoute from "./AuthRoute";
 import PersonalPost from "../pages/user/personalPosts/PersonalPost";
 import PersonalPostDetail from "../pages/user/personalPosts/PersonalPostDetail";
+import EditDocumentPage from "../pages/user/personalPosts/EditDocumentPage";
 import FavoritePage from "../pages/user/favorite/FavoritePage";
 import OrganizationDetailPage from "../pages/user/organization/OrganizationDetailPage";
 import OrganizationListPage from "../pages/user/organization/OrganizationListPage";
@@ -41,6 +42,10 @@ const UserRoute: React.FC = () => {
           <Route
             path="personal-posts/document-detail/:id"
             element={<PersonalPostDetail />}
+          />
+          <Route
+            path="personal-posts/edit/:id"
+            element={<EditDocumentPage />}
           />
           <Route path="personal-profile" element={<PersonalProfile />} />
           <Route path="upload-document" element={<UploadPage />} />

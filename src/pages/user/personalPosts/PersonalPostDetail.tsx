@@ -216,6 +216,7 @@ const PersonalPostDetail: React.FC = () => {
             currentPage={currentPage}
             onPageUpdate={handlePageUpdate}
             zoom={zoom}
+            isUser={true}
           />
         </div>
       </div>

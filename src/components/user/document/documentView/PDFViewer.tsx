@@ -15,6 +15,7 @@ interface PDFViewerProps {
   currentPage?: number;
   onPageUpdate?: (page: number) => void;
   zoom?: number;
+  isUser?: boolean; // True if document belongs to current user (no limitations)
 }
 
 const PDFViewer: React.FC<PDFViewerProps> = ({
@@ -23,6 +24,7 @@ const PDFViewer: React.FC<PDFViewerProps> = ({
   currentPage = 1,
   onPageUpdate,
   zoom = 1.5,
+  isUser = false,
 }) => {
   const [pdfDocument, setPdfDocument] =
     useState<pdfjsLib.PDFDocumentProxy | null>(null);
@@ -30,6 +32,37 @@ const PDFViewer: React.FC<PDFViewerProps> = ({
   const [visiblePage, setVisiblePage] = useState(1);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  const renderPages = useCallback(
+    async (pdf: pdfjsLib.PDFDocumentProxy) => {
+      // If user owns the document, show all pages. Otherwise, limit to 10 pages
+      const pageCount = isUser ? pdf.numPages : Math.min(pdf.numPages, 10);
+      const canvasImages: string[] = [];
+
+      for (let i = 1; i <= pageCount; i++) {
+        const page = await pdf.getPage(i);
+        const viewport = page.getViewport({ scale: zoom });
+        const canvas = document.createElement("canvas");
+        const context = canvas.getContext("2d");
+        canvas.height = viewport.height;
+        canvas.width = viewport.width;
+
+        await page.render({ canvasContext: context!, viewport, canvas })
+          .promise;
+        canvasImages.push(canvas.toDataURL());
+      }
+
+      setCanvases(canvasImages);
+
+      // Notify parent about page count (full pages if user's doc, limited if not)
+      if (onPageChange) {
+        onPageChange(1, pageCount);
+      }
+
+      console.log("Rendered canvases:", canvasImages.length);
+    },
+    [zoom, onPageChange, isUser]
+  );
 
   useEffect(() => {
     const loadPDF = async () => {
@@ -77,7 +110,7 @@ const PDFViewer: React.FC<PDFViewerProps> = ({
     };
 
     loadPDF();
-  }, [url]); // Removed dependencies to fix lint warning
+  }, [url, renderPages]);
 
   useEffect(() => {
     // Update visible page when currentPage prop changes
@@ -92,37 +125,7 @@ const PDFViewer: React.FC<PDFViewerProps> = ({
     if (pdfDocument) {
       renderPages(pdfDocument);
     }
-  }, [zoom, pdfDocument]);
-
-  const renderPages = useCallback(
-    async (pdf: pdfjsLib.PDFDocumentProxy) => {
-      const pageCount = Math.min(pdf.numPages, 10); // Giới hạn chỉ 10 trang đầu
-      const canvasImages: string[] = [];
-
-      for (let i = 1; i <= pageCount; i++) {
-        const page = await pdf.getPage(i);
-        const viewport = page.getViewport({ scale: zoom });
-        const canvas = document.createElement("canvas");
-        const context = canvas.getContext("2d");
-        canvas.height = viewport.height;
-        canvas.width = viewport.width;
-
-        await page.render({ canvasContext: context!, viewport, canvas })
-          .promise;
-        canvasImages.push(canvas.toDataURL());
-      }
-
-      setCanvases(canvasImages);
-
-      // Notify parent about limited pages (not total pages)
-      if (onPageChange) {
-        onPageChange(1, pageCount);
-      }
-
-      console.log("Rendered canvases:", canvasImages.length);
-    },
-    [zoom, onPageChange]
-  );
+  }, [zoom, pdfDocument, renderPages]);
 
   const scrollToPage = (pageNumber: number) => {
     const pageElement = document.getElementById(`pdf-page-${pageNumber}`);
@@ -224,8 +227,8 @@ const PDFViewer: React.FC<PDFViewerProps> = ({
               </div>
             ))}
 
-            {/* Thông báo giới hạn xem */}
-            {canvases.length >= 10 && (
+            {/* Thông báo giới hạn xem - chỉ hiển thị khi không phải tài liệu của user */}
+            {!isUser && canvases.length >= 10 && (
               <Card className="border-orange-200 bg-orange-50 text-center">
                 <div className="flex flex-col items-center space-y-3">
                   <div className="flex items-center space-x-2">
@@ -245,15 +248,14 @@ const PDFViewer: React.FC<PDFViewerProps> = ({
                     </Text>
                   </div>
                   <Text className="text-orange-600 text-sm">
-                    Để xem toàn bộ tài liệu, vui lòng tải xuống file PDF
+                    Để xem toàn bộ tài liệu, vui lòng tải xuống
                   </Text>
                   <Button
                     type="primary"
                     icon={<DownloadOutlined />}
                     className="bg-orange-500 border-orange-500 hover:bg-orange-600"
-                    onClick={() => window.open(url, "_blank")}
                   >
-                    Tải xuống file PDF
+                    Tải xuống
                   </Button>
                 </div>
               </Card>

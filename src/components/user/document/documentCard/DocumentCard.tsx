@@ -10,6 +10,7 @@ interface DocumentCardProps {
   description: string;
   imageUrl?: string;
   document?: Document;
+  navigationPath?: string; // Optional custom navigation path
 }
 
 const DocumentCard: React.FC<DocumentCardProps> = ({
@@ -17,6 +18,7 @@ const DocumentCard: React.FC<DocumentCardProps> = ({
   description,
   imageUrl,
   document,
+  navigationPath,
 }) => {
   const navigate = useNavigate();
   const [messageApi, contextHolder] = message.useMessage();
@@ -47,7 +49,8 @@ const DocumentCard: React.FC<DocumentCardProps> = ({
 
   const handleCardClick = () => {
     if (document?._id) {
-      navigate(`/document-detail/${document._id}`);
+      const path = navigationPath || `/document-detail/${document._id}`;
+      navigate(path);
     }
   };
 
@@ -93,7 +96,9 @@ const DocumentCard: React.FC<DocumentCardProps> = ({
       {/* Nội dung dưới ảnh: dùng flex-col, justify-between để nút luôn ở dưới */}
       <div className="flex flex-col justify-between p-4 text-[var(--primary-text-color)]">
         <div>
-          <h3 className="font-bold lg:text-xs mb-2 line-clamp-2 min-h-8">{title}</h3>
+          <h3 className="font-bold lg:text-xs mb-2 line-clamp-2 min-h-8">
+            {title}
+          </h3>
           <p className="text-xs mb-3 truncate">{description}</p>
         </div>
         <button

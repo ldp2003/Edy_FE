@@ -22,7 +22,7 @@ interface UserInfoHeaderProps {
 
 const UserInfoHeader: React.FC<UserInfoHeaderProps> = ({ user }) => {
   return (
-    <div className="bg-gray-50 px-4 py-2 rounded-lg mb-6 border border-gray-200">
+    <div className="bg-[var(--primary-background-color)] px-4 py-2 rounded-lg mb-6 border border-gray-200">
       <div className="flex items-center gap-6">
         {/* Avatar */}
         <Avatar
