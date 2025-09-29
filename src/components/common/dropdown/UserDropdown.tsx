@@ -14,10 +14,10 @@ const UserDropdown: React.FC = () => {
         window.location.href = "/personal-profile";
         break;
       case "upload":
-        window.location.href = "/upload";
+        window.location.href = "/upload-document";
         break;
       case "edit":
-        window.location.href = "/edit-info";
+        window.location.href = "/edit-profile";
         break;
       case "history":
         window.location.href = "/point-history";

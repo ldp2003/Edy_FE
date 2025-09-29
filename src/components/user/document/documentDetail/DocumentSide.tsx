@@ -1,7 +1,7 @@
 import React from "react";
 import DocumentInfo from "./DocumentInfo";
 import Description from "../description/Description";
-import Comment from "./Comment";
+import Comment from "../documentComment/Comment";
 import RelatedDocument from "./RelatedDocument";
 import type { Document } from "../../../../models/document";
 

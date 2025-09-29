@@ -35,6 +35,10 @@ const OrganizationDetail: React.FC = () => {
   const [myDocsDisplayedCount, setMyDocsDisplayedCount] = useState(4);
   const [recentDocsDisplayedCount, setRecentDocsDisplayedCount] = useState(4);
 
+  // Collapse states
+  const [isMyDocsCollapsed, setIsMyDocsCollapsed] = useState(false);
+  const [isRecentDocsCollapsed, setIsRecentDocsCollapsed] = useState(false);
+
   // Constants
   const subjectsPerPage = 4;
 
@@ -100,13 +104,16 @@ const OrganizationDetail: React.FC = () => {
 
   // Memoized computed values
   const displayedMyDocuments = useMemo(
-    () => documents.slice(0, myDocsDisplayedCount),
-    [documents, myDocsDisplayedCount]
+    () => (isMyDocsCollapsed ? [] : documents.slice(0, myDocsDisplayedCount)),
+    [documents, myDocsDisplayedCount, isMyDocsCollapsed]
   );
 
   const displayedRecentDocuments = useMemo(
-    () => recentDocuments.slice(0, recentDocsDisplayedCount),
-    [recentDocuments, recentDocsDisplayedCount]
+    () =>
+      isRecentDocsCollapsed
+        ? []
+        : recentDocuments.slice(0, recentDocsDisplayedCount),
+    [recentDocuments, recentDocsDisplayedCount, isRecentDocsCollapsed]
   );
 
   const totalDocumentsFromCategories = useMemo(
@@ -135,6 +142,14 @@ const OrganizationDetail: React.FC = () => {
       Math.min(prev + 12, recentDocuments.length)
     );
   }, [recentDocuments.length]);
+
+  const handleToggleMyDocsCollapse = useCallback(() => {
+    setIsMyDocsCollapsed((prev) => !prev);
+  }, []);
+
+  const handleToggleRecentDocsCollapse = useCallback(() => {
+    setIsRecentDocsCollapsed((prev) => !prev);
+  }, []);
 
   if (loading) {
     return (
@@ -182,6 +197,8 @@ const OrganizationDetail: React.FC = () => {
               totalDocuments={documents.length}
               onLoadMore={handleLoadMoreMyDocuments}
               title="Tài liệu của bạn"
+              isCollapsed={isMyDocsCollapsed}
+              onToggleCollapse={handleToggleMyDocsCollapse}
             />
 
             {/* Recent Documents Section */}
@@ -192,6 +209,8 @@ const OrganizationDetail: React.FC = () => {
               totalDocuments={recentDocuments.length}
               onLoadMore={handleLoadMoreRecentDocuments}
               title="Tài liệu gần đây"
+              isCollapsed={isRecentDocsCollapsed}
+              onToggleCollapse={handleToggleRecentDocsCollapse}
             />
 
             {/* Other Organizations Section */}
