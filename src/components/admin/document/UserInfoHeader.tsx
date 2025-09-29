@@ -52,7 +52,14 @@ const UserInfoHeader: React.FC<UserInfoHeaderProps> = ({ user }) => {
           {user.organization && (
             <div className="flex items-center gap-2 mb-3">
               <School size={16} className="text-black" />
-              <span className="text-xs text-black  font-bold">
+              <span
+                className="text-xs text-black  font-bold cursor-pointer"
+                onClick={() => {
+                  if (user.organization && user.organization._id) {
+                    window.location.href = `/organization/${user.organization._id}`;
+                  }
+                }}
+              >
                 {user.organization.name}
               </span>
             </div>

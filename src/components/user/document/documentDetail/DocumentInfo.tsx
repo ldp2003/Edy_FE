@@ -113,8 +113,12 @@ const DocumentInfo: React.FC<DocumentInfoProps> = ({ document }) => {
           <span className="text-sm font-medium">Thuộc:</span>
         </div>
         <span
-          className="font-bold text-xs"
-          style={{ color: "var(--primary-color)" }}
+          className="font-bold text-xs text-[var(--primary-color)] cursor-pointer"
+          onClick={() => {
+            if (document.organization && document.organization._id) {
+              window.location.href = `/organization/${document.organization._id}`;
+            }
+          }}
         >
           {document.organization.name}
         </span>

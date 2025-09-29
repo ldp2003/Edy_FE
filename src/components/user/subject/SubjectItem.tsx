@@ -35,7 +35,16 @@ const SubjectItem: React.FC<SubjectItemProps> = ({ subject, onClick }) => {
       {/* Thông tin tổ chức */}
       <div className="flex items-center gap-2 text-gray-600">
         <School size={14} />
-        <span className="text-xs truncate">{subject.organization.name}</span>
+        <span
+          className="text-xs truncate cursor-pointer"
+          onClick={() => {
+            if (subject.organization && subject.organization._id) {
+              window.location.href = `/organization/${subject.organization._id}`;
+            }
+          }}
+        >
+          {subject.organization.name}
+        </span>
       </div>
     </div>
   );

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Spin, message } from "antd";
 import { OrganizationService } from "../../../../utils/OrganizationService";
@@ -22,6 +22,7 @@ const OrganizationDetail: React.FC = () => {
   const [organization, setOrganization] = useState<OrganizationDetailed | null>(
     null
   );
+  const [recentDocuments, setRecentDocuments] = useState<Document[]>([]);
   const [subjects, setSubjects] = useState<Subject[]>([]);
   const [documents, setDocuments] = useState<Document[]>([]);
   const [otherOrganizations, setOtherOrganizations] = useState<
@@ -29,20 +30,13 @@ const OrganizationDetail: React.FC = () => {
   >([]);
   const [loading, setLoading] = useState(true);
 
-  // Pagination for subjects
+  // Pagination states
   const [subjectPage, setSubjectPage] = useState(1);
+  const [myDocsDisplayedCount, setMyDocsDisplayedCount] = useState(4);
+  const [recentDocsDisplayedCount, setRecentDocsDisplayedCount] = useState(4);
+
+  // Constants
   const subjectsPerPage = 4;
-
-  // Display limited documents
-  const [displayedCount, setDisplayedCount] = useState(12);
-  const displayedDocuments = documents.slice(0, displayedCount);
-
-  // Thống kê
-  const [stats, setStats] = useState({
-    totalSubjects: 0,
-    totalDocuments: 0,
-    totalViews: 0,
-  });
 
   const fetchOrganizationData = useCallback(
     async (organizationId: string) => {
@@ -71,23 +65,20 @@ const OrganizationDetail: React.FC = () => {
         );
         setSubjects(subjectsResponse || []);
 
-        // Lấy danh sách tài liệu từ DocumentService
-        const documentsResponse = await DocumentService.fetchNewestDocuments({
-          organization: organizationId,
-          limit: 50,
-        });
-        setDocuments(documentsResponse.documents || []);
+        // Fetch data parallel để cải thiện performance
+        const [documentsResponse, recentDocsResponse] = await Promise.all([
+          DocumentService.getMyDocuments({
+            organization: organizationId,
+            limit: 50,
+          }),
+          DocumentService.fetchNewestDocuments({
+            organization: organizationId,
+            limit: 50,
+          }),
+        ]);
 
-        // Cập nhật thống kê
-        setStats({
-          totalSubjects: subjectsResponse?.length || 0,
-          totalDocuments: documentsResponse.documents?.length || 0,
-          totalViews:
-            documentsResponse.documents?.reduce(
-              (total: number, doc: Document) => total + (doc.view || 0),
-              0
-            ) || 0,
-        });
+        setDocuments(documentsResponse.documents || []);
+        setRecentDocuments(recentDocsResponse.documents || []);
       } catch (error) {
         console.error("Error fetching organization data:", error);
         messageApi.error("Không thể tải thông tin tổ chức!");
@@ -107,13 +98,43 @@ const OrganizationDetail: React.FC = () => {
     fetchOrganizationData(id);
   }, [id, messageApi, navigate, fetchOrganizationData]);
 
-  const handleSubjectClick = (subject: Subject) => {
-    navigate(`/subject/${subject._id}`);
-  };
+  // Memoized computed values
+  const displayedMyDocuments = useMemo(
+    () => documents.slice(0, myDocsDisplayedCount),
+    [documents, myDocsDisplayedCount]
+  );
 
-  const handleLoadMoreDocuments = () => {
-    setDisplayedCount((prev) => Math.min(prev + 12, documents.length));
-  };
+  const displayedRecentDocuments = useMemo(
+    () => recentDocuments.slice(0, recentDocsDisplayedCount),
+    [recentDocuments, recentDocsDisplayedCount]
+  );
+
+  const totalDocumentsFromCategories = useMemo(
+    () =>
+      organization?.content_categories?.reduce(
+        (total, category) => total + (category.document_count || 0),
+        0
+      ) || 0,
+    [organization?.content_categories]
+  );
+
+  // Optimized handlers
+  const handleSubjectClick = useCallback(
+    (subject: Subject) => {
+      navigate(`/subject/${subject._id}`);
+    },
+    [navigate]
+  );
+
+  const handleLoadMoreMyDocuments = useCallback(() => {
+    setMyDocsDisplayedCount((prev) => Math.min(prev + 12, documents.length));
+  }, [documents.length]);
+
+  const handleLoadMoreRecentDocuments = useCallback(() => {
+    setRecentDocsDisplayedCount((prev) =>
+      Math.min(prev + 12, recentDocuments.length)
+    );
+  }, [recentDocuments.length]);
 
   if (loading) {
     return (
@@ -146,7 +167,7 @@ const OrganizationDetail: React.FC = () => {
             {/* Subjects Section */}
             <OrganizationSubjects
               subjects={subjects}
-              totalSubjects={stats.totalSubjects}
+              totalSubjects={subjects.length}
               subjectPage={subjectPage}
               subjectsPerPage={subjectsPerPage}
               onPageChange={setSubjectPage}
@@ -156,10 +177,21 @@ const OrganizationDetail: React.FC = () => {
             {/* Documents Section */}
             <OrganizationDocuments
               documents={documents}
-              displayedDocuments={displayedDocuments}
-              displayedCount={displayedCount}
-              totalDocuments={stats.totalDocuments}
-              onLoadMore={handleLoadMoreDocuments}
+              displayedDocuments={displayedMyDocuments}
+              displayedCount={myDocsDisplayedCount}
+              totalDocuments={documents.length}
+              onLoadMore={handleLoadMoreMyDocuments}
+              title="Tài liệu của bạn"
+            />
+
+            {/* Recent Documents Section */}
+            <OrganizationDocuments
+              documents={recentDocuments}
+              displayedDocuments={displayedRecentDocuments}
+              displayedCount={recentDocsDisplayedCount}
+              totalDocuments={recentDocuments.length}
+              onLoadMore={handleLoadMoreRecentDocuments}
+              title="Tài liệu gần đây"
             />
 
             {/* Other Organizations Section */}
@@ -176,8 +208,8 @@ const OrganizationDetail: React.FC = () => {
             <div className="sticky top-6 space-y-6">
               {/* Statistics */}
               <OrganizationStats
-                totalDocuments={stats.totalDocuments}
-                documents={documents}
+                totalDocuments={totalDocumentsFromCategories}
+                contentCategories={organization.content_categories || []}
               />
 
               {/* Organization Info */}

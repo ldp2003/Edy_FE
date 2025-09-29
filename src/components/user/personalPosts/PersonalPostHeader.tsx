@@ -89,7 +89,7 @@ const PersonalPostHeader: React.FC<PersonalPostHeaderProps> = ({
   };
 
   return (
-    <div className=" bg-white rounded-2xl shadow-lg px-6 py-2 mb-4">
+    <div className=" bg-white rounded-2xl shadow-lg px-6 py-2 mb-4 text-left">
       {/* User Info Section */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
@@ -114,7 +114,14 @@ const PersonalPostHeader: React.FC<PersonalPostHeaderProps> = ({
             </h3>
             <div className="flex flex-row gap-2 items-center">
               <School size={13} />
-              <p className="text-sm font-semibold">
+              <p
+                className="text-sm font-semibold cursor-pointer"
+                onClick={() => {
+                  if (document.organization && document.organization._id) {
+                    window.location.href = `/organization/${document.organization._id}`;
+                  }
+                }}
+              >
                 {document.organization.name}
               </p>
             </div>

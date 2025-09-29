@@ -9,6 +9,7 @@ interface OrganizationDocumentsProps {
   displayedCount: number;
   totalDocuments: number;
   onLoadMore: () => void;
+  title?: string;
 }
 
 const OrganizationDocuments: React.FC<OrganizationDocumentsProps> = ({
@@ -17,6 +18,7 @@ const OrganizationDocuments: React.FC<OrganizationDocumentsProps> = ({
   displayedCount,
   totalDocuments,
   onLoadMore,
+  title,
 }) => {
   return (
     <div className="bg-white rounded-lg border border-[var(--border-color)] mb-6">
@@ -24,7 +26,7 @@ const OrganizationDocuments: React.FC<OrganizationDocumentsProps> = ({
         <div className="flex items-center gap-2 mb-4">
           <FileText size={20} className="text-[var(--primary-color)]" />
           <h2 className="text-base font-semibold text-[var(--primary-text-color)]">
-            Tài liệu của bạn ({totalDocuments})
+            {title} ({totalDocuments})
           </h2>
         </div>
 
@@ -36,7 +38,9 @@ const OrganizationDocuments: React.FC<OrganizationDocumentsProps> = ({
                   key={doc._id}
                   title={doc.title}
                   imageUrl={doc.cover_page}
+                  // description={doc.subject?.name || "Chưa có môn học"}
                   description={doc.subject?.name || "Chưa có môn học"}
+
                   document={doc}
                 />
               ))}
