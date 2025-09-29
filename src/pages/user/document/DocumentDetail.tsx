@@ -7,6 +7,7 @@ import DocumentActions from "../../../components/user/document/documentDetail/Do
 import AuthorInfo from "../../../components/common/userInfo/AuthorInfo";
 import DocumentViewer from "../../../components/user/document/documentView/DocumentViewer";
 import DocumentPagination from "../../../components/user/document/documentView/DocumentPagination";
+import DocumentAccessError from "../../../components/common/error/DocumentAccessError";
 import { DocumentService } from "../../../utils/DocumentService";
 import type { Document } from "../../../models/document";
 
@@ -16,6 +17,10 @@ const DocumentDetail: React.FC = () => {
   const { user } = useContext(UserContext);
   const [document, setDocument] = useState<Document | null>(null);
   const [loading, setLoading] = useState(true);
+  const [accessError, setAccessError] = useState<{
+    type: "private" | "restricted" | "not-found" | "unauthorized";
+    message?: string;
+  } | null>(null);
   const [messageApi, contextHolder] = message.useMessage();
 
   // State for pagination
@@ -23,11 +28,74 @@ const DocumentDetail: React.FC = () => {
   const [totalPages, setTotalPages] = useState(0);
   const [zoom, setZoom] = useState(1.5);
 
+  // Function to check document access permission
+  const checkDocumentAccess = useCallback(
+    (doc: Document, currentUser: typeof user) => {
+      // Kiểm tra xem tài liệu có bị xóa không
+      if (doc.is_deleted) {
+        return {
+          hasAccess: false,
+          type: "not-found" as const,
+          message: "Tài liệu đã bị xóa.",
+        };
+      }
+
+      // Kiểm tra public mode
+      switch (doc.public_mode) {
+        case "PRIVATE":
+          // Chỉ tác giả mới có thể xem
+          if (!currentUser || doc.user._id !== currentUser._id) {
+            return { hasAccess: false, type: "private" as const };
+          }
+          break;
+
+        case "PRIVATE_SHARED":
+          // Tác giả và những người được chia sẻ (tạm thời cho phép truy cập)
+          if (!currentUser || doc.user._id !== currentUser._id) {
+            return { hasAccess: false, type: "restricted" as const };
+          }
+          break;
+
+        case "SHARE_ORGANIZATION":
+          // Chỉ những người trong cùng tổ chức
+          if (
+            !currentUser ||
+            (doc.user._id !== currentUser._id &&
+              (!currentUser.organization ||
+                (typeof doc.user.organization === "object"
+                  ? doc.user.organization._id
+                  : doc.user.organization) !==
+                  (typeof currentUser.organization === "object"
+                    ? currentUser.organization._id
+                    : currentUser.organization)))
+          ) {
+            return {
+              hasAccess: false,
+              type: "restricted" as const,
+              message: "Tài liệu chỉ dành cho thành viên trong tổ chức.",
+            };
+          }
+          break;
+
+        case "PUBLIC":
+        default:
+          // Công khai - ai cũng có thể xem
+          break;
+      }
+
+      return { hasAccess: true };
+    },
+    []
+  );
+
   // Fetch document data
   useEffect(() => {
     const fetchDocument = async () => {
       if (!id) {
-        messageApi.error("ID tài liệu không hợp lệ!");
+        setAccessError({
+          type: "not-found",
+          message: "ID tài liệu không hợp lệ!",
+        });
         setLoading(false);
         return;
       }
@@ -43,17 +111,31 @@ const DocumentDetail: React.FC = () => {
           return;
         }
 
+        // Kiểm tra quyền truy cập
+        const accessCheck = checkDocumentAccess(documentData, user);
+        if (!accessCheck.hasAccess) {
+          setAccessError({
+            type: accessCheck.type!,
+            message: accessCheck.message,
+          });
+          setLoading(false);
+          return;
+        }
+
         setDocument(documentData);
       } catch (error) {
         console.error("Error fetching document:", error);
-        messageApi.error("Không thể tải thông tin tài liệu!");
+        setAccessError({
+          type: "not-found",
+          message: "Không thể tải thông tin tài liệu!",
+        });
       } finally {
         setLoading(false);
       }
     };
 
     fetchDocument();
-  }, [id, messageApi, user, navigate]);
+  }, [id, messageApi, user, navigate, checkDocumentAccess]);
 
   // Handle page change from document viewer
   const handlePageChange = useCallback((current: number, total: number) => {
@@ -121,6 +203,15 @@ const DocumentDetail: React.FC = () => {
           <p className="mt-4 text-gray-600">Đang tải tài liệu...</p>
         </div>
       </div>
+    );
+  }
+
+  if (accessError) {
+    return (
+      <DocumentAccessError
+        type={accessError.type}
+        message={accessError.message}
+      />
     );
   }
 
