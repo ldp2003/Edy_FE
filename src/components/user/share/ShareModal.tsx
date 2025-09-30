@@ -169,7 +169,7 @@ const ShareModal: React.FC<ShareModalProps> = ({
         limited_access: maxUsers === -1 ? 999999 : maxUsers,
         request: requiresRequest,
         time_limited: timeLimited,
-        share_with_organization: shareWithOrganization,
+        // share_with_organization: shareWithOrganization,
         start_date: timeLimited ? dateRange[0]!.toISOString() : undefined,
         end_date: timeLimited ? dateRange[1]!.toISOString() : undefined,
       };
