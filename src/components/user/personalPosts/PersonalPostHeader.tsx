@@ -85,14 +85,19 @@ const PersonalPostHeader: React.FC<PersonalPostHeaderProps> = ({
       options.push({ mode: PublicMode.PRIVATE, label: "Riêng tư" });
     }
 
-    // Thêm Chia sẻ cá nhân nếu không phải một trong hai mode chia sẻ
-    if (
-      currentMode !== PublicMode.PRIVATE_SHARED &&
-      currentMode !== PublicMode.SHARE_ORGANIZATION
-    ) {
+    // Thêm Chia sẻ cá nhân nếu không phải mode hiện tại
+    if (currentMode !== PublicMode.PRIVATE_SHARED) {
       options.push({
         mode: PublicMode.PRIVATE_SHARED,
         label: "Chia sẻ cá nhân",
+      });
+    }
+
+    // Thêm Chỉ tổ chức nếu không phải mode hiện tại
+    if (currentMode !== PublicMode.SHARE_ORGANIZATION) {
+      options.push({
+        mode: PublicMode.SHARE_ORGANIZATION,
+        label: "Chỉ tổ chức",
       });
     }
 
@@ -103,12 +108,9 @@ const PersonalPostHeader: React.FC<PersonalPostHeaderProps> = ({
   const handleVisibilityChange = async (newMode: PublicModeType) => {
     console.log("🔄 handleVisibilityChange called with mode:", newMode);
 
-    // Nếu chọn "Chia sẻ cá nhân" (PRIVATE_SHARED hoặc SHARE_ORGANIZATION) thì mở ShareModal
-    if (
-      newMode === PublicMode.PRIVATE_SHARED ||
-      newMode === PublicMode.SHARE_ORGANIZATION
-    ) {
-      console.log("📤 Opening ShareModal for sharing mode:", newMode);
+    // Nếu chọn "Chia sẻ cá nhân" thì mở ShareModal
+    if (newMode === PublicMode.PRIVATE_SHARED) {
+      console.log("📤 Opening ShareModal for private sharing mode:", newMode);
       setShareModalVisible(true);
       return;
     }
@@ -274,10 +276,18 @@ const PersonalPostHeader: React.FC<PersonalPostHeaderProps> = ({
         confirmLoading={loading}
       >
         {pendingMode && (
-          <p>
-            Bạn có muốn thay đổi từ "{publicModeLabels[currentPublicMode]}" sang
-            "{publicModeLabels[pendingMode]}" không?
-          </p>
+          <div>
+            <p>
+              Bạn có muốn thay đổi từ "{publicModeLabels[currentPublicMode]}"
+              sang "{publicModeLabels[pendingMode]}" không?
+            </p>
+            {pendingMode === PublicMode.SHARE_ORGANIZATION && (
+              <p className="mt-2 text-orange-600 bg-orange-50 p-2 rounded">
+                ⚠️ Nếu bạn để chế độ này, chỉ có người trong tổ chức mới có thể
+                xem tài liệu.
+              </p>
+            )}
+          </div>
         )}
       </Modal>
 
@@ -292,10 +302,7 @@ const PersonalPostHeader: React.FC<PersonalPostHeaderProps> = ({
           currentPublicMode === PublicMode.SHARE_ORGANIZATION
         }
         isPrivate={currentPublicMode === PublicMode.PRIVATE}
-        isPrivateShared={
-          currentPublicMode === PublicMode.PRIVATE_SHARED ||
-          currentPublicMode === PublicMode.SHARE_ORGANIZATION
-        }
+        isPrivateShared={currentPublicMode === PublicMode.PRIVATE_SHARED}
         isOwner={true}
       />
     </>

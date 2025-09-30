@@ -84,7 +84,6 @@ const ShareModal: React.FC<ShareModalProps> = ({
   const [linkName, setLinkName] = useState("");
   const [maxUsers, setMaxUsers] = useState<number>(10);
   const [requiresRequest, setRequiresRequest] = useState(false);
-  const [shareWithOrganization, setShareWithOrganization] = useState(false);
   const [timeLimited, setTimeLimited] = useState(true);
   const [dateRange, setDateRange] = useState<
     [dayjs.Dayjs | null, dayjs.Dayjs | null]
@@ -169,7 +168,6 @@ const ShareModal: React.FC<ShareModalProps> = ({
         limited_access: maxUsers === -1 ? 999999 : maxUsers,
         request: requiresRequest,
         time_limited: timeLimited,
-        // share_with_organization: shareWithOrganization,
         start_date: timeLimited ? dateRange[0]!.toISOString() : undefined,
         end_date: timeLimited ? dateRange[1]!.toISOString() : undefined,
       };
@@ -182,7 +180,6 @@ const ShareModal: React.FC<ShareModalProps> = ({
       setLinkName("");
       setMaxUsers(10);
       setRequiresRequest(false);
-      setShareWithOrganization(false);
       setTimeLimited(true);
       setDateRange([dayjs(), dayjs().add(7, "day")]);
 
@@ -601,25 +598,6 @@ const ShareModal: React.FC<ShareModalProps> = ({
                       <div className="mt-2 text-xs text-blue-600 bg-blue-50 p-2 rounded">
                         💡 Người dùng sẽ phải gửi yêu cầu và được bạn phê duyệt
                         trước khi có thể truy cập tài liệu
-                      </div>
-                    )}
-                  </div>
-
-                  <div>
-                    <Checkbox
-                      checked={shareWithOrganization}
-                      onChange={(e) =>
-                        setShareWithOrganization(e.target.checked)
-                      }
-                    >
-                      <span className="text-sm font-medium">
-                        Chia sẻ với tổ chức
-                      </span>
-                    </Checkbox>
-                    {shareWithOrganization && (
-                      <div className="mt-2 text-xs text-green-600 bg-green-50 p-2 rounded">
-                        💡 Link này sẽ được chia sẻ với tất cả thành viên trong
-                        tổ chức của bạn
                       </div>
                     )}
                   </div>
