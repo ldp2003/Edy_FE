@@ -20,7 +20,6 @@ export function UserProfile({ isCompact }: UserProfileProps) {
     }
   };
 
-  console.log("User in UserProfile:", user);
   return (
     <div
       className={`p-4 border-b border-gray-200 ${
@@ -46,9 +45,12 @@ export function UserProfile({ isCompact }: UserProfileProps) {
         </div>
         {!isCompact && (
           <div className="text-left flex-1">
-            <a href="personal-profile" className="font-bold text-sm">
+            <div
+              className="font-bold text-sm cursor-pointer hover:underline"
+              onClick={() => (window.location.href = "/personal-profile")}
+            >
               {user?.first_name} {user?.last_name}
-            </a>
+            </div>
             <p
               className="text-[10px] font-bold overflow-hidden whitespace-nowrap text-ellipsis cursor-pointer hover:underline"
               style={{ color: "var(--primary-color)", maxWidth: "150px" }}

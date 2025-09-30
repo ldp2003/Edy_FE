@@ -1,15 +1,26 @@
 import React from "react";
-import type { Document } from "../../../../../models/document";
+
+interface ContentCategory {
+  doc_type: string;
+  document_count: number;
+  _id?: string;
+}
 
 interface OrganizationStatsProps {
   totalDocuments: number;
-  documents: Document[];
+  contentCategories: ContentCategory[];
 }
 
 const OrganizationStats: React.FC<OrganizationStatsProps> = ({
   totalDocuments,
-  documents,
+  contentCategories,
 }) => {
+  // Hàm helper để lấy số lượng document theo loại
+  const getDocumentCountByType = (docType: string): number => {
+    const category = contentCategories.find((cat) => cat.doc_type === docType);
+    return category ? category.document_count : 0;
+  };
+
   return (
     <div className="bg-white rounded-lg border border-[var(--border-color)] p-6">
       <h3 className="text-base font-semibold text-[var(--primary-text-color)] mb-4">
@@ -31,10 +42,7 @@ const OrganizationStats: React.FC<OrganizationStatsProps> = ({
             Báo cáo nghiên cứu khoa học:
           </span>
           <span className="font-semibold text-[var(--primary-text-color)]">
-            {
-              documents.filter((doc) => doc.doc_type === "RESEARCH_REPORT")
-                .length
-            }
+            {getDocumentCountByType("RESEARCH_REPORT").toLocaleString()}
           </span>
         </div>
 
@@ -43,14 +51,14 @@ const OrganizationStats: React.FC<OrganizationStatsProps> = ({
             Giáo trình:
           </span>
           <span className="font-semibold text-[var(--primary-text-color)]">
-            {documents.filter((doc) => doc.doc_type === "TEXTBOOK").length}
+            {getDocumentCountByType("TEXTBOOK").toLocaleString()}
           </span>
         </div>
 
         <div className="flex justify-between items-center text-sm  border-b pb-2">
           <span className="text-[var(--secondary-text-color)]">Bài giảng:</span>
           <span className="font-semibold text-[var(--primary-text-color)]">
-            {documents.filter((doc) => doc.doc_type === "LECTURE").length}
+            {getDocumentCountByType("LECTURE").toLocaleString()}
           </span>
         </div>
 
@@ -59,21 +67,21 @@ const OrganizationStats: React.FC<OrganizationStatsProps> = ({
             Luận văn / Khóa luận:
           </span>
           <span className="font-semibold text-[var(--primary-text-color)]">
-            {documents.filter((doc) => doc.doc_type === "THESIS").length}
+            {getDocumentCountByType("THESIS").toLocaleString()}
           </span>
         </div>
 
         <div className="flex justify-between items-center  text-sm  border-b pb-2">
           <span className="text-[var(--secondary-text-color)]">Video:</span>
           <span className="font-semibold text-[var(--primary-text-color)]">
-            {documents.filter((doc) => doc.doc_type === "VIDEO").length}
+            {getDocumentCountByType("VIDEO").toLocaleString()}
           </span>
         </div>
 
         <div className="flex justify-between items-center  text-sm  border-b pb-2">
           <span className="text-[var(--secondary-text-color)]">Khác:</span>
           <span className="font-semibold text-[var(--primary-text-color)]">
-            {documents.filter((doc) => doc.doc_type === "OTHER").length}
+            {getDocumentCountByType("OTHER").toLocaleString()}
           </span>
         </div>
       </div>

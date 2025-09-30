@@ -113,8 +113,12 @@ const DocumentInfo: React.FC<DocumentInfoProps> = ({ document }) => {
           <span className="text-sm font-medium">Thuộc:</span>
         </div>
         <span
-          className="font-bold text-xs"
-          style={{ color: "var(--primary-color)" }}
+          className="font-bold text-xs text-[var(--primary-color)] cursor-pointer"
+          onClick={() => {
+            if (document.organization && document.organization._id) {
+              window.location.href = `/organization/${document.organization._id}`;
+            }
+          }}
         >
           {document.organization.name}
         </span>
@@ -143,10 +147,7 @@ const DocumentInfo: React.FC<DocumentInfoProps> = ({ document }) => {
         </span>
       </div>
 
-      <div
-        className="flex flex-col gap-1 border-y-1 border-gray-200 py-4"
-        style={{ color: "var(--secondary-text-color)" }}
-      >
+      <div className="flex flex-col gap-1 border-y-1 border-gray-200 py-4 text-[var(--secondary-text-color)]">
         <span className="font-bold text-sm">Đăng tải lúc:</span>
         <span className="text-xs">{formatDate(document.createdAt)}</span>
       </div>

@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { message, Modal } from "antd";
 import PersonalPostHeader from "../../../components/user/personalPosts/PersonalPostHeader";
 import DocumentSide from "../../../components/user/document/documentDetail/DocumentSide";
@@ -11,6 +11,8 @@ import type { Document } from "../../../models/document";
 
 const PersonalPostDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
+
   const [document, setDocument] = useState<Document | null>(null);
   const [loading, setLoading] = useState(true);
   const [messageApi, contextHolder] = message.useMessage();
@@ -105,7 +107,7 @@ const PersonalPostDetail: React.FC = () => {
   // Header action handlers
   const handleEdit = () => {
     // Navigate to edit page or open edit modal
-    messageApi.info("Chức năng chỉnh sửa đang được phát triển");
+    navigate(`/personal-posts/edit/${document?._id}`);
   };
 
   const handleChangeVisibility = () => {

@@ -31,7 +31,14 @@ const AuthorInfo: React.FC<AuthorInfoProps> = ({ document }) => {
           </h3>
           <div className="flex flex-row gap-2 items-center">
             <School size={16} />
-            <p className="text-sm font-semibold">
+            <p
+              className="text-sm font-semibold cursor-pointer"
+              onClick={() => {
+                if (document.organization && document.organization._id) {
+                  window.location.href = `/organization/${document.organization._id}`;
+                }
+              }}
+            >
               {document.organization.name}
             </p>
           </div>
