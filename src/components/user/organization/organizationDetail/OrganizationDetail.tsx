@@ -104,15 +104,16 @@ const OrganizationDetail: React.FC = () => {
 
   // Memoized computed values
   const displayedMyDocuments = useMemo(
-    () => (isMyDocsCollapsed ? [] : documents.slice(0, myDocsDisplayedCount)),
+    () => documents.slice(0, isMyDocsCollapsed ? 4 : myDocsDisplayedCount),
     [documents, myDocsDisplayedCount, isMyDocsCollapsed]
   );
 
   const displayedRecentDocuments = useMemo(
     () =>
-      isRecentDocsCollapsed
-        ? []
-        : recentDocuments.slice(0, recentDocsDisplayedCount),
+      recentDocuments.slice(
+        0,
+        isRecentDocsCollapsed ? 4 : recentDocsDisplayedCount
+      ),
     [recentDocuments, recentDocsDisplayedCount, isRecentDocsCollapsed]
   );
 
@@ -144,11 +145,23 @@ const OrganizationDetail: React.FC = () => {
   }, [recentDocuments.length]);
 
   const handleToggleMyDocsCollapse = useCallback(() => {
-    setIsMyDocsCollapsed((prev) => !prev);
+    setIsMyDocsCollapsed((prev) => {
+      if (!prev) {
+        // Khi thu gọn, reset count về 4
+        setMyDocsDisplayedCount(4);
+      }
+      return !prev;
+    });
   }, []);
 
   const handleToggleRecentDocsCollapse = useCallback(() => {
-    setIsRecentDocsCollapsed((prev) => !prev);
+    setIsRecentDocsCollapsed((prev) => {
+      if (!prev) {
+        // Khi thu gọn, reset count về 4
+        setRecentDocsDisplayedCount(4);
+      }
+      return !prev;
+    });
   }, []);
 
   if (loading) {
@@ -189,17 +202,18 @@ const OrganizationDetail: React.FC = () => {
               onSubjectClick={handleSubjectClick}
             />
 
-            {/* Documents Section */}
-            <OrganizationDocuments
-              documents={documents}
-              displayedDocuments={displayedMyDocuments}
-              displayedCount={myDocsDisplayedCount}
-              totalDocuments={documents.length}
-              onLoadMore={handleLoadMoreMyDocuments}
-              title="Tài liệu của bạn"
-              isCollapsed={isMyDocsCollapsed}
-              onToggleCollapse={handleToggleMyDocsCollapse}
-            />
+            {documents.length > 0 && (
+              <OrganizationDocuments
+                documents={documents}
+                displayedDocuments={displayedMyDocuments}
+                displayedCount={myDocsDisplayedCount}
+                totalDocuments={documents.length}
+                onLoadMore={handleLoadMoreMyDocuments}
+                title="Tài liệu của bạn"
+                isCollapsed={isMyDocsCollapsed}
+                onToggleCollapse={handleToggleMyDocsCollapse}
+              />
+            )}
 
             {/* Recent Documents Section */}
             <OrganizationDocuments
