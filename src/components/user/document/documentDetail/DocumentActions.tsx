@@ -6,6 +6,7 @@ import DislikeButton from "../../../common/buttons/DislikeButton";
 import FavoriteButton from "../../../common/buttons/FavoriteButton";
 import ShareButton from "../../../common/buttons/ShareButton";
 import type { Document } from "../../../../models/document";
+import { UserContext } from "../../../../contexts/UserContext";
 
 interface DocumentActionsProps {
   document: Document;
@@ -17,6 +18,7 @@ const DocumentActions: React.FC<DocumentActionsProps> = ({
   isUser = false,
 }) => {
   const [isFixed, setIsFixed] = useState(false);
+  const { user } = React.useContext(UserContext);
 
   useEffect(() => {
     const handleScroll = (event: Event) => {
@@ -80,8 +82,8 @@ const DocumentActions: React.FC<DocumentActionsProps> = ({
     <div
       data-document-actions={document._id}
       className={`flex items-center justify-between p-2 transition-all duration-300 ${isFixed
-          ? "sticky top-0 bg-[var(--secondary-background-color)] shadow-md z-10 mx-[-16px] px-4"
-          : ""
+        ? "sticky top-0 bg-[var(--secondary-background-color)] shadow-md z-10 mx-[-16px] px-4"
+        : ""
         }`}
     >
       <DownloadButton
@@ -95,7 +97,15 @@ const DocumentActions: React.FC<DocumentActionsProps> = ({
         <LikeButton likeCount={0} />
         <DislikeButton dislikeCount={0} />
         <FavoriteButton documentId={document._id} />
-        <ShareButton />
+        <ShareButton
+          documentId={document._id}
+          documentTitle={document.title}
+          isPublic={document.public_mode === 'PUBLIC'}
+          isSharedWithOrganization={document.public_mode === 'SHARE_ORGANIZATION'}
+          isPrivate={document.public_mode === 'PRIVATE'}
+          isPrivateShared={document.public_mode === 'PRIVATE_SHARED'}
+          isOwner={document.user._id === user?._id}
+        />
       </div>
     </div>
   );

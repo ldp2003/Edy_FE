@@ -489,6 +489,43 @@ export const DocumentAPI = {
     }
   },
 
+  getShareLinks: async (documentId: string) => {
+    try {
+      const response = await apiClient.get(`/documents/${documentId}/share-links`);
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching share links:", error);
+      throw error;
+    }
+  },
+
+  createShareLink: async (documentId: string, data: {
+    name: string;
+    limited_access: number;
+    request: boolean;
+    time_limited: boolean;
+    start_date?: string;
+    end_date?: string;
+  }) => {
+    try {
+      const response = await apiClient.post(`/documents/${documentId}/share-links`, data);
+      return response.data;
+    } catch (error) {
+      console.error("Error creating share link:", error);
+      throw error;
+    }
+  },
+  
+  updateShareLinkStatus: async (linkId: string, status: 'ACTIVE' | 'INACTIVE' | 'DISABLED') => {
+    try {
+      const response = await apiClient.patch(`/documents/share-links/${linkId}/status`, { status });
+      return response.data;
+    } catch (error) {
+      console.error("Error updating share link status:", error);
+      throw error;
+    }
+  },
+
   // Get pending documents (for admin)
   getPendingDocuments: async (params?: {
     page?: number;

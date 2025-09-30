@@ -7,7 +7,7 @@ import type { Document } from "../../../models/document";
 interface PersonalPostHeaderProps {
   document: Document;
   onEdit?: () => void;
-  onChangeVisibility?: () => void;
+  onChangeVisibility?: (newMode: "PUBLIC" | "PRIVATE" | "SHARE_ORGANIZATION") => void;
   onShare?: () => void;
 }
 
@@ -15,7 +15,6 @@ const PersonalPostHeader: React.FC<PersonalPostHeaderProps> = ({
   document,
   onEdit,
   onChangeVisibility,
-  onShare,
 }) => {
   const navigate = useNavigate();
 
@@ -27,63 +26,111 @@ const PersonalPostHeader: React.FC<PersonalPostHeaderProps> = ({
     }
   };
   // Get buttons based on public_mode
-  const renderActionButtons = () => {
-    const buttons = [];
+const renderActionButtons = () => {
+  const buttons = [];
 
-    // Edit button - always available for user's own documents
+  // Edit button - always available for user's own documents
+  buttons.push(
+    <Button
+      key="edit"
+      type="default"
+      icon={<Edit size={13} />}
+      onClick={handleEditClick}
+      className="flex items-center text-xs gap-2"
+    >
+      <div className="text-xs">Chỉnh sửa</div>
+    </Button>
+  );
+
+  // Visibility change buttons - cycle through modes
+  if (document.public_mode === "PUBLIC") {
+    // From PUBLIC -> can go to SHARE_ORGANIZATION or PRIVATE
     buttons.push(
       <Button
-        key="edit"
+        key="visibility-org"
         type="default"
-        icon={<Edit size={13} />}
-        onClick={handleEditClick}
+        icon={<School size={13} />}
+        onClick={() => onChangeVisibility && onChangeVisibility("SHARE_ORGANIZATION")}
         className="flex items-center text-xs gap-2"
       >
-        <div className="text-xs">Chỉnh sửa</div>
+        <div className="text-xs">Chia sẻ tổ chức</div>
       </Button>
     );
+    buttons.push(
+      <Button
+        key="visibility-private"
+        type="default"
+        icon={<EyeOff size={13} />}
+        onClick={() => onChangeVisibility && onChangeVisibility("PRIVATE")}
+        className="flex items-center text-xs gap-2"
+      >
+        <div className="text-xs">Đặt riêng tư</div>
+      </Button>
+    );
+  } else if (document.public_mode === "SHARE_ORGANIZATION") {
+    // From SHARE_ORGANIZATION -> can go to PUBLIC or PRIVATE
+    buttons.push(
+      <Button
+        key="visibility-public"
+        type="primary"
+        icon={<Eye size={13} />}
+        onClick={() => onChangeVisibility && onChangeVisibility("PUBLIC")}
+        className="flex items-center text-xs gap-2"
+      >
+        <div className="text-xs">Công khai</div>
+      </Button>
+    );
+    buttons.push(
+      <Button
+        key="visibility-private"
+        type="default"
+        icon={<EyeOff size={13} />}
+        onClick={() => onChangeVisibility && onChangeVisibility("PRIVATE")}
+        className="flex items-center text-xs gap-2"
+      >
+        <div className="text-xs">Đặt riêng tư</div>
+      </Button>
+    );
+  } else { // PRIVATE
+    // From PRIVATE -> can go to PUBLIC or SHARE_ORGANIZATION
+    buttons.push(
+      <Button
+        key="visibility-public"
+        type="primary"
+        icon={<Eye size={13} />}
+        onClick={() => onChangeVisibility && onChangeVisibility("PUBLIC")}
+        className="flex items-center text-xs gap-2"
+      >
+        <div className="text-xs">Công khai</div>
+      </Button>
+    );
+    buttons.push(
+      <Button
+        key="visibility-org"
+        type="default"
+        icon={<School size={13} />}
+        onClick={() => onChangeVisibility && onChangeVisibility("SHARE_ORGANIZATION")}
+        className="flex items-center text-xs gap-2"
+      >
+        <div className="text-xs">Chia sẻ tổ chức</div>
+      </Button>
+    );
+  }
 
-    // Visibility change button - different based on current mode
-    if (document.public_mode === "PUBLIC") {
-      buttons.push(
-        <Button
-          key="visibility"
-          type="default"
-          icon={<EyeOff size={13} />}
-          onClick={onChangeVisibility}
-          className="flex items-center text-xs gap-2"
-        >
-          <div className="text-xs">Đặt riêng tư</div>
-        </Button>
-      );
-    } else {
-      buttons.push(
-        <Button
-          key="visibility"
-          type="primary"
-          icon={<Eye size={13} />}
-          onClick={onChangeVisibility}
-          className="flex items-center text-xs gap-2"
-        >
-          <div className="text-xs">Công khai</div>
-        </Button>
-      );
-    }
-
-    // Share button - only for non-public documents
-    if (document.public_mode !== "PUBLIC") {
-      buttons.push(
-        <Button
-          key="share"
-          type="default"
-          icon={<Share size={13} />}
-          onClick={onShare}
-          className="flex items-center text-xs gap-2"
-        >
-          <div className="text-xs">Chia sẻ</div>
-        </Button>
-      );
-    }
+    // // Share button - only for non-public documents
+    // if (document.public_mode !== "PUBLIC") {
+    //   buttons.push(
+    //     <Button
+    //       key="share"
+    //       type="default"
+    //       icon={<Share size={13} />}
+    //       onClick={onShare}
+    //       className="flex items-center text-xs gap-2"
+    //     >
+    //       <div className="text-xs">Chia sẻ</div>
+    //     </Button>
+    //   );
+    // }
 
     return buttons;
   };
