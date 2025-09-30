@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components */
 // TypeScript interfaces for Document
 import type { User, Organization } from "./user";
 
@@ -5,6 +6,73 @@ export interface Subject {
   _id: string;
   name: string;
 }
+
+// Public mode constants for reusability
+export const PublicMode = {
+  PUBLIC: "PUBLIC",
+  PRIVATE: "PRIVATE",
+  PRIVATE_SHARED: "PRIVATE_SHARED",
+  SHARE_ORGANIZATION: "SHARE_ORGANIZATION",
+} as const;
+
+export type PublicModeType = (typeof PublicMode)[keyof typeof PublicMode];
+
+export const publicModeLabels: Record<PublicModeType, string> = {
+  [PublicMode.PUBLIC]: "Công khai",
+  [PublicMode.PRIVATE]: "Riêng tư",
+  [PublicMode.PRIVATE_SHARED]: "Chia sẻ cá nhân",
+  [PublicMode.SHARE_ORGANIZATION]: "Chia sẻ tổ chức",
+};
+
+// Document status constants
+export const DocumentStatus = {
+  PENDING: "PENDING",
+  APPROVED: "APPROVED",
+  REJECTED: "REJECTED",
+  REQUESTED_EDIT: "REQUESTED_EDIT",
+  PENDING_EDIT: "PENDING_EDIT",
+} as const;
+
+export type DocumentStatusType =
+  (typeof DocumentStatus)[keyof typeof DocumentStatus];
+
+// Document level constants
+export const DocumentLevel = {
+  STUDENT: "STUDENT",
+  UNIVERSITY: "UNIVERSITY",
+  LECTURER: "LECTURER",
+  RESEARCHER: "RESEARCHER",
+  OTHER: "OTHER",
+} as const;
+
+export type DocumentLevelType =
+  (typeof DocumentLevel)[keyof typeof DocumentLevel];
+
+// File type constants
+export const FileType = {
+  WORD: "WORD",
+  PDF: "PDF",
+  EXCEL: "EXCEL",
+  VIDEO: "VIDEO",
+  POWERPOINT: "POWERPOINT",
+} as const;
+
+export type FileTypeType = (typeof FileType)[keyof typeof FileType];
+
+// Document type constants
+export const DocumentType = {
+  RESEARCH_REPORT: "RESEARCH_REPORT",
+  VIDEO: "VIDEO",
+  STUDY_GUIDE: "STUDY_GUIDE",
+  TEXTBOOK: "TEXTBOOK",
+  ESSAY: "ESSAY",
+  SOLUTION_SET: "SOLUTION_SET",
+  THESIS: "THESIS",
+  LECTURE: "LECTURE",
+  OTHER: "OTHER",
+} as const;
+
+export type DocumentTypeType = (typeof DocumentType)[keyof typeof DocumentType];
 
 export interface Document {
   _id: string;
@@ -15,38 +83,28 @@ export interface Document {
   };
   author: string[];
   url: string;
+  preview_url?: string;
   cover_page?: string;
   published_year?: number;
   publisher?: string;
   intensive: boolean;
   organization: Organization;
-  level: "STUDENT" | "UNIVERSITY" | "LECTURER" | "RESEARCHER" | "OTHER";
+  level: DocumentLevelType;
   subject: Subject;
-  status?:
-    | "PENDING"
-    | "APPROVED"
-    | "PENDING_SUMMARY"
-    | "REJECTED"
-    | "REQUESTED_EDIT";
-  public_mode?: "PUBLIC" | "PRIVATE" | "PRIVATE_SHARED" | "SHARE_ORGANIZATION";
+  status?: DocumentStatusType;
+  summary_status?: DocumentStatusType | "NONE";
+  public_mode?: PublicModeType;
   page?: number;
-  file_type: "WORD" | "PDF" | "EXCEL" | "VIDEO" | "POWERPOINT";
+  file_type: FileTypeType;
   keyword?: string[];
   title: string;
-  doc_type?:
-    | "RESEARCH_REPORT"
-    | "VIDEO"
-    | "STUDY_GUIDE"
-    | "TEXTBOOK"
-    | "ESSAY"
-    | "SOLUTION_SET"
-    | "THESIS"
-    | "LECTURE"
-    | "OTHER";
+  doc_type?: DocumentTypeType;
   view: number;
   comment_count: number;
   download_count: number;
   is_deleted?: boolean;
+  is_favorite?: boolean;
+  last_approved_at?: string;
   createdAt: string;
   updatedAt?: string;
 }

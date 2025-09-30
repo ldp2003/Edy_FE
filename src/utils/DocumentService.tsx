@@ -181,4 +181,20 @@ export const DocumentService = {
       throw error;
     }
   },
+
+  // Cập nhật chế độ công khai của tài liệu
+  async updateDocumentPublicMode(
+    documentId: string,
+    public_mode: "PUBLIC" | "PRIVATE" | "PRIVATE_SHARED" | "SHARE_ORGANIZATION"
+  ) {
+    try {
+      return await DocumentAPI.updatePublicMode(documentId, public_mode);
+    } catch (error) {
+      console.error(
+        "Error in DocumentService.updateDocumentPublicMode:",
+        error
+      );
+      throw error;
+    }
+  },
 };
