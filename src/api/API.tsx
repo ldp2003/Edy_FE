@@ -468,9 +468,11 @@ export const DocumentAPI = {
     }
   },
 
-   createDownloadLink: async (documentId: string) => {
+  createDownloadLink: async (documentId: string) => {
     try {
-      const response = await apiClient.post(`/documents/${documentId}/download`);
+      const response = await apiClient.post(
+        `/documents/${documentId}/download`
+      );
       return response.data;
     } catch (error) {
       console.error("Error creating download link:", error);
@@ -491,7 +493,9 @@ export const DocumentAPI = {
 
   getShareLinks: async (documentId: string) => {
     try {
-      const response = await apiClient.get(`/documents/${documentId}/share-links`);
+      const response = await apiClient.get(
+        `/documents/${documentId}/share-links`
+      );
       return response.data;
     } catch (error) {
       console.error("Error fetching share links:", error);
@@ -499,26 +503,39 @@ export const DocumentAPI = {
     }
   },
 
-  createShareLink: async (documentId: string, data: {
-    name: string;
-    limited_access: number;
-    request: boolean;
-    time_limited: boolean;
-    start_date?: string;
-    end_date?: string;
-  }) => {
+  createShareLink: async (
+    documentId: string,
+    data: {
+      name: string;
+      limited_access: number;
+      request: boolean;
+      time_limited: boolean;
+      share_with_organization?: boolean;
+      start_date?: string;
+      end_date?: string;
+    }
+  ) => {
     try {
-      const response = await apiClient.post(`/documents/${documentId}/share-links`, data);
+      const response = await apiClient.post(
+        `/documents/${documentId}/share-links`,
+        data
+      );
       return response.data;
     } catch (error) {
       console.error("Error creating share link:", error);
       throw error;
     }
   },
-  
-  updateShareLinkStatus: async (linkId: string, status: 'ACTIVE' | 'INACTIVE' | 'DISABLED') => {
+
+  updateShareLinkStatus: async (
+    linkId: string,
+    status: "ACTIVE" | "INACTIVE" | "DISABLED"
+  ) => {
     try {
-      const response = await apiClient.patch(`/documents/share-links/${linkId}/status`, { status });
+      const response = await apiClient.patch(
+        `/documents/share-links/${linkId}/status`,
+        { status }
+      );
       return response.data;
     } catch (error) {
       console.error("Error updating share link status:", error);
@@ -582,6 +599,22 @@ export const DocumentAPI = {
       return response.data;
     } catch (error) {
       console.error("Error rejecting document request:", error);
+      throw error;
+    }
+  },
+
+  updatePublicMode: async (
+    documentId: string,
+    public_mode: "PUBLIC" | "PRIVATE" | "PRIVATE_SHARED" | "SHARE_ORGANIZATION"
+  ) => {
+    try {
+      const response = await apiClient.patch(
+        `/documents/${documentId}/public-mode`,
+        { public_mode }
+      );
+      return response.data;
+    } catch (error) {
+      console.error("Error updating document public mode:", error);
       throw error;
     }
   },
