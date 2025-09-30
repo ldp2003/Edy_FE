@@ -1,13 +1,26 @@
-import React from "react";
-import { Button, Avatar } from "antd";
-import { Edit, Eye, EyeOff, Share, School } from "lucide-react";
+import React, { useState } from "react";
+import { Button, Avatar, Dropdown, Modal, message } from "antd";
+import {
+  Edit,
+  Settings,
+  School,
+  Globe,
+  Lock,
+  Users,
+  Share2,
+} from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import type { Document } from "../../../models/document";
+import {
+  PublicMode,
+  publicModeLabels,
+  type PublicModeType,
+} from "../../../models/document";
 
 interface PersonalPostHeaderProps {
   document: Document;
   onEdit?: () => void;
-  onChangeVisibility?: (newMode: "PUBLIC" | "PRIVATE" | "SHARE_ORGANIZATION") => void;
+  onChangeVisibility?: (newMode: PublicModeType) => Promise<void>;
   onShare?: () => void;
 }
 
@@ -17,6 +30,7 @@ const PersonalPostHeader: React.FC<PersonalPostHeaderProps> = ({
   onChangeVisibility,
 }) => {
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
 
   const handleEditClick = () => {
     if (onEdit) {
@@ -25,114 +39,99 @@ const PersonalPostHeader: React.FC<PersonalPostHeaderProps> = ({
       navigate(`/personal-posts/edit/${document._id}`);
     }
   };
-  // Get buttons based on public_mode
-const renderActionButtons = () => {
-  const buttons = [];
 
-  // Edit button - always available for user's own documents
-  buttons.push(
-    <Button
-      key="edit"
-      type="default"
-      icon={<Edit size={13} />}
-      onClick={handleEditClick}
-      className="flex items-center text-xs gap-2"
-    >
-      <div className="text-xs">Chỉnh sửa</div>
-    </Button>
-  );
+  // Get icon for public mode
+  const getPublicModeIcon = (mode: PublicModeType) => {
+    switch (mode) {
+      case PublicMode.PUBLIC:
+        return <Globe size={13} />;
+      case PublicMode.PRIVATE:
+        return <Lock size={13} />;
+      case PublicMode.SHARE_ORGANIZATION:
+        return <Users size={13} />;
+      case PublicMode.PRIVATE_SHARED:
+        return <Share2 size={13} />;
+      default:
+        return <Settings size={13} />;
+    }
+  };
 
-  // Visibility change buttons - cycle through modes
-  if (document.public_mode === "PUBLIC") {
-    // From PUBLIC -> can go to SHARE_ORGANIZATION or PRIVATE
-    buttons.push(
-      <Button
-        key="visibility-org"
-        type="default"
-        icon={<School size={13} />}
-        onClick={() => onChangeVisibility && onChangeVisibility("SHARE_ORGANIZATION")}
-        className="flex items-center text-xs gap-2"
-      >
-        <div className="text-xs">Chia sẻ tổ chức</div>
-      </Button>
-    );
-    buttons.push(
-      <Button
-        key="visibility-private"
-        type="default"
-        icon={<EyeOff size={13} />}
-        onClick={() => onChangeVisibility && onChangeVisibility("PRIVATE")}
-        className="flex items-center text-xs gap-2"
-      >
-        <div className="text-xs">Đặt riêng tư</div>
-      </Button>
-    );
-  } else if (document.public_mode === "SHARE_ORGANIZATION") {
-    // From SHARE_ORGANIZATION -> can go to PUBLIC or PRIVATE
-    buttons.push(
-      <Button
-        key="visibility-public"
-        type="primary"
-        icon={<Eye size={13} />}
-        onClick={() => onChangeVisibility && onChangeVisibility("PUBLIC")}
-        className="flex items-center text-xs gap-2"
-      >
-        <div className="text-xs">Công khai</div>
-      </Button>
-    );
-    buttons.push(
-      <Button
-        key="visibility-private"
-        type="default"
-        icon={<EyeOff size={13} />}
-        onClick={() => onChangeVisibility && onChangeVisibility("PRIVATE")}
-        className="flex items-center text-xs gap-2"
-      >
-        <div className="text-xs">Đặt riêng tư</div>
-      </Button>
-    );
-  } else { // PRIVATE
-    // From PRIVATE -> can go to PUBLIC or SHARE_ORGANIZATION
-    buttons.push(
-      <Button
-        key="visibility-public"
-        type="primary"
-        icon={<Eye size={13} />}
-        onClick={() => onChangeVisibility && onChangeVisibility("PUBLIC")}
-        className="flex items-center text-xs gap-2"
-      >
-        <div className="text-xs">Công khai</div>
-      </Button>
-    );
-    buttons.push(
-      <Button
-        key="visibility-org"
-        type="default"
-        icon={<School size={13} />}
-        onClick={() => onChangeVisibility && onChangeVisibility("SHARE_ORGANIZATION")}
-        className="flex items-center text-xs gap-2"
-      >
-        <div className="text-xs">Chia sẻ tổ chức</div>
-      </Button>
-    );
-  }
+  // Get available options (exclude current mode)
+  const getAvailableOptions = () => {
+    const allModes = Object.values(PublicMode) as PublicModeType[];
+    return allModes.filter((mode) => mode !== document.public_mode);
+  };
 
-    // // Share button - only for non-public documents
-    // if (document.public_mode !== "PUBLIC") {
-    //   buttons.push(
-    //     <Button
-    //       key="share"
-    //       type="default"
-    //       icon={<Share size={13} />}
-    //       onClick={onShare}
-    //       className="flex items-center text-xs gap-2"
-    //     >
-    //       <div className="text-xs">Chia sẻ</div>
-    //     </Button>
-    //   );
-    // }
+  // Handle visibility change with confirmation
+  const handleVisibilityChange = async (newMode: PublicModeType) => {
+    const currentModeLabel =
+      publicModeLabels[document.public_mode || PublicMode.PUBLIC];
+    const newModeLabel = publicModeLabels[newMode];
 
-    return buttons;
+    Modal.confirm({
+      title: "Xác nhận thay đổi chế độ hiển thị",
+      content: `Bạn có muốn thay đổi từ "${currentModeLabel}" sang "${newModeLabel}" không?`,
+      okText: "Xác nhận",
+      cancelText: "Hủy",
+      onOk: async () => {
+        if (onChangeVisibility) {
+          setLoading(true);
+          try {
+            await onChangeVisibility(newMode);
+            message.success("Đã cập nhật chế độ hiển thị thành công!");
+          } catch (error) {
+            console.error("Error changing visibility:", error);
+            message.error("Không thể cập nhật chế độ hiển thị!");
+          } finally {
+            setLoading(false);
+          }
+        }
+      },
+    });
+  };
+
+  // Create dropdown items
+  const dropdownItems = getAvailableOptions().map((mode) => ({
+    key: mode,
+    label: (
+      <div className="flex items-center gap-2">
+        {getPublicModeIcon(mode)}
+        <span>{publicModeLabels[mode]}</span>
+      </div>
+    ),
+    onClick: () => handleVisibilityChange(mode),
+  }));
+
+  const renderActionButtons = () => {
+    return [
+      // Edit button
+      <Button
+        key="edit"
+        type="default"
+        icon={<Edit size={13} />}
+        onClick={handleEditClick}
+        className="flex items-center text-xs gap-2"
+      >
+        <span className="text-xs">Chỉnh sửa</span>
+      </Button>,
+
+      // Visibility dropdown button
+      <Dropdown
+        key="visibility"
+        menu={{ items: dropdownItems }}
+        placement="bottomRight"
+        disabled={loading}
+      >
+        <Button
+          type="default"
+          loading={loading}
+          icon={getPublicModeIcon(document.public_mode || PublicMode.PUBLIC)}
+          className="flex items-center text-xs gap-2"
+        >
+          <span className="text-xs">Chế độ hiển thị</span>
+        </Button>
+      </Dropdown>,
+    ];
   };
 
   return (
@@ -176,10 +175,7 @@ const renderActionButtons = () => {
         </div>
 
         {/* Action Buttons - Vertical Layout */}
-        <div className="flex flex-col gap-3">
-          {/* Action Buttons */}
-          {renderActionButtons()}
-        </div>
+        <div className="flex flex-col gap-3">{renderActionButtons()}</div>
       </div>
     </div>
   );
