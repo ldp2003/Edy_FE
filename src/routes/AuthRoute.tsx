@@ -7,6 +7,8 @@ import { defaultUser } from "../models/user";
 import { ROLE_CODES } from "../constants/RoleConstants";
 import type { RoleCode } from "../models/role";
 import { getIsAdminMode } from "../utils/CookieUtils";
+import { UserService } from "../utils/UserService";
+import type { Document } from "../models/document";
 
 const AuthRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const navigate = useNavigate();
@@ -17,6 +19,7 @@ const AuthRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [account, setAccount] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isInitialLoad, setIsInitialLoad] = useState(true);
+  const [favoriteDocuments, setFavoriteDocuments] = useState<Document[]>([]);
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -27,12 +30,15 @@ const AuthRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
       try {
         await refreshToken();
         const data = await getCurrentUser();
+        const favoriteRes = await UserService.getListFavorites();
+        const favoriteDocuments = favoriteRes?.documents || [];
 
         if (data) {
           setIsLoggedIn(true);
           setUser(data.user); // Full user data
           setRole(data.role); // User role
           setAccount(data.account); // Account data
+          setFavoriteDocuments(favoriteDocuments);
 
           // Check if user needs account activation
           if (
@@ -81,6 +87,7 @@ const AuthRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
           setUser(defaultUser);
           setAccount(null);
           setRole(null);
+          setFavoriteDocuments([]);
 
           // Allow access to public pages without redirecting
           const publicPages = ["/", "/document-detail"];
@@ -135,7 +142,16 @@ const AuthRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   }
 
   return (
-    <UserContext.Provider value={{ isLoggedIn, user, account, role }}>
+    <UserContext.Provider
+      value={{
+        isLoggedIn,
+        user,
+        account,
+        role,
+        favoriteDocuments,
+        setFavoriteDocuments,
+      }}
+    >
       {children}
     </UserContext.Provider>
   );
