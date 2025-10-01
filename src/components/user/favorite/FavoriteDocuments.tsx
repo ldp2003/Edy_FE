@@ -27,7 +27,10 @@ const FavoriteDocuments: React.FC = () => {
 
   const handleRemoveFromFavorites = async (documentId: string) => {
     try {
+      
       await UserService.removeFromFavorites(documentId);
+      console.log("Removed document ID:", documentId);
+
       message.success("Đã xóa khỏi danh sách yêu thích!");
       // Refresh the list
       fetchFavoriteDocuments();

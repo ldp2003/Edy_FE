@@ -4,7 +4,6 @@ import { Tooltip } from "antd";
 import { Heart } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import type { Document } from "../../../models/document";
-import { UserService } from "../../../utils/UserService";
 
 interface FavoriteCardProps {
   document: Document;
@@ -14,7 +13,7 @@ interface FavoriteCardProps {
 
 const FavoriteCard: React.FC<FavoriteCardProps> = ({ document, onRemove }) => {
   const navigate = useNavigate();
-  const { favoriteDocuments, setFavoriteDocuments } = useContext(UserContext);
+  const { favoriteDocuments } = useContext(UserContext);
   const [isFavorite, setIsFavorite] = useState(false);
 
   // Sync with context
@@ -28,26 +27,10 @@ const FavoriteCard: React.FC<FavoriteCardProps> = ({ document, onRemove }) => {
 
   const handleHeartClick = async (e: React.MouseEvent) => {
     e.stopPropagation();
-    try {
-      if (isFavorite) {
-        await UserService.removeFromFavorites(document._id);
-        setFavoriteDocuments(
-          favoriteDocuments.filter((doc) => doc._id !== document._id)
-        );
-        setIsFavorite(false);
-        if (onRemove) {
-          onRemove(document._id);
-        }
-      } else {
-        const addedDoc = await UserService.addToFavorites(document._id);
-        if (addedDoc && addedDoc._id) {
-          setFavoriteDocuments([...favoriteDocuments, addedDoc]);
-        }
-        setIsFavorite(true);
-      }
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    } catch (error) {
-      // silent
+
+    // Chỉ gọi callback từ parent component để xử lý
+    if (onRemove) {
+      onRemove(document._id);
     }
   };
 
