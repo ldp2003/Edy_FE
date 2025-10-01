@@ -10,6 +10,10 @@ import OrganizationSubjects from "./components/OrganizationSubjects";
 import OrganizationDocuments from "./components/OrganizationDocuments";
 import OrganizationStats from "./components/OrganizationStats";
 import OrganizationInfo from "./components/OrganizationInfo";
+import {
+  createSubjectSlug,
+  storeSubjectMapping,
+} from "../../../../utils/SlugUtils";
 import type { OrganizationDetailed } from "../../../../models/organization";
 import type { Subject } from "../../../../models/subject";
 import type { Document } from "../../../../models/document";
@@ -129,7 +133,10 @@ const OrganizationDetail: React.FC = () => {
   // Optimized handlers
   const handleSubjectClick = useCallback(
     (subject: Subject) => {
-      navigate(`/subject/${subject._id}`);
+      const slug = createSubjectSlug(subject.name);
+      // Store mapping for navigation
+      storeSubjectMapping(subject.name, subject._id);
+      navigate(`/subject/${slug}/documents`);
     },
     [navigate]
   );

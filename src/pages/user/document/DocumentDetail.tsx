@@ -110,18 +110,6 @@ const DocumentDetail: React.FC = () => {
           navigate(`/personal-posts/document-detail/${id}`, { replace: true });
           return;
         }
-
-        // Kiểm tra quyền truy cập
-        const accessCheck = checkDocumentAccess(documentData, user);
-        if (!accessCheck.hasAccess) {
-          setAccessError({
-            type: accessCheck.type!,
-            message: accessCheck.message,
-          });
-          setLoading(false);
-          return;
-        }
-
         setDocument(documentData);
       } catch (error) {
         console.error("Error fetching document:", error);
@@ -206,22 +194,12 @@ const DocumentDetail: React.FC = () => {
     );
   }
 
-  if (accessError) {
-    return (
-      <DocumentAccessError
-        type={accessError.type}
-        message={accessError.message}
-      />
-    );
-  }
-
   if (!document) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <p className="text-gray-600">Không tìm thấy tài liệu!</p>
-        </div>
-      </div>
+      <DocumentAccessError
+        type={accessError?.type}
+        message={accessError?.message}
+      />
     );
   }
 

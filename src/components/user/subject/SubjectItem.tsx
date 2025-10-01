@@ -1,5 +1,10 @@
 import React from "react";
 import { School, FolderOpen } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import {
+  createSubjectSlug,
+  storeSubjectMapping,
+} from "../../../utils/SlugUtils";
 import type { Subject } from "../../../models/subject";
 
 interface SubjectItemProps {
@@ -8,8 +13,19 @@ interface SubjectItemProps {
 }
 
 const SubjectItem: React.FC<SubjectItemProps> = ({ subject, onClick }) => {
+  const navigate = useNavigate();
+
   const handleClick = () => {
-    onClick?.(subject);
+    // Create slug and navigate to subject documents page
+    const slug = createSubjectSlug(subject.name);
+    // Store mapping for later retrieval
+    storeSubjectMapping(subject.name, subject._id);
+    navigate(`/subject/${slug}/documents`);
+
+    // Also call the onClick if provided for any additional handling
+    if (onClick) {
+      onClick(subject);
+    }
   };
 
   return (
@@ -36,10 +52,11 @@ const SubjectItem: React.FC<SubjectItemProps> = ({ subject, onClick }) => {
       <div className="flex items-center gap-2 text-gray-600">
         <School size={14} />
         <span
-          className="text-xs truncate cursor-pointer"
-          onClick={() => {
+          className="text-xs truncate cursor-pointer hover:text-blue-600 transition-colors"
+          onClick={(e) => {
+            e.stopPropagation(); // Prevent parent click event
             if (subject.organization && subject.organization._id) {
-              window.location.href = `/organization/${subject.organization._id}`;
+              navigate(`/organization/${subject.organization._id}`);
             }
           }}
         >
