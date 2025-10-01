@@ -14,6 +14,7 @@ export interface Subject {
   is_deleted: boolean;
   createdAt: string;
   updatedAt: string;
+  doc_count: number;
 }
 
 export interface SubjectsResponse {

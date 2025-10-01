@@ -71,10 +71,8 @@ export default function HomePage() {
   }, [messageApi, user]);
 
   const handleSubjectClick = (subject: Subject) => {
-    // Navigate to subject detail page or documents by subject
-    console.log("Subject clicked:", subject);
-    // TODO: Implement navigation to subject detail page
-    messageApi.info(`Đang phát triển trang chi tiết môn học: ${subject.name}`);
+    // This function is intentionally empty as SubjectItem handles its own navigation
+    console.log("Subject clicked:", subject.name);
   };
 
   if (loading) {

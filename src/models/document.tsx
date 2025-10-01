@@ -72,8 +72,6 @@ export const DocumentType = {
   OTHER: "OTHER",
 } as const;
 
-export type DocumentTypeType = (typeof DocumentType)[keyof typeof DocumentType];
-
 export interface Document {
   _id: string;
   user: User;
@@ -98,7 +96,7 @@ export interface Document {
   file_type: FileTypeType;
   keyword?: string[];
   title: string;
-  doc_type?: DocumentTypeType;
+  doc_type?: string;
   view: number;
   comment_count: number;
   download_count: number;
@@ -151,3 +149,43 @@ export interface UploadDocumentData {
   description?: string;
   page?: number;
 }
+
+// Document type labels in Vietnamese
+export const documentTypeLabels: Record<keyof typeof DocumentType, string> = {
+  RESEARCH_REPORT: "Báo cáo nghiên cứu",
+  VIDEO: "Video bài giảng",
+  STUDY_GUIDE: "Đề cương học tập",
+  TEXTBOOK: "Giáo trình",
+  ESSAY: "Tiểu luận",
+  SOLUTION_SET: "Bài giải",
+  THESIS: "Luận văn",
+  LECTURE: "Bài giảng",
+  OTHER: "Khác",
+};
+
+/**
+ * Determine document type based on filename
+ * @param fileName - Name of the document file
+ * @returns DocumentTypeType
+ */
+export const getDocumentTypeFromFileName = (
+  fileName: string
+): keyof typeof DocumentType => {
+  const name = fileName.toLowerCase();
+
+  if (name.includes("báo cáo") || name.includes("report"))
+    return "RESEARCH_REPORT";
+  if (name.includes("đề cương") || name.includes("outline"))
+    return "STUDY_GUIDE";
+  if (name.includes("giáo trình") || name.includes("textbook"))
+    return "TEXTBOOK";
+  if (name.includes("tiểu luận") || name.includes("essay")) return "ESSAY";
+  if (name.includes("bài giải") || name.includes("solution"))
+    return "SOLUTION_SET";
+  if (name.includes("luận văn") || name.includes("thesis")) return "THESIS";
+  if (name.includes("bài giảng") || name.includes("lecture")) return "LECTURE";
+  if (name.includes("video") || name.includes(".mp4") || name.includes(".avi"))
+    return "VIDEO";
+
+  return "OTHER";
+};

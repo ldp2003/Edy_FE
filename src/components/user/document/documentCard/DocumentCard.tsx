@@ -1,6 +1,7 @@
 import { Heart } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
+import { UserContext } from "../../../../contexts/UserContext";
 import type { Document } from "../../../../models/document";
 import { UserService } from "../../../../utils/UserService";
 import { message } from "antd";
@@ -22,30 +23,15 @@ const DocumentCard: React.FC<DocumentCardProps> = ({
 }) => {
   const navigate = useNavigate();
   const [messageApi, contextHolder] = message.useMessage();
+  const { favoriteDocuments, setFavoriteDocuments } = useContext(UserContext);
   const [isFavorite, setIsFavorite] = useState(false);
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [favoriteDocuments, setFavoriteDocuments] = useState<string[]>([]);
 
-  // Check if document is in favorites
+  // Sync with context
   useEffect(() => {
-    const fetchFavorites = async () => {
-      try {
-        const favoritesResponse = await UserService.getListFavorites();
-        const favoriteIds =
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          favoritesResponse.documents?.map((doc: any) => doc._id) || [];
-        setFavoriteDocuments(favoriteIds);
-
-        if (document?._id) {
-          setIsFavorite(favoriteIds.includes(document._id));
-        }
-      } catch (error) {
-        console.error("Failed to fetch favorites:", error);
-      }
-    };
-
-    fetchFavorites();
-  }, [document?._id]);
+    if (document?._id) {
+      setIsFavorite(favoriteDocuments.some((doc) => doc._id === document._id));
+    }
+  }, [favoriteDocuments, document?._id]);
 
   const handleCardClick = () => {
     if (document?._id) {
@@ -55,20 +41,25 @@ const DocumentCard: React.FC<DocumentCardProps> = ({
   };
 
   const handleSaveClick = async (e: React.MouseEvent) => {
-    e.stopPropagation(); // Prevent card click when clicking save button
+    e.stopPropagation();
     if (!document?._id) return;
-
     try {
       if (isFavorite) {
         await UserService.removeFromFavorites(document._id);
+        setFavoriteDocuments(
+          favoriteDocuments.filter((doc) => doc._id !== document._id)
+        );
         setIsFavorite(false);
         messageApi.success("Đã xóa tài liệu khỏi mục yêu thích!");
       } else {
-        await UserService.addToFavorites(document._id);
+        const addedDoc = await UserService.addToFavorites(document._id);
+        if (addedDoc && addedDoc._id) {
+          setFavoriteDocuments([...favoriteDocuments, addedDoc]);
+        }
         setIsFavorite(true);
         messageApi.success("Đã lưu tài liệu vào mục yêu thích!");
       }
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
       messageApi.error("Có lỗi xảy ra, vui lòng thử lại!");
     }

@@ -182,6 +182,30 @@ export const DocumentService = {
     }
   },
 
+  // Cập nhật thông tin tài liệu
+  async updateDocument(
+    documentId: string,
+    updateData: {
+      title?: string;
+      doc_type?: string;
+      author?: string[];
+      published_year?: number;
+      publisher?: string;
+      level?: string;
+      intensive?: boolean;
+      keyword?: string[];
+      description?: string;
+      page?: number;
+    }
+  ) {
+    try {
+      return await DocumentAPI.updateDocument(documentId, updateData);
+    } catch (error) {
+      console.error("Error in DocumentService.updateDocument:", error);
+      throw error;
+    }
+  },
+
   // Cập nhật chế độ công khai của tài liệu
   async updateDocumentPublicMode(
     documentId: string,

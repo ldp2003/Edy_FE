@@ -16,8 +16,9 @@ import EditDocumentPage from "../pages/user/personalPosts/EditDocumentPage";
 import FavoritePage from "../pages/user/favorite/FavoritePage";
 import OrganizationDetailPage from "../pages/user/organization/OrganizationDetailPage";
 import OrganizationListPage from "../pages/user/organization/OrganizationListPage";
+import SubjectDocumentPage from "../pages/user/subject/SubjectDocumentPage";
 import NotFoundPage from "../pages/NotFoundPage";
-import DirectDownload from '../pages/user/download/DirectDownload';
+import DirectDownload from "../pages/user/download/DirectDownload";
 
 const UserRoute: React.FC = () => {
   return (
@@ -36,6 +37,10 @@ const UserRoute: React.FC = () => {
           <Route path="document-detail/:id" element={<DocumentDetail />} />
           <Route path="organizations" element={<OrganizationListPage />} />
           <Route path="organization/:id" element={<OrganizationDetailPage />} />
+          <Route
+            path="subject/:subjectId/documents"
+            element={<SubjectDocumentPage />}
+          />
 
           {/* Protected pages - will be handled by individual components */}
           <Route path="personal-posts" element={<PersonalPost />} />
@@ -55,7 +60,7 @@ const UserRoute: React.FC = () => {
           {/* 404 Page */}
           <Route path="*" element={<NotFoundPage />} />
         </Route>
-        
+
         {/* Download page without layout - standalone */}
         <Route path="download/:linkId" element={<DirectDownload />} />
       </Routes>

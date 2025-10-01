@@ -1,8 +1,8 @@
 import { Heart } from "lucide-react";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
+import { UserContext } from "../../../contexts/UserContext";
 import { message } from "antd";
 import { UserService } from "../../../utils/UserService";
-import type { Document } from "../../../models/document";
 
 interface FavoriteButtonProps {
   documentId: string;
@@ -15,40 +15,36 @@ const FavoriteButton: React.FC<FavoriteButtonProps> = ({
   initialFavorited = false,
   onToggle,
 }) => {
+  const { favoriteDocuments, setFavoriteDocuments } = useContext(UserContext);
   const [isFavorited, setIsFavorited] = useState(initialFavorited);
   const [isLoading, setIsLoading] = useState(false);
 
-  // Check if document is in favorites when component mounts
+  // Sync with context when favoriteDocuments changes
   useEffect(() => {
-    const checkFavoriteStatus = async () => {
-      try {
-        const favoritesResponse = await UserService.getListFavorites();
-        const favoriteIds =
-          favoritesResponse.documents?.map((doc: Document) => doc._id) || [];
-        const isFav = favoriteIds.includes(documentId);
-        setIsFavorited(isFav);
-      } catch (error) {
-        console.error("Failed to fetch favorites:", error);
-      }
-    };
-
-    if (!initialFavorited) {
-      checkFavoriteStatus();
-    }
-  }, [documentId, initialFavorited]);
+    setIsFavorited(favoriteDocuments.some((doc) => doc._id === documentId));
+  }, [favoriteDocuments, documentId]);
 
   const handleToggleFavorite = async () => {
     try {
       setIsLoading(true);
-
       if (isFavorited) {
         await UserService.removeFromFavorites(documentId);
         message.success("Đã bỏ khỏi danh sách yêu thích!");
+        setFavoriteDocuments(
+          favoriteDocuments.filter((doc) => doc._id !== documentId)
+        );
       } else {
-        await UserService.addToFavorites(documentId);
+        const addedDoc = await UserService.addToFavorites(documentId);
         message.success("Đã thêm vào danh sách yêu thích!");
+        // Nếu API trả về document mới, thêm vào danh sách
+        if (addedDoc && addedDoc._id) {
+          setFavoriteDocuments([...favoriteDocuments, addedDoc]);
+        } else {
+          // Nếu không trả về, fetch lại toàn bộ (fallback)
+          // Không khuyến khích, nhưng để tránh lỗi
+          // setFavoriteDocuments(await UserService.getListFavorites().documents || []);
+        }
       }
-
       const newFavoritedState = !isFavorited;
       setIsFavorited(newFavoritedState);
       onToggle?.(newFavoritedState);

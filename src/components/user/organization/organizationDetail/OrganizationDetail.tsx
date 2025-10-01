@@ -129,7 +129,7 @@ const OrganizationDetail: React.FC = () => {
   // Optimized handlers
   const handleSubjectClick = useCallback(
     (subject: Subject) => {
-      navigate(`/subject/${subject._id}`);
+      navigate(`/subject/${subject._id}/documents`);
     },
     [navigate]
   );

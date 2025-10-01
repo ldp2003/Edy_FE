@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
+import { UserContext } from "../../../contexts/UserContext";
 import { Tooltip } from "antd";
 import { Heart } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import type { Document } from "../../../models/document";
-import { UserService } from "../../../utils/UserService";
 
 interface FavoriteCardProps {
   document: Document;
@@ -13,23 +13,13 @@ interface FavoriteCardProps {
 
 const FavoriteCard: React.FC<FavoriteCardProps> = ({ document, onRemove }) => {
   const navigate = useNavigate();
+  const { favoriteDocuments } = useContext(UserContext);
   const [isFavorite, setIsFavorite] = useState(false);
 
-  // Check if document is in favorites
+  // Sync with context
   useEffect(() => {
-    const checkFavoriteStatus = async () => {
-      try {
-        const favoritesResponse = await UserService.getListFavorites();
-        const favoriteIds =
-          favoritesResponse.documents?.map((doc: Document) => doc._id) || [];
-        setIsFavorite(favoriteIds.includes(document._id));
-      } catch (error) {
-        console.error("Failed to fetch favorites:", error);
-      }
-    };
-
-    checkFavoriteStatus();
-  }, [document._id]);
+    setIsFavorite(favoriteDocuments.some((doc) => doc._id === document._id));
+  }, [favoriteDocuments, document._id]);
 
   const handleCardClick = () => {
     navigate(`/document-detail/${document._id}`);
@@ -38,19 +28,9 @@ const FavoriteCard: React.FC<FavoriteCardProps> = ({ document, onRemove }) => {
   const handleHeartClick = async (e: React.MouseEvent) => {
     e.stopPropagation();
 
-    try {
-      if (isFavorite) {
-        await UserService.removeFromFavorites(document._id);
-        setIsFavorite(false);
-        if (onRemove) {
-          onRemove(document._id);
-        }
-      } else {
-        await UserService.addToFavorites(document._id);
-        setIsFavorite(true);
-      }
-    } catch (error) {
-      console.error("Failed to toggle favorite:", error);
+    // Chỉ gọi callback từ parent component để xử lý
+    if (onRemove) {
+      onRemove(document._id);
     }
   };
 

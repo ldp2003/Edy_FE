@@ -1,4 +1,5 @@
 import { SubjectAPI } from "../api/API";
+import { storeSubjectMapping } from "./SlugUtils";
 import type {
   Subject,
   CreateSubjectData,
@@ -16,7 +17,14 @@ const SubjectService = {
       const response = await SubjectAPI.getSubjectsByOrganization(
         organizationId
       );
-      return response || [];
+      const subjects = response || [];
+
+      // Store slug mappings for all subjects
+      subjects.forEach((subject: Subject) => {
+        storeSubjectMapping(subject.name, subject._id);
+      });
+
+      return subjects;
     } catch (error) {
       console.error(
         "Error in SubjectService.getSubjectsByOrganization:",
@@ -97,6 +105,7 @@ const SubjectService = {
   async getDocumentsBySubject(subjectId: string): Promise<unknown> {
     try {
       const response = await SubjectAPI.getDocumentsBySubject(subjectId);
+      console.log("SubjectService.getDocumentsBySubject response:", response);
       return response;
     } catch (error) {
       console.error("Error in SubjectService.getDocumentsBySubject:", error);
