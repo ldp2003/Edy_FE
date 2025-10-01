@@ -2,6 +2,11 @@ import React from "react";
 import { Empty, Pagination } from "antd";
 import DocumentCard from "../../document/documentCard/DocumentCard";
 import type { Document } from "../../../../models/document";
+import {
+  getDocumentTypeFromFileName,
+  documentTypeLabels,
+  DocumentType,
+} from "../../../../models/document";
 
 interface DocumentSectionProps {
   title: string;
@@ -93,17 +98,25 @@ const DocumentSection: React.FC<DocumentSectionProps> = ({
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mb-6">
-        {displayDocuments.map((doc) => (
-          <DocumentCard
-            key={doc._id}
-            title={doc.title}
-            description={`${doc.user?.first_name} ${doc.user?.last_name} • ${
-              doc.published_year || new Date(doc.createdAt).getFullYear()
-            }`}
-            imageUrl={doc.cover_page}
-            document={doc}
-          />
-        ))}
+        {displayDocuments.map((doc) => {
+          // Use doc_type from API or determine from filename as fallback
+          const docType =
+            doc.doc_type || getDocumentTypeFromFileName(doc.title);
+          const typeLabel =
+            documentTypeLabels[docType as keyof typeof DocumentType] || docType;
+
+          return (
+            <DocumentCard
+              key={doc._id}
+              title={doc.title}
+              description={`${doc.user?.first_name} ${doc.user?.last_name} • ${
+                doc.published_year || new Date(doc.createdAt).getFullYear()
+              } • ${typeLabel}`}
+              imageUrl={doc.cover_page}
+              document={doc}
+            />
+          );
+        })}
       </div>
 
       {showPagination && totalPages > 1 && onPageChange && (

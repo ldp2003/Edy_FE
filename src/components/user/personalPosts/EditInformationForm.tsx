@@ -15,6 +15,7 @@ import { useNavigate } from "react-router-dom";
 
 import { UserContext } from "../../../contexts/UserContext";
 import SubjectService from "../../../utils/SubjectService";
+import { DocumentService } from "../../../utils/DocumentService";
 import { uploadImageToCloudinary } from "../../../utils/CloudinaryService";
 import type { Subject } from "../../../models/subject";
 import type { Document } from "../../../models/document";
@@ -93,17 +94,18 @@ const EditInformationForm = ({
   // Ensure form is updated when both document and subjects are available
   useEffect(() => {
     if (document && subjects.length > 0 && !subjectsLoading) {
-      const subjectId = typeof document.subject === "object" 
-        ? document.subject._id 
-        : document.subject;
-      
+      const subjectId =
+        typeof document.subject === "object"
+          ? document.subject._id
+          : document.subject;
+
       // Check if the subject exists in the loaded subjects
-      const subjectExists = subjects.find(s => s._id === subjectId);
+      const subjectExists = subjects.find((s) => s._id === subjectId);
       console.log("Subject exists in list:", subjectExists);
-      
+
       if (subjectExists) {
         // Force update the subject field specifically
-        form.setFieldValue('subject', subjectId);
+        form.setFieldValue("subject", subjectId);
         console.log("Force set subject field to:", subjectId);
       }
     }
@@ -114,13 +116,14 @@ const EditInformationForm = ({
     if (document && subjects.length > 0) {
       console.log("Setting form values with document:", document);
       console.log("Available subjects:", subjects);
-      
-      const subjectId = typeof document.subject === "object" 
-        ? document.subject._id 
-        : document.subject;
-      
+
+      const subjectId =
+        typeof document.subject === "object"
+          ? document.subject._id
+          : document.subject;
+
       console.log("Document subject ID:", subjectId);
-      
+
       const formValues: Partial<FormData> = {
         documentName: document.title,
         subject: subjectId,
@@ -128,7 +131,7 @@ const EditInformationForm = ({
           typeof document.organization === "object"
             ? document.organization._id
             : document.organization,
-        documentType: document.doc_type || "OTHER",
+        documentType: document.doc_type ? String(document.doc_type) : "OTHER",
         pageCount: document.page,
         level: document.level,
         keywords: document.keyword ? document.keyword.join(", ") : "",
@@ -256,10 +259,11 @@ const EditInformationForm = ({
 
       console.log("Document update data:", updateData);
 
-      // TODO: Add actual update document API endpoint
-      // For now, we'll simulate the update
-      console.log("Would update document with:", updateData);
-      const response = { success: true };
+      // Call the actual update document API
+      const response = await DocumentService.updateDocument(
+        document._id,
+        updateData
+      );
 
       if (response) {
         const showMessage = messageApi || message;
@@ -431,7 +435,7 @@ const EditInformationForm = ({
                     style={{ flex: 1 }}
                     onChange={(value) => {
                       console.log("Subject selected:", value);
-                      form.setFieldValue('subject', value);
+                      form.setFieldValue("subject", value);
                     }}
                     loading={subjectsLoading}
                   >

@@ -38,7 +38,7 @@ const UserRoute: React.FC = () => {
           <Route path="organizations" element={<OrganizationListPage />} />
           <Route path="organization/:id" element={<OrganizationDetailPage />} />
           <Route
-            path="subject/:subjectSlug/documents"
+            path="subject/:subjectId/documents"
             element={<SubjectDocumentPage />}
           />
 

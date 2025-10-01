@@ -1,10 +1,6 @@
 import React from "react";
 import { School, FolderOpen } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import {
-  createSubjectSlug,
-  storeSubjectMapping,
-} from "../../../utils/SlugUtils";
 import type { Subject } from "../../../models/subject";
 
 interface SubjectItemProps {
@@ -16,11 +12,8 @@ const SubjectItem: React.FC<SubjectItemProps> = ({ subject, onClick }) => {
   const navigate = useNavigate();
 
   const handleClick = () => {
-    // Create slug and navigate to subject documents page
-    const slug = createSubjectSlug(subject.name);
-    // Store mapping for later retrieval
-    storeSubjectMapping(subject.name, subject._id);
-    navigate(`/subject/${slug}/documents`);
+    // Always navigate to subject documents page
+    navigate(`/subject/${subject._id}/documents`);
 
     // Also call the onClick if provided for any additional handling
     if (onClick) {

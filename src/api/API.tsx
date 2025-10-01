@@ -603,6 +603,34 @@ export const DocumentAPI = {
     }
   },
 
+  // Update document information
+  updateDocument: async (
+    documentId: string,
+    updateData: {
+      title?: string;
+      doc_type?: string;
+      author?: string[];
+      published_year?: number;
+      publisher?: string;
+      level?: string;
+      intensive?: boolean;
+      keyword?: string[];
+      description?: string;
+      page?: number;
+    }
+  ) => {
+    try {
+      const response = await apiClient.put(
+        `/documents/${documentId}/update`,
+        updateData
+      );
+      return response.data;
+    } catch (error) {
+      console.error("Error updating document:", error);
+      throw error;
+    }
+  },
+
   updatePublicMode: async (
     documentId: string,
     public_mode: "PUBLIC" | "PRIVATE" | "PRIVATE_SHARED" | "SHARE_ORGANIZATION"

@@ -1,5 +1,5 @@
 import { SubjectAPI } from "../api/API";
-import { storeSubjectMapping, getSubjectIdFromSlug } from "./SlugUtils";
+import { storeSubjectMapping } from "./SlugUtils";
 import type {
   Subject,
   CreateSubjectData,
@@ -105,34 +105,10 @@ const SubjectService = {
   async getDocumentsBySubject(subjectId: string): Promise<unknown> {
     try {
       const response = await SubjectAPI.getDocumentsBySubject(subjectId);
+      console.log("SubjectService.getDocumentsBySubject response:", response);
       return response;
     } catch (error) {
       console.error("Error in SubjectService.getDocumentsBySubject:", error);
-      throw error;
-    }
-  },
-
-  /**
-   * Get subject by slug
-   * @param slug - URL slug của môn học
-   * @returns Promise<Subject | null>
-   */
-  async getSubjectBySlug(slug: string): Promise<Subject | null> {
-    try {
-      // Try to get ID from slug mapping
-      const subjectId = getSubjectIdFromSlug(slug);
-
-      if (subjectId) {
-        // If we have the ID, fetch the subject directly
-        const subject = await this.getSubjectById(subjectId);
-        return subject;
-      }
-
-      // If not found in mapping, we need to search through subjects
-      // This is a fallback - in practice, you might want to call an API that supports search by name
-      return null;
-    } catch (error) {
-      console.error("Error in SubjectService.getSubjectBySlug:", error);
       throw error;
     }
   },

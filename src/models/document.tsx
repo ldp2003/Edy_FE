@@ -72,8 +72,6 @@ export const DocumentType = {
   OTHER: "OTHER",
 } as const;
 
-export type DocumentTypeType = (typeof DocumentType)[keyof typeof DocumentType];
-
 export interface Document {
   _id: string;
   user: User;
@@ -98,7 +96,7 @@ export interface Document {
   file_type: FileTypeType;
   keyword?: string[];
   title: string;
-  doc_type?: DocumentTypeType;
+  doc_type?: string;
   view: number;
   comment_count: number;
   download_count: number;
@@ -151,9 +149,9 @@ export interface UploadDocumentData {
   description?: string;
   page?: number;
 }
-  
+
 // Document type labels in Vietnamese
-export const documentTypeLabels: Record<DocumentTypeType, string> = {
+export const documentTypeLabels: Record<keyof typeof DocumentType, string> = {
   RESEARCH_REPORT: "Báo cáo nghiên cứu",
   VIDEO: "Video bài giảng",
   STUDY_GUIDE: "Đề cương học tập",
@@ -172,7 +170,7 @@ export const documentTypeLabels: Record<DocumentTypeType, string> = {
  */
 export const getDocumentTypeFromFileName = (
   fileName: string
-): DocumentTypeType => {
+): keyof typeof DocumentType => {
   const name = fileName.toLowerCase();
 
   if (name.includes("báo cáo") || name.includes("report"))

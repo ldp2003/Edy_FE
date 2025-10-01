@@ -2,11 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { Spin } from "antd";
 import type { Subject } from "../../../models/subject";
-import type {
-  Document,
-  DocumentTypeType,
-  FetchDocumentsParams,
-} from "../../../models/document";
+import type { Document } from "../../../models/document";
 import {
   documentTypeLabels,
   getDocumentTypeFromFileName,
@@ -15,12 +11,10 @@ import SubjectService from "../../../utils/SubjectService";
 import SubjectHeader from "./components/SubjectHeader";
 import DocumentFilter from "./components/DocumentFilter";
 import DocumentSection from "./components/DocumentSection";
-import { DocumentService } from "../../../utils/DocumentService";
 
 const SubjectDocuments: React.FC = () => {
-  const { subjectSlug } = useParams<{ subjectSlug: string }>();
+  const { subjectId } = useParams<{ subjectId: string }>();
   const [subject, setSubject] = useState<Subject | null>(null);
-  const [subjectId, setSubjectId] = useState<string | null>(null);
   const [documents, setDocuments] = useState<Document[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
@@ -31,16 +25,15 @@ const SubjectDocuments: React.FC = () => {
   const [totalPages, setTotalPages] = useState(0);
   const pageSize = 12;
 
-  // Fetch subject information by slug
+  // Fetch subject information by ID
   useEffect(() => {
     const fetchSubject = async () => {
-      if (!subjectSlug) return;
+      if (!subjectId) return;
 
       try {
-        const subjectData = await SubjectService.getSubjectBySlug(subjectSlug);
+        const subjectData = await SubjectService.getSubjectById(subjectId);
         if (subjectData) {
           setSubject(subjectData);
-          setSubjectId(subjectData._id);
         }
       } catch (error) {
         console.error("Error fetching subject:", error);
@@ -48,7 +41,7 @@ const SubjectDocuments: React.FC = () => {
     };
 
     fetchSubject();
-  }, [subjectSlug]);
+  }, [subjectId]);
 
   // Fetch documents
   useEffect(() => {
@@ -57,46 +50,73 @@ const SubjectDocuments: React.FC = () => {
 
       setLoading(true);
       try {
-        const params: FetchDocumentsParams = {
-          subject: subjectId,
-          page: currentPage,
-          limit: pageSize,
-        };
+        const response = await SubjectService.getDocumentsBySubject(subjectId);
+        console.log("Documents response:", response);
 
-        // Add search term if exists
+        // Assuming response structure matches DocumentsResponse or is an array
+        const documents: Document[] = Array.isArray(response)
+          ? response
+          : (response as { documents?: Document[] })?.documents || [];
+
+        // Apply client-side filtering and sorting since we're using getDocumentsBySubject
+        let filteredDocs = [...documents];
+
+        // Apply search filter
         if (searchTerm.trim()) {
-          params.search = searchTerm.trim();
+          const searchLower = searchTerm.toLowerCase();
+          filteredDocs = filteredDocs.filter(
+            (doc) =>
+              doc.title.toLowerCase().includes(searchLower) ||
+              doc.author?.some((author: string) =>
+                author.toLowerCase().includes(searchLower)
+              ) ||
+              doc.description?.summary_by_user
+                ?.toLowerCase()
+                .includes(searchLower)
+          );
         }
 
-        // Add sorting
+        // Apply level filter
+        if (filterLevel !== "all") {
+          filteredDocs = filteredDocs.filter(
+            (doc) => doc.level === filterLevel
+          );
+        }
+
+        // Apply sorting
         switch (sortBy) {
           case "newest":
-            params.ordering = "createdAt";
-            params.order = -1;
+            filteredDocs.sort(
+              (a, b) =>
+                new Date(b.createdAt).getTime() -
+                new Date(a.createdAt).getTime()
+            );
             break;
           case "oldest":
-            params.ordering = "createdAt";
-            params.order = 1;
+            filteredDocs.sort(
+              (a, b) =>
+                new Date(a.createdAt).getTime() -
+                new Date(b.createdAt).getTime()
+            );
             break;
           case "title":
-            params.ordering = "title";
-            params.order = 1;
+            filteredDocs.sort((a, b) => a.title.localeCompare(b.title));
             break;
           case "download":
-            params.ordering = "download_count";
-            params.order = -1;
+            filteredDocs.sort(
+              (a, b) => (b.download_count || 0) - (a.download_count || 0)
+            );
             break;
         }
 
-        // Add level filter
-        if (filterLevel !== "all") {
-          params.level = filterLevel;
-        }
+        // Apply pagination
+        const startIndex = (currentPage - 1) * pageSize;
+        const endIndex = startIndex + pageSize;
+        const paginatedDocs = filteredDocs.slice(startIndex, endIndex);
 
-        const response = await DocumentService.fetchNewestDocuments(params);
-        setDocuments(response.documents || []);
-        setTotalDocuments(response.total || 0);
-        setTotalPages(response.totalPages || 0);
+        setDocuments(paginatedDocs);
+        setTotalDocuments(filteredDocs.length);
+        setTotalPages(Math.ceil(filteredDocs.length / pageSize));
       } catch (error) {
         console.error("Error fetching documents:", error);
         setDocuments([]);
@@ -137,15 +157,25 @@ const SubjectDocuments: React.FC = () => {
 
   // Group by document type - use smart categorization from filename if doc_type is missing
   const documentsByType: Record<string, Document[]> = {};
-  documents.forEach((doc) => {
+  console.log("Total documents:", documents.length);
+  documents.forEach((doc, index) => {
     // Use existing doc_type or determine from filename
     const docType = doc.doc_type || getDocumentTypeFromFileName(doc.title);
+
+    console.log(`Document ${index + 1}:`, {
+      title: doc.title,
+      doc_type: doc.doc_type,
+      determined_type: docType,
+      raw_document: doc, // Log toàn bộ document để debug
+    });
 
     if (!documentsByType[docType]) {
       documentsByType[docType] = [];
     }
     documentsByType[docType].push(doc);
   });
+
+  console.log("Documents by type:", documentsByType);
 
   if (!subject) {
     return (
@@ -194,23 +224,28 @@ const SubjectDocuments: React.FC = () => {
           />
         )}
 
-        {/* Các loại tài liệu theo doc_type */}
-        {Object.entries(documentsByType).map(([type, docs]) => {
-          if (!docs || docs.length === 0) return null;
+        {/* Các loại tài liệu theo doc_type - Sắp xếp theo số lượng giảm dần */}
+        {Object.entries(documentsByType)
+          .sort(([, docsA], [, docsB]) => docsB.length - docsA.length) // Sắp xếp theo số lượng tài liệu giảm dần
+          .map(([type, docs]) => {
+            if (!docs || docs.length === 0) return null;
 
-          const title = documentTypeLabels[type as DocumentTypeType] || type;
+            const title =
+              documentTypeLabels[type as keyof typeof documentTypeLabels] ||
+              type;
 
-          return (
-            <DocumentSection
-              key={type}
-              title={`${title}`}
-              documents={docs}
-              loading={loading}
-              maxDisplay={4}
-              canExpand={true}
-            />
-          );
-        })}
+            return (
+              <DocumentSection
+                key={type}
+                title={`${title} (${docs.length})`}
+                documents={docs}
+                loading={loading}
+                maxDisplay={docs.length >= 6 ? 6 : 4} // Hiển thị nhiều hơn nếu có nhiều tài liệu
+                canExpand={docs.length > 4}
+              />
+            );
+          })
+          .filter(Boolean)}
 
         {/* Tất cả tài liệu (khi có tìm kiếm hoặc filter) */}
         {(searchTerm || filterLevel !== "all") && (
