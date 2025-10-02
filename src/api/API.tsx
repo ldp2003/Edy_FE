@@ -545,7 +545,9 @@ export const DocumentAPI = {
 
   accessShareLink: async (linkId: string) => {
     try {
-      const response = await apiClient.post(`/documents/share/${linkId}/access`);
+      const response = await apiClient.post(
+        `/documents/share/${linkId}/access`
+      );
       return response.data;
     } catch (error) {
       console.error("Error accessing share link:", error);
@@ -653,6 +655,119 @@ export const DocumentAPI = {
       return response.data;
     } catch (error) {
       console.error("Error updating document public mode:", error);
+      throw error;
+    }
+  },
+};
+export const AccessRequestAPI = {
+  // Create access request for private share
+  createAccessRequest: async (
+    privateShareId: string,
+    data?: { content?: string }
+  ) => {
+    try {
+      const response = await apiClient.post(
+        `/access-requests/private-share/${privateShareId}`,
+        data || {}
+      );
+      return response.data;
+    } catch (error) {
+      console.error("Error creating access request:", error);
+      throw error;
+    }
+  },
+
+  // Get access requests by private share (owner only)
+  getAccessRequestsByPrivateShare: async (
+    privateShareId: string,
+    params?: {
+      status?: string;
+      page?: number;
+      limit?: number;
+      ordering?: string;
+      order?: 1 | -1;
+    }
+  ) => {
+    try {
+      const queryParams = new URLSearchParams();
+      if (params?.status) queryParams.append("status", params.status);
+      if (params?.page) queryParams.append("page", params.page.toString());
+      if (params?.limit) queryParams.append("limit", params.limit.toString());
+      if (params?.ordering) queryParams.append("ordering", params.ordering);
+      if (params?.order) queryParams.append("order", params.order.toString());
+
+      const response = await apiClient.get(
+        `/access-requests/private-share/${privateShareId}/list?${queryParams}`
+      );
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching access requests by private share:", error);
+      throw error;
+    }
+  },
+
+  // Approve access request
+  approveAccessRequest: async (requestId: string) => {
+    try {
+      const response = await apiClient.put(
+        `/access-requests/${requestId}/approve`
+      );
+      return response.data;
+    } catch (error) {
+      console.error("Error approving access request:", error);
+      throw error;
+    }
+  },
+
+  // Deny access request
+  denyAccessRequest: async (requestId: string, data?: { reason?: string }) => {
+    try {
+      const response = await apiClient.put(
+        `/access-requests/${requestId}/deny`,
+        data || {}
+      );
+      return response.data;
+    } catch (error) {
+      console.error("Error denying access request:", error);
+      throw error;
+    }
+  },
+
+  // Get my access requests
+  getMyAccessRequests: async (params?: {
+    status?: string;
+    page?: number;
+    limit?: number;
+    ordering?: string;
+    order?: 1 | -1;
+  }) => {
+    try {
+      const queryParams = new URLSearchParams();
+      if (params?.status) queryParams.append("status", params.status);
+      if (params?.page) queryParams.append("page", params.page.toString());
+      if (params?.limit) queryParams.append("limit", params.limit.toString());
+      if (params?.ordering) queryParams.append("ordering", params.ordering);
+      if (params?.order) queryParams.append("order", params.order.toString());
+
+      const response = await apiClient.get(
+        `/access-requests/my-requests?${queryParams}`
+      );
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching my access requests:", error);
+      throw error;
+    }
+  },
+
+  // Cancel access request
+  cancelAccessRequest: async (requestId: string) => {
+    try {
+      const response = await apiClient.delete(
+        `/access-requests/${requestId}/cancel`
+      );
+      return response.data;
+    } catch (error) {
+      console.error("Error canceling access request:", error);
       throw error;
     }
   },

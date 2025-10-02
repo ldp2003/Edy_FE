@@ -1,37 +1,17 @@
-import {
-  Forward,
-  Copy,
-  Check,
-  Plus,
-  Users,
-  Clock,
-  Lock,
-  Ban,
-  Eye,
-  Settings,
-} from "lucide-react";
+import { Forward, Copy, Check, Plus, Settings, UserCheck } from "lucide-react";
 import React, { useState, useEffect, useCallback } from "react";
-import {
-  Modal,
-  message,
-  Tabs,
-  Input,
-  Select,
-  Button,
-  Table,
-  Tag,
-  Tooltip,
-  Checkbox,
-  DatePicker,
-} from "antd";
-import { DocumentAPI } from "../../../api/API";
+import { Modal, message, Tabs, Button, Tag } from "antd";
 import dayjs from "dayjs";
+import { DocumentService } from "../../../utils/DocumentService";
+import AccessRequestService from "../../../utils/AccessRequestService";
+import type { AccessRequest } from "../../../models/accessRequest";
+import ShareLinksTable from "./ShareLinksTable";
+import ShareLinkCreateForm from "./ShareLinkCreateForm";
+import AccessRequestsPanel from "./AccessRequestsPanel";
 
-const { Option } = Select;
 const { TabPane } = Tabs;
-const { RangePicker } = DatePicker;
 
-interface ShareLinkData {
+export interface ShareLinkData {
   _id: string;
   name: string;
   limited_access: number;
@@ -92,6 +72,11 @@ const ShareModal: React.FC<ShareModalProps> = ({
   // Share links data
   const [shareLinks, setShareLinks] = useState<ShareLinkData[]>([]);
 
+  // Access requests data
+  const [accessRequests, setAccessRequests] = useState<AccessRequest[]>([]);
+  const [selectedLinkId, setSelectedLinkId] = useState<string | null>(null);
+  const [pendingRequestsCount, setPendingRequestsCount] = useState(0);
+
   // Determine if can share
   const canShare =
     isPublic ||
@@ -103,8 +88,30 @@ const ShareModal: React.FC<ShareModalProps> = ({
   const fetchShareLinks = useCallback(async () => {
     try {
       setLoading(true);
-      const response = await DocumentAPI.getShareLinks(documentId);
-      setShareLinks(response.data || []);
+      const response = await DocumentService.getShareLinks(documentId);
+      const links = response.data || [];
+      setShareLinks(links);
+
+      // Count total pending requests across all links that require approval
+      let totalPending = 0;
+      for (const link of links.filter(
+        (l: ShareLinkData) => l.request && l.status === "ACTIVE"
+      )) {
+        try {
+          const requestsResponse =
+            await AccessRequestService.getAccessRequestsByPrivateShare(
+              link._id,
+              {
+                status: "PENDING",
+                limit: 1000, // Get all pending requests for counting
+              }
+            );
+          totalPending += requestsResponse.accessRequests?.length || 0;
+        } catch {
+          // Ignore errors when counting requests
+        }
+      }
+      setPendingRequestsCount(totalPending);
     } catch (error: unknown) {
       let errorMessage = "Không thể tải danh sách link chia sẻ!";
 
@@ -172,7 +179,7 @@ const ShareModal: React.FC<ShareModalProps> = ({
         end_date: timeLimited ? dateRange[1]!.toISOString() : undefined,
       };
 
-      await DocumentAPI.createShareLink(documentId, createData);
+      await DocumentService.createShareLink(documentId, createData);
 
       messageApi.success("Tạo link chia sẻ thành công!");
 
@@ -219,6 +226,80 @@ const ShareModal: React.FC<ShareModalProps> = ({
     }
   };
 
+  const fetchAccessRequests = useCallback(
+    async (linkId: string) => {
+      if (!linkId) return;
+
+      try {
+        setLoading(true);
+        const response =
+          await AccessRequestService.getAccessRequestsByPrivateShare(linkId);
+        setAccessRequests(response.accessRequests || []);
+      } catch (error: unknown) {
+        let errorMessage = "Không thể tải danh sách yêu cầu truy cập!";
+        if (error && typeof error === "object" && "response" in error) {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const apiError = error as any;
+          if (apiError.response?.data?.message) {
+            errorMessage = apiError.response.data.message;
+          }
+        }
+        messageApi.error(errorMessage);
+      } finally {
+        setLoading(false);
+      }
+    },
+    [messageApi]
+  );
+
+  const handleApproveRequest = async (requestId: string) => {
+    try {
+      setLoading(true);
+      await AccessRequestService.approveAccessRequest(requestId);
+      messageApi.success("Đã phê duyệt yêu cầu truy cập!");
+
+      // Refresh both requests and share links (to update counts)
+      if (selectedLinkId) {
+        await fetchAccessRequests(selectedLinkId);
+      }
+      await fetchShareLinks();
+    } catch (error: unknown) {
+      const errorMessage =
+        error && typeof error === "object" && "response" in error
+          ? // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            (error as any).response?.data?.message ||
+            "Không thể phê duyệt yêu cầu!"
+          : "Không thể phê duyệt yêu cầu!";
+      messageApi.error(errorMessage);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDenyRequest = async (requestId: string, reason?: string) => {
+    try {
+      setLoading(true);
+      await AccessRequestService.denyAccessRequest(requestId, { reason });
+      messageApi.success("Đã từ chối yêu cầu truy cập!");
+
+      // Refresh both requests and share links (to update counts)
+      if (selectedLinkId) {
+        await fetchAccessRequests(selectedLinkId);
+      }
+      await fetchShareLinks();
+    } catch (error: unknown) {
+      const errorMessage =
+        error && typeof error === "object" && "response" in error
+          ? // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            (error as any).response?.data?.message ||
+            "Không thể từ chối yêu cầu!"
+          : "Không thể từ chối yêu cầu!";
+      messageApi.error(errorMessage);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleUpdateStatus = async (
     linkId: string,
     newStatus: "ACTIVE" | "INACTIVE" | "DISABLED"
@@ -226,7 +307,7 @@ const ShareModal: React.FC<ShareModalProps> = ({
     try {
       setLoading(true);
 
-      await DocumentAPI.updateShareLinkStatus(linkId, newStatus);
+      await DocumentService.updateShareLinkStatus(linkId, newStatus);
 
       // Update local state
       setShareLinks(
@@ -242,6 +323,9 @@ const ShareModal: React.FC<ShareModalProps> = ({
       }[newStatus];
 
       messageApi.success(`Đã ${statusText} link chia sẻ thành công!`);
+
+      // Refresh pending count
+      await fetchShareLinks();
     } catch (error: unknown) {
       const errorMessage =
         error && typeof error === "object" && "response" in error
@@ -255,171 +339,17 @@ const ShareModal: React.FC<ShareModalProps> = ({
     }
   };
 
-  const formatDate = (dateStr: string): string => {
-    return dayjs(dateStr).format("DD/MM/YYYY HH:mm");
-  };
-
-  const getStatusColor = (status: string): string => {
-    switch (status) {
-      case "ACTIVE":
-        return "green";
-      case "INACTIVE":
-        return "orange";
-      case "DISABLED":
-        return "red";
-      default:
-        return "default";
-    }
-  };
-
-  const getStatusText = (status: string): string => {
-    switch (status) {
-      case "ACTIVE":
-        return "Hoạt động";
-      case "INACTIVE":
-        return "Đã khóa";
-      case "DISABLED":
-        return "Vô hiệu hóa";
-      default:
-        return status;
-    }
-  };
-
   const handleModalClose = () => {
     onClose();
     setCopied(false);
     setActiveTab("create");
+    setSelectedLinkId(null);
+    setAccessRequests([]);
   };
 
   if (!canShare) {
     return null;
   }
-
-  // Columns for share links table
-  const columns = [
-    {
-      title: "Tên Link",
-      dataIndex: "name",
-      key: "name",
-      render: (text: string, record: ShareLinkData) => (
-        <div>
-          <span className="font-medium">{text}</span>
-          {record.request && (
-            <Tag color="blue" className="ml-2" style={{ fontSize: "12px" }}>
-              Yêu cầu duyệt
-            </Tag>
-          )}
-        </div>
-      ),
-    },
-    {
-      title: "Người dùng",
-      key: "users",
-      render: (record: ShareLinkData) => (
-        <span className="text-sm">
-          {record.access_count}/
-          {record.limited_access === 999999 ? "∞" : record.limited_access}
-        </span>
-      ),
-    },
-    {
-      title: "Thời gian",
-      key: "time",
-      render: (record: ShareLinkData) => (
-        <div className="text-xs text-gray-600">
-          {record.time_limited ? (
-            <>
-              <div>Từ: {formatDate(record.start_date)}</div>
-              <div>Đến: {formatDate(record.end_date)}</div>
-            </>
-          ) : (
-            <span className="text-green-600">Không giới hạn</span>
-          )}
-        </div>
-      ),
-    },
-    {
-      title: "Trạng thái",
-      dataIndex: "status",
-      key: "status",
-      render: (status: string) => (
-        <Tag color={getStatusColor(status)}>{getStatusText(status)}</Tag>
-      ),
-    },
-    {
-      title: "Thao tác",
-      key: "actions",
-      render: (record: ShareLinkData) => (
-        <div className="flex items-center space-x-2">
-          {record.status === "ACTIVE" && (
-            <>
-              <Tooltip title="Sao chép link">
-                <Button
-                  size="small"
-                  icon={<Copy size={12} />}
-                  onClick={() => handleCopyLink(record.access_url)}
-                />
-              </Tooltip>
-              <Tooltip title="Khóa link">
-                <Button
-                  size="small"
-                  icon={<Lock size={12} />}
-                  onClick={() => handleUpdateStatus(record._id, "INACTIVE")}
-                  className="text-orange-600 hover:text-orange-700"
-                  loading={loading}
-                />
-              </Tooltip>
-              <Tooltip title="Vô hiệu hóa">
-                <Button
-                  size="small"
-                  icon={<Ban size={12} />}
-                  onClick={() => handleUpdateStatus(record._id, "DISABLED")}
-                  className="text-red-600 hover:text-red-700"
-                  loading={loading}
-                />
-              </Tooltip>
-            </>
-          )}
-
-          {record.status === "INACTIVE" && (
-            <>
-              <Tooltip title="Sao chép link">
-                <Button
-                  size="small"
-                  icon={<Copy size={12} />}
-                  onClick={() => handleCopyLink(record.access_url)}
-                />
-              </Tooltip>
-              <Tooltip title="Kích hoạt lại">
-                <Button
-                  size="small"
-                  icon={<Eye size={12} />}
-                  onClick={() => handleUpdateStatus(record._id, "ACTIVE")}
-                  className="text-green-600 hover:text-green-700"
-                  loading={loading}
-                />
-              </Tooltip>
-              <Tooltip title="Vô hiệu hóa">
-                <Button
-                  size="small"
-                  icon={<Ban size={12} />}
-                  onClick={() => handleUpdateStatus(record._id, "DISABLED")}
-                  className="text-red-600 hover:text-red-700"
-                  loading={loading}
-                />
-              </Tooltip>
-            </>
-          )}
-
-          {record.status === "DISABLED" && (
-            <Tooltip title="Không thể khôi phục">
-              <span className="text-xs text-gray-400">Đã vô hiệu hóa</span>
-            </Tooltip>
-          )}
-        </div>
-      ),
-    },
-  ];
 
   return (
     <>
@@ -517,120 +447,20 @@ const ShareModal: React.FC<ShareModalProps> = ({
                 }
                 key="create"
               >
-                <div className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Tên link chia sẻ *
-                    </label>
-                    <Input
-                      placeholder="Nhập tên cho link chia sẻ (vd: Link cho nhóm A)"
-                      value={linkName}
-                      onChange={(e) => setLinkName(e.target.value)}
-                      className="w-full"
-                    />
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        <Users size={16} className="inline mr-1" />
-                        Giới hạn người dùng
-                      </label>
-                      <Select
-                        value={maxUsers}
-                        onChange={setMaxUsers}
-                        className="w-full"
-                      >
-                        <Option value={-1}>Không giới hạn</Option>
-                        <Option value={1}>1 người</Option>
-                        <Option value={5}>5 người</Option>
-                        <Option value={10}>10 người</Option>
-                        <Option value={20}>20 người</Option>
-                        <Option value={50}>50 người</Option>
-                        <Option value={100}>100 người</Option>
-                      </Select>
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        <Clock size={16} className="inline mr-1" />
-                        Giới hạn thời gian
-                      </label>
-                      <Checkbox
-                        checked={timeLimited}
-                        onChange={(e) => setTimeLimited(e.target.checked)}
-                      >
-                        Có giới hạn thời gian
-                      </Checkbox>
-                    </div>
-                  </div>
-
-                  {timeLimited && (
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Thời gian hiệu lực
-                      </label>
-                      <RangePicker
-                        showTime
-                        value={dateRange}
-                        onChange={(dates) =>
-                          setDateRange(dates || [null, null])
-                        }
-                        className="w-full"
-                        placeholder={[
-                          "Thời gian bắt đầu",
-                          "Thời gian kết thúc",
-                        ]}
-                      />
-                    </div>
-                  )}
-
-                  <div>
-                    <Checkbox
-                      checked={requiresRequest}
-                      onChange={(e) => setRequiresRequest(e.target.checked)}
-                    >
-                      <span className="text-sm font-medium">
-                        Yêu cầu phê duyệt trước khi truy cập
-                      </span>
-                    </Checkbox>
-                    {requiresRequest && (
-                      <div className="mt-2 text-xs text-blue-600 bg-blue-50 p-2 rounded">
-                        💡 Người dùng sẽ phải gửi yêu cầu và được bạn phê duyệt
-                        trước khi có thể truy cập tài liệu
-                      </div>
-                    )}
-                  </div>
-
-                  <div className="bg-blue-50 p-3 rounded-lg text-sm text-blue-800">
-                    <p className="mb-2">
-                      <strong>Lưu ý:</strong>
-                    </p>
-                    <ul className="list-disc list-inside space-y-1">
-                      <li>
-                        Link sẽ tự động hết hạn sau thời gian đã chọn (nếu có)
-                      </li>
-                      <li>
-                        Chỉ số lượng người dùng được phép mới có thể truy cập
-                      </li>
-                      <li>
-                        Bạn có thể quản lý và thu hồi quyền truy cập bất cứ lúc
-                        nào
-                      </li>
-                    </ul>
-                  </div>
-
-                  <Button
-                    type="primary"
-                    icon={<Plus size={16} />}
-                    onClick={handleCreateLink}
-                    className="w-full"
-                    disabled={!linkName.trim()}
-                    loading={loading}
-                  >
-                    Tạo Link Chia Sẻ
-                  </Button>
-                </div>
+                <ShareLinkCreateForm
+                  linkName={linkName}
+                  maxUsers={maxUsers}
+                  requiresRequest={requiresRequest}
+                  timeLimited={timeLimited}
+                  dateRange={dateRange}
+                  loading={loading}
+                  onLinkNameChange={setLinkName}
+                  onMaxUsersChange={setMaxUsers}
+                  onRequiresRequestChange={setRequiresRequest}
+                  onTimeLimitedChange={setTimeLimited}
+                  onDateRangeChange={setDateRange}
+                  onCreateLink={handleCreateLink}
+                />
               </TabPane>
 
               <TabPane
@@ -644,14 +474,18 @@ const ShareModal: React.FC<ShareModalProps> = ({
               >
                 <div>
                   {shareLinks.length > 0 ? (
-                    <Table
-                      columns={columns}
-                      dataSource={shareLinks}
-                      rowKey="_id"
-                      pagination={false}
-                      size="small"
-                      className="mt-4"
+                    <ShareLinksTable
+                      shareLinks={shareLinks}
                       loading={loading}
+                      onCopyLink={handleCopyLink}
+                      onUpdateStatus={(id, status) =>
+                        handleUpdateStatus(id, status)
+                      }
+                      onViewRequests={(id) => {
+                        setSelectedLinkId(id);
+                        setActiveTab("requests");
+                        fetchAccessRequests(id);
+                      }}
                     />
                   ) : (
                     <div className="text-center py-8 text-gray-500">
@@ -710,6 +544,36 @@ const ShareModal: React.FC<ShareModalProps> = ({
                     </ul>
                   </div>
                 )}
+              </TabPane>
+
+              {/* New Access Requests Tab */}
+              <TabPane
+                tab={
+                  <span className="flex items-center space-x-2">
+                    <UserCheck size={16} />
+                    <span>Yêu cầu truy cập</span>
+                    {pendingRequestsCount > 0 && (
+                      <span className="bg-red-500 text-white text-xs rounded-full px-2 py-1 min-w-[20px] h-5 flex items-center justify-center">
+                        {pendingRequestsCount}
+                      </span>
+                    )}
+                  </span>
+                }
+                key="requests"
+              >
+                <AccessRequestsPanel
+                  shareLinks={shareLinks}
+                  accessRequests={accessRequests}
+                  selectedLinkId={selectedLinkId}
+                  loading={loading}
+                  onLinkSelect={(linkId) => {
+                    setSelectedLinkId(linkId);
+                    fetchAccessRequests(linkId);
+                  }}
+                  onApproveRequest={handleApproveRequest}
+                  onDenyRequest={handleDenyRequest}
+                  onCreateTabClick={() => setActiveTab("create")}
+                />
               </TabPane>
             </Tabs>
           )}
