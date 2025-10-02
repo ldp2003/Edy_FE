@@ -24,8 +24,8 @@ import {
   Checkbox,
   DatePicker,
 } from "antd";
-import { DocumentAPI } from "../../../api/API";
 import dayjs from "dayjs";
+import { DocumentService } from "../../../utils/DocumentService";
 
 const { Option } = Select;
 const { TabPane } = Tabs;
@@ -103,7 +103,7 @@ const ShareModal: React.FC<ShareModalProps> = ({
   const fetchShareLinks = useCallback(async () => {
     try {
       setLoading(true);
-      const response = await DocumentAPI.getShareLinks(documentId);
+      const response = await DocumentService.getShareLinks(documentId);
       setShareLinks(response.data || []);
     } catch (error: unknown) {
       let errorMessage = "Không thể tải danh sách link chia sẻ!";
@@ -172,7 +172,7 @@ const ShareModal: React.FC<ShareModalProps> = ({
         end_date: timeLimited ? dateRange[1]!.toISOString() : undefined,
       };
 
-      await DocumentAPI.createShareLink(documentId, createData);
+      await DocumentService.createShareLink(documentId, createData);
 
       messageApi.success("Tạo link chia sẻ thành công!");
 
@@ -226,7 +226,7 @@ const ShareModal: React.FC<ShareModalProps> = ({
     try {
       setLoading(true);
 
-      await DocumentAPI.updateShareLinkStatus(linkId, newStatus);
+      await DocumentService.updateShareLinkStatus(linkId, newStatus);
 
       // Update local state
       setShareLinks(

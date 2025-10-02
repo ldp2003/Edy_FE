@@ -54,6 +54,7 @@ const ShareAccess: React.FC = () => {
                     setStatus('error');
                     setErrorMessage(response.data.message || 'Không có quyền truy cập tài liệu này');
                 }
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             } catch (error: any) {
                 setStatus('error');
 

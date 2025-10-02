@@ -221,4 +221,78 @@ export const DocumentService = {
       throw error;
     }
   },
+
+  // Tạo link tải xuống
+  async createDownloadLink(documentId: string) {
+    try {
+      return await DocumentAPI.createDownloadLink(documentId);
+    } catch (error) {
+      console.error("Error in DocumentService.createDownloadLink:", error);
+      throw error;
+    }
+  },
+
+  // Tải xuống file bằng link
+  async downloadFile(linkId: string) {
+    try {
+      return await DocumentAPI.downloadFile(linkId);
+    } catch (error) {
+      console.error("Error in DocumentService.downloadFile:", error);
+      throw error;
+    }
+  },
+
+  // Lấy danh sách share links của tài liệu
+  async getShareLinks(documentId: string) {
+    try {
+      return await DocumentAPI.getShareLinks(documentId);
+    } catch (error) {
+      console.error("Error in DocumentService.getShareLinks:", error);
+      throw error;
+    }
+  },
+
+  // Tạo share link mới
+  async createShareLink(
+    documentId: string,
+    data: {
+      name: string;
+      limited_access: number;
+      request: boolean;
+      time_limited: boolean;
+      share_with_organization?: boolean;
+      start_date?: string;
+      end_date?: string;
+    }
+  ) {
+    try {
+      return await DocumentAPI.createShareLink(documentId, data);
+    } catch (error) {
+      console.error("Error in DocumentService.createShareLink:", error);
+      throw error;
+    }
+  },
+
+  // Cập nhật trạng thái share link
+  async updateShareLinkStatus(
+    linkId: string,
+    status: "ACTIVE" | "INACTIVE" | "DISABLED"
+  ) {
+    try {
+      return await DocumentAPI.updateShareLinkStatus(linkId, status);
+    } catch (error) {
+      console.error("Error in DocumentService.updateShareLinkStatus:", error);
+      throw error;
+    }
+  },
+
+  // Truy cập share link
+  async accessShareLink(linkId: string) {
+    try {
+      return await DocumentAPI.accessShareLink(linkId);
+    } catch (error) {
+      console.error("Error in DocumentService.accessShareLink:", error);
+      throw error;
+    }
+  },
 };
