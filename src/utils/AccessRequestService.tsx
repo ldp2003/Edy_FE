@@ -10,7 +10,7 @@ const AccessRequestService = {
   async createAccessRequest(
     privateShareId: string,
     data?: { content?: string }
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
   ): Promise<any> {
     try {
       const response = await AccessRequestAPI.createAccessRequest(
@@ -42,22 +42,40 @@ const AccessRequestService = {
       ordering?: string;
       order?: 1 | -1;
     }
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
   ): Promise<any> {
     try {
       const response = await AccessRequestAPI.getAccessRequestsByPrivateShare(
         privateShareId,
         params
       );
-      return (
-        response || {
-          accessRequests: [],
-          total: 0,
-          page: 1,
-          totalPages: 0,
-          have_next: false,
-        }
-      );
+
+      // Debug API response
+      this.debugApiResponse(response, "getAccessRequestsByPrivateShare");
+
+      // API trả về cấu trúc: { requests: [...], total, page, totalPages, have_next, privateShare }
+      // Chuyển đổi để tương thích với component (accessRequests thay vì requests)
+      if (response && response.requests) {
+        const result = {
+          accessRequests: response.requests, // Map requests -> accessRequests
+          total: response.total || 0,
+          page: response.page || 1,
+          totalPages: response.totalPages || 0,
+          have_next: response.have_next || false,
+          privateShare: response.privateShare,
+        };
+        console.log("🔄 Mapped Response:", result);
+        return result;
+      }
+
+      // Fallback nếu không có data
+      return {
+        accessRequests: [],
+        total: 0,
+        page: 1,
+        totalPages: 0,
+        have_next: false,
+      };
     } catch (error) {
       console.error(
         "Error in AccessRequestService.getAccessRequestsByPrivateShare:",
@@ -95,7 +113,7 @@ const AccessRequestService = {
   async denyAccessRequest(
     requestId: string,
     data?: { reason?: string }
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
   ): Promise<any> {
     try {
       const response = await AccessRequestAPI.denyAccessRequest(
@@ -120,10 +138,23 @@ const AccessRequestService = {
     limit?: number;
     ordering?: string;
     order?: 1 | -1;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
   }): Promise<any> {
     try {
       const response = await AccessRequestAPI.getMyAccessRequests(params);
+
+      // Chuyển đổi cấu trúc nếu API trả về requests thay vì accessRequests
+      if (response && response.requests) {
+        return {
+          accessRequests: response.requests,
+          total: response.total || 0,
+          page: response.page || 1,
+          totalPages: response.totalPages || 0,
+          have_next: response.have_next || false,
+        };
+      }
+
+      // Fallback hoặc nếu đã đúng cấu trúc accessRequests
       return (
         response || {
           accessRequests: [],
@@ -203,6 +234,83 @@ const AccessRequestService = {
    */
   canCancel(status: string): boolean {
     return status === "PENDING";
+  },
+
+  /**
+   * Format user display name
+   * @param user - User object or populated user
+   * @returns string
+   */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  formatUserName(user: any): string {
+    if (!user) return "Người dùng";
+    if (typeof user === "string") return user;
+    return (
+      `${user.first_name || ""} ${user.last_name || ""}`.trim() || "Người dùng"
+    );
+  },
+
+  /**
+   * Get user email
+   * @param user - User object or populated user
+   * @returns string
+   */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  getUserEmail(user: any): string {
+    if (!user) return "Email không có";
+    if (typeof user === "string") return "Email không có";
+    return user.contact_email || user.email || "Email không có";
+  },
+
+  /**
+   * Get user avatar
+   * @param user - User object or populated user
+   * @returns string | null
+   */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  getUserAvatar(user: any): string | null {
+    if (!user || typeof user === "string") return null;
+    return user.avatar || null;
+  },
+
+  /**
+   * Get user initials for avatar placeholder
+   * @param user - User object or populated user
+   * @returns string
+   */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  getUserInitials(user: any): string {
+    if (!user || typeof user === "string") return "U";
+    const firstName = user.first_name || "";
+    const lastName = user.last_name || "";
+    return `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase() || "U";
+  },
+
+  /**
+   * Debug log API response structure
+   * @param response - API response to debug
+   * @param context - Context string for logging
+   */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  debugApiResponse(response: any, context: string = "API Response"): void {
+    console.group(`🔍 ${context}`);
+    console.log("Full Response:", response);
+    console.log("Response Keys:", Object.keys(response || {}));
+    if (response?.requests) {
+      console.log("Requests Array:", response.requests);
+      console.log("Number of Requests:", response.requests.length);
+      if (response.requests.length > 0) {
+        console.log("First Request Structure:", response.requests[0]);
+        console.log(
+          "First Request Keys:",
+          Object.keys(response.requests[0] || {})
+        );
+      }
+    }
+    if (response?.privateShare) {
+      console.log("Private Share Info:", response.privateShare);
+    }
+    console.groupEnd();
   },
 };
 

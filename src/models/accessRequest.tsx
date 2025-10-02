@@ -54,6 +54,21 @@ export interface AccessRequest {
 
 // Response interfaces
 export interface AccessRequestsResponse {
+  requests: AccessRequest[];
+  total: number;
+  page: number;
+  totalPages: number;
+  have_next: boolean;
+  privateShare?: {
+    _id: string;
+    name: string;
+    limited_access: number;
+    current_access_count: number;
+  };
+}
+
+// Legacy interface for backward compatibility
+export interface LegacyAccessRequestsResponse {
   accessRequests: AccessRequest[];
   total: number;
   page: number;
