@@ -117,6 +117,9 @@ const AccessRequestsPanel: React.FC<AccessRequestsPanelProps> = ({
                           <h4 className="font-medium text-gray-900">
                             {AccessRequestService.formatUserName(request.user)}
                           </h4>
+                          <p className="text-sm text-gray-600">
+                            {AccessRequestService.getUserEmail(request.user)}
+                          </p>
                           <Tag
                             color={AccessRequestService.getStatusColor(
                               request.status
@@ -127,9 +130,7 @@ const AccessRequestsPanel: React.FC<AccessRequestsPanelProps> = ({
                             )}
                           </Tag>
                         </div>
-                        <p className="text-sm text-gray-600">
-                          {AccessRequestService.getUserEmail(request.user)}
-                        </p>
+
                         {request.content && (
                           <div className="mt-2 p-2 bg-gray-50 rounded text-sm">
                             <MessageSquare size={14} className="inline mr-1" />
