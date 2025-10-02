@@ -543,6 +543,16 @@ export const DocumentAPI = {
     }
   },
 
+  accessShareLink: async (linkId: string) => {
+    try {
+      const response = await apiClient.post(`/documents/share/${linkId}/access`);
+      return response.data;
+    } catch (error) {
+      console.error("Error accessing share link:", error);
+      throw error;
+    }
+  },
+
   // Get pending documents (for admin)
   getPendingDocuments: async (params?: {
     page?: number;

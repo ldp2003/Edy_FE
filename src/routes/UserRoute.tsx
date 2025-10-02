@@ -19,6 +19,7 @@ import OrganizationListPage from "../pages/user/organization/OrganizationListPag
 import SubjectDocumentPage from "../pages/user/subject/SubjectDocumentPage";
 import NotFoundPage from "../pages/NotFoundPage";
 import DirectDownload from "../pages/user/download/DirectDownload";
+import ShareAccess from "../pages/user/share/ShareAccess";
 
 const UserRoute: React.FC = () => {
   return (
@@ -63,6 +64,7 @@ const UserRoute: React.FC = () => {
 
         {/* Download page without layout - standalone */}
         <Route path="download/:linkId" element={<DirectDownload />} />
+        <Route path="share/:linkId" element={<ShareAccess />} />
       </Routes>
     </AuthRoute>
   );
