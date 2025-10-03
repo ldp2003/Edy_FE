@@ -110,10 +110,9 @@ const PersonalPostDetail: React.FC = () => {
     navigate(`/personal-posts/edit/${document?._id}`);
   };
 
-  const handleChangeVisibility = () => {
+  const handleChangeVisibility = async (newMode: string) => {
     if (!document) return;
 
-    const newMode = document.public_mode === "PUBLIC" ? "PRIVATE" : "PUBLIC";
     const action = newMode === "PUBLIC" ? "công khai" : "riêng tư";
 
     Modal.confirm({

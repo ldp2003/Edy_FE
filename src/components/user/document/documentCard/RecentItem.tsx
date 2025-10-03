@@ -4,13 +4,15 @@ import ViewCount from "../documentElement/ViewCount";
 import RatingRatio from "../documentElement/RatingRatio";
 import PageCount from "../documentElement/PageCount";
 import IntensiveMark from "../documentElement/IntensiveMark";
+import type { ReactNode } from "react";
 
 type RecentItemProps = {
-  title: string;
+  title: string | ReactNode;
   views: number;
   rating: number;
   pages: number;
   date: string;
+  intensive?: boolean;
 };
 
 const RecentItem: React.FC<RecentItemProps> = ({
@@ -19,6 +21,7 @@ const RecentItem: React.FC<RecentItemProps> = ({
   rating,
   pages,
   date,
+  intensive,
 }) => {
   return (
     <div className="flex text-left w-full gap-4 justify-between px-2 py-1 border rounded-lg shadow-md bg-white mb-2">
@@ -47,7 +50,7 @@ const RecentItem: React.FC<RecentItemProps> = ({
         <span className="text-xs text-[var(--secondary-text-color)] mr-4">
           {date}
         </span>
-        <IntensiveMark label="Chuyên sâu"></IntensiveMark>
+        {intensive && <IntensiveMark label="Chuyên sâu"></IntensiveMark>}
       </div>
     </div>
   );

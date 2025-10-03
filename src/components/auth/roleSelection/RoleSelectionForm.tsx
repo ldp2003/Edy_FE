@@ -2,8 +2,25 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import type { UserRole } from "../../../models/role";
 import RoleCard from "./RoleCard";
-import { USER_ROLES } from "../../../constants/RoleConstants";
 import { setCookie } from "../../../utils/CookieUtils";
+
+// Simplified roles for role selection
+const SIMPLE_ROLES: UserRole[] = [
+  {
+    role: "SUPER_ADMIN",
+    displayName: "Quản trị viên",
+    description: "Quản lý và điều hành hệ thống",
+    icon: "🛡️",
+    permissions: ["ALL"],
+  },
+  {
+    role: "CUSTOM_ROLE",
+    displayName: "Người dùng",
+    description: "Sử dụng các tính năng của hệ thống",
+    icon: "👤",
+    permissions: [],
+  },
+];
 
 const RoleSelectionForm: React.FC = () => {
   const [selectedRole, setSelectedRole] = useState<UserRole | null>(null);
@@ -35,15 +52,15 @@ const RoleSelectionForm: React.FC = () => {
       <div className="max-w-4xl w-full">
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold text-gray-800 mb-4">
-            Chọn quyền đăng nhập
+            Chọn chế độ sử dụng
           </h1>
           <p className="text-lg text-gray-600">
-            Vui lòng chọn vai trò của bạn:
+            Bạn muốn sử dụng hệ thống với vai trò nào?
           </p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12 max-w-2xl mx-auto">
-          {USER_ROLES.map((role) => (
+          {SIMPLE_ROLES.map((role) => (
             <RoleCard
               key={role.role}
               role={role}

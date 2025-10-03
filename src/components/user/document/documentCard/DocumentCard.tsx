@@ -5,13 +5,15 @@ import { UserContext } from "../../../../contexts/UserContext";
 import type { Document } from "../../../../models/document";
 import { UserService } from "../../../../utils/UserService";
 import { message } from "antd";
+import type { ReactNode } from "react";
 
 interface DocumentCardProps {
-  title: string;
+  title: string | ReactNode;
   description: string;
   imageUrl?: string;
   document?: Document;
   navigationPath?: string; // Optional custom navigation path
+  disableClick?: boolean;
 }
 
 const DocumentCard: React.FC<DocumentCardProps> = ({
@@ -20,6 +22,7 @@ const DocumentCard: React.FC<DocumentCardProps> = ({
   imageUrl,
   document,
   navigationPath,
+  disableClick = false,
 }) => {
   const navigate = useNavigate();
   const [messageApi, contextHolder] = message.useMessage();
@@ -34,9 +37,11 @@ const DocumentCard: React.FC<DocumentCardProps> = ({
   }, [favoriteDocuments, document?._id]);
 
   const handleCardClick = () => {
-    if (document?._id) {
-      const path = navigationPath || `/document-detail/${document._id}`;
-      navigate(path);
+    if (disableClick) return;
+    if (document?._id && navigationPath) {
+      navigate(navigationPath);
+    } else if (document?._id) {
+      navigate(`/document-detail/${document._id}`);
     }
   };
 
@@ -59,7 +64,7 @@ const DocumentCard: React.FC<DocumentCardProps> = ({
         setIsFavorite(true);
         messageApi.success("Đã lưu tài liệu vào mục yêu thích!");
       }
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
       messageApi.error("Có lỗi xảy ra, vui lòng thử lại!");
     }
@@ -72,14 +77,16 @@ const DocumentCard: React.FC<DocumentCardProps> = ({
 
   return (
     <div
-      className="text-left rounded-lg border border-[var(--border-color)]  overflow-hidden hover:shadow-md transition-shadow cursor-pointer"
+      className={`text-left rounded-lg border border-[var(--border-color)] overflow-hidden transition-shadow ${
+        disableClick ? "cursor-not-allowed" : "hover:shadow-md cursor-pointer"
+      }`}
       onClick={handleCardClick}
     >
       {contextHolder}
       <div className="bg-[var(--card-background-color)] rounded-md relative flex justify-center items-center">
         <img
           src={imageUrl || "/public/image/thumb_1200_1553.png"}
-          alt={title}
+          alt={typeof title === "string" ? title : "Tài liệu"}
           className="h-40 m-3 w-full object-fill rounded-md"
           onError={handleImageError}
         />

@@ -31,6 +31,7 @@ export const DocumentStatus = {
   REJECTED: "REJECTED",
   REQUESTED_EDIT: "REQUESTED_EDIT",
   PENDING_EDIT: "PENDING_EDIT",
+  PENDING_SUMMARY: "PENDING_SUMMARY",
 } as const;
 
 export type DocumentStatusType =
@@ -105,6 +106,18 @@ export interface Document {
   last_approved_at?: string;
   createdAt: string;
   updatedAt?: string;
+  content_rejection?: {
+    _id: string;
+    doc: string;
+    reviewed_by: {
+      _id: string;
+      first_name: string;
+      last_name: string;
+    };
+    reviewed_at: string;
+    is_summary: boolean;
+    message: string;
+  };
 }
 
 export interface DocumentsResponse {

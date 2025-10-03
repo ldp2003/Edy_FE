@@ -28,10 +28,34 @@ const AuthRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
         setIsLoading(true);
       }
       try {
+        console.log("🔄 Starting auth check...");
+
+        console.log("🔄 Step 1: Refreshing token...");
         await refreshToken();
+        console.log("✅ Token refreshed successfully");
+
+        console.log("🔄 Step 2: Getting current user...");
         const data = await getCurrentUser();
-        const favoriteRes = await UserService.getListFavorites();
-        const favoriteDocuments = favoriteRes?.documents || [];
+        console.log("✅ Got current user data:", data);
+
+        // Try to get favorites, but don't fail if it errors
+        let favoriteDocuments: Document[] = [];
+        try {
+          console.log("🔄 Step 3: Getting favorite documents...");
+          const favoriteRes = await UserService.getListFavorites();
+          favoriteDocuments = favoriteRes?.documents || [];
+          console.log(
+            "✅ Got favorite documents:",
+            favoriteDocuments.length,
+            "items"
+          );
+        } catch (favError) {
+          console.warn(
+            "⚠️ Failed to get favorite documents (non-critical):",
+            favError
+          );
+          // Continue with empty favorites - this shouldn't block authentication
+        }
 
         if (data) {
           setIsLoggedIn(true);
@@ -40,17 +64,32 @@ const AuthRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
           setAccount(data.account); // Account data
           setFavoriteDocuments(favoriteDocuments);
 
+          // Debug user verification status
+          console.log("🔍 Checking verification status:");
+          console.log("  - data.roles:", data.roles);
+          console.log("  - data.account:", data.account);
+          console.log("  - data.user:", data.user);
+
           // Check if user needs account activation
-          if (
+          const needsVerification =
             data.roles &&
             (data.roles.includes("NOT_VERIFIED") ||
-              data.roles.includes("NOT_VERIFY"))
-          ) {
+              data.roles.includes("NOT_VERIFY") ||
+              data.roles.includes("PENDING_VERIFICATION"));
+
+          console.log("  - needsVerification:", needsVerification);
+
+          if (needsVerification) {
+            console.log(
+              "➡️ User needs verification, redirecting to activation page"
+            );
             // Only redirect if not already on activation page
             if (location.pathname !== "/account-activation") {
               navigate("/account-activation");
+              return; // Exit early to avoid further processing
             }
           } else {
+            console.log("✅ User is verified, proceeding with role checks");
             // Check if user has any admin role
             const adminRoles = [
               ROLE_CODES.SUPER_ADMIN,
@@ -103,11 +142,65 @@ const AuthRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
           }
         }
       } catch (error) {
-        console.error("Error during auth check:", error);
+        console.error("❌ Error during auth check:", error);
+
+        // Log detailed error information
+        if (error && typeof error === "object") {
+          const axiosError = error as {
+            message?: string;
+            response?: {
+              status?: number;
+              statusText?: string;
+              data?: unknown;
+            };
+          };
+          console.error("❌ Error details:", {
+            message: axiosError.message,
+            status: axiosError.response?.status,
+            statusText: axiosError.response?.statusText,
+            data: axiosError.response?.data,
+          });
+
+          // Handle specific error cases
+          if (axiosError.response?.status === 403) {
+            console.log(
+              "🔐 403 Forbidden - Token expired, invalid, or account not verified"
+            );
+
+            // Check if error message indicates account not verified
+            const errorData = axiosError.response.data as {
+              message?: string;
+              code?: string;
+            };
+            if (
+              errorData?.message?.includes("not verified") ||
+              errorData?.message?.includes("NOT_VERIFIED") ||
+              errorData?.code === "ACCOUNT_NOT_VERIFIED"
+            ) {
+              console.log(
+                "📧 Account needs verification - redirecting to activation page"
+              );
+              if (location.pathname !== "/account-activation") {
+                navigate("/account-activation");
+                return; // Exit early to avoid further processing
+              }
+            }
+
+            // Clear any stored tokens/cookies here if needed
+            // deleteCookie("token"); // if you store token in cookies
+          } else if (axiosError.response?.status === 401) {
+            console.log("🔐 401 Unauthorized - User not authenticated");
+          } else if (axiosError.response?.status === 500) {
+            console.log("🔴 500 Server Error - Backend issue");
+          }
+        }
+
+        // Reset auth state
         setIsLoggedIn(false);
         setUser(defaultUser);
         setAccount(null);
         setRole(null);
+        setFavoriteDocuments([]);
 
         // Allow access to public pages even when auth fails
         const publicPages = ["/", "/document-detail"];
@@ -119,7 +212,10 @@ const AuthRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
         );
 
         if (!isPublicPage) {
+          console.log("🔄 Redirecting to home page due to auth failure");
           navigate("/");
+        } else {
+          console.log("📄 Staying on public page despite auth failure");
         }
       } finally {
         if (isInitialLoad) {
