@@ -22,6 +22,9 @@ interface Post {
   public_mode: string;
   url: string;
   createdAt: string;
+  content_rejection?: {
+    message: string;
+  };
 }
 
 interface PostTableProps {
@@ -43,16 +46,49 @@ const PostTable: React.FC<PostTableProps> = ({ data, loading }) => {
       title: "Tên tài liệu",
       dataIndex: "title",
       key: "title",
-      render: (text: string, record: Post) => (
-        <span
-          onClick={() =>
-            navigate(`/personal-posts/document-detail/${record.key}`)
-          }
-          className="text-[var(--primary-text-color)] font-medium cursor-pointer"
-        >
-          {text}
-        </span>
-      ),
+      render: (text: string, record: Post) => {
+        const isRejected = record.status === "REJECTED";
+        const isRequestedEdit =
+          record.status === "REQUESTED_EDIT" ||
+          record.status === "PENDING_EDIT";
+        const hasRejectionMessage = record.content_rejection?.message;
+        const showRejectionReason =
+          (isRejected || isRequestedEdit) && hasRejectionMessage;
+
+        return (
+          <div
+            onClick={
+              isRejected
+                ? undefined
+                : () =>
+                    navigate(`/personal-posts/document-detail/${record.key}`)
+            }
+            className={isRejected ? "cursor-not-allowed" : "cursor-pointer"}
+          >
+            <div
+              className={`text-[var(--primary-text-color)] font-medium ${
+                isRejected ? "line-through text-gray-400" : ""
+              }`}
+              style={{ fontSize: isRejected ? "12px" : "14px" }}
+            >
+              {text}
+            </div>
+            {showRejectionReason && (
+              <div
+                style={{
+                  fontSize: "11px",
+                  color: isRejected ? "#e74c3c" : "#f39c12",
+                  fontStyle: "italic",
+                  marginTop: "4px",
+                }}
+              >
+                {isRejected ? "Lý do từ chối" : "Yêu cầu chỉnh sửa"}:{" "}
+                {record.content_rejection?.message}
+              </div>
+            )}
+          </div>
+        );
+      },
       width: "30%",
     },
     {
@@ -99,24 +135,53 @@ const PostTable: React.FC<PostTableProps> = ({ data, loading }) => {
       title: "Hành động",
       key: "action",
       align: "center",
-      render: (_, record) => (
-        <div className="flex gap-2 justify-center">
-          <button
-            className="p-2 text-xs text-white rounded bg-[var(--green-button-color)] transition-all duration-300 hover:bg-blue-600 hover:shadow-lg transform hover:scale-105"
-            onClick={() => navigate(`/personal-posts/edit/${record.key}`)}
-            title="Chỉnh sửa tài liệu"
-          >
-            <Edit size={15} />
-          </button>
-          <button
-            className="p-2 text-xs text-white rounded bg-[var(--red-button-color)] transition-all duration-300 hover:bg-red-600 hover:shadow-lg transform hover:scale-105"
-            onClick={() => console.log("Delete action triggered")}
-            title="Xóa tài liệu"
-          >
-            <Trash size={15} />
-          </button>
-        </div>
-      ),
+      render: (_, record) => {
+        const isRejected = record.status === "REJECTED";
+        return (
+          <div className="flex gap-2 justify-center">
+            <button
+              className={`p-2 text-xs text-white rounded transition-all duration-300 ${
+                isRejected
+                  ? "bg-gray-400 cursor-not-allowed"
+                  : "bg-[var(--green-button-color)] hover:bg-blue-600 hover:shadow-lg transform hover:scale-105"
+              }`}
+              onClick={
+                isRejected
+                  ? undefined
+                  : () => navigate(`/personal-posts/edit/${record.key}`)
+              }
+              title={
+                isRejected
+                  ? "Không thể sửa tài liệu bị từ chối"
+                  : "Chỉnh sửa tài liệu"
+              }
+              disabled={isRejected}
+            >
+              <Edit size={15} />
+            </button>
+            <button
+              className={`p-2 text-xs text-white rounded transition-all duration-300 ${
+                isRejected
+                  ? "bg-gray-400 cursor-not-allowed"
+                  : "bg-[var(--red-button-color)] hover:bg-red-600 hover:shadow-lg transform hover:scale-105"
+              }`}
+              onClick={
+                isRejected
+                  ? undefined
+                  : () => console.log("Delete action triggered")
+              }
+              title={
+                isRejected
+                  ? "Không thể xóa tài liệu bị từ chối"
+                  : "Xóa tài liệu"
+              }
+              disabled={isRejected}
+            >
+              <Trash size={15} />
+            </button>
+          </div>
+        );
+      },
     },
   ];
 

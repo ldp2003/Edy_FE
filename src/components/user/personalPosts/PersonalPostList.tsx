@@ -22,6 +22,9 @@ interface Post {
   public_mode: string;
   url: string;
   createdAt: string;
+  content_rejection?: {
+    message: string;
+  };
 }
 
 const PersonalPostList: React.FC = () => {
@@ -70,6 +73,11 @@ const PersonalPostList: React.FC = () => {
             public_mode: doc.public_mode || "PRIVATE",
             url: doc.url,
             createdAt: doc.createdAt,
+            content_rejection: doc.content_rejection
+              ? {
+                  message: doc.content_rejection.message,
+                }
+              : undefined,
           }))
         : [];
 

@@ -15,6 +15,9 @@ interface Post {
   url: string;
   cover_page?: string;
   createdAt: string;
+  content_rejection?: {
+    message: string;
+  };
 }
 
 interface PostGridViewProps {
@@ -82,6 +85,12 @@ const PostGridView: React.FC<PostGridViewProps> = ({ data, loading }) => {
       <Row gutter={[16, 16]} justify="start">
         {displayData.map((post) => {
           const documentData = transformPostToDocument(post);
+          const isRejected = post.status === "REJECTED";
+          const isRequestedEdit =
+            post.status === "REQUESTED_EDIT" || post.status === "PENDING_EDIT";
+          const hasRejectionMessage = post.content_rejection?.message;
+          const showRejectionReason =
+            (isRejected || isRequestedEdit) && hasRejectionMessage;
           return (
             <Col
               key={post.key}
@@ -93,13 +102,54 @@ const PostGridView: React.FC<PostGridViewProps> = ({ data, loading }) => {
               xxl={4}
               style={{ maxWidth: "20%", flex: "0 0 20%" }}
             >
-              <DocumentCard
-                title={post.title}
-                description={`${post.views} lượt xem • ${post.comments} bình luận • Đánh giá: ${post.rating}`}
-                imageUrl={post.cover_page}
-                document={documentData}
-                navigationPath={`/personal-posts/document-detail/${post.key}`}
-              />
+              <div
+                className={isRejected ? "cursor-not-allowed opacity-60" : ""}
+                onClick={(e) => {
+                  if (isRejected) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                  }
+                }}
+              >
+                <DocumentCard
+                  title={
+                    showRejectionReason ? (
+                      <div>
+                        <div
+                          className={
+                            isRejected ? "line-through text-gray-400" : ""
+                          }
+                          style={{ fontSize: "12px" }}
+                        >
+                          {post.title}
+                        </div>
+                        <div
+                          style={{
+                            fontSize: "11px",
+                            color: isRejected ? "#e74c3c" : "#f39c12",
+                            fontStyle: "italic",
+                            marginTop: "4px",
+                          }}
+                        >
+                          {isRejected ? "Lý do từ chối" : "Yêu cầu chỉnh sửa"}:{" "}
+                          {post.content_rejection?.message}
+                        </div>
+                      </div>
+                    ) : (
+                      post.title
+                    )
+                  }
+                  description={`${post.views} lượt xem • ${post.comments} bình luận • Đánh giá: ${post.rating}`}
+                  imageUrl={post.cover_page}
+                  document={documentData}
+                  navigationPath={
+                    isRejected
+                      ? undefined
+                      : `/personal-posts/document-detail/${post.key}`
+                  }
+                  disableClick={!!isRejected}
+                />
+              </div>
             </Col>
           );
         })}
