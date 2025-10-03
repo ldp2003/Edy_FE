@@ -23,8 +23,14 @@ const LoginForm: React.FC<LoginFormProps> = ({
       if (result) {
         messageApi.success("Đăng nhập thành công");
         form.resetFields();
+
+        // Trigger AuthRoute recheck sau khi login thành công
+        // Có thể dùng window.location.reload() hoặc navigate
+        setTimeout(() => {
+          window.location.reload();
+        }, 500); // Delay nhỏ để user thấy success message
+
         onSuccess();
-        window.location.reload();
       }
     } catch (error: unknown) {
       let errorMessage = "Đăng nhập thất bại. Vui lòng kiểm tra lại thông tin.";
