@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from "react";
-import { Table, Select, Button, Input, message } from "antd";
+import { Table, Select, Button, message } from "antd";
 import { useNavigate } from "react-router-dom";
 import type { ColumnsType } from "antd/es/table";
-import { Download, Printer, Search, Filter } from "lucide-react";
+import { Download, Printer } from "lucide-react";
 import type { Document } from "../../../models/document";
-import DocumentFilterDrawer from "./DocumentFilterDrawer";
+import AdminDocumentFilterSearch, {
+  type AdminFilterSearchParams,
+} from "./AdminDocumentFilterSearch";
 import { DocumentService } from "../../../utils/DocumentService";
 
 const { Option } = Select;
@@ -32,11 +34,11 @@ const AdminDocumentTable: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(5);
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
-  const [filterVisible, setFilterVisible] = useState(false);
   const [documents, setDocuments] = useState<Document[]>([]);
   const [loading, setLoading] = useState(false);
   const [totalDocuments, setTotalDocuments] = useState(0);
   const [viewMode, setViewMode] = useState<"all" | "pending">("pending");
+  const [filterParams, setFilterParams] = useState<AdminFilterSearchParams>({});
 
   // Fetch documents from API
   useEffect(() => {
@@ -44,20 +46,25 @@ const AdminDocumentTable: React.FC = () => {
       setLoading(true);
       try {
         let response;
+        const apiParams = {
+          page: currentPage,
+          limit: pageSize,
+          ordering: filterParams.ordering || "createdAt",
+          order: filterParams.order || -1,
+          title: filterParams.title,
+          status: filterParams.status,
+          doc_type: filterParams.doc_type,
+          level: filterParams.level,
+          intensive: filterParams.intensive,
+          published_year: filterParams.published_year,
+          start_date: filterParams.dateRange?.[0],
+          end_date: filterParams.dateRange?.[1],
+        };
+
         if (viewMode === "pending") {
-          response = await DocumentService.getPendingDocuments({
-            page: currentPage,
-            limit: pageSize,
-            ordering: "createdAt",
-            order: -1,
-          });
+          response = await DocumentService.getPendingDocuments(apiParams);
         } else {
-          response = await DocumentService.fetchNewestDocuments({
-            page: currentPage,
-            limit: pageSize,
-            ordering: "createdAt",
-            order: -1,
-          });
+          response = await DocumentService.fetchNewestDocuments(apiParams);
         }
 
         setDocuments(response.documents || []);
@@ -73,7 +80,12 @@ const AdminDocumentTable: React.FC = () => {
     };
 
     fetchDocuments();
-  }, [currentPage, pageSize, viewMode]);
+  }, [currentPage, pageSize, viewMode, filterParams]);
+
+  const handleFilterChange = (newParams: AdminFilterSearchParams) => {
+    setFilterParams(newParams);
+    setCurrentPage(1); // Reset to page 1 when filter changes
+  };
 
   // Create a display interface that extends Document with display-specific fields
   interface DocumentDisplay extends Document {
@@ -300,35 +312,12 @@ const AdminDocumentTable: React.FC = () => {
             Print
           </Button>
         </div>
-
-        <div className="flex items-center space-x-2">
-          <Button
-            icon={<Filter size={14} />}
-            size="small"
-            type="text"
-            onClick={() => setFilterVisible(true)}
-          >
-            Bộ lọc
-          </Button>
-        </div>
       </div>
 
-      {/* Search Bar */}
-      <div className="flex items-center space-x-2">
-        <div className="relative flex-1 max-w-sm">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-          <Input
-            placeholder="Tìm kiếm theo ID và tên"
-            className="pl-10"
-            size="small"
-          />
-        </div>
-      </div>
-
-      {/* Filter Drawer */}
-      <DocumentFilterDrawer
-        visible={filterVisible}
-        onClose={() => setFilterVisible(false)}
+      {/* Filter & Search Component */}
+      <AdminDocumentFilterSearch
+        onFilterChange={handleFilterChange}
+        loading={loading}
       />
 
       {/* Table */}
