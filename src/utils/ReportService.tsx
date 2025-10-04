@@ -1,5 +1,6 @@
 import { ReportAPI } from "../api/API";
 import type { Report } from "../models/report";
+import { ReportType } from "../models/report";
 
 /**
  * Service for handling document reports
@@ -190,8 +191,8 @@ export class ReportService {
   }): Promise<ReportResponse> {
     return this.createReport({
       docId: reportData.documentId,
-      type: ["INAPPROPRIATE_CONTENT"], // Default type
-      reason: reportData.reason,
+      type: [ReportType.OTHER], // Default type
+      reason: reportData.description || reportData.reason,
     });
   }
 }

@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Modal, Form, Checkbox, Input, message, Tooltip } from "antd";
 import { Flag } from "lucide-react";
 import { ReportService } from "../../../utils/ReportService";
+import { ReportType } from "../../../models/report";
 
 interface ReportModalProps {
   visible: boolean;
@@ -13,46 +14,46 @@ interface ReportModalProps {
 // Các lý do báo cáo cho tài liệu
 const REPORT_REASONS = [
   {
-    value: "SPAM_OR_MISLEADING",
+    value: ReportType.SPAM_OR_MISLEADING,
     label: "Spam hoặc gây hiểu lầm",
     description:
       "Nội dung spam, quảng cáo không mong muốn hoặc thông tin sai lệch",
   },
   {
-    value: "DUPLICATE",
+    value: ReportType.DUPLICATE,
     label: "Nội dung trùng lặp",
     description:
       "Tài liệu này đã tồn tại trước đó hoặc giống hệt với tài liệu khác",
   },
   {
-    value: "COPYRIGHT",
+    value: ReportType.COPYRIGHT,
     label: "Vi phạm bản quyền",
     description: "Sử dụng nội dung có bản quyền mà không có sự cho phép",
   },
   {
-    value: "INCORRECT_CATEGORY",
+    value: ReportType.INCORRECT_CATEGORY,
     label: "Phân loại sai",
     description: "Tài liệu được đặt ở danh mục hoặc môn học không đúng",
   },
   {
-    value: "PERSONAL_INFORMATION",
+    value: ReportType.PERSONAL_INFORMATION,
     label: "Chứa thông tin cá nhân",
     description: "Tiết lộ thông tin cá nhân hoặc riêng tư của người khác",
   },
   {
-    value: "LOW_QUALITY",
+    value: ReportType.LOW_QUALITY,
     label: "Chất lượng kém",
     description:
       "Nội dung không rõ ràng, thiếu thông tin hoặc không có giá trị",
   },
   {
-    value: "INAPPROPRIATE",
+    value: ReportType.INAPPROPRIATE,
     label: "Nội dung không phù hợp",
     description:
       "Chứa nội dung bạo lực, khiêu dâm, hoặc không phù hợp với chính sách",
   },
   {
-    value: "OTHER",
+    value: ReportType.OTHER,
     label: "Lý do khác",
     description: "Vấn đề khác không thuộc các danh mục trên",
   },
@@ -88,13 +89,14 @@ const ReportModal: React.FC<ReportModalProps> = ({
     setLoading(true);
 
     try {
-      await ReportService.submitDocumentReport({
-        documentId,
-        reason: values.reasons.join(", "),
-        description: values.description,
+      // Sử dụng ReportService.createReport mới
+      const result = await ReportService.createReport({
+        docId: documentId,
+        type: values.reasons, // Trực tiếp truyền array các ReportType
+        reason: values.description || values.reasons.join(", "), // Mô tả chi tiết hoặc kết hợp các lý do
       });
 
-      messageApi.success("Báo cáo đã được gửi thành công!");
+      messageApi.success(result.message || "Báo cáo đã được gửi thành công!");
       form.resetFields();
       setSelectedReasons([]);
       onClose();
