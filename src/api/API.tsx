@@ -339,6 +339,7 @@ export const DocumentAPI = {
     doc_type?: string;
     level?: string;
     subject?: string;
+    status?: string;
   }) => {
     try {
       const response = await apiClient.get("/documents/newest", { params });

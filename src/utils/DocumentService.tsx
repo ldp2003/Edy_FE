@@ -17,6 +17,7 @@ export const DocumentService = {
     doc_type?: string;
     level?: string;
     subject?: string;
+    status?: string;
   }) {
     try {
       return await DocumentAPI.fetchNewestDocuments(params);
