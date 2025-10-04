@@ -39,13 +39,15 @@ export const DocumentService = {
     publisher?: string;
     published_year?: number;
     intensive?: boolean;
-    author?: string;
+    author?: string | string[];
     user?: string;
-    keyword?: string;
+    keyword?: string | string[];
     doc_type?: string;
     level?: string;
     subject?: string;
     status?: string;
+    summary_status?: string;
+    public_mode?: string;
   }) {
     try {
       return await DocumentAPI.fetchNewestDocuments(params);

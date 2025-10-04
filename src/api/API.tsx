@@ -363,13 +363,15 @@ export const DocumentAPI = {
     publisher?: string;
     published_year?: number;
     intensive?: boolean;
-    author?: string;
+    author?: string | string[];
     user?: string;
-    keyword?: string;
+    keyword?: string | string[];
     doc_type?: string;
     level?: string;
     subject?: string;
     status?: string;
+    summary_status?: string;
+    public_mode?: string;
   }) => {
     try {
       const response = await apiClient.get("/documents/newest", { params });
