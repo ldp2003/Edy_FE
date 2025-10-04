@@ -48,6 +48,8 @@ const UploadPage: React.FC = () => {
           onFileUploaded={handleFileUploaded}
           onUploadStart={handleUploadStart}
           onUploadError={handleUploadError}
+          onRemoveFile={handleUploadSuccess}
+          messageApi={messageApi}
         />
       </div>
 

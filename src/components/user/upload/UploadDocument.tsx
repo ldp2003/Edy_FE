@@ -1,4 +1,4 @@
-import { Card, Upload, message, Progress } from "antd";
+import { Card, Upload, Progress } from "antd";
 import { CloudUpload } from "lucide-react";
 import React, { useState } from "react";
 import type { UploadFile, UploadProps } from "antd";
@@ -20,12 +20,21 @@ interface UploadDocumentProps {
   }) => void;
   onUploadStart?: () => void;
   onUploadError?: () => void;
+  onRemoveFile?: () => void;
+  messageApi?: {
+    success: (content: string) => void;
+    error: (content: string) => void;
+    warning: (content: string) => void;
+    info: (content: string) => void;
+  };
 }
 
 const UploadDocument: React.FC<UploadDocumentProps> = ({
   onFileUploaded,
   onUploadStart,
   onUploadError,
+  onRemoveFile,
+  messageApi,
 }) => {
   const [uploading, setUploading] = useState(false);
   const [fileList, setFileList] = useState<UploadFile[]>([]);
@@ -426,11 +435,15 @@ const UploadDocument: React.FC<UploadDocumentProps> = ({
         onFileUploaded(fileInfo);
       }
 
-      message.success(`${(file as File).name} được tải lên thành công!`);
+      if (messageApi) {
+        messageApi.success(`${(file as File).name} được tải lên thành công!`);
+      }
       onSuccess?.(uploadResult.url);
     } catch (error) {
       console.error("Upload error:", error);
-      message.error(`Tải lên ${(file as File).name} thất bại!`);
+      if (messageApi) {
+        messageApi.error(`Tải lên ${(file as File).name} thất bại!`);
+      }
       onError?.(error as Error);
       onUploadError?.();
     } finally {
@@ -441,6 +454,15 @@ const UploadDocument: React.FC<UploadDocumentProps> = ({
 
   const handleChange: UploadProps["onChange"] = ({ fileList: newFileList }) => {
     setFileList(newFileList);
+  };
+
+  const handleRemove = () => {
+    setFileList([]);
+    onRemoveFile?.();
+    if (messageApi) {
+      messageApi.info("Đã gỡ file. Bạn có thể tải file mới.");
+    }
+    return true;
   };
 
   return (
@@ -457,7 +479,19 @@ const UploadDocument: React.FC<UploadDocumentProps> = ({
           customRequest={customUpload}
           fileList={fileList}
           onChange={handleChange}
+          onRemove={handleRemove}
           disabled={uploading}
+          beforeUpload={() => {
+            if (uploading || fileList.length > 0) {
+              if (messageApi) {
+                messageApi.warning(
+                  "Chỉ được tải 1 file và chờ hoàn tất trước khi tải mới!"
+                );
+              }
+              return Upload.LIST_IGNORE; // Ngăn upload
+            }
+            return true;
+          }}
         >
           <div className="flex flex-col items-center text-center">
             <CloudUpload
