@@ -1,11 +1,38 @@
+import { ReportAPI } from "../api/API";
+import type { Report } from "../models/report";
+import { ReportType } from "../models/report";
+
 /**
  * Service for handling document reports
  */
 
-export interface ReportData {
-  documentId: string;
+export interface CreateReportParams {
+  docId: string;
+  cmtId?: string;
+  type: string[];
   reason: string;
-  description?: string;
+}
+
+export interface GetAllReportsParams {
+  status?: string;
+  type?: string;
+  search?: string;
+  page?: number;
+  limit?: number;
+}
+
+export interface ResolveReportParams {
+  validTypes: string[];
+  action: string;
+  resolveReason: string;
+}
+
+export interface ReportsResponse {
+  reports: Report[];
+  total: number;
+  page: number;
+  totalPages: number;
+  have_next: boolean;
 }
 
 export interface ReportResponse {
@@ -14,31 +41,24 @@ export interface ReportResponse {
   reportId?: string;
 }
 
-interface ApiResponse {
-  data?: {
-    id?: string;
-    hasReported?: boolean;
-  };
-}
-
 export class ReportService {
   /**
-   * Submit a document report
+   * Tạo báo cáo mới
+   * @param params - Thông tin báo cáo
+   * @returns Promise<ReportResponse>
    */
-  static async submitDocumentReport(
-    reportData: ReportData
+  static async createReport(
+    params: CreateReportParams
   ): Promise<ReportResponse> {
     try {
-      const response = (await ReportAPI.submitDocumentReport(
-        reportData
-      )) as ApiResponse;
+      const response = await ReportAPI.createReport(params);
       return {
         success: true,
         message: "Báo cáo đã được gửi thành công!",
-        reportId: response.data?.id,
+        reportId: response.data?.id || response.id,
       };
     } catch (error: unknown) {
-      console.error("Error submitting report:", error);
+      console.error("ReportService.createReport error:", error);
 
       // Handle specific error cases
       const axiosError = error as {
@@ -53,13 +73,8 @@ export class ReportService {
         throw new Error("Tài liệu không tồn tại");
       } else if (axiosError.response?.status === 429) {
         throw new Error("Bạn đã báo cáo quá nhiều. Vui lòng thử lại sau");
-      } else if (error && typeof error === "object" && "response" in error) {
-        const axiosError = error as {
-          response?: { data?: { message?: string } };
-        };
-        if (axiosError.response?.data?.message) {
-          throw new Error(axiosError.response.data.message);
-        }
+      } else if (axiosError.response?.data?.message) {
+        throw new Error(axiosError.response.data.message);
       }
 
       throw new Error("Có lỗi xảy ra khi gửi báo cáo. Vui lòng thử lại!");
@@ -67,85 +82,117 @@ export class ReportService {
   }
 
   /**
-   * Get user's report history
+   * Lấy tất cả báo cáo (dành cho admin)
+   * @param params - Tham số lọc và phân trang
+   * @returns Promise<ReportsResponse>
    */
-  static async getUserReportHistory(): Promise<unknown[]> {
+  static async getAllReports(
+    params?: GetAllReportsParams
+  ): Promise<ReportsResponse> {
     try {
-      const response = (await ReportAPI.getUserReportHistory()) as ApiResponse;
-      return (response.data as unknown[]) || [];
-    } catch (error) {
-      console.error("Error getting report history:", error);
-      return [];
+      const response = await ReportAPI.getAllReports(params);
+      return response;
+    } catch (error: unknown) {
+      console.error("ReportService.getAllReports error:", error);
+      throw error;
     }
   }
 
   /**
-   * Check if user has already reported this document
+   * Giải quyết báo cáo (dành cho admin)
+   * @param reportId - ID của báo cáo
+   * @param params - Thông tin giải quyết
+   * @returns Promise<any>
    */
-  static async checkExistingReport(documentId: string): Promise<boolean> {
+  static async resolveReport(reportId: string, params: ResolveReportParams) {
     try {
-      const response = (await ReportAPI.checkExistingReport(
-        documentId
-      )) as ApiResponse;
-      return response.data?.hasReported || false;
-    } catch (error) {
-      console.error("Error checking existing report:", error);
-      return false;
+      const response = await ReportAPI.resolveReport(reportId, params);
+      return response;
+    } catch (error: unknown) {
+      console.error("ReportService.resolveReport error:", error);
+      throw error;
     }
   }
-}
 
-// API placeholder - this should be implemented in your API service
-class ReportAPI {
-  static async submitDocumentReport(reportData: ReportData) {
-    // TODO: Replace with actual API endpoint
-    // Example: return axiosInstance.post('/api/reports/documents', reportData);
-
-    console.log(
-      "Mock API: Submitting report for document:",
-      reportData.documentId
-    );
-
-    // Temporary mock implementation
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        resolve({
-          data: {
-            id: `report_${Date.now()}`,
-            status: "pending",
-          },
-        });
-      }, 1000);
-    });
+  /**
+   * Lấy báo cáo theo trạng thái
+   * @param status - Trạng thái báo cáo (PENDING, RESOLVED, REJECTED)
+   * @param params - Tham số bổ sung
+   * @returns Promise<ReportsResponse>
+   */
+  static async getReportsByStatus(
+    status: string,
+    params?: Omit<GetAllReportsParams, "status">
+  ): Promise<ReportsResponse> {
+    try {
+      const response = await ReportAPI.getAllReports({
+        ...params,
+        status,
+      });
+      return response;
+    } catch (error: unknown) {
+      console.error("ReportService.getReportsByStatus error:", error);
+      throw error;
+    }
   }
 
-  static async getUserReportHistory() {
-    // TODO: Replace with actual API endpoint
-    // Example: return axiosInstance.get('/api/reports/user/history');
-
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        resolve({
-          data: [],
-        });
-      }, 500);
-    });
+  /**
+   * Lấy báo cáo theo loại
+   * @param type - Loại báo cáo
+   * @param params - Tham số bổ sung
+   * @returns Promise<ReportsResponse>
+   */
+  static async getReportsByType(
+    type: string,
+    params?: Omit<GetAllReportsParams, "type">
+  ): Promise<ReportsResponse> {
+    try {
+      const response = await ReportAPI.getAllReports({
+        ...params,
+        type,
+      });
+      return response;
+    } catch (error: unknown) {
+      console.error("ReportService.getReportsByType error:", error);
+      throw error;
+    }
   }
 
-  static async checkExistingReport(documentId: string) {
-    // TODO: Replace with actual API endpoint
-    // Example: return axiosInstance.get(`/api/reports/check/${documentId}`);
+  /**
+   * Tìm kiếm báo cáo
+   * @param search - Từ khóa tìm kiếm
+   * @param params - Tham số bổ sung
+   * @returns Promise<ReportsResponse>
+   */
+  static async searchReports(
+    search: string,
+    params?: Omit<GetAllReportsParams, "search">
+  ): Promise<ReportsResponse> {
+    try {
+      const response = await ReportAPI.getAllReports({
+        ...params,
+        search,
+      });
+      return response;
+    } catch (error: unknown) {
+      console.error("ReportService.searchReports error:", error);
+      throw error;
+    }
+  }
 
-    console.log("Mock API: Checking existing report for document:", documentId);
-
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        resolve({
-          data: {
-            hasReported: false,
-          },
-        });
-      }, 500);
+  /**
+   * Báo cáo tài liệu (wrapper cho backward compatibility)
+   * @deprecated Sử dụng createReport thay thế
+   */
+  static async submitDocumentReport(reportData: {
+    documentId: string;
+    reason: string;
+    description?: string;
+  }): Promise<ReportResponse> {
+    return this.createReport({
+      docId: reportData.documentId,
+      type: [ReportType.OTHER], // Default type
+      reason: reportData.description || reportData.reason,
     });
   }
 }

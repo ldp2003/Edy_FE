@@ -1,6 +1,34 @@
 import { DocumentAPI } from "../api/API";
 
 export const DocumentService = {
+  async getAllDocuments(params: {
+    search?: string;
+    ordering?: string;
+    order?: 1 | -1;
+    page?: number;
+    limit?: number;
+    organization?: string;
+    publisher?: string;
+    published_year?: number;
+    intensive?: boolean;
+    author?: string | string[];
+    user?: string;
+    keyword?: string | string[];
+    doc_type?: string;
+    level?: string;
+    subject?: string;
+    status?: string;
+    summary_status?: string;
+    public_mode?: string;
+  }) {
+    try {
+      return await DocumentAPI.getAllDocuments(params);
+    } catch (error) {
+      console.error("Error in DocumentService.getAllDocuments:", error);
+      throw error;
+    }
+  },
+
   async fetchNewestDocuments(params: {
     search?: string;
     ordering?: string;
@@ -126,10 +154,18 @@ export const DocumentService = {
   },
 
   async getPendingDocuments(params?: {
+    search?: string;
+    title?: string;
     page?: number;
     limit?: number;
     ordering?: string;
     order?: 1 | -1;
+    doc_type?: string;
+    level?: string;
+    intensive?: boolean;
+    published_year?: number;
+    start_date?: string;
+    end_date?: string;
   }) {
     try {
       return await DocumentAPI.getPendingDocuments(params);

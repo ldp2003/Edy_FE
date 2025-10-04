@@ -20,6 +20,7 @@ import SubjectDocumentPage from "../pages/user/subject/SubjectDocumentPage";
 import NotFoundPage from "../pages/NotFoundPage";
 import DirectDownload from "../pages/user/download/DirectDownload";
 import ShareAccess from "../pages/user/share/ShareAccess";
+import SearchPage from "../pages/user/search/SearchPage";
 
 const UserRoute: React.FC = () => {
   return (
@@ -35,6 +36,7 @@ const UserRoute: React.FC = () => {
         <Route path="/" element={<UserLayout />}>
           {/* Public pages - accessible by anyone */}
           <Route index element={<HomePage />} />
+          <Route path="search" element={<SearchPage />} />
           <Route path="document-detail/:id" element={<DocumentDetail />} />
           <Route path="organizations" element={<OrganizationListPage />} />
           <Route path="organization/:id" element={<OrganizationDetailPage />} />

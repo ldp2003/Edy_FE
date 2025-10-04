@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { Table, Select, Button, message } from "antd";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import type { ColumnsType } from "antd/es/table";
-import { Download, Printer } from "lucide-react";
+// import { Download, Printer } from "lucide-react";
 import type { Document } from "../../../models/document";
 import AdminDocumentFilterSearch, {
   type AdminFilterSearchParams,
@@ -31,21 +31,54 @@ interface ApprovalRequest {
 
 const AdminDocumentTable: React.FC = () => {
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(5);
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
   const [documents, setDocuments] = useState<Document[]>([]);
   const [loading, setLoading] = useState(false);
   const [totalDocuments, setTotalDocuments] = useState(0);
-  const [viewMode, setViewMode] = useState<"all" | "pending">("pending");
+  // Đã bỏ viewMode, luôn dùng getAllDocuments
   const [filterParams, setFilterParams] = useState<AdminFilterSearchParams>({});
+
+  // Initialize filter from URL params on mount
+  useEffect(() => {
+    const urlParams: AdminFilterSearchParams = {};
+
+    // Extract all params from URL
+    const title = searchParams.get("title");
+    const status = searchParams.get("status");
+    const doc_type = searchParams.get("doc_type");
+    const level = searchParams.get("level");
+    const intensive = searchParams.get("intensive");
+    const published_year = searchParams.get("published_year");
+    const ordering = searchParams.get("ordering");
+    const order = searchParams.get("order");
+    const start_date = searchParams.get("start_date");
+    const end_date = searchParams.get("end_date");
+    const page = searchParams.get("page");
+    const limit = searchParams.get("limit");
+
+    if (title) urlParams.title = title;
+    if (status) urlParams.status = status;
+    if (doc_type) urlParams.doc_type = doc_type;
+    if (level) urlParams.level = level;
+    if (intensive) urlParams.intensive = intensive === "true";
+    if (published_year) urlParams.published_year = parseInt(published_year);
+    if (ordering) urlParams.ordering = ordering;
+    if (order) urlParams.order = parseInt(order) as 1 | -1;
+    if (start_date && end_date) urlParams.dateRange = [start_date, end_date];
+    if (page) setCurrentPage(parseInt(page));
+    if (limit) setPageSize(parseInt(limit));
+
+    setFilterParams(urlParams);
+  }, [searchParams]);
 
   // Fetch documents from API
   useEffect(() => {
     const fetchDocuments = async () => {
       setLoading(true);
       try {
-        let response;
         const apiParams = {
           page: currentPage,
           limit: pageSize,
@@ -61,11 +94,7 @@ const AdminDocumentTable: React.FC = () => {
           end_date: filterParams.dateRange?.[1],
         };
 
-        if (viewMode === "pending") {
-          response = await DocumentService.getPendingDocuments(apiParams);
-        } else {
-          response = await DocumentService.fetchNewestDocuments(apiParams);
-        }
+        const response = await DocumentService.getAllDocuments(apiParams);
 
         setDocuments(response.documents || []);
         setTotalDocuments(response.total || 0);
@@ -80,11 +109,38 @@ const AdminDocumentTable: React.FC = () => {
     };
 
     fetchDocuments();
-  }, [currentPage, pageSize, viewMode, filterParams]);
+  }, [currentPage, pageSize, filterParams]);
 
   const handleFilterChange = (newParams: AdminFilterSearchParams) => {
     setFilterParams(newParams);
-    setCurrentPage(1); // Reset to page 1 when filter changes
+    setCurrentPage(1);
+
+    // Update URL params
+    const newSearchParams = new URLSearchParams();
+
+    if (newParams.title) newSearchParams.set("title", newParams.title);
+    if (newParams.status) newSearchParams.set("status", newParams.status);
+    if (newParams.doc_type) newSearchParams.set("doc_type", newParams.doc_type);
+    if (newParams.level) newSearchParams.set("level", newParams.level);
+    if (newParams.intensive !== undefined)
+      newSearchParams.set("intensive", newParams.intensive.toString());
+    if (newParams.published_year)
+      newSearchParams.set(
+        "published_year",
+        newParams.published_year.toString()
+      );
+    if (newParams.ordering) newSearchParams.set("ordering", newParams.ordering);
+    if (newParams.order)
+      newSearchParams.set("order", newParams.order.toString());
+    if (newParams.dateRange?.[0])
+      newSearchParams.set("start_date", newParams.dateRange[0]);
+    if (newParams.dateRange?.[1])
+      newSearchParams.set("end_date", newParams.dateRange[1]);
+
+    newSearchParams.set("page", "1");
+    newSearchParams.set("limit", pageSize.toString());
+
+    setSearchParams(newSearchParams);
   };
 
   // Create a display interface that extends Document with display-specific fields
@@ -127,13 +183,12 @@ const AdminDocumentTable: React.FC = () => {
       dataIndex: "index",
       key: "index",
       align: "center",
-      width: 60,
     },
     {
       title: "Tên tài liệu",
       dataIndex: "title",
       key: "title",
-      width: 200,
+      fixed: "left",
       render: (text: string, record: DocumentDisplay) => (
         <Button
           type="link"
@@ -150,7 +205,6 @@ const AdminDocumentTable: React.FC = () => {
       dataIndex: "doc_type",
       key: "doc_type",
       align: "center",
-      width: 100,
       render: (type: string) => {
         const typeMap: { [key: string]: string } = {
           RESEARCH_REPORT: "Nghiên cứu",
@@ -171,7 +225,6 @@ const AdminDocumentTable: React.FC = () => {
       dataIndex: "level",
       key: "level",
       align: "center",
-      width: 80,
       render: (level: string) => {
         const levelMap: { [key: string]: string } = {
           STUDENT: "Học sinh",
@@ -188,7 +241,6 @@ const AdminDocumentTable: React.FC = () => {
       dataIndex: "intensive",
       key: "intensive",
       align: "center",
-      width: 80,
       render: (intensive: boolean) => (intensive ? "Có" : "Không"),
     },
     {
@@ -196,20 +248,17 @@ const AdminDocumentTable: React.FC = () => {
       dataIndex: "view",
       key: "view",
       align: "center",
-      width: 80,
     },
     {
       title: "Lượt bình luận",
       dataIndex: "comment_count",
       key: "comment_count",
       align: "center",
-      width: 120,
     },
     {
       title: "Đánh giá",
       key: "rating",
       align: "center",
-      width: 80,
       render: () => "0%", // Placeholder since rating calculation isn't in the model
     },
     {
@@ -217,14 +266,13 @@ const AdminDocumentTable: React.FC = () => {
       dataIndex: "download_count",
       key: "download_count",
       align: "center",
-      width: 80,
     },
     {
       title: "Trạng thái",
       dataIndex: "status",
       key: "status",
       align: "center",
-      width: 120,
+      fixed: "right",
       render: (status: string) => {
         const getStatusDisplay = (status: string) => {
           switch (status) {
@@ -247,6 +295,22 @@ const AdminDocumentTable: React.FC = () => {
         return <span className={`font-medium ${color}`}>{text}</span>;
       },
     },
+    {
+      title: "Ngày tạo",
+      dataIndex: "createdAt",
+      key: "createdAt",
+      render: (text: string) => {
+        const date = new Date(text);
+        return date.toLocaleDateString("vi-VN", {
+          day: "2-digit",
+          month: "2-digit",
+          year: "numeric",
+          hour: "2-digit",
+          minute: "2-digit",
+          second: "2-digit",
+        });
+      },
+    },
   ];
 
   // Transform API data to display format
@@ -266,17 +330,33 @@ const AdminDocumentTable: React.FC = () => {
   const handlePageSizeChange = (value: number) => {
     setPageSize(value);
     setCurrentPage(1);
+
+    // Update URL
+    const newSearchParams = new URLSearchParams(searchParams);
+    newSearchParams.set("limit", value.toString());
+    newSearchParams.set("page", "1");
+    setSearchParams(newSearchParams);
   };
 
   const handlePreviousPage = () => {
     if (currentPage > 1) {
-      setCurrentPage(currentPage - 1);
+      const newPage = currentPage - 1;
+      setCurrentPage(newPage);
+
+      const newSearchParams = new URLSearchParams(searchParams);
+      newSearchParams.set("page", newPage.toString());
+      setSearchParams(newSearchParams);
     }
   };
 
   const handleNextPage = () => {
     if (currentPage < totalPages) {
-      setCurrentPage(currentPage + 1);
+      const newPage = currentPage + 1;
+      setCurrentPage(newPage);
+
+      const newSearchParams = new URLSearchParams(searchParams);
+      newSearchParams.set("page", newPage.toString());
+      setSearchParams(newSearchParams);
     }
   };
 
@@ -290,17 +370,8 @@ const AdminDocumentTable: React.FC = () => {
   return (
     <div className="space-y-4">
       {/* Header Controls */}
-      <div className="flex justify-between items-center">
+      {/* <div className="flex justify-between items-center">
         <div className="flex items-center space-x-2">
-          <Select
-            value={viewMode}
-            onChange={setViewMode}
-            size="small"
-            style={{ width: 150 }}
-          >
-            <Option value="pending">Chờ duyệt</Option>
-            <Option value="all">Tất cả</Option>
-          </Select>
           <Select defaultValue="2025" size="small" style={{ width: 80 }}>
             <Option value="2025">2025</Option>
             <Option value="2024">2024</Option>
@@ -312,12 +383,13 @@ const AdminDocumentTable: React.FC = () => {
             Print
           </Button>
         </div>
-      </div>
+      </div> */}
 
       {/* Filter & Search Component */}
       <AdminDocumentFilterSearch
         onFilterChange={handleFilterChange}
         loading={loading}
+        initialFilters={filterParams}
       />
 
       {/* Table */}
@@ -330,6 +402,12 @@ const AdminDocumentTable: React.FC = () => {
             .ant-table-thead > tr > th {
               font-size: 11px !important;
             }
+            .ant-table-container .ant-table-body,
+            .ant-table-container .ant-table-content {
+              scrollbar-width: thin;
+              scrollbar-color: #eaeaea transparent;
+              scrollbar-gutter: stable;
+            }
           `}
         </style>
         <Table
@@ -340,6 +418,7 @@ const AdminDocumentTable: React.FC = () => {
           size="small"
           loading={loading}
           rowKey="_id"
+          scroll={{ x: "max-content" }}
           onRow={(record) => ({
             style: { cursor: "pointer" },
             onClick: () => handleRowClick(record),

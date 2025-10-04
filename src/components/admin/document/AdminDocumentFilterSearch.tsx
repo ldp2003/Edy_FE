@@ -20,15 +20,24 @@ export interface AdminFilterSearchParams {
 interface AdminDocumentFilterSearchProps {
   onFilterChange: (params: AdminFilterSearchParams) => void;
   loading?: boolean;
+  initialFilters?: AdminFilterSearchParams;
 }
 
 const AdminDocumentFilterSearch: React.FC<AdminDocumentFilterSearchProps> = ({
   onFilterChange,
   loading,
+  initialFilters = {},
 }) => {
-  const [searchText, setSearchText] = useState("");
-  const [filters, setFilters] = useState<AdminFilterSearchParams>({});
+  const [searchText, setSearchText] = useState(initialFilters.title || "");
+  const [filters, setFilters] =
+    useState<AdminFilterSearchParams>(initialFilters);
   const [showFilterDrawer, setShowFilterDrawer] = useState(false);
+
+  // Sync with initialFilters when they change (from URL)
+  useEffect(() => {
+    setFilters(initialFilters);
+    setSearchText(initialFilters.title || "");
+  }, [initialFilters]);
 
   const handleFilterChange = useCallback(
     (newFilters: Partial<AdminFilterSearchParams>) => {
