@@ -4,7 +4,6 @@ import { message } from "antd";
 import { DocumentService } from "../../../utils/DocumentService";
 import type { Document } from "../../../models/document";
 import SearchHeader from "../../../components/user/search/SearchHeader";
-import SearchFilters from "../../../components/user/search/SearchFilters";
 import SearchResults from "../../../components/user/search/SearchResults";
 // import SubjectSection from "../../../components/user/search/SubjectSection";
 
@@ -15,19 +14,19 @@ export interface SearchFilters {
   organization?: string;
   intensive?: boolean;
   published_year?: number;
-  start_date?: string;
-  end_date?: string;
-  min_views?: number;
-  max_views?: number;
-  min_downloads?: number;
-  max_downloads?: number;
-  min_pages?: number;
-  max_pages?: number;
+  publisher?: string;
+  author?: string[];
+  keyword?: string[];
+  subject?: string;
+  status?: string;
+  summary_status?: string;
+  public_mode?: string;
   ordering?: string;
   order?: 1 | -1;
 }
 
 export type ViewMode = "grid" | "list";
+export type TabMode = "all" | "subjects";
 
 const SearchPage: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -37,6 +36,7 @@ const SearchPage: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize] = useState(12);
   const [viewMode, setViewMode] = useState<ViewMode>("grid");
+  const [currentTab, setCurrentTab] = useState<TabMode>("all");
 
   // Extract filters from URL
   const getFiltersFromURL = useCallback((): SearchFilters => {
@@ -48,14 +48,13 @@ const SearchPage: React.FC = () => {
     const organization = searchParams.get("organization");
     const intensive = searchParams.get("intensive");
     const published_year = searchParams.get("published_year");
-    const start_date = searchParams.get("start_date");
-    const end_date = searchParams.get("end_date");
-    const min_views = searchParams.get("min_views");
-    const max_views = searchParams.get("max_views");
-    const min_downloads = searchParams.get("min_downloads");
-    const max_downloads = searchParams.get("max_downloads");
-    const min_pages = searchParams.get("min_pages");
-    const max_pages = searchParams.get("max_pages");
+    const publisher = searchParams.get("publisher");
+    const author = searchParams.get("author");
+    const keyword = searchParams.get("keyword");
+    const subject = searchParams.get("subject");
+    const status = searchParams.get("status");
+    const summary_status = searchParams.get("summary_status");
+    const public_mode = searchParams.get("public_mode");
     const ordering = searchParams.get("ordering");
     const order = searchParams.get("order");
     const page = searchParams.get("page");
@@ -66,14 +65,13 @@ const SearchPage: React.FC = () => {
     if (organization) filters.organization = organization;
     if (intensive) filters.intensive = intensive === "true";
     if (published_year) filters.published_year = parseInt(published_year);
-    if (start_date) filters.start_date = start_date;
-    if (end_date) filters.end_date = end_date;
-    if (min_views) filters.min_views = parseInt(min_views);
-    if (max_views) filters.max_views = parseInt(max_views);
-    if (min_downloads) filters.min_downloads = parseInt(min_downloads);
-    if (max_downloads) filters.max_downloads = parseInt(max_downloads);
-    if (min_pages) filters.min_pages = parseInt(min_pages);
-    if (max_pages) filters.max_pages = parseInt(max_pages);
+    if (publisher) filters.publisher = publisher;
+    if (author) filters.author = author.split(",");
+    if (keyword) filters.keyword = keyword.split(",");
+    if (subject) filters.subject = subject;
+    if (status) filters.status = status;
+    if (summary_status) filters.summary_status = summary_status;
+    if (public_mode) filters.public_mode = public_mode;
     if (ordering) filters.ordering = ordering;
     if (order) filters.order = parseInt(order) as 1 | -1;
     if (page) setCurrentPage(parseInt(page));
@@ -85,6 +83,13 @@ const SearchPage: React.FC = () => {
 
   // Fetch documents based on filters
   const fetchDocuments = useCallback(async () => {
+    // Skip fetching documents for subjects tab, only show subjects
+    if (currentTab === "subjects") {
+      setDocuments([]);
+      setTotalDocuments(6); // Mock count for subjects
+      return;
+    }
+
     setLoading(true);
     try {
       const params = {
@@ -105,7 +110,7 @@ const SearchPage: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  }, [filters, currentPage, pageSize]);
+  }, [filters, currentPage, pageSize, currentTab]);
 
   // Update URL when filters change
   const updateURL = (newFilters: SearchFilters, newPage?: number) => {
@@ -124,26 +129,25 @@ const SearchPage: React.FC = () => {
         "published_year",
         newFilters.published_year.toString()
       );
-    if (newFilters.start_date)
-      newSearchParams.set("start_date", newFilters.start_date);
-    if (newFilters.end_date)
-      newSearchParams.set("end_date", newFilters.end_date);
-    if (newFilters.min_views)
-      newSearchParams.set("min_views", newFilters.min_views.toString());
-    if (newFilters.max_views)
-      newSearchParams.set("max_views", newFilters.max_views.toString());
-    if (newFilters.min_downloads)
-      newSearchParams.set("min_downloads", newFilters.min_downloads.toString());
-    if (newFilters.max_downloads)
-      newSearchParams.set("max_downloads", newFilters.max_downloads.toString());
-    if (newFilters.min_pages)
-      newSearchParams.set("min_pages", newFilters.min_pages.toString());
-    if (newFilters.max_pages)
-      newSearchParams.set("max_pages", newFilters.max_pages.toString());
+    if (newFilters.publisher)
+      newSearchParams.set("publisher", newFilters.publisher);
+    if (newFilters.author && newFilters.author.length > 0)
+      newSearchParams.set("author", newFilters.author.join(","));
+    if (newFilters.keyword && newFilters.keyword.length > 0)
+      newSearchParams.set("keyword", newFilters.keyword.join(","));
+    if (newFilters.subject) newSearchParams.set("subject", newFilters.subject);
+    if (newFilters.status) newSearchParams.set("status", newFilters.status);
+    if (newFilters.summary_status)
+      newSearchParams.set("summary_status", newFilters.summary_status);
+    if (newFilters.public_mode)
+      newSearchParams.set("public_mode", newFilters.public_mode);
     if (newFilters.ordering)
       newSearchParams.set("ordering", newFilters.ordering);
     if (newFilters.order)
       newSearchParams.set("order", newFilters.order.toString());
+
+    // Add current tab to URL
+    if (currentTab !== "all") newSearchParams.set("tab", currentTab);
 
     const pageToSet = newPage || currentPage;
     if (pageToSet > 1) newSearchParams.set("page", pageToSet.toString());
@@ -175,10 +179,26 @@ const SearchPage: React.FC = () => {
     handleFilterChange(newFilters);
   };
 
-  // Fetch documents when filters or page change
+  // Handle tab change
+  const handleTabChange = (tab: TabMode) => {
+    setCurrentTab(tab);
+    setCurrentPage(1);
+
+    // Update URL with new tab
+    const newSearchParams = new URLSearchParams(searchParams);
+    if (tab !== "all") {
+      newSearchParams.set("tab", tab);
+    } else {
+      newSearchParams.delete("tab");
+    }
+    newSearchParams.delete("page"); // Reset page to 1
+    setSearchParams(newSearchParams);
+  };
+
+  // Fetch documents when filters, page, or tab change
   useEffect(() => {
     fetchDocuments();
-  }, [filters, currentPage, fetchDocuments]);
+  }, [fetchDocuments]);
 
   // Update filters when URL changes
   useEffect(() => {
@@ -186,41 +206,74 @@ const SearchPage: React.FC = () => {
     setFilters(urlFilters);
   }, [searchParams, getFiltersFromURL]);
 
+  // Handle tab state from URL
+  useEffect(() => {
+    const tabFromURL = searchParams.get("tab") as TabMode;
+    if (tabFromURL && tabFromURL !== currentTab) {
+      setCurrentTab(tabFromURL);
+    } else if (!tabFromURL && currentTab !== "all") {
+      setCurrentTab("all");
+    }
+  }, [searchParams, currentTab]);
+
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="max-w-7xl mx-auto px-4 py-6">
-        {/* Search Header */}
+    <div className="min-h-screen">
+      <div className="max-w-7xl mx-auto px-4 py-6 bg-white rounded-lg shadow">
+        {/* Search Header with integrated filter drawer */}
         <SearchHeader
           initialQuery={filters.search || ""}
           onSearch={(query) =>
             handleFilterChange({ ...filters, search: query })
           }
+          filters={filters}
+          onFilterChange={handleFilterChange}
         />
 
-        {/* Search Filters */}
-        <SearchFilters filters={filters} onFilterChange={handleFilterChange} />
-
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 mt-6">
-          {/* Main Content */}
-          <div className="lg:col-span-3">
-            <SearchResults
-              documents={documents}
-              loading={loading}
-              total={totalDocuments}
-              currentPage={currentPage}
-              pageSize={pageSize}
-              viewMode={viewMode}
-              onPageChange={handlePageChange}
-              onViewModeChange={handleViewModeChange}
-              onSortChange={handleSortChange}
-              searchQuery={filters.search || ""}
-            />
+        {/* Tab Navigation */}
+        <div className="mb-6">
+          <div className="mb-6">
+            <div className="flex border-b border-gray-200">
+              <button
+                className={`px-6 py-3 font-medium border-b-2 transition-colors ${
+                  currentTab === "all"
+                    ? "text-blue-600 border-blue-600"
+                    : "text-gray-500 hover:text-gray-700 border-transparent"
+                }`}
+                onClick={() => handleTabChange("all")}
+              >
+                Tất cả
+              </button>
+              <button
+                className={`px-6 py-3 font-medium border-b-2 transition-colors ${
+                  currentTab === "subjects"
+                    ? "text-blue-600 border-blue-600"
+                    : "text-gray-500 hover:text-gray-700 border-transparent"
+                }`}
+                onClick={() => handleTabChange("subjects")}
+              >
+                Môn học
+              </button>
+            </div>
           </div>
 
-          {/* Sidebar */}
-          {/* <div className="lg:col-span-1">
-            <SubjectSection />
-          </div> */}
+          <div className="">
+            {/* Main Content */}
+            <div className="">
+              <SearchResults
+                documents={documents}
+                loading={loading}
+                total={totalDocuments}
+                currentPage={currentPage}
+                pageSize={pageSize}
+                viewMode={viewMode}
+                onPageChange={handlePageChange}
+                onViewModeChange={handleViewModeChange}
+                onSortChange={handleSortChange}
+                searchQuery={filters.search || ""}
+                currentTab={currentTab}
+              />
+            </div>
+          </div>
         </div>
       </div>
     </div>

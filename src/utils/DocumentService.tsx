@@ -3,7 +3,6 @@ import { DocumentAPI } from "../api/API";
 export const DocumentService = {
   async getAllDocuments(params: {
     search?: string;
-    title?: string;
     ordering?: string;
     order?: 1 | -1;
     page?: number;
@@ -12,17 +11,15 @@ export const DocumentService = {
     publisher?: string;
     published_year?: number;
     intensive?: boolean;
-    author?: string;
+    author?: string | string[];
     user?: string;
-    keyword?: string;
+    keyword?: string | string[];
     doc_type?: string;
     level?: string;
     subject?: string;
     status?: string;
     summary_status?: string;
     public_mode?: string;
-    start_date?: string;
-    end_date?: string;
   }) {
     try {
       return await DocumentAPI.getAllDocuments(params);
