@@ -99,7 +99,7 @@ const SearchPage: React.FC = () => {
         status: "APPROVED", // Chỉ lấy tài liệu đã duyệt
       };
 
-      const response = await DocumentService.getAllDocuments(params);
+      const response = await DocumentService.fetchNewestDocuments(params);
       setDocuments(response.documents || []);
       setTotalDocuments(response.total || 0);
     } catch (error) {

@@ -129,12 +129,13 @@ const AuthRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
           setFavoriteDocuments([]);
 
           // Allow access to public pages without redirecting
-          const publicPages = ["/", "/document-detail"];
+          const publicPages = ["/", "/document-detail", "/search"];
           const isPublicPage = publicPages.some(
             (page) =>
               location.pathname === page ||
               (page === "/document-detail" &&
-                location.pathname.startsWith("/document-detail/"))
+                location.pathname.startsWith("/document-detail/")) ||
+              (page === "/search" && location.pathname.startsWith("/search"))
           );
 
           if (!isPublicPage) {
@@ -203,12 +204,13 @@ const AuthRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
         setFavoriteDocuments([]);
 
         // Allow access to public pages even when auth fails
-        const publicPages = ["/", "/document-detail"];
+        const publicPages = ["/", "/document-detail", "/search"];
         const isPublicPage = publicPages.some(
           (page) =>
             location.pathname === page ||
             (page === "/document-detail" &&
-              location.pathname.startsWith("/document-detail/"))
+              location.pathname.startsWith("/document-detail/")) ||
+            (page === "/search" && location.pathname.startsWith("/search"))
         );
 
         if (!isPublicPage) {
