@@ -81,10 +81,11 @@ const DocumentActions: React.FC<DocumentActionsProps> = ({
   return (
     <div
       data-document-actions={document._id}
-      className={`flex items-center justify-between p-2 transition-all duration-300 ${isFixed
-        ? "sticky top-0 bg-[var(--secondary-background-color)] shadow-md z-10 mx-[-16px] px-4"
-        : ""
-        }`}
+      className={`flex items-center justify-between p-2 transition-all duration-300 ${
+        isFixed
+          ? "sticky top-0 bg-[var(--secondary-background-color)] shadow-md z-10 mx-[-16px] px-4"
+          : ""
+      }`}
     >
       <DownloadButton
         point={document.intensive ? 6 : 4}
@@ -93,17 +94,24 @@ const DocumentActions: React.FC<DocumentActionsProps> = ({
       />
 
       <div className="flex items-center space-x-4">
-        {!isUser && <ReportButton />}
+        {!isUser && (
+          <ReportButton
+            documentId={document._id}
+            documentTitle={document.title}
+          />
+        )}
         <LikeButton likeCount={0} />
         <DislikeButton dislikeCount={0} />
         <FavoriteButton documentId={document._id} />
         <ShareButton
           documentId={document._id}
           documentTitle={document.title}
-          isPublic={document.public_mode === 'PUBLIC'}
-          isSharedWithOrganization={document.public_mode === 'SHARE_ORGANIZATION'}
-          isPrivate={document.public_mode === 'PRIVATE'}
-          isPrivateShared={document.public_mode === 'PRIVATE_SHARED'}
+          isPublic={document.public_mode === "PUBLIC"}
+          isSharedWithOrganization={
+            document.public_mode === "SHARE_ORGANIZATION"
+          }
+          isPrivate={document.public_mode === "PRIVATE"}
+          isPrivateShared={document.public_mode === "PRIVATE_SHARED"}
           isOwner={document.user._id === user?._id}
         />
       </div>

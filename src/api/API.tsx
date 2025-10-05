@@ -322,6 +322,36 @@ export const SubjectAPI = {
 };
 
 export const DocumentAPI = {
+  // Get all documents (for admin)
+  getAllDocuments: async (params: {
+    search?: string;
+    ordering?: string;
+    order?: 1 | -1;
+    page?: number;
+    limit?: number;
+    organization?: string;
+    publisher?: string;
+    published_year?: number;
+    intensive?: boolean;
+    author?: string | string[];
+    user?: string;
+    keyword?: string | string[];
+    doc_type?: string;
+    level?: string;
+    subject?: string;
+    status?: string;
+    summary_status?: string;
+    public_mode?: string;
+  }) => {
+    try {
+      const response = await apiClient.get("/documents", { params });
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching all documents:", error);
+      throw error;
+    }
+  },
+
   // Fetch newest documents
   fetchNewestDocuments: async (params: {
     search?: string;
@@ -333,12 +363,15 @@ export const DocumentAPI = {
     publisher?: string;
     published_year?: number;
     intensive?: boolean;
-    author?: string;
+    author?: string | string[];
     user?: string;
-    keyword?: string;
+    keyword?: string | string[];
     doc_type?: string;
     level?: string;
     subject?: string;
+    status?: string;
+    summary_status?: string;
+    public_mode?: string;
   }) => {
     try {
       const response = await apiClient.get("/documents/newest", { params });
@@ -767,6 +800,62 @@ export const AccessRequestAPI = {
       return response.data;
     } catch (error) {
       console.error("Error canceling access request:", error);
+      throw error;
+    }
+  },
+};
+
+export const ReportAPI = {
+  // Create a new report
+  createReport: async (data: {
+    docId: string;
+    cmtId?: string;
+    type: string[];
+    reason: string;
+  }) => {
+    try {
+      const response = await apiClient.post("/reports", data);
+      return response.data;
+    } catch (error) {
+      console.error("Error creating report:", error);
+      throw error;
+    }
+  },
+
+  // Get all reports (admin only)
+  getAllReports: async (params?: {
+    status?: string;
+    type?: string;
+    search?: string;
+    page?: number;
+    limit?: number;
+  }) => {
+    try {
+      const response = await apiClient.get("/reports", { params });
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching reports:", error);
+      throw error;
+    }
+  },
+
+  // Resolve a report (admin only)
+  resolveReport: async (
+    reportId: string,
+    data: {
+      validTypes: string[];
+      action: string;
+      resolveReason: string;
+    }
+  ) => {
+    try {
+      const response = await apiClient.put(
+        `/reports/${reportId}/resolve`,
+        data
+      );
+      return response.data;
+    } catch (error) {
+      console.error("Error resolving report:", error);
       throw error;
     }
   },

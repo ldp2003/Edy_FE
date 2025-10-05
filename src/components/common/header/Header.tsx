@@ -28,7 +28,10 @@ export function Header() {
     <header className="bg-white border-b border-gray-200 px-6 py-2 w-full flex-shrink-0 shadow-sm">
       <div className="flex items-center justify-between">
         {/* Logo */}
-        <div className="flex items-center gap-2">
+        <div
+          className="flex items-center gap-2 cursor-pointer"
+          onClick={() => (window.location.href = "/")}
+        >
           <div className="w-10 h-10 rounded flex items-center justify-center">
             <img src={logo} alt="Logo" />
           </div>
@@ -42,10 +45,34 @@ export function Header() {
           <div className="relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
             <input
+              id="search-input"
               placeholder="Nhập từ khóa tìm kiếm: Tên tài liệu, trường, môn học, tác giả..."
               className="pl-10 text-sm pr-24 py-2 w-full border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              onKeyPress={(e) => {
+                if (e.key === "Enter") {
+                  const query = (e.target as HTMLInputElement).value.trim();
+                  if (query) {
+                    window.location.href = `/search?q=${encodeURIComponent(
+                      query
+                    )}`;
+                  }
+                }
+              }}
             />
-            <button className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-[var(--primary-color)] hover:bg-gray-700 text-white px-4 py-1 text-xs rounded transition-colors">
+            <button
+              className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-[var(--primary-color)] hover:bg-gray-700 text-white px-4 py-1 text-xs rounded transition-colors"
+              onClick={() => {
+                const input = document.getElementById(
+                  "search-input"
+                ) as HTMLInputElement;
+                const query = input?.value.trim();
+                if (query) {
+                  window.location.href = `/search?q=${encodeURIComponent(
+                    query
+                  )}`;
+                }
+              }}
+            >
               Tìm kiếm
             </button>
           </div>

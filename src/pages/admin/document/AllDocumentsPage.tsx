@@ -13,7 +13,7 @@ const AllDocumentsPage: React.FC = () => {
       <AdminBreadcrumb items={breadcrumbItems} />
 
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-        <h1 className="text-base text-left font-bold text-gray-900 mb-6">
+        <h1 className="text-base text-left font-bold text-[var(--primary-text-color)] mb-6">
           Tất cả tài liệu
         </h1>
 
