@@ -8,6 +8,7 @@ export const AccessRequestStatus = {
   PENDING: "PENDING",
   APPROVED: "APPROVED",
   DENIED: "DENIED",
+  IGNORED: "IGNORED",
 } as const;
 
 export type AccessRequestStatusType =
@@ -21,6 +22,7 @@ export const accessRequestStatusLabels: Record<
   PENDING: "Đang chờ xử lý",
   APPROVED: "Đã phê duyệt",
   DENIED: "Đã từ chối",
+  IGNORED: "Đã bỏ qua",
 };
 
 // Private Share interface (basic structure)

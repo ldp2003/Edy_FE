@@ -276,10 +276,10 @@ const ShareModal: React.FC<ShareModalProps> = ({
     }
   };
 
-  const handleDenyRequest = async (requestId: string, reason?: string) => {
+  const handleDenyRequest = async (requestId: string) => {
     try {
       setLoading(true);
-      await AccessRequestService.denyAccessRequest(requestId, { reason });
+      await AccessRequestService.denyAccessRequest(requestId);
       messageApi.success("Đã từ chối yêu cầu truy cập!");
 
       // Refresh both requests and share links (to update counts)
