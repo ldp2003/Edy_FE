@@ -200,16 +200,16 @@ const DocumentActionButtons: React.FC<DocumentActionButtonsProps> = ({
         </div>
       </Modal>
 
-      {/* Delete Modal */}
+      {/* Request edit Modal */}
       <Modal
-        title="Xóa bài viết"
+        title="Yêu cầu chỉnh sửa"
         open={deleteModalVisible}
         onOk={handleDelete}
         onCancel={() => {
           setDeleteModalVisible(false);
           setDeleteReason("");
         }}
-        okText="Xóa"
+        okText="Yêu cầu"
         cancelText="Hủy"
         confirmLoading={processing}
         okButtonProps={{
@@ -221,7 +221,7 @@ const DocumentActionButtons: React.FC<DocumentActionButtonsProps> = ({
       >
         <div className="mb-4">
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            Lý do xóa bài:
+            Lý do yêu cầu chỉnh sửa:
           </label>
           <TextArea
             rows={4}
@@ -229,7 +229,7 @@ const DocumentActionButtons: React.FC<DocumentActionButtonsProps> = ({
             onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
               setDeleteReason(e.target.value)
             }
-            placeholder="Nhập lý do xóa bài viết này..."
+            placeholder="Nhập lý do yêu cầu chỉnh sửa bài viết này..."
             style={{ resize: "none" }}
           />
         </div>

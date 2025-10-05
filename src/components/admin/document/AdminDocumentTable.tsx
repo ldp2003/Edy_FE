@@ -280,8 +280,8 @@ const AdminDocumentTable: React.FC = () => {
               return { text: "Chờ duyệt", color: "text-yellow-600" };
             case "APPROVED":
               return { text: "Đã duyệt", color: "text-green-600" };
-            case "PENDING_SUMMARY":
-              return { text: "Chờ tóm tắt", color: "text-blue-600" };
+            case "PENDING_EDIT":
+              return { text: "Chờ duyệt chỉnh sửa", color: "text-blue-600" };
             case "REJECTED":
               return { text: "Đã từ chối", color: "text-red-600" };
             case "REQUESTED_EDIT":

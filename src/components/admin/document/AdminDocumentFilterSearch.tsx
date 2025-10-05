@@ -82,7 +82,7 @@ const AdminDocumentFilterSearch: React.FC<AdminDocumentFilterSearchProps> = ({
         { value: "PENDING", label: "Chờ duyệt" },
         { value: "APPROVED", label: "Đã duyệt" },
         { value: "REJECTED", label: "Bị từ chối" },
-        { value: "PENDING_SUMMARY", label: "Chờ tóm tắt" },
+        { value: "PENDING_EDIT", label: "Chờ duyệt chỉnh sửa" },
         { value: "REQUESTED_EDIT", label: "Yêu cầu chỉnh sửa" },
       ],
       onChange: (value) => handleFilterChange({ status: value as string }),

@@ -86,14 +86,16 @@ const PostTable: React.FC<PostTableProps> = ({ data, loading }) => {
       options.push({ mode: PublicMode.PUBLIC, label: "Công khai" });
     }
     if (currentMode !== PublicMode.PRIVATE) {
-      options.push({ mode: PublicMode.PRIVATE, label: "Riêng tư" });
+      if (currentMode !== PublicMode.PRIVATE_SHARED) {
+        options.push({ mode: PublicMode.PRIVATE, label: "Riêng tư" });
+      }
     }
-    if (currentMode !== PublicMode.PRIVATE_SHARED) {
-      options.push({
-        mode: PublicMode.PRIVATE_SHARED,
-        label: "Chia sẻ cá nhân",
-      });
-    }
+    // if (currentMode !== PublicMode.PRIVATE_SHARED) {
+    //   options.push({
+    //     mode: PublicMode.PRIVATE_SHARED,
+    //     label: "Chia sẻ cá nhân",
+    //   });
+    // }
     if (currentMode !== PublicMode.SHARE_ORGANIZATION) {
       options.push({
         mode: PublicMode.SHARE_ORGANIZATION,

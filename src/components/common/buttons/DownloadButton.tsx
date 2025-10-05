@@ -280,7 +280,7 @@ const DownloadButton: React.FC<DownloadButtonProps> = ({
                 <p className="text-green-700 text-sm mt-1">
                   Link sẽ hết hạn sau 10 phút.{" "}
                   <strong>
-                    Nếu bạn tắt thông báo này, bạn sẽ không thể tải tài liệu.
+                    Nếu bạn tắt thông báo này, bạn sẽ không thể lấy lại link tải.
                   </strong>
                 </p>
               </div>

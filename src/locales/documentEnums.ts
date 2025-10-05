@@ -30,9 +30,9 @@ export const levelTranslations = {
 export const statusTranslations = {
   PENDING: "Đang chờ duyệt",
   APPROVED: "Đã duyệt",
-  PENDING_SUMMARY: "Chờ tóm tắt",
   REJECTED: "Bị từ chối",
   REQUESTED_EDIT: "Yêu cầu chỉnh sửa",
+  PENDING_EDIT: "Chờ chỉnh sửa",
 };
 
 export const publicModeTranslations = {

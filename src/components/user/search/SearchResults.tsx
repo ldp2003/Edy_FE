@@ -304,7 +304,7 @@ const SearchResults: React.FC<SearchResultsProps> = ({
                       } lượt xem • ${document.download_count || 0} lượt tải`}
                       imageUrl={document.cover_page}
                       document={document}
-                      navigationPath={`/documents/${document._id}`}
+                      // navigationPath={`/document-detail/${document._id}`}
                     />
                   ))}
                 </div>
@@ -319,7 +319,7 @@ const SearchResults: React.FC<SearchResultsProps> = ({
                         key={document._id}
                         className="cursor-pointer hover:bg-gray-50 rounded"
                         onClick={() =>
-                          (window.location.href = `/documents/${document._id}`)
+                          (window.location.href = `/document-detail/${document._id}`)
                         }
                       >
                         <RecentItem

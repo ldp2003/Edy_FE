@@ -82,16 +82,18 @@ const PersonalPostHeader: React.FC<PersonalPostHeaderProps> = ({
 
     // Thêm Riêng tư nếu không phải mode hiện tại
     if (currentMode !== PublicMode.PRIVATE) {
-      options.push({ mode: PublicMode.PRIVATE, label: "Riêng tư" });
+      if (currentMode !== PublicMode.PRIVATE_SHARED) {
+        options.push({ mode: PublicMode.PRIVATE, label: "Riêng tư" });
+      }
     }
 
     // Thêm Chia sẻ cá nhân nếu không phải mode hiện tại
-    if (currentMode !== PublicMode.PRIVATE_SHARED) {
-      options.push({
-        mode: PublicMode.PRIVATE_SHARED,
-        label: "Chia sẻ cá nhân",
-      });
-    }
+    // if (currentMode !== PublicMode.PRIVATE_SHARED) {
+    //   options.push({
+    //     mode: PublicMode.PRIVATE_SHARED,
+    //     label: "Chia sẻ cá nhân",
+    //   });
+    // }
 
     // Thêm Chỉ tổ chức nếu không phải mode hiện tại
     if (currentMode !== PublicMode.SHARE_ORGANIZATION) {
