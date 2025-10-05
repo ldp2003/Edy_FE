@@ -22,7 +22,7 @@ interface AccessRequestsPanelProps {
   loading: boolean;
   onLinkSelect: (linkId: string) => void;
   onApproveRequest: (requestId: string) => void;
-  onDenyRequest: (requestId: string, reason?: string) => void;
+  onDenyRequest: (requestId: string) => void;
   onCreateTabClick: () => void;
 }
 
@@ -167,7 +167,6 @@ const AccessRequestsPanel: React.FC<AccessRequestsPanelProps> = ({
                             onClick={() =>
                               onDenyRequest(
                                 request._id,
-                                "Không đáp ứng yêu cầu"
                               )
                             }
                             loading={loading}

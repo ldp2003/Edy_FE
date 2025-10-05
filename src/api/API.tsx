@@ -753,11 +753,10 @@ export const AccessRequestAPI = {
   },
 
   // Deny access request
-  denyAccessRequest: async (requestId: string, data?: { reason?: string }) => {
+  denyAccessRequest: async (requestId: string) => {
     try {
       const response = await apiClient.put(
-        `/access-requests/${requestId}/deny`,
-        data || {}
+        `/access-requests/${requestId}/deny`
       );
       return response.data;
     } catch (error) {
