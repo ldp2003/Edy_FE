@@ -48,11 +48,6 @@ const PersonalPostList: React.FC = () => {
         page: currentPage,
         limit: pageSize,
         ...filters,
-        // Handle date range
-        ...(filters.dateRange && {
-          created_from: filters.dateRange[0],
-          created_to: filters.dateRange[1],
-        }),
       };
 
       console.log("API Params:", apiParams); // Debug log
@@ -123,6 +118,9 @@ const PersonalPostList: React.FC = () => {
     const published_year = searchParams.get("published_year");
     if (published_year) urlFilters.published_year = parseInt(published_year);
 
+    const createdAt = searchParams.get("createdAt");
+    if (createdAt) urlFilters.createdAt = createdAt;
+
     if (Object.keys(urlFilters).length > 0) {
       setFilters(urlFilters);
     }
@@ -161,9 +159,8 @@ const PersonalPostList: React.FC = () => {
           newFilters.published_year.toString()
         );
       }
-      if (newFilters.dateRange) {
-        newSearchParams.set("date_from", newFilters.dateRange[0]);
-        newSearchParams.set("date_to", newFilters.dateRange[1]);
+      if (newFilters.createdAt) {
+        newSearchParams.set("createdAt", newFilters.createdAt);
       }
 
       setSearchParams(newSearchParams);

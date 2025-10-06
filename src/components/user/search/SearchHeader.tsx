@@ -20,6 +20,9 @@ const SearchHeader: React.FC<SearchHeaderProps> = ({
   const [query, setQuery] = useState(initialQuery);
   const [filterDrawerOpen, setFilterDrawerOpen] = useState(false);
   const [isFixed, setIsFixed] = useState(false);
+  const [appliedFilters, setAppliedFilters] = useState<ISearchFilters | null>(
+    null
+  );
 
   // Memoize scroll handler để tránh tạo lại function mỗi lần render
   const handleScroll = useCallback((event: Event) => {
@@ -95,6 +98,13 @@ const SearchHeader: React.FC<SearchHeaderProps> = ({
       (key) => key !== "search" && key !== "ordering" && key !== "order"
     );
     return filterKeys.length > 0;
+  };
+
+  const handleApplyFilters = (newFilters: ISearchFilters) => {
+    setAppliedFilters(newFilters);
+    if (onFilterChange) {
+      onFilterChange(newFilters);
+    }
   };
 
   return (
@@ -190,6 +200,98 @@ const SearchHeader: React.FC<SearchHeaderProps> = ({
               ))}
             </div>
           </div>
+          {appliedFilters &&
+            Object.keys(appliedFilters).some(
+              (key) =>
+                key !== "search" &&
+                key !== "ordering" &&
+                key !== "order" &&
+                appliedFilters[key as keyof typeof appliedFilters]
+            ) && (
+              <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 mt-4">
+                <div className="flex items-center gap-2 mb-3">
+                  <Filter className="w-4 h-4 text-blue-600" />
+                  <h3 className="text-sm font-semibold text-blue-800">
+                    Bộ lọc đang áp dụng
+                  </h3>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  {Object.entries(appliedFilters).map(([key, value]) => {
+                    if (
+                      !value ||
+                      key === "search" ||
+                      key === "ordering" ||
+                      key === "order"
+                    )
+                      return null;
+
+                    const getFilterLabel = (key: string) => {
+                      const labels: { [key: string]: string } = {
+                        doc_type: "Loại tài liệu",
+                        level: "Trình độ",
+                        organization: "Tổ chức",
+                        author: "Tác giả",
+                        publisher: "Nhà xuất bản",
+                        published_year: "Năm xuất bản",
+                        subject: "Môn học",
+                        keyword: "Từ khóa",
+                        intensive: "Chuyên sâu",
+                        view_count: "Lượt xem",
+                        download_count: "Lượt tải",
+                        page: "Số trang",
+                      };
+                      return labels[key] || key;
+                    };
+
+                    const getFilterValue = (
+                      key: string,
+                      value: string | number | boolean | string[]
+                    ) => {
+                      if (key === "intensive") return value ? "Có" : "Không";
+                      if (key === "doc_type" && typeof value === "string") {
+                        const types: { [key: string]: string } = {
+                          RESEARCH_REPORT: "Nghiên cứu",
+                          VIDEO: "Video",
+                          STUDY_GUIDE: "Đề cương",
+                          TEXTBOOK: "Giáo trình",
+                          ESSAY: "Tiểu luận",
+                          SOLUTION_SET: "Bài giải",
+                          THESIS: "Luận văn",
+                          LECTURE: "Bài giảng",
+                          OTHER: "Khác",
+                        };
+                        return types[value] || value;
+                      }
+                      if (key === "level" && typeof value === "string") {
+                        const levels: { [key: string]: string } = {
+                          STUDENT: "Học sinh",
+                          UNIVERSITY: "Đại học",
+                          LECTURER: "Giảng viên",
+                          RESEARCHER: "Nghiên cứu sinh",
+                          OTHER: "Khác",
+                        };
+                        return levels[value] || value;
+                      }
+                      return Array.isArray(value)
+                        ? value.join(", ")
+                        : value.toString();
+                    };
+
+                    return (
+                      <span
+                        key={key}
+                        className="inline-flex items-center gap-1 px-3 py-1.5 bg-white border border-blue-300 rounded-full text-xs font-medium text-blue-700 shadow-sm"
+                      >
+                        <span className="font-semibold">
+                          {getFilterLabel(key)}:
+                        </span>
+                        <span>{getFilterValue(key, value)}</span>
+                      </span>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
         </div>
       </div>
 
@@ -241,6 +343,8 @@ const SearchHeader: React.FC<SearchHeaderProps> = ({
         </div>
       )}
 
+      {/* Display applied filters */}
+
       {/* Filter Drawer - Enhanced styling */}
       <Drawer
         title={
@@ -257,10 +361,10 @@ const SearchHeader: React.FC<SearchHeaderProps> = ({
         width={420}
         className="filter-drawer"
       >
-        {filters && onFilterChange && (
+        {filters && (
           <SearchFilters
             filters={filters}
-            onFilterChange={onFilterChange}
+            onFilterChange={handleApplyFilters}
             onApply={() => setFilterDrawerOpen(false)}
             onReset={() => setFilterDrawerOpen(false)}
           />

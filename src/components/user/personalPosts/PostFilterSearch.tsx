@@ -11,7 +11,7 @@ export interface FilterSearchParams {
   doc_type?: string;
   public_mode?: string;
   published_year?: number;
-  dateRange?: [string, string];
+  createdAt?: string;
   ordering?: string;
   order?: 1 | -1;
 }
@@ -89,11 +89,14 @@ const PostFilterSearch: React.FC<PostFilterSearchProps> = ({
       placeholder: "Chọn loại tài liệu",
       value: tempFilters.doc_type || null,
       options: [
-        { value: "RESEARCH_REPORT", label: "Báo cáo nghiên cứu" },
-        { value: "TEXTBOOK", label: "Giáo trình" },
-        { value: "LECTURE", label: "Bài giảng" },
-        { value: "THESIS", label: "Luận văn" },
+        { value: "RESEARCH_REPORT", label: "Nghiên cứu" },
         { value: "VIDEO", label: "Video" },
+        { value: "STUDY_GUIDE", label: "Đề cương" },
+        { value: "TEXTBOOK", label: "Giáo trình" },
+        { value: "ESSAY", label: "Tiểu luận" },
+        { value: "SOLUTION_SET", label: "Bài giải" },
+        { value: "THESIS", label: "Luận văn" },
+        { value: "LECTURE", label: "Bài giảng" },
         { value: "OTHER", label: "Khác" },
       ],
       onChange: (value) =>
@@ -147,18 +150,13 @@ const PostFilterSearch: React.FC<PostFilterSearchProps> = ({
       },
     },
     {
-      type: "dateRange",
-      key: "dateRange",
-      label: "Khoảng thời gian tạo",
-      value: tempFilters.dateRange,
-      onChange: (value) => {
-        const dateStrings = value as [string, string];
-        if (dateStrings && dateStrings[0] && dateStrings[1]) {
-          handleTempFilterChange({ dateRange: dateStrings });
-        } else {
-          handleTempFilterChange({ dateRange: undefined });
-        }
-      },
+      type: "date",
+      key: "createdAt",
+      label: "Ngày tạo",
+      placeholder: "Chọn ngày tạo",
+      value: tempFilters.createdAt || null,
+      onChange: (value) =>
+        handleTempFilterChange({ createdAt: value as string }),
     },
     {
       type: "select",
@@ -219,29 +217,89 @@ const PostFilterSearch: React.FC<PostFilterSearchProps> = ({
 
         {/* Filter Summary */}
         {Object.keys(filters).length > 0 && (
-          <div className="mt-4 pt-4 border-t">
-            <div className="flex flex-wrap gap-2">
-              <span className="text-sm font-medium text-gray-600">
-                Đang lọc:
+          <div className="mt-4 pt-4 border-t border-gray-100">
+            <div className="flex flex-wrap gap-2 items-center">
+              <span className="text-sm font-semibold text-gray-700 flex items-center gap-1">
+                <Filter size={14} />
+                Bộ lọc đang áp dụng:
               </span>
               {filters.search && (
-                <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-50 text-blue-700 border border-blue-200">
                   Tìm kiếm: "{filters.search}"
                 </span>
               )}
               {filters.status && (
-                <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                  Trạng thái: {filters.status}
+                <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-50 text-green-700 border border-green-200">
+                  Trạng thái:{" "}
+                  {filters.status === "PENDING"
+                    ? "Chờ duyệt"
+                    : filters.status === "APPROVED"
+                    ? "Đã duyệt"
+                    : filters.status === "REJECTED"
+                    ? "Bị từ chối"
+                    : "Yêu cầu chỉnh sửa"}
                 </span>
               )}
               {filters.doc_type && (
-                <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
-                  Loại: {filters.doc_type}
+                <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-purple-50 text-purple-700 border border-purple-200">
+                  Loại:{" "}
+                  {filters.doc_type === "RESEARCH_REPORT"
+                    ? "Nghiên cứu"
+                    : filters.doc_type === "TEXTBOOK"
+                    ? "Giáo trình"
+                    : filters.doc_type === "LECTURE"
+                    ? "Bài giảng"
+                    : filters.doc_type === "THESIS"
+                    ? "Luận văn"
+                    : filters.doc_type === "VIDEO"
+                    ? "Video"
+                    : filters.doc_type === "STUDY_GUIDE"
+                    ? "Đề cương"
+                    : filters.doc_type === "ESSAY"
+                    ? "Tiểu luận"
+                    : filters.doc_type === "SOLUTION_SET"
+                    ? "Bài giải"
+                    : "Khác"}
                 </span>
               )}
               {filters.public_mode && (
-                <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-orange-100 text-orange-800">
-                  Chế độ: {filters.public_mode}
+                <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-orange-50 text-orange-700 border border-orange-200">
+                  Chế độ:{" "}
+                  {filters.public_mode === "PUBLIC"
+                    ? "Công khai"
+                    : filters.public_mode === "PRIVATE"
+                    ? "Riêng tư"
+                    : filters.public_mode === "PRIVATE_SHARED"
+                    ? "Chia sẻ riêng tư"
+                    : "Chia sẻ tổ chức"}
+                </span>
+              )}
+              {filters.published_year && (
+                <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-indigo-50 text-indigo-700 border border-indigo-200">
+                  Năm: {filters.published_year}
+                </span>
+              )}
+              {filters.createdAt && (
+                <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-teal-50 text-teal-700 border border-teal-200">
+                  Ngày tạo: {filters.createdAt}
+                </span>
+              )}
+              {filters.ordering && (
+                <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-gray-50 text-gray-700 border border-gray-200">
+                  Sắp xếp:{" "}
+                  {filters.ordering === "createdAt"
+                    ? filters.order === -1
+                      ? "Mới nhất"
+                      : "Cũ nhất"
+                    : filters.ordering === "title"
+                    ? filters.order === 1
+                      ? "Tên A-Z"
+                      : "Tên Z-A"
+                    : filters.ordering === "view"
+                    ? filters.order === -1
+                      ? "Lượt xem cao"
+                      : "Lượt xem thấp"
+                    : "Tùy chỉnh"}
                 </span>
               )}
             </div>

@@ -398,6 +398,8 @@ export const DocumentAPI = {
     level?: string;
     subject?: string;
     status?: string;
+    public_mode?: string;
+    createdAt?: string;
   }) => {
     try {
       const response = await apiClient.get("/documents/my-documents", {
