@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useCallback } from "react";
 import { Input, Button } from "antd";
 import { Search, Filter, RotateCcw } from "lucide-react";
 import CommonFilterDrawer, {
@@ -27,37 +27,43 @@ const PostFilterSearch: React.FC<PostFilterSearchProps> = ({
 }) => {
   const [searchText, setSearchText] = useState("");
   const [filters, setFilters] = useState<FilterSearchParams>({});
+  const [tempFilters, setTempFilters] = useState<FilterSearchParams>({}); // Temporary filters for drawer
   const [showFilterDrawer, setShowFilterDrawer] = useState(false);
 
-  const handleFilterChange = useCallback(
+  // Apply filters manually when search button is clicked
+  const handleSearch = () => {
+    const updatedFilters = { ...tempFilters, search: searchText };
+    setFilters(updatedFilters);
+    onFilterChange(updatedFilters);
+  };
+
+  // Handle filter field changes in drawer (temporary)
+  const handleTempFilterChange = useCallback(
     (newFilters: Partial<FilterSearchParams>) => {
-      const updatedFilters = { ...filters, ...newFilters };
-      setFilters(updatedFilters);
-      onFilterChange(updatedFilters);
+      setTempFilters((prev) => ({ ...prev, ...newFilters }));
     },
-    [filters, onFilterChange]
+    []
   );
-
-  // Debounce search
-  useEffect(() => {
-    const timeoutId = setTimeout(() => {
-      if (searchText !== filters.search) {
-        handleFilterChange({ search: searchText });
-      }
-    }, 500);
-
-    return () => clearTimeout(timeoutId);
-  }, [searchText, filters.search, handleFilterChange]);
 
   const handleReset = () => {
     setSearchText("");
     setFilters({});
+    setTempFilters({});
     onFilterChange({});
     setShowFilterDrawer(false);
   };
 
   const handleApplyFilter = () => {
+    const updatedFilters = { ...tempFilters, search: searchText };
+    setFilters(updatedFilters);
+    onFilterChange(updatedFilters);
     setShowFilterDrawer(false);
+  };
+
+  // Initialize temp filters when opening drawer
+  const handleOpenDrawer = () => {
+    setTempFilters(filters);
+    setShowFilterDrawer(true);
   };
 
   // Configure filter fields for the drawer
@@ -67,21 +73,21 @@ const PostFilterSearch: React.FC<PostFilterSearchProps> = ({
       key: "status",
       label: "Trạng thái",
       placeholder: "Chọn trạng thái",
-      value: filters.status || null,
+      value: tempFilters.status || null,
       options: [
         { value: "PENDING", label: "Chờ duyệt" },
         { value: "APPROVED", label: "Đã duyệt" },
         { value: "REJECTED", label: "Bị từ chối" },
         { value: "EDIT_REQUESTED", label: "Yêu cầu chỉnh sửa" },
       ],
-      onChange: (value) => handleFilterChange({ status: value as string }),
+      onChange: (value) => handleTempFilterChange({ status: value as string }),
     },
     {
       type: "select",
       key: "doc_type",
       label: "Loại tài liệu",
       placeholder: "Chọn loại tài liệu",
-      value: filters.doc_type || null,
+      value: tempFilters.doc_type || null,
       options: [
         { value: "RESEARCH_REPORT", label: "Báo cáo nghiên cứu" },
         { value: "TEXTBOOK", label: "Giáo trình" },
@@ -90,21 +96,23 @@ const PostFilterSearch: React.FC<PostFilterSearchProps> = ({
         { value: "VIDEO", label: "Video" },
         { value: "OTHER", label: "Khác" },
       ],
-      onChange: (value) => handleFilterChange({ doc_type: value as string }),
+      onChange: (value) =>
+        handleTempFilterChange({ doc_type: value as string }),
     },
     {
       type: "select",
       key: "public_mode",
       label: "Chế độ công khai",
       placeholder: "Chọn chế độ",
-      value: filters.public_mode || null,
+      value: tempFilters.public_mode || null,
       options: [
         { value: "PUBLIC", label: "Công khai" },
         { value: "PRIVATE", label: "Riêng tư" },
         { value: "PRIVATE_SHARED", label: "Chia sẻ riêng tư" },
         { value: "SHARE_ORGANIZATION", label: "Chia sẻ tổ chức" },
       ],
-      onChange: (value) => handleFilterChange({ public_mode: value as string }),
+      onChange: (value) =>
+        handleTempFilterChange({ public_mode: value as string }),
     },
     {
       type: "select",
@@ -112,8 +120,8 @@ const PostFilterSearch: React.FC<PostFilterSearchProps> = ({
       label: "Sắp xếp theo",
       placeholder: "Sắp xếp",
       value:
-        filters.ordering && filters.order
-          ? `${filters.ordering}_${filters.order}`
+        tempFilters.ordering && tempFilters.order
+          ? `${tempFilters.ordering}_${tempFilters.order}`
           : null,
       options: [
         { value: "createdAt_-1", label: "Ngày tạo (Mới nhất)" },
@@ -126,12 +134,12 @@ const PostFilterSearch: React.FC<PostFilterSearchProps> = ({
       onChange: (value) => {
         if (value) {
           const [ordering, order] = (value as string).split("_");
-          handleFilterChange({
+          handleTempFilterChange({
             ordering,
             order: parseInt(order) as 1 | -1,
           });
         } else {
-          handleFilterChange({
+          handleTempFilterChange({
             ordering: undefined,
             order: undefined,
           });
@@ -142,13 +150,13 @@ const PostFilterSearch: React.FC<PostFilterSearchProps> = ({
       type: "dateRange",
       key: "dateRange",
       label: "Khoảng thời gian tạo",
-      value: filters.dateRange,
+      value: tempFilters.dateRange,
       onChange: (value) => {
         const dateStrings = value as [string, string];
         if (dateStrings && dateStrings[0] && dateStrings[1]) {
-          handleFilterChange({ dateRange: dateStrings });
+          handleTempFilterChange({ dateRange: dateStrings });
         } else {
-          handleFilterChange({ dateRange: undefined });
+          handleTempFilterChange({ dateRange: undefined });
         }
       },
     },
@@ -157,13 +165,13 @@ const PostFilterSearch: React.FC<PostFilterSearchProps> = ({
       key: "published_year",
       label: "Năm xuất bản",
       placeholder: "Chọn năm xuất bản",
-      value: filters.published_year?.toString() || null,
+      value: tempFilters.published_year?.toString() || null,
       options: Array.from({ length: 20 }, (_, i) => {
         const year = new Date().getFullYear() - i;
         return { value: year.toString(), label: year.toString() };
       }),
       onChange: (value) =>
-        handleFilterChange({
+        handleTempFilterChange({
           published_year: value ? parseInt(value as string) : undefined,
         }),
     },
@@ -180,13 +188,22 @@ const PostFilterSearch: React.FC<PostFilterSearchProps> = ({
               prefix={<Search size={16} />}
               value={searchText}
               onChange={(e) => setSearchText(e.target.value)}
+              onPressEnter={handleSearch}
               size="middle"
               allowClear
             />
           </div>
           <Button
+            type="primary"
+            icon={<Search size={16} />}
+            onClick={handleSearch}
+            loading={loading}
+          >
+            Tìm kiếm
+          </Button>
+          <Button
             icon={<Filter size={16} />}
-            onClick={() => setShowFilterDrawer(true)}
+            onClick={handleOpenDrawer}
             type={Object.keys(filters).length > 1 ? "primary" : "default"}
           >
             Bộ lọc

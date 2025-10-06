@@ -181,8 +181,7 @@ const SearchHeader: React.FC<SearchHeaderProps> = ({
                 <button
                   key={tag}
                   onClick={() => {
-                    setQuery(tag);
-                    onSearch(tag);
+                    setQuery(tag); // Set the query in the search bar
                   }}
                   className="px-3 py-1.5 bg-white bg-opacity-70 hover:bg-white hover:shadow-sm border border-gray-200 rounded-full text-xs text-gray-700 hover:text-blue-600 transition-all duration-200"
                 >

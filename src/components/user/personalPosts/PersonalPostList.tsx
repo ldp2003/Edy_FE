@@ -16,6 +16,7 @@ interface Post {
   title: string;
   views: number;
   comments: number;
+  download_count: number;
   rating: string;
   status: string;
   mode: string;
@@ -73,6 +74,7 @@ const PersonalPostList: React.FC = () => {
             public_mode: doc.public_mode || "PRIVATE",
             url: doc.url,
             createdAt: doc.createdAt,
+            download_count: doc.download_count || 0,
             content_rejection: doc.content_rejection
               ? {
                   message: doc.content_rejection.message,

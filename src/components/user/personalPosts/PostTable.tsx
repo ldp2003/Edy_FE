@@ -32,6 +32,7 @@ interface Post {
   title: string;
   views: number;
   comments: number;
+  download_count: number;
   rating: string;
   status: string;
   mode: string;
@@ -168,11 +169,15 @@ const PostTable: React.FC<PostTableProps> = ({ data, loading }) => {
       dataIndex: "index",
       key: "index",
       align: "center",
+      width: 60,
+      fixed: true,
     },
     {
       title: "Tên tài liệu",
       dataIndex: "title",
       key: "title",
+      width: 300,
+      fixed: "left",
       render: (text: string, record: Post) => {
         const isRejected = record.status === "REJECTED";
         const isRequestedEdit =
@@ -216,25 +221,49 @@ const PostTable: React.FC<PostTableProps> = ({ data, loading }) => {
           </div>
         );
       },
-      width: "30%",
+    },
+    {
+      title: "Ngày tạo",
+      dataIndex: "createdAt",
+      key: "createdAt",
+      align: "center",
+      width: 120,
+      render: (dateString: string) => {
+        const date = new Date(dateString);
+        return date.toLocaleDateString("vi-VN", {
+          day: "2-digit",
+          month: "2-digit",
+          year: "numeric",
+        });
+      },
     },
     {
       title: "Lượt xem",
       dataIndex: "views",
       key: "views",
       align: "center",
+      width: 100,
     },
     {
-      title: "Lượt bình luận",
+      title: "Bình luận",
       dataIndex: "comments",
       key: "comments",
       align: "center",
+      width: 100,
+    },
+    {
+      title: "Lượt tải",
+      dataIndex: "download_count",
+      key: "download_count",
+      align: "center",
+      width: 100,
     },
     {
       title: "Loại file",
       dataIndex: "mode",
       key: "mode",
       align: "center",
+      width: 100,
       render: (fileType: string) => createFileTypeTag(fileType),
     },
     {
@@ -242,6 +271,7 @@ const PostTable: React.FC<PostTableProps> = ({ data, loading }) => {
       dataIndex: "rating",
       key: "rating",
       align: "center",
+      width: 100,
       render: (rating: string) => createRatingDisplay(rating),
     },
     {
@@ -249,6 +279,7 @@ const PostTable: React.FC<PostTableProps> = ({ data, loading }) => {
       dataIndex: "status",
       key: "status",
       align: "center",
+      width: 120,
       render: (status: string) => createStatusTag(status),
     },
     {
@@ -256,12 +287,16 @@ const PostTable: React.FC<PostTableProps> = ({ data, loading }) => {
       dataIndex: "public_mode",
       key: "public_mode",
       align: "center",
+      width: 120,
       render: (mode: string) => createPublicModeTag(mode),
     },
+
     {
-      title: "Hành động",
+      title: "Thao tác",
       key: "action",
       align: "center",
+      width: 120,
+      fixed: "right",
       render: (_, record) => {
         const isRejected = record.status === "REJECTED";
         const isLoading = visibilityLoading === record.key;
@@ -377,6 +412,9 @@ const PostTable: React.FC<PostTableProps> = ({ data, loading }) => {
           loading={loading}
           pagination={false}
           size="small"
+          scroll={{ x: 1200, y: 600 }}
+          bordered
+          sticky={{ offsetHeader: 0 }}
         />
       </div>
 
