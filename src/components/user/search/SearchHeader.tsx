@@ -28,7 +28,7 @@ const SearchHeader: React.FC<SearchHeaderProps> = ({
     const scrollTop = target.scrollTop;
 
     // Cố định vị trí khi cuộn xuống quá 200px trong main content
-    const shouldBeFixed = scrollTop > 80;
+    const shouldBeFixed = scrollTop > 100;
 
     // Chỉ update state khi có thay đổi để tránh re-render liên tục
     setIsFixed((prev) => {
@@ -163,18 +163,6 @@ const SearchHeader: React.FC<SearchHeaderProps> = ({
               size="middle"
             >
               Bộ lọc
-              {hasActiveFilters() && (
-                <span className="bg-white bg-opacity-20 text-xs px-2 py-1 rounded-full ml-1 font-semibold">
-                  {
-                    Object.keys(filters || {}).filter(
-                      (key) =>
-                        key !== "search" &&
-                        key !== "ordering" &&
-                        key !== "order"
-                    ).length
-                  }
-                </span>
-              )}
             </Button>
           </div>
 
@@ -248,18 +236,6 @@ const SearchHeader: React.FC<SearchHeaderProps> = ({
                 }`}
               >
                 Lọc
-                {hasActiveFilters() && (
-                  <span className="bg-white bg-opacity-20 text-xs px-1.5 py-0.5 rounded-full ml-1 font-semibold">
-                    {
-                      Object.keys(filters || {}).filter(
-                        (key) =>
-                          key !== "search" &&
-                          key !== "ordering" &&
-                          key !== "order"
-                      ).length
-                    }
-                  </span>
-                )}
               </Button>
             </div>
           </div>
@@ -270,8 +246,8 @@ const SearchHeader: React.FC<SearchHeaderProps> = ({
       <Drawer
         title={
           <div className="flex items-center gap-3">
-            <Filter className="w-5 h-5 text-blue-600" />
-            <span className="text-lg font-semibold text-gray-800">
+            <Filter className="w-5 h-5 text-[var(--primary-text-color)]" />
+            <span className="text-lg font-semibold text-[var(--primary-text-color)]">
               Bộ lọc tìm kiếm
             </span>
           </div>
@@ -281,15 +257,6 @@ const SearchHeader: React.FC<SearchHeaderProps> = ({
         onClose={() => setFilterDrawerOpen(false)}
         width={420}
         className="filter-drawer"
-        headerStyle={{
-          borderBottom: "1px solid #e5e7eb",
-          padding: "20px 24px",
-          background: "linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%)",
-        }}
-        bodyStyle={{
-          padding: "24px",
-          background: "#fafafa",
-        }}
       >
         {filters && onFilterChange && (
           <SearchFilters

@@ -126,7 +126,7 @@ const SearchFilters: React.FC<SearchFiltersProps> = ({
       <div className="space-y-4">
         {/* Loại tài liệu */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label className="block text-sm font-medium text-[var(--primary-text-color)] mb-1">
             Loại tài liệu
           </label>
           <Select
@@ -151,7 +151,7 @@ const SearchFilters: React.FC<SearchFiltersProps> = ({
 
         {/* Trình độ */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label className="block text-sm font-medium text-[var(--primary-text-color)] mb-1">
             Trình độ
           </label>
           <Select
@@ -172,7 +172,7 @@ const SearchFilters: React.FC<SearchFiltersProps> = ({
 
         {/* Tổ chức */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label className="block text-sm font-medium text-[var(--primary-text-color)] mb-1">
             Tổ chức
           </label>
           <Select
@@ -197,7 +197,7 @@ const SearchFilters: React.FC<SearchFiltersProps> = ({
 
         {/* Tác giả */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label className="block text-sm font-medium text-[var(--primary-text-color)] mb-1">
             Tên tác giả
           </label>
           <Input
@@ -233,7 +233,7 @@ const SearchFilters: React.FC<SearchFiltersProps> = ({
 
         {/* Lượt xem */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label className="block text-sm font-medium text-[var(--primary-text-color)] mb-1">
             Lượt xem tối thiểu
           </label>
           <InputNumber
@@ -248,7 +248,7 @@ const SearchFilters: React.FC<SearchFiltersProps> = ({
 
         {/* Lượt tải */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label className="block text-sm font-medium text-[var(--primary-text-color)] mb-1">
             Lượt tải tối thiểu
           </label>
           <InputNumber
@@ -265,7 +265,7 @@ const SearchFilters: React.FC<SearchFiltersProps> = ({
 
         {/* Tài liệu chuyên sâu */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label className="block text-sm font-medium text-[var(--primary-text-color)] mb-1">
             Chuyên sâu
           </label>
           <div className="flex items-center">
@@ -281,7 +281,7 @@ const SearchFilters: React.FC<SearchFiltersProps> = ({
               }
               className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
             />
-            <label htmlFor="intensive" className="ml-2 text-sm text-gray-700">
+            <label htmlFor="intensive" className="ml-2 text-sm text-[var(--primary-text-color)]">
               Chỉ hiển thị tài liệu chuyên sâu
             </label>
           </div>
@@ -289,7 +289,7 @@ const SearchFilters: React.FC<SearchFiltersProps> = ({
 
         {/* Năm xuất bản */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label className="block text-sm font-medium text-[var(--primary-text-color)] mb-1">
             Năm xuất bản
           </label>
           <InputNumber
@@ -307,7 +307,7 @@ const SearchFilters: React.FC<SearchFiltersProps> = ({
 
         {/* Số trang */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label className="block text-sm font-medium text-[var(--primary-text-color)] mb-1">
             Số trang
           </label>
           <InputNumber
@@ -321,7 +321,7 @@ const SearchFilters: React.FC<SearchFiltersProps> = ({
         </div>
 
         {/* Action Buttons */}
-        <div className="flex gap-2 pt-4 border-t">
+        <div className="flex gap-2 pt-4">
           <Button
             onClick={clearAllFilters}
             icon={<RotateCcw className="w-4 h-4" />}
