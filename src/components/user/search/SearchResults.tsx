@@ -302,7 +302,6 @@ const SearchResults: React.FC<SearchResultsProps> = ({
                       } lượt xem • ${document.download_count || 0} lượt tải`}
                       imageUrl={document.cover_page}
                       document={document}
-                      navigationPath={`/documents/${document._id}`}
                     />
                   ))}
                 </div>

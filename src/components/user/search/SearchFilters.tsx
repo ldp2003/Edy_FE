@@ -1,8 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useState, useEffect } from "react";
-import { Select, InputNumber, Button } from "antd";
+import { Select, InputNumber, Button, Input } from "antd";
 import { RotateCcw } from "lucide-react";
+import { OrganizationService } from "../../../utils/OrganizationService";
 import type { SearchFilters as ISearchFilters } from "../../../pages/user/search/SearchPage";
+import type { OrganizationDetailed } from "../../../models/organization";
 
 const { Option } = Select;
 
@@ -20,11 +22,53 @@ const SearchFilters: React.FC<SearchFiltersProps> = ({
   onReset,
 }) => {
   const [tempFilters, setTempFilters] = useState<ISearchFilters>(filters);
+  const [organizations, setOrganizations] = useState<OrganizationDetailed[]>(
+    []
+  );
+  const [loadingOrgs, setLoadingOrgs] = useState(false);
 
   // Sync temp filters when props change
   useEffect(() => {
     setTempFilters(filters);
   }, [filters]);
+
+  // Fetch organizations on component mount
+  useEffect(() => {
+    const fetchOrganizations = async () => {
+      setLoadingOrgs(true);
+      try {
+        // Thử lấy organizations có is_dropdown = true trước
+        let orgList = await OrganizationService.getDropdownOrganizations();
+
+        // Nếu không có data hoặc empty, fallback về tất cả organizations
+        if (!orgList || orgList.length === 0) {
+          console.log(
+            "No dropdown organizations found, fetching all organizations"
+          );
+          orgList = await OrganizationService.getOrganizations();
+        }
+
+        setOrganizations(orgList);
+      } catch (error) {
+        console.error("Failed to fetch organizations:", error);
+        // Fallback: thử lấy tất cả organizations
+        try {
+          const allOrgs = await OrganizationService.getOrganizations();
+          setOrganizations(allOrgs);
+        } catch (fallbackError) {
+          console.error(
+            "Failed to fetch fallback organizations:",
+            fallbackError
+          );
+          setOrganizations([]);
+        }
+      } finally {
+        setLoadingOrgs(false);
+      }
+    };
+
+    fetchOrganizations();
+  }, []);
 
   const handleTempFilterChange = (key: keyof ISearchFilters, value: any) => {
     setTempFilters((prev) => ({ ...prev, [key]: value }));
@@ -140,29 +184,107 @@ const SearchFilters: React.FC<SearchFiltersProps> = ({
             size="small"
             showSearch
             optionFilterProp="children"
+            loading={loadingOrgs}
+            notFoundContent={loadingOrgs ? "Đang tải..." : "Không có dữ liệu"}
           >
-            <Option value="org1">Đại học Công nghiệp TP.HCM</Option>
-            <Option value="org2">Đại học Bách Khoa TP.HCM</Option>
-            <Option value="org3">Đại học Khoa học Tự nhiên</Option>
+            {organizations.map((org) => (
+              <Option key={org._id} value={org._id}>
+                {org.name}
+              </Option>
+            ))}
           </Select>
+        </div>
+
+        {/* Tác giả */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Tên tác giả
+          </label>
+          <Input
+            placeholder="Nhập tên tác giả"
+            value={
+              Array.isArray(tempFilters.author)
+                ? tempFilters.author.join(", ")
+                : tempFilters.author || ""
+            }
+            onChange={(e) => {
+              const value = e.target.value;
+              if (value) {
+                // Split by comma and trim whitespace
+                const authors = value
+                  .split(",")
+                  .map((author) => author.trim())
+                  .filter((author) => author);
+                handleTempFilterChange(
+                  "author",
+                  authors.length > 0 ? authors : undefined
+                );
+              } else {
+                handleTempFilterChange("author", undefined);
+              }
+            }}
+            size="small"
+            allowClear
+          />
+          <p className="text-xs text-gray-500 mt-1">
+            Nhập nhiều tác giả cách nhau bằng dấu phẩy
+          </p>
+        </div>
+
+        {/* Lượt xem */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Lượt xem tối thiểu
+          </label>
+          <InputNumber
+            placeholder="Số lượt xem"
+            value={tempFilters.view_count}
+            onChange={(value) => handleTempFilterChange("view_count", value)}
+            className="w-full"
+            size="small"
+            min={0}
+          />
+        </div>
+
+        {/* Lượt tải */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Lượt tải tối thiểu
+          </label>
+          <InputNumber
+            placeholder="Số lượt tải"
+            value={tempFilters.download_count}
+            onChange={(value) =>
+              handleTempFilterChange("download_count", value)
+            }
+            className="w-full"
+            size="small"
+            min={0}
+          />
         </div>
 
         {/* Tài liệu chuyên sâu */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            Tài liệu chuyên sâu
+            Chuyên sâu
           </label>
-          <Select
-            placeholder="Tất cả"
-            value={tempFilters.intensive}
-            onChange={(value) => handleTempFilterChange("intensive", value)}
-            allowClear
-            className="w-full"
-            size="small"
-          >
-            <Option value={true}>Có</Option>
-            <Option value={false}>Không</Option>
-          </Select>
+          <div className="flex items-center">
+            <input
+              type="checkbox"
+              id="intensive"
+              checked={tempFilters.intensive === true}
+              onChange={(e) =>
+                handleTempFilterChange(
+                  "intensive",
+                  e.target.checked ? true : undefined
+                )
+              }
+              className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+            />
+            <label htmlFor="intensive" className="ml-2 text-sm text-gray-700">
+              Chỉ hiển thị tài liệu chuyên sâu
+            </label>
+          </div>
         </div>
 
         {/* Năm xuất bản */}
@@ -183,69 +305,19 @@ const SearchFilters: React.FC<SearchFiltersProps> = ({
           />
         </div>
 
-        {/* Nhà xuất bản */}
+        {/* Số trang */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            Nhà xuất bản
+            Số trang
           </label>
-          <Select
-            placeholder="Chọn nhà xuất bản"
-            value={tempFilters.publisher}
-            onChange={(value) => handleTempFilterChange("publisher", value)}
-            allowClear
+          <InputNumber
+            placeholder="Số trang"
+            value={tempFilters.page}
+            onChange={(value) => handleTempFilterChange("page", value)}
             className="w-full"
             size="small"
-            showSearch
-            optionFilterProp="children"
-          >
-            <Option value="NXB Giáo dục Việt Nam">NXB Giáo dục Việt Nam</Option>
-            <Option value="NXB Đại học Quốc gia">NXB Đại học Quốc gia</Option>
-            <Option value="NXB Khoa học và Kỹ thuật">
-              NXB Khoa học và Kỹ thuật
-            </Option>
-            <Option value="NXB Thông tin và Truyền thông">
-              NXB Thông tin và Truyền thông
-            </Option>
-          </Select>
-        </div>
-
-        {/* Chế độ công khai */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Chế độ công khai
-          </label>
-          <Select
-            placeholder="Chọn chế độ"
-            value={tempFilters.public_mode}
-            onChange={(value) => handleTempFilterChange("public_mode", value)}
-            allowClear
-            className="w-full"
-            size="small"
-          >
-            <Option value="PUBLIC">Công khai</Option>
-            <Option value="SHARE_ORGANIZATION">Chia sẻ tổ chức</Option>
-            <Option value="PRIVATE">Riêng tư</Option>
-            <Option value="PRIVATE_SHARED">Chia sẻ riêng</Option>
-          </Select>
-        </div>
-
-        {/* Trạng thái duyệt */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Trạng thái duyệt
-          </label>
-          <Select
-            placeholder="Chọn trạng thái"
-            value={tempFilters.status}
-            onChange={(value) => handleTempFilterChange("status", value)}
-            allowClear
-            className="w-full"
-            size="small"
-          >
-            <Option value="APPROVED">Đã duyệt</Option>
-            <Option value="PENDING">Chờ duyệt</Option>
-            <Option value="REJECTED">Từ chối</Option>
-          </Select>
+            min={1}
+          />
         </div>
 
         {/* Action Buttons */}

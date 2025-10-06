@@ -88,9 +88,9 @@ export const OrganizationAPI = {
     }
   },
 
-  getOrganizations: async () => {
+  getOrganizations: async (params?: { is_dropdown?: boolean }) => {
     try {
-      const response = await apiClient.get("/organizations");
+      const response = await apiClient.get("/organizations", { params });
       return response.data;
     } catch (error) {
       console.error("Error fetching organizations:", error);
