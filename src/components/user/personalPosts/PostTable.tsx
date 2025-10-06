@@ -238,6 +238,23 @@ const PostTable: React.FC<PostTableProps> = ({ data, loading }) => {
       },
     },
     {
+      title: "Trạng thái",
+      dataIndex: "status",
+      key: "status",
+      align: "center",
+      width: 120,
+      render: (status: string) => createStatusTag(status),
+    },
+    {
+      title: "Chế độ",
+      dataIndex: "public_mode",
+      key: "public_mode",
+      align: "center",
+      width: 120,
+      render: (mode: string) => createPublicModeTag(mode),
+    },
+
+    {
       title: "Lượt xem",
       dataIndex: "views",
       key: "views",
@@ -273,22 +290,6 @@ const PostTable: React.FC<PostTableProps> = ({ data, loading }) => {
       align: "center",
       width: 100,
       render: (rating: string) => createRatingDisplay(rating),
-    },
-    {
-      title: "Trạng thái",
-      dataIndex: "status",
-      key: "status",
-      align: "center",
-      width: 120,
-      render: (status: string) => createStatusTag(status),
-    },
-    {
-      title: "Chế độ",
-      dataIndex: "public_mode",
-      key: "public_mode",
-      align: "center",
-      width: 120,
-      render: (mode: string) => createPublicModeTag(mode),
     },
 
     {
