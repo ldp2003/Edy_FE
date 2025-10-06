@@ -1,11 +1,12 @@
 import React from "react";
 import { Drawer, Select, Button, Input, DatePicker, Checkbox } from "antd";
+import dayjs from "dayjs";
 
 const { Option } = Select;
 const { RangePicker } = DatePicker;
 
 export interface FilterField {
-  type: "select" | "input" | "dateRange" | "checkbox" | "numberRange";
+  type: "select" | "input" | "dateRange" | "date" | "checkbox" | "numberRange";
   key: string;
   label: string;
   placeholder?: string;
@@ -73,6 +74,25 @@ const CommonFilterDrawer: React.FC<CommonFilterDrawerProps> = ({
             onChange={(_dates, dateStrings) => field.onChange(dateStrings)}
             placeholder={["Từ ngày", "Đến ngày"]}
             size="small"
+          />
+        );
+
+      case "date":
+        return (
+          <DatePicker
+            className="w-full"
+            format="YYYY-MM-DD"
+            value={
+              typeof field.value === "string" && field.value
+                ? dayjs(field.value)
+                : null
+            }
+            onChange={(_, dateString) =>
+              field.onChange(typeof dateString === "string" ? dateString : null)
+            }
+            placeholder={field.placeholder || "Chọn ngày"}
+            size="small"
+            allowClear
           />
         );
 

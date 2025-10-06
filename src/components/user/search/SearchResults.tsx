@@ -195,57 +195,6 @@ const SearchResults: React.FC<SearchResultsProps> = ({
         </p>
       </div>
 
-      {/* Controls */}
-      <div className="bg-white">
-        <div className="flex flex-col sm:flex-row justify-start items-start sm:items-center gap-4">
-          <div className="flex items-center gap-3">
-            {/* Sort Dropdown */}
-            <div className="flex items-center gap-2">
-              <span className="text-sm text-gray-600">Sắp xếp:</span>
-              <Select
-                placeholder="Chọn cách sắp xếp"
-                onChange={handleSortChange}
-                className="w-40"
-                size="small"
-                defaultValue="createdAt:desc"
-              >
-                <Option value="createdAt:desc">Mới nhất</Option>
-                <Option value="createdAt:asc">Cũ nhất</Option>
-                <Option value="view:desc">Lượt xem nhiều</Option>
-                <Option value="download_count:desc">Lượt tải nhiều</Option>
-                <Option value="title:asc">Tên A-Z</Option>
-                <Option value="title:desc">Tên Z-A</Option>
-              </Select>
-            </div>
-
-            {/* View Mode Toggle */}
-            <div className="flex items-center gap-2">
-              <span className="text-sm text-gray-600">Hiển thị:</span>
-              <div className="flex border border-gray-300 rounded">
-                <Button
-                  type={viewMode === "grid" ? "primary" : "default"}
-                  size="small"
-                  icon={<Grid className="w-4 h-4" />}
-                  onClick={() => onViewModeChange("grid")}
-                  className="border-0 rounded-r-none"
-                >
-                  Lưới
-                </Button>
-                <Button
-                  type={viewMode === "list" ? "primary" : "default"}
-                  size="small"
-                  icon={<List className="w-4 h-4" />}
-                  onClick={() => onViewModeChange("list")}
-                  className="border-0 rounded-l-none"
-                >
-                  Cột
-                </Button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
       {/* Results Content */}
       {currentTab === "subjects" ? (
         /* Subject Grid Only */
@@ -268,7 +217,56 @@ const SearchResults: React.FC<SearchResultsProps> = ({
               window.location.href = `/subject/${subject._id}/documents`;
             }}
           />
+          {/* Controls */}
+          <div className="bg-white">
+            <div className="flex flex-col sm:flex-row justify-start items-start sm:items-center gap-4">
+              <div className="flex items-center gap-3">
+                {/* Sort Dropdown */}
+                <div className="flex items-center gap-2">
+                  <span className="text-sm text-gray-600">Sắp xếp:</span>
+                  <Select
+                    placeholder="Chọn cách sắp xếp"
+                    onChange={handleSortChange}
+                    className="w-40"
+                    size="small"
+                    defaultValue="createdAt:desc"
+                  >
+                    <Option value="createdAt:desc">Mới nhất</Option>
+                    <Option value="createdAt:asc">Cũ nhất</Option>
+                    <Option value="view:desc">Lượt xem nhiều</Option>
+                    <Option value="download_count:desc">Lượt tải nhiều</Option>
+                    <Option value="title:asc">Tên A-Z</Option>
+                    <Option value="title:desc">Tên Z-A</Option>
+                  </Select>
+                </div>
 
+                {/* View Mode Toggle */}
+                <div className="flex items-center gap-2">
+                  <span className="text-sm text-gray-600">Hiển thị:</span>
+                  <div className="flex border border-gray-300 rounded">
+                    <Button
+                      type={viewMode === "grid" ? "primary" : "default"}
+                      size="small"
+                      icon={<Grid className="w-4 h-4" />}
+                      onClick={() => onViewModeChange("grid")}
+                      className="border-0 rounded-r-none"
+                    >
+                      Lưới
+                    </Button>
+                    <Button
+                      type={viewMode === "list" ? "primary" : "default"}
+                      size="small"
+                      icon={<List className="w-4 h-4" />}
+                      onClick={() => onViewModeChange("list")}
+                      className="border-0 rounded-l-none"
+                    >
+                      Cột
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
           {/* Documents Section */}
           {loading ? (
             <div className="flex justify-center items-center py-12">
@@ -304,7 +302,6 @@ const SearchResults: React.FC<SearchResultsProps> = ({
                       } lượt xem • ${document.download_count || 0} lượt tải`}
                       imageUrl={document.cover_page}
                       document={document}
-                      navigationPath={`/documents/${document._id}`}
                     />
                   ))}
                 </div>

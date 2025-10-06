@@ -21,6 +21,10 @@ export interface SearchFilters {
   status?: string;
   summary_status?: string;
   public_mode?: string;
+  page?: number;
+  title?: string;
+  view_count?: number;
+  download_count?: number;
   ordering?: string;
   order?: 1 | -1;
 }
@@ -55,9 +59,13 @@ const SearchPage: React.FC = () => {
     const status = searchParams.get("status");
     const summary_status = searchParams.get("summary_status");
     const public_mode = searchParams.get("public_mode");
+    const pageFilter = searchParams.get("pageFilter"); // Số trang của document
+    const title = searchParams.get("title");
+    const view_count = searchParams.get("view_count");
+    const download_count = searchParams.get("download_count");
     const ordering = searchParams.get("ordering");
     const order = searchParams.get("order");
-    const page = searchParams.get("page");
+    const page = searchParams.get("page"); // Trang hiện tại của pagination
 
     if (search) filters.search = search;
     if (doc_type) filters.doc_type = doc_type;
@@ -72,6 +80,10 @@ const SearchPage: React.FC = () => {
     if (status) filters.status = status;
     if (summary_status) filters.summary_status = summary_status;
     if (public_mode) filters.public_mode = public_mode;
+    if (pageFilter) filters.page = parseInt(pageFilter);
+    if (title) filters.title = title;
+    if (view_count) filters.view_count = parseInt(view_count);
+    if (download_count) filters.download_count = parseInt(download_count);
     if (ordering) filters.ordering = ordering;
     if (order) filters.order = parseInt(order) as 1 | -1;
     if (page) setCurrentPage(parseInt(page));
@@ -141,6 +153,16 @@ const SearchPage: React.FC = () => {
       newSearchParams.set("summary_status", newFilters.summary_status);
     if (newFilters.public_mode)
       newSearchParams.set("public_mode", newFilters.public_mode);
+    if (newFilters.page)
+      newSearchParams.set("pageFilter", newFilters.page.toString());
+    if (newFilters.title) newSearchParams.set("title", newFilters.title);
+    if (newFilters.view_count)
+      newSearchParams.set("view_count", newFilters.view_count.toString());
+    if (newFilters.download_count)
+      newSearchParams.set(
+        "download_count",
+        newFilters.download_count.toString()
+      );
     if (newFilters.ordering)
       newSearchParams.set("ordering", newFilters.ordering);
     if (newFilters.order)
@@ -232,22 +254,22 @@ const SearchPage: React.FC = () => {
         {/* Tab Navigation */}
         <div className="mb-6">
           <div className="mb-6">
-            <div className="flex border-b border-gray-200">
+            <div className="flex border-b border-gray-200 text-sm">
               <button
-                className={`px-6 py-3 font-medium border-b-2 transition-colors ${
+                className={`cursor-pointer px-6 py-3 font-medium border-b-2 transition-colors ${
                   currentTab === "all"
-                    ? "text-blue-600 border-blue-600"
-                    : "text-gray-500 hover:text-gray-700 border-transparent"
+                    ? "text-[var(--primary-color)] border-[var(--primary-color)]"
+                    : "text-[var(--third-text-color)] hover:text-black border-transparent"
                 }`}
                 onClick={() => handleTabChange("all")}
               >
                 Tất cả
               </button>
               <button
-                className={`px-6 py-3 font-medium border-b-2 transition-colors ${
+                className={`cursor-pointer px-6 py-3 font-medium border-b-2 transition-colors ${
                   currentTab === "subjects"
-                    ? "text-blue-600 border-blue-600"
-                    : "text-gray-500 hover:text-gray-700 border-transparent"
+                    ? "text-[var(--primary-color)] border-[var(--primary-color)]"
+                    : "text-[var(--third-text-color)] hover:text-black border-transparent"
                 }`}
                 onClick={() => handleTabChange("subjects")}
               >

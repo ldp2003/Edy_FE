@@ -87,7 +87,7 @@ const PostListView: React.FC<PostListViewProps> = ({ data, loading }) => {
                 views={post.views}
                 rating={parseInt(post.rating.replace("%", ""))}
                 pages={Math.floor(Math.random() * 50) + 10}
-                date="2024-09-18"
+                date={new Date(post.createdAt)  }
                 intensive={post.intensive}
               />
             </div>

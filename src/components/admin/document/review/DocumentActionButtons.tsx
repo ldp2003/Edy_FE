@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Button, Modal, message, Input } from "antd";
+import { useNavigate } from "react-router-dom";
 
 const { TextArea } = Input;
 
@@ -21,6 +22,7 @@ interface DocumentActionButtonsProps {
   summaryAction: "approve" | "reject";
   summaryRejectReason: string;
   processing: boolean;
+  documentId: string;
   onApprove: (approvalData: {
     documentRequestId: string;
     summaryRequestId?: string;
@@ -39,10 +41,12 @@ const DocumentActionButtons: React.FC<DocumentActionButtonsProps> = ({
   summaryAction,
   summaryRejectReason,
   processing,
+  documentId,
   onApprove,
   onReject,
   onDelete,
 }) => {
+  const navigate = useNavigate();
   const [messageApi, contextHolder] = message.useMessage();
   const [rejectModalVisible, setRejectModalVisible] = useState(false);
   const [deleteModalVisible, setDeleteModalVisible] = useState(false);
@@ -122,6 +126,10 @@ const DocumentActionButtons: React.FC<DocumentActionButtonsProps> = ({
     }
   };
 
+  const handleCompare = () => {
+    navigate(`/admin/documents/compare/${documentId}`);
+  };
+
   return (
     <>
       {contextHolder}
@@ -161,6 +169,17 @@ const DocumentActionButtons: React.FC<DocumentActionButtonsProps> = ({
             disabled={processing}
           >
             Yêu cầu chỉnh sửa
+          </Button>
+          <Button
+            style={{
+              backgroundColor: "#8b5cf6",
+              borderColor: "#8b5cf6",
+              color: "white",
+            }}
+            onClick={handleCompare}
+            disabled={processing}
+          >
+            Xem trùng
           </Button>
         </div>
       </div>

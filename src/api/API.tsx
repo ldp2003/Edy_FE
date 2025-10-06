@@ -88,9 +88,9 @@ export const OrganizationAPI = {
     }
   },
 
-  getOrganizations: async () => {
+  getOrganizations: async (params?: { is_dropdown?: boolean }) => {
     try {
-      const response = await apiClient.get("/organizations");
+      const response = await apiClient.get("/organizations", { params });
       return response.data;
     } catch (error) {
       console.error("Error fetching organizations:", error);
@@ -398,6 +398,8 @@ export const DocumentAPI = {
     level?: string;
     subject?: string;
     status?: string;
+    public_mode?: string;
+    createdAt?: string;
   }) => {
     try {
       const response = await apiClient.get("/documents/my-documents", {

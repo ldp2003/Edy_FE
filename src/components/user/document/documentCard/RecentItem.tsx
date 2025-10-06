@@ -11,7 +11,7 @@ type RecentItemProps = {
   views: number;
   rating: number;
   pages: number;
-  date: string;
+  date: Date | string;
   intensive?: boolean;
 };
 
@@ -48,7 +48,7 @@ const RecentItem: React.FC<RecentItemProps> = ({
       </div>
       <div className="flex flex-col text-right">
         <span className="text-xs text-[var(--secondary-text-color)] mr-4">
-          {date}
+          {date instanceof Date ? date.toLocaleDateString() : date}
         </span>
         {intensive && <IntensiveMark label="Chuyên sâu"></IntensiveMark>}
       </div>
