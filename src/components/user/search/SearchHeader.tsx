@@ -169,7 +169,12 @@ const SearchHeader: React.FC<SearchHeaderProps> = ({
         }}
       >
         {filters && onFilterChange && (
-          <SearchFilters filters={filters} onFilterChange={onFilterChange} />
+          <SearchFilters
+            filters={filters}
+            onFilterChange={onFilterChange}
+            onApply={() => setFilterDrawerOpen(false)}
+            onReset={() => setFilterDrawerOpen(false)}
+          />
         )}
       </Drawer>
     </>

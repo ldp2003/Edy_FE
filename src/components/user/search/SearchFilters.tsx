@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Select, InputNumber, Button } from "antd";
 import { RotateCcw } from "lucide-react";
 import type { SearchFilters as ISearchFilters } from "../../../pages/user/search/SearchPage";
@@ -9,26 +9,48 @@ const { Option } = Select;
 interface SearchFiltersProps {
   filters: ISearchFilters;
   onFilterChange: (filters: ISearchFilters) => void;
+  onApply?: () => void;
+  onReset?: () => void;
 }
 
 const SearchFilters: React.FC<SearchFiltersProps> = ({
   filters,
   onFilterChange,
+  onApply,
+  onReset,
 }) => {
-  const handleFilterChange = (key: keyof ISearchFilters, value: any) => {
-    const newFilters = { ...filters, [key]: value };
-    onFilterChange(newFilters);
+  const [tempFilters, setTempFilters] = useState<ISearchFilters>(filters);
+
+  // Sync temp filters when props change
+  useEffect(() => {
+    setTempFilters(filters);
+  }, [filters]);
+
+  const handleTempFilterChange = (key: keyof ISearchFilters, value: any) => {
+    setTempFilters((prev) => ({ ...prev, [key]: value }));
+  };
+
+  const applyFilters = () => {
+    onFilterChange(tempFilters);
+    if (onApply) onApply();
   };
 
   const clearAllFilters = () => {
-    onFilterChange({ search: filters.search }); // Keep search query
+    const resetFilters = { search: filters.search }; // Keep search query
+    setTempFilters(resetFilters);
+    onFilterChange(resetFilters);
+    if (onReset) onReset();
   };
 
   const hasActiveFilters = () => {
-    const filterKeys = Object.keys(filters).filter(
+    const filterKeys = Object.keys(tempFilters).filter(
       (key) => key !== "search" && key !== "ordering" && key !== "order"
     );
     return filterKeys.length > 0;
+  };
+
+  const hasUnsavedChanges = () => {
+    return JSON.stringify(tempFilters) !== JSON.stringify(filters);
   };
 
   return (
@@ -65,8 +87,8 @@ const SearchFilters: React.FC<SearchFiltersProps> = ({
           </label>
           <Select
             placeholder="Chọn loại tài liệu"
-            value={filters.doc_type}
-            onChange={(value) => handleFilterChange("doc_type", value)}
+            value={tempFilters.doc_type}
+            onChange={(value) => handleTempFilterChange("doc_type", value)}
             allowClear
             className="w-full"
             size="small"
@@ -90,8 +112,8 @@ const SearchFilters: React.FC<SearchFiltersProps> = ({
           </label>
           <Select
             placeholder="Chọn trình độ"
-            value={filters.level}
-            onChange={(value) => handleFilterChange("level", value)}
+            value={tempFilters.level}
+            onChange={(value) => handleTempFilterChange("level", value)}
             allowClear
             className="w-full"
             size="small"
@@ -111,8 +133,8 @@ const SearchFilters: React.FC<SearchFiltersProps> = ({
           </label>
           <Select
             placeholder="Chọn tổ chức"
-            value={filters.organization}
-            onChange={(value) => handleFilterChange("organization", value)}
+            value={tempFilters.organization}
+            onChange={(value) => handleTempFilterChange("organization", value)}
             allowClear
             className="w-full"
             size="small"
@@ -132,8 +154,8 @@ const SearchFilters: React.FC<SearchFiltersProps> = ({
           </label>
           <Select
             placeholder="Tất cả"
-            value={filters.intensive}
-            onChange={(value) => handleFilterChange("intensive", value)}
+            value={tempFilters.intensive}
+            onChange={(value) => handleTempFilterChange("intensive", value)}
             allowClear
             className="w-full"
             size="small"
@@ -150,8 +172,10 @@ const SearchFilters: React.FC<SearchFiltersProps> = ({
           </label>
           <InputNumber
             placeholder="Năm xuất bản"
-            value={filters.published_year}
-            onChange={(value) => handleFilterChange("published_year", value)}
+            value={tempFilters.published_year}
+            onChange={(value) =>
+              handleTempFilterChange("published_year", value)
+            }
             className="w-full"
             size="small"
             min={1900}
@@ -166,8 +190,8 @@ const SearchFilters: React.FC<SearchFiltersProps> = ({
           </label>
           <Select
             placeholder="Chọn nhà xuất bản"
-            value={filters.publisher}
-            onChange={(value) => handleFilterChange("publisher", value)}
+            value={tempFilters.publisher}
+            onChange={(value) => handleTempFilterChange("publisher", value)}
             allowClear
             className="w-full"
             size="small"
@@ -192,8 +216,8 @@ const SearchFilters: React.FC<SearchFiltersProps> = ({
           </label>
           <Select
             placeholder="Chọn chế độ"
-            value={filters.public_mode}
-            onChange={(value) => handleFilterChange("public_mode", value)}
+            value={tempFilters.public_mode}
+            onChange={(value) => handleTempFilterChange("public_mode", value)}
             allowClear
             className="w-full"
             size="small"
@@ -212,8 +236,8 @@ const SearchFilters: React.FC<SearchFiltersProps> = ({
           </label>
           <Select
             placeholder="Chọn trạng thái"
-            value={filters.status}
-            onChange={(value) => handleFilterChange("status", value)}
+            value={tempFilters.status}
+            onChange={(value) => handleTempFilterChange("status", value)}
             allowClear
             className="w-full"
             size="small"
@@ -222,6 +246,27 @@ const SearchFilters: React.FC<SearchFiltersProps> = ({
             <Option value="PENDING">Chờ duyệt</Option>
             <Option value="REJECTED">Từ chối</Option>
           </Select>
+        </div>
+
+        {/* Action Buttons */}
+        <div className="flex gap-2 pt-4 border-t">
+          <Button
+            onClick={clearAllFilters}
+            icon={<RotateCcw className="w-4 h-4" />}
+            className="flex-1"
+            size="small"
+          >
+            Đặt lại
+          </Button>
+          <Button
+            type="primary"
+            onClick={applyFilters}
+            className="flex-1 bg-blue-600 hover:bg-blue-700"
+            size="small"
+            disabled={!hasUnsavedChanges()}
+          >
+            Áp dụng bộ lọc
+          </Button>
         </div>
       </div>
     </div>
