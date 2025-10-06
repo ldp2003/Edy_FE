@@ -4,6 +4,7 @@ import AdminLayout from "../layouts/AdminLayout";
 import AdminHomePage from "../pages/admin/home/AdminHomePage";
 import AllDocumentsPage from "../pages/admin/document/AllDocumentsPage";
 import DocumentReviewPage from "../pages/admin/document/DocumentReviewPage";
+import DocumentComparePage from "../pages/admin/document/DocumentComparePage";
 import AdminUsersPage from "../pages/admin/user/AdminUsersPage";
 import UserDetailPage from "../pages/admin/user/UserDetailPage";
 import UserEditPage from "../pages/admin/user/UserEditPage";
@@ -14,6 +15,9 @@ const AdminRoute: React.FC = () => {
   return (
     <AuthRoute>
       <Routes>
+        {/* Document compare page - fullscreen without AdminLayout */}
+        <Route path="documents/compare/:id" element={<DocumentComparePage />} />
+
         <Route path="/" element={<AdminLayout />}>
           <Route index element={<AdminHomePage />} />
           {/* Future admin routes will be added here */}
