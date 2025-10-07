@@ -72,7 +72,7 @@ const AdminReportTable: React.FC<AdminReportTableProps> = ({
       ellipsis: true,
       render: (doc: string | { title?: string; author?: string[] }) =>
         typeof doc === "object" && doc !== null ? (
-          <div className="text-left text-sm">
+          <div className="text-left text-xs">
             <div className="font-medium truncate" title={doc.title}>
               {doc.title}
             </div>
@@ -138,7 +138,7 @@ const AdminReportTable: React.FC<AdminReportTableProps> = ({
       width: 200,
       ellipsis: true,
       render: (reason: string) => (
-        <span className="text-left text-sm" title={reason}>
+        <span className="text-left text-xs" title={reason}>
           {reason}
         </span>
       ),

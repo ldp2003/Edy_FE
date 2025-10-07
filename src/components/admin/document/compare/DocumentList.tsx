@@ -74,7 +74,7 @@ const DocumentList: React.FC<DocumentListProps> = ({
   return (
     <div className="flex flex-col h-full text-left">
       {/* Search */}
-      <div className="p-4 border-b">
+      <div className="p-4 border-b flex-shrink-0">
         <Search
           placeholder="Tìm kiếm tài liệu..."
           prefix={<SearchOutlined />}
@@ -84,7 +84,7 @@ const DocumentList: React.FC<DocumentListProps> = ({
       </div>
 
       {/* Document List */}
-      <div className="flex-1 overflow-auto pl-2">
+      <div className="flex-1 overflow-auto pl-2 min-h-0">
         {loading ? (
           <div className="flex items-center justify-center h-full">
             <Spin size="large" />
@@ -145,7 +145,7 @@ const DocumentList: React.FC<DocumentListProps> = ({
 
       {/* Pagination */}
       {total > pageSize && (
-        <div className="p-4 border-t">
+        <div className="p-4 border-t flex-shrink-0">
           <Pagination
             current={currentPage}
             total={total}
