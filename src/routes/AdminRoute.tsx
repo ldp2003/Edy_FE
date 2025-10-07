@@ -10,6 +10,7 @@ import UserDetailPage from "../pages/admin/user/UserDetailPage";
 import UserEditPage from "../pages/admin/user/UserEditPage";
 import AuthRoute from "./AuthRoute";
 import NotFoundPage from "../pages/NotFoundPage";
+import ReportsPage from "../pages/admin/report/ReportsPage";
 
 const AdminRoute: React.FC = () => {
   return (
@@ -35,11 +36,12 @@ const AdminRoute: React.FC = () => {
           <Route path="users" element={<AdminUsersPage />} />
           <Route path="users/detail/:id" element={<UserDetailPage />} />
           <Route path="users/edit/:id" element={<UserEditPage />} />
+
           {/* <Route path="users/assign-roles" element={<AssignRolesPage />} />
                 <Route path="users/manage-roles" element={<ManageRolesPage />} /> */}
 
           {/* Reports routes */}
-          {/* <Route path="reports" element={<ReportsPage />} /> */}
+          <Route path="reports" element={<ReportsPage />} />
 
           {/* 404 Page */}
           <Route path="*" element={<NotFoundPage />} />

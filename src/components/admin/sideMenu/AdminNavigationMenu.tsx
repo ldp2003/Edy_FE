@@ -45,14 +45,7 @@ export function AdminNavigationMenu({ isCompact }: AdminNavigationMenuProps) {
         { label: "Thống kê chung", path: "/admin/statistics/general" },
       ],
     },
-    {
-      icon: FileText,
-      label: "Tài liệu",
-      children: [
-        { label: "Tất cả tài liệu", path: "/admin/documents/all" },
-        { label: "Tài liệu đang chờ duyệt", path: "/admin/documents/pending" },
-      ],
-    },
+    { icon: FileText, label: "Tài liệu", path: "/admin/documents/all" },
     {
       icon: Users,
       label: "Người dùng",
@@ -62,13 +55,7 @@ export function AdminNavigationMenu({ isCompact }: AdminNavigationMenuProps) {
         { label: "Quản lý quyền", path: "/admin/users/manage-roles" },
       ],
     },
-    {
-      icon: Flag,
-      label: "Báo cáo",
-      children: [
-        { label: "Quản lý danh sách các báo cáo", path: "/admin/reports" },
-      ],
-    },
+    { icon: Flag, label: "Báo cáo", path: "/admin/reports" },
   ];
 
   const isItemActive = (item: MenuItem): boolean => {

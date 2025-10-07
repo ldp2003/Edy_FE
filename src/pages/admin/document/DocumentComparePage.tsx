@@ -5,6 +5,7 @@ import { ArrowLeftOutlined } from "@ant-design/icons";
 import { DocumentService } from "../../../utils/DocumentService";
 import type { Document } from "../../../models/document";
 import DocumentList from "../../../components/admin/document/compare/DocumentList";
+import SecurePdfViewer from "../../../components/admin/document/compare/SecurePdfViewer";
 
 const DocumentComparePage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -73,20 +74,20 @@ const DocumentComparePage: React.FC = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <div className="bg-white shadow-sm border-b">
-        <div className="px-6 py-4">
+      <div className="bg-white shadow-sm">
+        <div className="px-2 py-2">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2">
               <Button
                 type="text"
                 icon={<ArrowLeftOutlined />}
                 onClick={handleBackToReview}
                 className="flex items-center"
               >
-                Quay lại Review
+                Quay lại
               </Button>
               <div className="h-6 w-px bg-gray-300" />
-              <h1 className="text-xl font-semibold text-gray-900">
+              <h1 className="text-base font-semibold text-[var(--primary-text-color)]">
                 So sánh tài liệu trùng lặp
               </h1>
             </div>
@@ -95,28 +96,22 @@ const DocumentComparePage: React.FC = () => {
       </div>
 
       {/* Content */}
-      <div className="p-6">
-        <div className="grid grid-cols-3 gap-6 h-[calc(100vh-160px)]">
+      <div className="p-1">
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-5 gap-2 h-screen">
           {/* Left Panel - Selected Document Viewer */}
-          <div className="bg-white rounded-lg shadow-sm border overflow-hidden">
-            <div className="p-4 border-b bg-gray-50">
-              <h2 className="text-lg font-medium text-gray-900">
+          <div className="col-span-1 xl:col-span-2 bg-white shadow-sm overflow-hidden">
+            <div className="p-2 border-b border-gray-200 bg-gray-50">
+              <h2 className="text-base font-medium text-[var(--primary-text-color)]">
                 Tài liệu được chọn
               </h2>
-              <p className="text-sm text-gray-600 mt-1 truncate">
+              <p className="text-xs text-gray-600 mt-1 truncate">
                 {selectedDocument.title}
               </p>
             </div>
-            <div className="flex-1 overflow-hidden h-full">
+            <div className="flex-1 overflow-hidden h-screen xl:h-full">
               {selectedDocument.url ? (
                 selectedDocument.file_type === "PDF" ? (
-                  <iframe
-                    src={`${selectedDocument.url}#toolbar=0&navpanes=1&scrollbar=1`}
-                    width="100%"
-                    height="100%"
-                    style={{ border: "none" }}
-                    title="Selected Document Viewer"
-                  />
+                  <SecurePdfViewer url={selectedDocument.url} />
                 ) : selectedDocument.file_type === "WORD" ? (
                   <iframe
                     src={`https://docs.google.com/viewer?url=${encodeURIComponent(
@@ -153,28 +148,22 @@ const DocumentComparePage: React.FC = () => {
           </div>
 
           {/* Middle Panel - Compare Document Viewer */}
-          <div className="bg-white rounded-lg shadow-sm border overflow-hidden">
-            <div className="p-4 border-b bg-gray-50">
-              <h2 className="text-lg font-medium text-gray-900">
+          <div className="col-span-1 xl:col-span-2 bg-white shadow-sm overflow-hidden">
+            <div className="p-2 border-b border-gray-200 bg-gray-50">
+              <h2 className="text-base font-medium text-[var(--primary-text-color)]">
                 Tài liệu so sánh
               </h2>
-              <p className="text-sm text-gray-600 mt-1 truncate">
+              <p className="text-xs text-gray-600 mt-1 truncate">
                 {compareDocument
                   ? compareDocument.title
                   : "Chưa chọn tài liệu để so sánh"}
               </p>
             </div>
-            <div className="flex-1 overflow-hidden h-full">
+            <div className="flex-1 overflow-hidden h-screen xl:h-full">
               {compareDocument ? (
                 compareDocument.url ? (
                   compareDocument.file_type === "PDF" ? (
-                    <iframe
-                      src={`${compareDocument.url}#toolbar=0&navpanes=1&scrollbar=1`}
-                      width="100%"
-                      height="100%"
-                      style={{ border: "none" }}
-                      title="Compare Document Viewer"
-                    />
+                    <SecurePdfViewer url={compareDocument.url} />
                   ) : compareDocument.file_type === "WORD" ? (
                     <iframe
                       src={`https://docs.google.com/viewer?url=${encodeURIComponent(
@@ -218,12 +207,12 @@ const DocumentComparePage: React.FC = () => {
           </div>
 
           {/* Right Panel - Document List */}
-          <div className="bg-white rounded-lg shadow-sm border overflow-hidden">
-            <div className="p-4 border-b bg-gray-50">
-              <h2 className="text-lg font-medium text-gray-900">
+          <div className="col-span-1 bg-white shadow-sm overflow-hidden">
+            <div className="p-2 border-b border-gray-200 bg-gray-50">
+              <h2 className="text-base font-medium text-[var(--primary-text-color)]">
                 Danh sách tài liệu
               </h2>
-              <p className="text-sm text-gray-600 mt-1">
+              <p className="text-xs text-gray-600 mt-1">
                 Chọn tài liệu để so sánh
               </p>
             </div>
