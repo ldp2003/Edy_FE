@@ -1,16 +1,15 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect } from "react";
 import { Input, Button, Select } from "antd";
+import { ReloadOutlined, SearchOutlined } from "@ant-design/icons";
 import {
-  ReloadOutlined,
-  SearchOutlined,
-} from "@ant-design/icons";
+  REPORT_TYPE_OPTIONS,
+  REPORT_STATUS_OPTIONS,
+} from "../../../utils/reportTypeUtils";
 
 export interface AdminReportFilterParams {
-  reason?: string;
+  search?: string;
   status?: string;
   type?: string;
-  reporter?: string;
-  docTitle?: string;
 }
 
 interface AdminReportFilterSearchProps {
@@ -21,67 +20,47 @@ interface AdminReportFilterSearchProps {
 
 const { Option } = Select;
 
-const statusOptions = [
-  { value: "PROCESSING", label: "Đang xử lý" },
-  { value: "RESOLVED", label: "Đã xử lý" },
-];
-
-const typeOptions = [
-  { value: "SPAM_OR_MISLEADING", label: "Spam/Tin giả" },
-  { value: "DUPLICATE", label: "Trùng lặp" },
-  { value: "COPYRIGHT", label: "Bản quyền" },
-  { value: "INCORRECT_CATEGORY", label: "Sai danh mục" },
-  { value: "PERSONAL_INFORMATION", label: "Thông tin cá nhân" },
-  { value: "LOW_QUALITY", label: "Chất lượng thấp" },
-  { value: "INAPPROPRIATE", label: "Không phù hợp" },
-  { value: "OTHER", label: "Khác" },
-];
+const statusOptions = REPORT_STATUS_OPTIONS;
+const typeOptions = REPORT_TYPE_OPTIONS;
 
 const AdminReportFilterSearch: React.FC<AdminReportFilterSearchProps> = ({
   onFilterChange,
   loading,
   initialFilters = {},
 }) => {
-  const [searchText, setSearchText] = useState(initialFilters.reason || "");
-  const [filters, setFilters] =
-    useState<AdminReportFilterParams>(initialFilters);
+  const [searchText, setSearchText] = useState(initialFilters.search || "");
+  const [status, setStatus] = useState(initialFilters.status || "");
+  const [type, setType] = useState(initialFilters.type || "");
 
   useEffect(() => {
-    setFilters(initialFilters);
-    setSearchText(initialFilters.reason || "");
+    setSearchText(initialFilters.search || "");
+    setStatus(initialFilters.status || "");
+    setType(initialFilters.type || "");
   }, [initialFilters]);
 
-  const handleFilterChange = useCallback(
-    (newFilters: Partial<AdminReportFilterParams>) => {
-      const updatedFilters = { ...filters, ...newFilters };
-      setFilters(updatedFilters);
-      onFilterChange(updatedFilters);
-    },
-    [filters, onFilterChange]
-  );
+  const handleApplyFilter = () => {
+    const filterParams: AdminReportFilterParams = {};
+    if (searchText) filterParams.search = searchText;
+    if (status) filterParams.status = status;
+    if (type) filterParams.type = type;
 
-  // Debounce search
-  useEffect(() => {
-    const timeoutId = setTimeout(() => {
-      if (searchText !== filters.reason) {
-        handleFilterChange({ reason: searchText });
-      }
-    }, 500);
-    return () => clearTimeout(timeoutId);
-  }, [searchText, filters.reason, handleFilterChange]);
+    onFilterChange(filterParams);
+  };
 
   const handleReset = () => {
     setSearchText("");
-    setFilters({});
+    setStatus("");
+    setType("");
     onFilterChange({});
   };
 
   return (
     <div className="bg-white p-4 rounded-lg border border-gray-200 mb-4">
-      <div className="flex gap-4 mb-4">
-        <div className="flex-1">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+        <div>
+          <label className="block text-sm font-medium mb-2">Tìm kiếm</label>
           <Input
-            placeholder="Tìm kiếm lý do báo cáo..."
+            placeholder="Tìm kiếm theo lý do, tài liệu, người báo cáo..."
             prefix={<SearchOutlined />}
             value={searchText}
             onChange={(e) => setSearchText(e.target.value)}
@@ -89,32 +68,48 @@ const AdminReportFilterSearch: React.FC<AdminReportFilterSearchProps> = ({
             allowClear
           />
         </div>
-        <Select
-          placeholder="Trạng thái"
-          style={{ minWidth: 120 }}
-          value={filters.status}
-          onChange={(value) => handleFilterChange({ status: value })}
-          allowClear
+        <div>
+          <label className="block text-sm font-medium mb-2">Trạng thái</label>
+          <Select
+            placeholder="Chọn trạng thái"
+            style={{ width: "100%" }}
+            value={status || undefined}
+            onChange={(value) => setStatus(value || "")}
+            allowClear
+          >
+            {statusOptions.map((opt) => (
+              <Option key={opt.value} value={opt.value}>
+                {opt.label}
+              </Option>
+            ))}
+          </Select>
+        </div>
+        <div>
+          <label className="block text-sm font-medium mb-2">Loại báo cáo</label>
+          <Select
+            placeholder="Chọn loại báo cáo"
+            style={{ width: "100%" }}
+            value={type || undefined}
+            onChange={(value) => setType(value || "")}
+            allowClear
+          >
+            {typeOptions.map((opt) => (
+              <Option key={opt.value} value={opt.value}>
+                {opt.label}
+              </Option>
+            ))}
+          </Select>
+        </div>
+      </div>
+      <div className="flex gap-2">
+        <Button
+          type="primary"
+          icon={<SearchOutlined />}
+          onClick={handleApplyFilter}
+          loading={loading}
         >
-          {statusOptions.map((opt) => (
-            <Option key={opt.value} value={opt.value}>
-              {opt.label}
-            </Option>
-          ))}
-        </Select>
-        <Select
-          placeholder="Loại báo cáo"
-          style={{ minWidth: 140 }}
-          value={filters.type}
-          onChange={(value) => handleFilterChange({ type: value })}
-          allowClear
-        >
-          {typeOptions.map((opt) => (
-            <Option key={opt.value} value={opt.value}>
-              {opt.label}
-            </Option>
-          ))}
-        </Select>
+          Áp dụng
+        </Button>
         <Button
           icon={<ReloadOutlined />}
           onClick={handleReset}
