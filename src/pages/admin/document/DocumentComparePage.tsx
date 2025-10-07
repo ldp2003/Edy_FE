@@ -75,9 +75,9 @@ const DocumentComparePage: React.FC = () => {
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
       <div className="bg-white shadow-sm">
-        <div className="px-6 py-4">
+        <div className="px-2 py-2">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2">
               <Button
                 type="text"
                 icon={<ArrowLeftOutlined />}
@@ -100,7 +100,7 @@ const DocumentComparePage: React.FC = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-5 gap-2 h-screen">
           {/* Left Panel - Selected Document Viewer */}
           <div className="col-span-1 xl:col-span-2 bg-white shadow-sm overflow-hidden">
-            <div className="p-2 border-b bg-gray-50">
+            <div className="p-2 border-b border-gray-200 bg-gray-50">
               <h2 className="text-base font-medium text-[var(--primary-text-color)]">
                 Tài liệu được chọn
               </h2>
@@ -148,8 +148,8 @@ const DocumentComparePage: React.FC = () => {
           </div>
 
           {/* Middle Panel - Compare Document Viewer */}
-          <div className="col-span-1 xl:col-span-2 bg-white shadow-sm overflow-hidden">z
-            <div className="p-2 border-b bg-gray-50">
+          <div className="col-span-1 xl:col-span-2 bg-white shadow-sm overflow-hidden">
+            <div className="p-2 border-b border-gray-200 bg-gray-50">
               <h2 className="text-base font-medium text-[var(--primary-text-color)]">
                 Tài liệu so sánh
               </h2>
@@ -208,7 +208,7 @@ const DocumentComparePage: React.FC = () => {
 
           {/* Right Panel - Document List */}
           <div className="col-span-1 bg-white shadow-sm overflow-hidden">
-            <div className="p-2 border-b bg-gray-50">
+            <div className="p-2 border-b border-gray-200 bg-gray-50">
               <h2 className="text-base font-medium text-[var(--primary-text-color)]">
                 Danh sách tài liệu
               </h2>
