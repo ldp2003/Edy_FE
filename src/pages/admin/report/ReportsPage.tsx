@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { message, Pagination, Modal } from "antd";
-import { useSearchParams, useNavigate } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
 import { ReportService } from "../../../utils/ReportService";
 import type { Report } from "../../../models/report";
 import { AdminBreadcrumb } from "../../../components/admin/common/AdminBreadcrumb";
@@ -12,7 +12,7 @@ import AdminReportFilterSearch from "../../../components/admin/report/AdminRepor
 
 const ReportsPage: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
 
   const [reports, setReports] = useState<Report[]>([]);
   const [loading, setLoading] = useState(true);
@@ -149,7 +149,7 @@ const ReportsPage: React.FC = () => {
     }
   };
 
-  const handleDelete = (_report: Report) => {
+  const handleDelete = () => {
     Modal.confirm({
       title: "Xác nhận xóa",
       content: "Bạn có chắc chắn muốn xóa báo cáo này không?",
@@ -174,7 +174,7 @@ const ReportsPage: React.FC = () => {
 
       <div className="p-6 bg-white rounded shadow">
         <div className="flex justify-between items-center mb-6">
-          <h1 className="text-xl font-semibold text-gray-800">
+          <h1 className="text-sm font-bold text-[var(--primary-text-color)]">
             Quản lý báo cáo
           </h1>
           <div className="text-sm text-gray-500">Tổng: {total} báo cáo</div>

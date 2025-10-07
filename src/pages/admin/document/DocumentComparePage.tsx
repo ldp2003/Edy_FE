@@ -72,9 +72,9 @@ const DocumentComparePage: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="h-screen bg-[var(--secondary-background-color)] overflow-hidden flex flex-col">
       {/* Header */}
-      <div className="bg-white shadow-sm">
+      <div className="bg-white shadow-sm flex-shrink-0">
         <div className="px-2 py-2">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
@@ -96,11 +96,11 @@ const DocumentComparePage: React.FC = () => {
       </div>
 
       {/* Content */}
-      <div className="p-1">
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-5 gap-2 h-screen">
+      <div className="flex-1 p-1 overflow-hidden">
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-5 gap-2 h-full">
           {/* Left Panel - Selected Document Viewer */}
-          <div className="col-span-1 xl:col-span-2 bg-white shadow-sm overflow-hidden">
-            <div className="p-2 border-b border-gray-200 bg-gray-50">
+          <div className="col-span-1 xl:col-span-2 bg-white shadow-sm overflow-hidden flex flex-col">
+            <div className="p-2 border-b border-gray-200 bg-gray-50 flex-shrink-0">
               <h2 className="text-base font-medium text-[var(--primary-text-color)]">
                 Tài liệu được chọn
               </h2>
@@ -108,7 +108,7 @@ const DocumentComparePage: React.FC = () => {
                 {selectedDocument.title}
               </p>
             </div>
-            <div className="flex-1 overflow-hidden h-screen xl:h-full">
+            <div className="flex-1 overflow-hidden">
               {selectedDocument.url ? (
                 selectedDocument.file_type === "PDF" ? (
                   <SecurePdfViewer url={selectedDocument.url} />
@@ -148,8 +148,8 @@ const DocumentComparePage: React.FC = () => {
           </div>
 
           {/* Middle Panel - Compare Document Viewer */}
-          <div className="col-span-1 xl:col-span-2 bg-white shadow-sm overflow-hidden">
-            <div className="p-2 border-b border-gray-200 bg-gray-50">
+          <div className="col-span-1 xl:col-span-2 bg-white shadow-sm overflow-hidden flex flex-col">
+            <div className="p-2 border-b border-gray-200 bg-gray-50 flex-shrink-0">
               <h2 className="text-base font-medium text-[var(--primary-text-color)]">
                 Tài liệu so sánh
               </h2>
@@ -159,7 +159,7 @@ const DocumentComparePage: React.FC = () => {
                   : "Chưa chọn tài liệu để so sánh"}
               </p>
             </div>
-            <div className="flex-1 overflow-hidden h-screen xl:h-full">
+            <div className="flex-1 overflow-hidden">
               {compareDocument ? (
                 compareDocument.url ? (
                   compareDocument.file_type === "PDF" ? (
@@ -207,8 +207,8 @@ const DocumentComparePage: React.FC = () => {
           </div>
 
           {/* Right Panel - Document List */}
-          <div className="col-span-1 bg-white shadow-sm overflow-hidden">
-            <div className="p-2 border-b border-gray-200 bg-gray-50">
+          <div className="col-span-1 bg-white shadow-sm overflow-hidden flex flex-col">
+            <div className="p-2 border-b border-gray-200 bg-gray-50 flex-shrink-0">
               <h2 className="text-base font-medium text-[var(--primary-text-color)]">
                 Danh sách tài liệu
               </h2>
@@ -216,10 +216,12 @@ const DocumentComparePage: React.FC = () => {
                 Chọn tài liệu để so sánh
               </p>
             </div>
-            <DocumentList
-              onSelectDocument={handleSelectDocument}
-              selectedDocumentId={compareDocument?._id}
-            />
+            <div className="flex-1 overflow-hidden">
+              <DocumentList
+                onSelectDocument={handleSelectDocument}
+                selectedDocumentId={compareDocument?._id}
+              />
+            </div>
           </div>
         </div>
       </div>

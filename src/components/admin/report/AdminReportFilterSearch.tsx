@@ -55,7 +55,7 @@ const AdminReportFilterSearch: React.FC<AdminReportFilterSearchProps> = ({
   };
 
   return (
-    <div className="bg-white p-4 rounded-lg border border-gray-200 mb-4">
+    <div className="bg-white p-4 rounded-lg border border-gray-200 mb-4 text-left">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
         <div>
           <label className="block text-sm font-medium mb-2">Tìm kiếm</label>

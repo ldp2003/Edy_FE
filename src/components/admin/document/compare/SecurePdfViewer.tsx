@@ -12,17 +12,21 @@ interface SecurePdfViewerProps {
 
 const SecurePdfViewer: React.FC<SecurePdfViewerProps> = ({ url }) => {
   const containerRef = useRef<HTMLDivElement>(null);
-  const renderedUrlRef = useRef<string | null>(null); // 🔒 Ngăn render lặp URL giống nhau
+  const renderedUrlRef = useRef<string | null>(null);
+  const isRenderingRef = useRef<boolean>(false); // 🔒 Ngăn render đồng thời
 
   useEffect(() => {
     const container = containerRef.current;
     if (!container) return;
 
-    // Nếu URL giống lần trước => không render lại
-    if (renderedUrlRef.current === url) return;
+    // Nếu URL giống lần trước hoặc đang render => không render lại
+    if (renderedUrlRef.current === url || isRenderingRef.current) return;
+
+    // Đánh dấu đang render
+    isRenderingRef.current = true;
     renderedUrlRef.current = url;
 
-    // Dọn trước khi render
+    // Dọn sạch container trước khi render
     container.innerHTML = "";
 
     const renderPDF = async () => {
@@ -72,6 +76,9 @@ const SecurePdfViewer: React.FC<SecurePdfViewerProps> = ({ url }) => {
           pageContainer.appendChild(canvas);
           container.appendChild(pageContainer);
         }
+
+        // 🔒 Đánh dấu hoàn thành render
+        isRenderingRef.current = false;
       } catch (error) {
         console.error("Lỗi khi render PDF:", error);
         container.innerHTML = `
