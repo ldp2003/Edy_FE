@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { List, Avatar, Input, Spin, Pagination } from "antd";
-import { SearchOutlined, FileTextOutlined } from "@ant-design/icons";
+import { List, Input, Spin, Pagination } from "antd";
+import { SearchOutlined } from "@ant-design/icons";
 import { DocumentService } from "../../../../utils/DocumentService";
 import type { Document } from "../../../../models/document";
+import CompareDocItem from "./CompareDocItem";
 
 const { Search } = Input;
 
@@ -23,6 +24,9 @@ const DocumentList: React.FC<DocumentListProps> = ({
   const [currentPage, setCurrentPage] = useState(1);
   const [total, setTotal] = useState(0);
   const [displayLimit, setDisplayLimit] = useState(10);
+  const [checkedDocuments, setCheckedDocuments] = useState<Set<string>>(
+    new Set()
+  );
   const pageSize = 10;
   const initialLimit = 10;
 
@@ -54,9 +58,64 @@ const DocumentList: React.FC<DocumentListProps> = ({
     }
   }, [currentPage, searchText, doc_id]);
 
+  // Local Storage functions
+  const getStorageKey = useCallback(
+    () => `checkedDocuments_${doc_id}`,
+    [doc_id]
+  );
+
+  const saveCheckedDocuments = useCallback(
+    (checkedSet: Set<string>) => {
+      localStorage.setItem(
+        getStorageKey(),
+        JSON.stringify(Array.from(checkedSet))
+      );
+    },
+    [getStorageKey]
+  );
+
+  const loadCheckedDocuments = useCallback((): Set<string> => {
+    try {
+      const stored = localStorage.getItem(getStorageKey());
+      if (stored) {
+        return new Set(JSON.parse(stored));
+      }
+    } catch (error) {
+      console.error(
+        "Error loading checked documents from localStorage:",
+        error
+      );
+    }
+    return new Set();
+  }, [getStorageKey]);
+
+  // Checkbox handlers
+  const handleCheckboxChange = useCallback(
+    (documentId: string, checked: boolean) => {
+      setCheckedDocuments((prev) => {
+        const newSet = new Set(prev);
+        if (checked) {
+          newSet.add(documentId);
+        } else {
+          newSet.delete(documentId);
+        }
+        saveCheckedDocuments(newSet);
+        return newSet;
+      });
+    },
+    [saveCheckedDocuments]
+  );
+
   useEffect(() => {
     fetchDocuments();
   }, [fetchDocuments]);
+
+  // Load checked documents from localStorage on component mount
+  useEffect(() => {
+    if (doc_id) {
+      setCheckedDocuments(loadCheckedDocuments());
+    }
+  }, [doc_id, loadCheckedDocuments]);
 
   const handleSearch = (value: string) => {
     setSearchText(value);
@@ -68,29 +127,12 @@ const DocumentList: React.FC<DocumentListProps> = ({
     setCurrentPage(page);
   };
 
-
-  const getDocumentTypeColor = (docType: string) => {
-    const colors = {
-      TEXTBOOK: "#1890ff",
-      REFERENCE: "#52c41a",
-      THESIS: "#722ed1",
-      RESEARCH_PAPER: "#fa541c",
-      REPORT: "#13c2c2",
-      OTHER: "#8c8c8c",
-    };
-    return colors[docType as keyof typeof colors] || colors.OTHER;
-  };
-
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString("vi-VN");
-  };
-
   // Logic để xác định có nên sử dụng pagination hay load more
   const useLoadMore = !searchText || searchText.trim() === "";
   const displayedDocuments = useLoadMore
     ? documents.slice(0, displayLimit)
     : documents;
- 
+
   return (
     <div className="flex flex-col h-full text-left">
       {/* Search */}
@@ -113,50 +155,14 @@ const DocumentList: React.FC<DocumentListProps> = ({
           <List
             dataSource={displayedDocuments}
             renderItem={(document) => (
-              <List.Item
+              <CompareDocItem
                 key={document._id}
-                className={`cursor-pointer hover:bg-gray-50 transition-colors border-l-4 ${
-                  selectedDocumentId === document._id
-                    ? "bg-blue-50 border-l-blue-500"
-                    : "border-l-transparent"
-                }`}
-                onClick={() => onSelectDocument(document)}
-              >
-                <List.Item.Meta
-                  avatar={
-                    <Avatar
-                      icon={<FileTextOutlined />}
-                      style={{
-                        backgroundColor: getDocumentTypeColor(
-                          document.doc_type || "OTHER"
-                        ),
-                      }}
-                    />
-                  }
-                  title={
-                    <div className="pr-4">
-                      <div className="font-medium text-gray-900 line-clamp-2">
-                        {document.title}
-                      </div>
-                      <div className="text-xs text-gray-500 mt-1">
-                        {document.doc_type} • {formatDate(document.createdAt)}
-                      </div>
-                    </div>
-                  }
-                  description={
-                    <div className="pr-4">
-                      <div className="text-sm text-gray-600 line-clamp-1">
-                        Tác giả: {document.author?.join(", ") || "Không có"}
-                      </div>
-                      {document.subject && (
-                        <div className="text-xs text-gray-500 mt-1">
-                          Môn học: {document.subject.name}
-                        </div>
-                      )}
-                    </div>
-                  }
-                />
-              </List.Item>
+                document={document}
+                isSelected={selectedDocumentId === document._id}
+                isChecked={checkedDocuments.has(document._id)}
+                onSelect={onSelectDocument}
+                onCheckboxChange={handleCheckboxChange}
+              />
             )}
             locale={{ emptyText: "Không có tài liệu nào" }}
           />
@@ -173,11 +179,11 @@ const DocumentList: React.FC<DocumentListProps> = ({
             onChange={handlePageChange}
             size="small"
             showSizeChanger={false}
-            showTotal={(total, range) =>
-              <span style={{ fontSize: '11px' }}>
+            showTotal={(total, range) => (
+              <span style={{ fontSize: "11px" }}>
                 {`${range[0]}-${range[1]} của ${total} tài liệu`}
               </span>
-            }
+            )}
           />
         </div>
       )}
