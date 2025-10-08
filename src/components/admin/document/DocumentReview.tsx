@@ -161,7 +161,7 @@ const DocumentReview: React.FC<DocumentReviewProps> = ({
   }
 
   return (
-    <div className="py-6 min-h-screen text-left">
+    <div className="pb-6 min-h-screen text-left">
       {contextHolder}
 
       {/* User Info Header */}

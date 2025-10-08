@@ -4,6 +4,7 @@ import { message, Spin } from "antd";
 import DocumentReview from "../../../components/admin/document/DocumentReview";
 import { DocumentService } from "../../../utils/DocumentService";
 import type { Document } from "../../../models/document";
+import { AdminBreadcrumb } from "../../../components/admin/common/AdminBreadcrumb";
 
 const DocumentReviewPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -136,9 +137,16 @@ const DocumentReviewPage: React.FC = () => {
       </div>
     );
   }
+  const breadcrumbItems = [
+    { label: "Tài liệu", path: "/admin/documents/all" },
+    { label: "Duyệt tài liệu", path: `/admin/documents/review/${id}` },
+    { label: document.title || "Chi tiết tài liệu" },
+  ];
 
   return (
-    <div className="max-w-7xl mx-auto">
+    <div className="max-w-7xl mx-auto p-6">
+      <AdminBreadcrumb items={breadcrumbItems} />
+
       <DocumentReview
         document={document}
         onApprove={handleApprove}

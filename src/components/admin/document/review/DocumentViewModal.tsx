@@ -1,6 +1,7 @@
 import React from "react";
 import { Modal, Button } from "antd";
 import type { Document } from "../../../../models/document";
+import SecurePdfViewer from "../compare/SecurePdfViewer";
 
 interface DocumentViewModalProps {
   document: Document;
@@ -13,52 +14,23 @@ const DocumentViewModal: React.FC<DocumentViewModalProps> = ({
   visible,
   onClose,
 }) => {
-  const getDocumentViewerUrl = () => {
-    if (!document?.url) return null;
-
-    // For PDF files, we can use Cloudinary's built-in PDF viewer or embed directly
-    if (document.file_type === "PDF") {
-      return document.url;
+  const renderDocumentContent = () => {
+    if (!document?.url) {
+      return (
+        <div className="flex items-center justify-center h-full bg-gray-100">
+          <div className="text-center">
+            <p className="text-gray-600 mb-4">Không có URL tài liệu</p>
+          </div>
+        </div>
+      );
     }
 
-    // For Word documents, convert to viewable format
-    if (document.file_type === "WORD") {
-      // Use Google Docs Viewer
-      return `https://docs.google.com/viewer?url=${encodeURIComponent(
-        document.url
-      )}&embedded=true`;
-    }
+    switch (document.file_type) {
+      case "PDF":
+        return <SecurePdfViewer url={document.url} />;
 
-    return document.url;
-  };
-
-  return (
-    <Modal
-      title={`Xem tài liệu: ${document.title}`}
-      open={visible}
-      onCancel={onClose}
-      footer={[
-        <Button key="close" onClick={onClose}>
-          Đóng
-        </Button>,
-      ]}
-      width="90vw"
-      style={{ maxWidth: "1200px" }}
-      bodyStyle={{ padding: 0, height: "80vh" }}
-      destroyOnClose={true}
-    >
-      <div className="w-full h-full">
-        {document.file_type === "PDF" ? (
-          // For PDF files - direct embed
-          <iframe
-            src={`${getDocumentViewerUrl()}#toolbar=0&navpanes=1&scrollbar=1`}
-            width="100%"
-            height="100%"
-            style={{ border: "none" }}
-            title="Document Viewer"
-          />
-        ) : document.file_type === "WORD" ? (
-          // For Word files - use Google Docs Viewer
+      case "WORD":
+        return (
           <iframe
             src={`https://docs.google.com/viewer?url=${encodeURIComponent(
               document.url
@@ -68,11 +40,15 @@ const DocumentViewModal: React.FC<DocumentViewModalProps> = ({
             style={{ border: "none" }}
             title="Document Viewer"
           />
-        ) : (
-          // For other file types
+        );
+
+      default:
+        return (
           <div className="flex items-center justify-center h-full bg-gray-100">
             <div className="text-center">
-              <p className="text-gray-600 mb-4">Không thể xem trước file này</p>
+              <p className="text-gray-600 mb-4">
+                Không thể xem trước file loại {document.file_type}
+              </p>
               <Button
                 type="primary"
                 onClick={() => window.open(document.url, "_blank")}
@@ -81,7 +57,31 @@ const DocumentViewModal: React.FC<DocumentViewModalProps> = ({
               </Button>
             </div>
           </div>
-        )}
+        );
+    }
+  };
+
+  return (
+    <Modal
+      title={
+        <div className="flex flex-col">
+          <span className="text-lg font-medium">{document.title}</span>
+          <span className="text-sm text-gray-500 font-normal">
+            {document.file_type} • {document.doc_type}
+          </span>
+        </div>
+      }
+      open={visible}
+      onCancel={onClose}
+      footer={null}
+      style={{ maxWidth: "1200px" }}
+      bodyStyle={{ padding: 0, height: "80vh" }}
+      destroyOnClose={true}
+      className="document-view-modal"
+      centered={true}
+    >
+      <div className="w-full h-full overflow-hidden">
+        {renderDocumentContent()}
       </div>
     </Modal>
   );
