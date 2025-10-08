@@ -334,4 +334,14 @@ export const DocumentService = {
       throw error;
     }
   },
+
+  // Lấy danh sách tài liệu tương tự
+  async getSimilarDocuments(documentId: string, limit?: number) {
+    try {
+      return await DocumentAPI.getSimilarDocuments(documentId, limit);
+    } catch (error) {
+      console.error("Error in DocumentService.getSimilarDocuments:", error);
+      throw error;
+    }
+  },
 };
