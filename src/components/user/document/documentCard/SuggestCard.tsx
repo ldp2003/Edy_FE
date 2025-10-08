@@ -10,7 +10,7 @@ const SuggestCard: React.FC<SuggestCardProps> = ({ document }) => {
   const { _id, title, subject, cover_page } = document;
   const handleImageError = (e: React.SyntheticEvent<HTMLImageElement>) => {
     const target = e.target as HTMLImageElement;
-    target.src = "/public/image/thumb_1200_1553.png";
+    target.src = "/public/image/default_cover.png";
   };
 
   const onClick = () => {
@@ -27,7 +27,7 @@ const SuggestCard: React.FC<SuggestCardProps> = ({ document }) => {
         style={{ backgroundColor: "var(--card-background-color)" }}
       >
         <img
-          src={cover_page || "/public/image/thumb_1200_1553.png"}
+          src={cover_page || "/public/image/default_cover.png"}
           alt={title}
           className="h-16 w-16 object-cover rounded-lg"
           onError={handleImageError}

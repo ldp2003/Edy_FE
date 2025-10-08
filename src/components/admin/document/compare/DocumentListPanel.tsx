@@ -5,11 +5,13 @@ import type { Document } from "../../../../models/document";
 interface DocumentListPanelProps {
   onSelectDocument: (document: Document) => void;
   selectedDocumentId?: string;
+  doc_id?: string;
 }
 
 const DocumentListPanel: React.FC<DocumentListPanelProps> = ({
   onSelectDocument,
   selectedDocumentId,
+  doc_id,
 }) => {
   return (
     <div className="bg-white shadow-sm overflow-hidden flex flex-col h-full">
@@ -23,6 +25,7 @@ const DocumentListPanel: React.FC<DocumentListPanelProps> = ({
         <DocumentList
           onSelectDocument={onSelectDocument}
           selectedDocumentId={selectedDocumentId}
+          doc_id={doc_id}
         />
       </div>
     </div>

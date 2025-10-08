@@ -72,7 +72,7 @@ const DocumentCard: React.FC<DocumentCardProps> = ({
 
   const handleImageError = (e: React.SyntheticEvent<HTMLImageElement>) => {
     const target = e.target as HTMLImageElement;
-    target.src = "/public/image/thumb_1200_1553.png";
+    target.src = "/public/image/default_cover.png";
   };
 
   return (
@@ -85,9 +85,9 @@ const DocumentCard: React.FC<DocumentCardProps> = ({
       {contextHolder}
       <div className="bg-[var(--card-background-color)] rounded-md relative flex justify-center items-center">
         <img
-          src={imageUrl || "/public/image/thumb_1200_1553.png"}
+          src={imageUrl || "/public/image/default_cover.png"}
           alt={typeof title === "string" ? title : "Tài liệu"}
-          className="h-40 m-3 w-full object-fill rounded-md"
+          className="h-40 m-3 w-full object-fill rounded-md bg-white"
           onError={handleImageError}
         />
       </div>

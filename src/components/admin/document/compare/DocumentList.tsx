@@ -9,38 +9,50 @@ const { Search } = Input;
 interface DocumentListProps {
   onSelectDocument: (document: Document) => void;
   selectedDocumentId?: string;
+  doc_id?: string;
 }
 
 const DocumentList: React.FC<DocumentListProps> = ({
   onSelectDocument,
   selectedDocumentId,
+  doc_id,
 }) => {
   const [documents, setDocuments] = useState<Document[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchText, setSearchText] = useState("");
-  const [currentPage, setCurrenPage] = useState(1);
+  const [currentPage, setCurrentPage] = useState(1);
   const [total, setTotal] = useState(0);
+  const [displayLimit, setDisplayLimit] = useState(10);
   const pageSize = 10;
+  const initialLimit = 10;
 
   const fetchDocuments = useCallback(async () => {
     try {
       setLoading(true);
-      const response = await DocumentService.fetchNewestDocuments({
-        search: searchText,
-        page: currentPage,
-        limit: pageSize,
-        ordering: "createdAt",
-        order: -1,
-      });
+      let response;
+
+      if (searchText && searchText.trim()) {
+        // Nếu có tìm kiếm, sử dụng getAllDocuments
+        response = await DocumentService.getAllDocuments({
+          search: searchText,
+          page: currentPage,
+          limit: pageSize,
+          ordering: "createdAt",
+          order: -1,
+        });
+      } else {
+        // Nếu không có tìm kiếm, sử dụng getSimilarDocuments
+        response = await DocumentService.getSimilarDocuments(doc_id || "");
+      }
 
       setDocuments(response.documents || []);
-      setTotal(response.totalCount || 0);
+      setTotal(response.total || response.totalCount || 0);
     } catch (error) {
       console.error("Error fetching documents:", error);
     } finally {
       setLoading(false);
     }
-  }, [currentPage, searchText]);
+  }, [currentPage, searchText, doc_id]);
 
   useEffect(() => {
     fetchDocuments();
@@ -48,12 +60,14 @@ const DocumentList: React.FC<DocumentListProps> = ({
 
   const handleSearch = (value: string) => {
     setSearchText(value);
-    setCurrenPage(1);
+    setCurrentPage(1);
+    setDisplayLimit(initialLimit);
   };
 
   const handlePageChange = (page: number) => {
-    setCurrenPage(page);
+    setCurrentPage(page);
   };
+
 
   const getDocumentTypeColor = (docType: string) => {
     const colors = {
@@ -71,6 +85,12 @@ const DocumentList: React.FC<DocumentListProps> = ({
     return new Date(dateString).toLocaleDateString("vi-VN");
   };
 
+  // Logic để xác định có nên sử dụng pagination hay load more
+  const useLoadMore = !searchText || searchText.trim() === "";
+  const displayedDocuments = useLoadMore
+    ? documents.slice(0, displayLimit)
+    : documents;
+ 
   return (
     <div className="flex flex-col h-full text-left">
       {/* Search */}
@@ -91,7 +111,7 @@ const DocumentList: React.FC<DocumentListProps> = ({
           </div>
         ) : (
           <List
-            dataSource={documents}
+            dataSource={displayedDocuments}
             renderItem={(document) => (
               <List.Item
                 key={document._id}
@@ -143,9 +163,9 @@ const DocumentList: React.FC<DocumentListProps> = ({
         )}
       </div>
 
-      {/* Pagination */}
-      {total > pageSize && (
-        <div className="p-4 border-t flex-shrink-0">
+      {/* Pagination - chỉ hiển thị khi có tìm kiếm */}
+      {!useLoadMore && total > pageSize && (
+        <div className="p-4  border-t flex-shrink-0">
           <Pagination
             current={currentPage}
             total={total}
@@ -154,7 +174,9 @@ const DocumentList: React.FC<DocumentListProps> = ({
             size="small"
             showSizeChanger={false}
             showTotal={(total, range) =>
-              `${range[0]}-${range[1]} của ${total} tài liệu`
+              <span style={{ fontSize: '11px' }}>
+                {`${range[0]}-${range[1]} của ${total} tài liệu`}
+              </span>
             }
           />
         </div>

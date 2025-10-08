@@ -120,6 +120,7 @@ const DocumentComparePage: React.FC = () => {
             <DocumentListPanel
               onSelectDocument={handleSelectDocument}
               selectedDocumentId={compareDocument?._id}
+              doc_id={id}
             />
           </div>
         </div>
