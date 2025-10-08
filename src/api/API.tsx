@@ -693,6 +693,20 @@ export const DocumentAPI = {
       throw error;
     }
   },
+
+  // Get similar documents
+  getSimilarDocuments: async (documentId: string, limit?: number) => {
+    try {
+      const params = limit ? { limit } : {};
+      const response = await apiClient.get(`/documents/${documentId}/similar`, {
+        params,
+      });
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching similar documents:", error);
+      throw error;
+    }
+  },
 };
 export const AccessRequestAPI = {
   // Create access request for private share

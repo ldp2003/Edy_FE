@@ -1,58 +1,29 @@
 import React from "react";
 import SuggestCard from "../documentCard/SuggestCard";
+import { DocumentService } from "../../../../utils/DocumentService";
 
-const featuredDocuments = [
-  {
-    id: "1",
-    title: "Tài liệu tổng hợp Kinh tế chính trị Mác-Lênin",
-    description: "Kinh tế chính trị Mác-Lênin",
-    imageUrl: "/image/thumb_1200_1553.png",
-    like: 160,
-  },
-  {
-    id: "2",
-    title: "Tài liệu tổng hợp Kinh tế chính trị Mác-Lênin",
-    description: "Kinh tế chính trị Mác-Lênin",
-    imageUrl: "/image/thumb_1200_1553.png",
-    like: 160,
-  },
-  {
-    id: "3",
-    title: "Tài liệu tổng hợp Kinh tế chính trị Mác-Lênin",
-    description: "Kinh tế chính trị Mác-Lênin",
-    imageUrl: "/image/thumb_1200_1553.png",
-    like: 160,
-  },
-  {
-    id: "4",
-    title: "Tài liệu tổng hợp Kinh tế chính trị Mác-Lênin",
-    description: "Kinh tế chính trị Mác-Lênin",
-    imageUrl: "/image/thumb_1200_1553.png",
-    like: 160,
-  },
-  {
-    id: "5",
-    title: "Tài liệu tổng hợp Kinh tế chính trị Mác-Lênin",
-    description: "Kinh tế chính trị Mác-Lênin",
-    imageUrl: "/image/thumb_1200_1553.png",
-    like: 160,
-  },
-];
+interface RelatedDocumentProps {
+  doc_id: string;
+}
+const RelatedDocument: React.FC<RelatedDocumentProps> = ({ doc_id }) => {
+  const [similarDocuments, setSimilarDocuments] = React.useState([]);
 
-const RelatedDocument: React.FC = () => {
+  const fetchSimilarDocuments = async () => {
+    const respone = await DocumentService.getSimilarDocuments(doc_id);
+    setSimilarDocuments(respone.documents);
+    console.log(respone);
+  };
+  React.useEffect(() => {
+    fetchSimilarDocuments();
+  }, []);
   return (
     <div className="pt-6">
-      <h4 className="font-medium text-lg mb-3">Gợi ý cho bạn:</h4>
+      <h4 className="font-bold text-sm text-[var(--secondary-text-color)] mb-3">
+        Gợi ý cho bạn:
+      </h4>
       <div className="space-y-3">
-        {featuredDocuments.map((doc) => (
-          <SuggestCard
-            key={doc.id}
-            id={doc.id}
-            title={doc.title}
-            description={doc.description}
-            imageUrl={doc.imageUrl}
-            like={doc.like}
-          />
+        {similarDocuments.map((doc) => (
+          <SuggestCard document={doc} />
         ))}
       </div>
     </div>
