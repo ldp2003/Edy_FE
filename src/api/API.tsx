@@ -590,6 +590,34 @@ export const DocumentAPI = {
     }
   },
 
+  reactDocument: async (
+    documentId: string,
+    reaction: "LIKE" | "DISLIKE" | "UNREACT"
+  ) => {
+    try {
+      const response = await apiClient.post(
+        `/documents/${documentId}/react`,
+        { reaction }
+      );
+      return response.data;
+    } catch (error) {
+      console.error("Error reacting to document:", error);
+      throw error;
+    }
+  },
+
+  getDocumentReactions: async (documentId: string) => {
+    try {
+      const response = await apiClient.get(
+        `/documents/${documentId}/reactions`
+      );
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching document reactions:", error);
+      throw error;
+    }
+  },
+
   // Get pending documents (for admin)
   getPendingDocuments: async (params?: {
     page?: number;

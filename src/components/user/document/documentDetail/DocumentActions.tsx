@@ -7,10 +7,17 @@ import FavoriteButton from "../../../common/buttons/FavoriteButton";
 import ShareButton from "../../../common/buttons/ShareButton";
 import type { Document } from "../../../../models/document";
 import { UserContext } from "../../../../contexts/UserContext";
+import { DocumentAPI } from "../../../../api/API";
 
 interface DocumentActionsProps {
   document: Document;
   isUser?: boolean;
+}
+
+interface ReactionData {
+  likes: number;
+  dislikes: number;
+  userReaction: "LIKE" | "DISLIKE" | null;
 }
 
 const DocumentActions: React.FC<DocumentActionsProps> = ({
@@ -19,6 +26,83 @@ const DocumentActions: React.FC<DocumentActionsProps> = ({
 }) => {
   const [isFixed, setIsFixed] = useState(false);
   const { user } = React.useContext(UserContext);
+  const [reactionData, setReactionData] = useState<ReactionData>({
+    likes: 0,
+    dislikes: 0,
+    userReaction: null
+  });
+  const [reactionsLoading, setReactionsLoading] = useState(true);
+
+  //fetch reactions
+  useEffect(() => {
+    const fetchReactions = async () => {
+      try {
+        setReactionsLoading(true);
+        const response = await DocumentAPI.getDocumentReactions(document._id);
+
+        const userReactionValue = response.reacted === 'NONE' ? null : response.reacted;
+
+        setReactionData({
+          likes: response.likes || 0,
+          dislikes: response.dislikes || 0,
+          userReaction: userReactionValue
+        });
+      } catch (error) {
+        console.error("Error fetching reactions:", error);
+        // Set default values on error
+        setReactionData({
+          likes: 0,
+          dislikes: 0,
+          userReaction: null
+        });
+      } finally {
+        setReactionsLoading(false);
+      }
+    };
+
+    if (user) {
+      fetchReactions();
+    } else {
+      setReactionsLoading(false);
+    }
+  }, [document._id, user]);
+
+  const refetchReactions = async () => {
+    try {
+      const response = await DocumentAPI.getDocumentReactions(document._id);
+      const userReactionValue = response.reacted === 'NONE' ? null : response.reacted;
+
+      const newReactionData = {
+        likes: response.likes || 0,
+        dislikes: response.dislikes || 0,
+        userReaction: userReactionValue
+      };
+
+      setReactionData(newReactionData);
+
+      // Dispatch event để update cả 2 buttons
+      window.dispatchEvent(new CustomEvent('reactionRefetch', {
+        detail: {
+          documentId: document._id,
+          ...newReactionData
+        }
+      }));
+    } catch (error) {
+      console.error("Error refetching reactions:", error);
+    }
+  };
+
+  // Thêm listener để trigger refetch khi có reaction
+  useEffect(() => {
+    const handleReactionChange = (event: any) => {
+      if (event.detail.documentId === document._id) {
+        refetchReactions();
+      }
+    };
+
+    window.addEventListener('reactionChanged', handleReactionChange);
+    return () => window.removeEventListener('reactionChanged', handleReactionChange);
+  }, [document._id]);
 
   useEffect(() => {
     const handleScroll = (event: Event) => {
@@ -81,11 +165,10 @@ const DocumentActions: React.FC<DocumentActionsProps> = ({
   return (
     <div
       data-document-actions={document._id}
-      className={`flex items-center justify-between p-2 transition-all duration-300 ${
-        isFixed
-          ? "sticky top-0 bg-[var(--secondary-background-color)] shadow-md z-10 mx-[-16px] px-4"
-          : ""
-      }`}
+      className={`flex items-center justify-between p-2 transition-all duration-300 ${isFixed
+        ? "sticky top-0 bg-[var(--secondary-background-color)] shadow-md z-10 mx-[-16px] px-4"
+        : ""
+        }`}
     >
       <DownloadButton
         point={document.intensive ? 6 : 4}
@@ -100,8 +183,34 @@ const DocumentActions: React.FC<DocumentActionsProps> = ({
             documentTitle={document.title}
           />
         )}
-        <LikeButton likeCount={0} />
-        <DislikeButton dislikeCount={0} />
+        {user && !reactionsLoading && (
+          <>
+            <LikeButton
+              documentId={document._id}
+              initialLikeCount={reactionData.likes}
+              initialUserReaction={reactionData.userReaction}
+            />
+            <DislikeButton
+              documentId={document._id}
+              initialDislikeCount={reactionData.dislikes}
+              initialUserReaction={reactionData.userReaction}
+            />
+          </>
+        )}
+
+        {/* Show loading state for reactions */}
+        {user && reactionsLoading && (
+          <>
+            <div className="flex items-center space-x-2 bg-gray-100 rounded-2xl border border-gray-300 px-3 py-1">
+              <div className="w-4 h-4 bg-gray-300 rounded animate-pulse"></div>
+              <span className="text-xs text-gray-400">-</span>
+            </div>
+            <div className="flex items-center space-x-2 bg-gray-100 rounded-2xl border border-gray-300 px-3 py-1">
+              <div className="w-4 h-4 bg-gray-300 rounded animate-pulse"></div>
+              <span className="text-xs text-gray-400">-</span>
+            </div>
+          </>
+        )}
         <FavoriteButton documentId={document._id} />
         <ShareButton
           documentId={document._id}
