@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect } from "react";
 import { Input, Button } from "antd";
 import { Search, Filter, RotateCcw } from "lucide-react";
 import CommonFilterDrawer, {
@@ -6,7 +6,7 @@ import CommonFilterDrawer, {
 } from "../../common/filter/CommonFilterDrawer";
 
 export interface AdminFilterSearchParams {
-  title?: string;
+  search?: string;
   status?: string;
   doc_type?: string;
   level?: string;
@@ -19,55 +19,61 @@ export interface AdminFilterSearchParams {
 
 interface AdminDocumentFilterSearchProps {
   onFilterChange: (params: AdminFilterSearchParams) => void;
+  onApplyFilters: (params: AdminFilterSearchParams) => void;
   loading?: boolean;
   initialFilters?: AdminFilterSearchParams;
 }
 
 const AdminDocumentFilterSearch: React.FC<AdminDocumentFilterSearchProps> = ({
   onFilterChange,
+  onApplyFilters,
   loading,
   initialFilters = {},
 }) => {
-  const [searchText, setSearchText] = useState(initialFilters.title || "");
+  const [searchText, setSearchText] = useState(initialFilters.search || "");
   const [filters, setFilters] =
     useState<AdminFilterSearchParams>(initialFilters);
   const [showFilterDrawer, setShowFilterDrawer] = useState(false);
+  const [appliedFilters, setAppliedFilters] =
+    useState<AdminFilterSearchParams>(initialFilters);
 
   // Sync with initialFilters when they change (from URL)
   useEffect(() => {
     setFilters(initialFilters);
-    setSearchText(initialFilters.title || "");
+    setAppliedFilters(initialFilters);
+    setSearchText(initialFilters.search || "");
   }, [initialFilters]);
 
-  const handleFilterChange = useCallback(
-    (newFilters: Partial<AdminFilterSearchParams>) => {
-      const updatedFilters = { ...filters, ...newFilters };
-      setFilters(updatedFilters);
-      onFilterChange(updatedFilters);
-    },
-    [filters, onFilterChange]
-  );
-
-  // Debounce search
+  // Cập nhật search trong filters khi searchText thay đổi
   useEffect(() => {
-    const timeoutId = setTimeout(() => {
-      if (searchText !== filters.title) {
-        handleFilterChange({ title: searchText });
+    setFilters((prevFilters) => {
+      if (prevFilters.search !== searchText) {
+        const updatedFilters = { ...prevFilters, search: searchText };
+        // Gọi onFilterChange để đồng bộ với parent component
+        setTimeout(() => onFilterChange(updatedFilters), 0);
+        return updatedFilters;
       }
-    }, 500);
-
-    return () => clearTimeout(timeoutId);
-  }, [searchText, filters.title, handleFilterChange]);
+      return prevFilters;
+    });
+  }, [searchText, onFilterChange]);
 
   const handleReset = () => {
     setSearchText("");
     setFilters({});
-    onFilterChange({});
+    setAppliedFilters({});
+    onApplyFilters({});
     setShowFilterDrawer(false);
   };
 
   const handleApplyFilter = () => {
+    setAppliedFilters(filters);
+    onApplyFilters(filters);
     setShowFilterDrawer(false);
+  };
+
+  const handleSearch = () => {
+    setAppliedFilters(filters);
+    onApplyFilters(filters);
   };
 
   // Configure filter fields for the drawer
@@ -85,7 +91,13 @@ const AdminDocumentFilterSearch: React.FC<AdminDocumentFilterSearchProps> = ({
         { value: "PENDING_SUMMARY", label: "Chờ tóm tắt" },
         { value: "REQUESTED_EDIT", label: "Yêu cầu chỉnh sửa" },
       ],
-      onChange: (value) => handleFilterChange({ status: value as string }),
+      onChange: (value) => {
+        setFilters((prev) => {
+          const updated = { ...prev, status: value as string };
+          onFilterChange(updated);
+          return updated;
+        });
+      },
     },
     {
       type: "select",
@@ -104,7 +116,13 @@ const AdminDocumentFilterSearch: React.FC<AdminDocumentFilterSearchProps> = ({
         { value: "LECTURE", label: "Bài giảng" },
         { value: "OTHER", label: "Khác" },
       ],
-      onChange: (value) => handleFilterChange({ doc_type: value as string }),
+      onChange: (value) => {
+        setFilters((prev) => {
+          const updated = { ...prev, doc_type: value as string };
+          onFilterChange(updated);
+          return updated;
+        });
+      },
     },
     {
       type: "select",
@@ -119,7 +137,13 @@ const AdminDocumentFilterSearch: React.FC<AdminDocumentFilterSearchProps> = ({
         { value: "RESEARCHER", label: "Nghiên cứu sinh" },
         { value: "OTHER", label: "Khác" },
       ],
-      onChange: (value) => handleFilterChange({ level: value as string }),
+      onChange: (value) => {
+        setFilters((prev) => {
+          const updated = { ...prev, level: value as string };
+          onFilterChange(updated);
+          return updated;
+        });
+      },
     },
     {
       type: "select",
@@ -132,10 +156,16 @@ const AdminDocumentFilterSearch: React.FC<AdminDocumentFilterSearchProps> = ({
         { value: "true", label: "Có" },
         { value: "false", label: "Không" },
       ],
-      onChange: (value) =>
-        handleFilterChange({
-          intensive: value ? value === "true" : undefined,
-        }),
+      onChange: (value) => {
+        setFilters((prev) => {
+          const updated = {
+            ...prev,
+            intensive: value ? value === "true" : undefined,
+          };
+          onFilterChange(updated);
+          return updated;
+        });
+      },
     },
     {
       type: "select",
@@ -159,14 +189,24 @@ const AdminDocumentFilterSearch: React.FC<AdminDocumentFilterSearchProps> = ({
       onChange: (value) => {
         if (value) {
           const [ordering, order] = (value as string).split("_");
-          handleFilterChange({
-            ordering,
-            order: parseInt(order) as 1 | -1,
+          setFilters((prev) => {
+            const updated = {
+              ...prev,
+              ordering,
+              order: parseInt(order) as 1 | -1,
+            };
+            onFilterChange(updated);
+            return updated;
           });
         } else {
-          handleFilterChange({
-            ordering: undefined,
-            order: undefined,
+          setFilters((prev) => {
+            const updated = {
+              ...prev,
+              ordering: undefined,
+              order: undefined,
+            };
+            onFilterChange(updated);
+            return updated;
           });
         }
       },
@@ -179,9 +219,17 @@ const AdminDocumentFilterSearch: React.FC<AdminDocumentFilterSearchProps> = ({
       onChange: (value) => {
         const dateStrings = value as [string, string];
         if (dateStrings && dateStrings[0] && dateStrings[1]) {
-          handleFilterChange({ dateRange: dateStrings });
+          setFilters((prev) => {
+            const updated = { ...prev, dateRange: dateStrings };
+            onFilterChange(updated);
+            return updated;
+          });
         } else {
-          handleFilterChange({ dateRange: undefined });
+          setFilters((prev) => {
+            const updated = { ...prev, dateRange: undefined };
+            onFilterChange(updated);
+            return updated;
+          });
         }
       },
     },
@@ -195,10 +243,16 @@ const AdminDocumentFilterSearch: React.FC<AdminDocumentFilterSearchProps> = ({
         const year = new Date().getFullYear() - i;
         return { value: year.toString(), label: year.toString() };
       }),
-      onChange: (value) =>
-        handleFilterChange({
-          published_year: value ? parseInt(value as string) : undefined,
-        }),
+      onChange: (value) => {
+        setFilters((prev) => {
+          const updated = {
+            ...prev,
+            published_year: value ? parseInt(value as string) : undefined,
+          };
+          onFilterChange(updated);
+          return updated;
+        });
+      },
     },
   ];
 
@@ -231,13 +285,19 @@ const AdminDocumentFilterSearch: React.FC<AdminDocumentFilterSearchProps> = ({
               allowClear
             />
           </div>
+          <Button type="primary" onClick={handleSearch} disabled={loading}>
+            Tìm
+          </Button>
           <Button
             icon={<Filter size={16} />}
             onClick={() => setShowFilterDrawer(true)}
-            type={Object.keys(filters).length > 1 ? "primary" : "default"}
+            type={
+              Object.keys(appliedFilters).length > 0 ? "primary" : "default"
+            }
           >
             Bộ lọc
           </Button>
+
           <Button
             icon={<RotateCcw size={16} />}
             onClick={handleReset}
@@ -247,41 +307,41 @@ const AdminDocumentFilterSearch: React.FC<AdminDocumentFilterSearchProps> = ({
           </Button>
         </div>
 
-        {/* Filter Summary */}
-        {Object.keys(filters).length > 0 && (
+        {/* Filter Summary - chỉ hiển thị khi đã áp dụng filter */}
+        {Object.keys(appliedFilters).length > 0 && (
           <div className="mt-4 pt-4 border-t">
             <div className="flex flex-wrap gap-2">
               <span className="text-sm font-medium text-gray-600">
                 Đang lọc:
               </span>
-              {filters.title && (
+              {appliedFilters.search && (
                 <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                  Tìm kiếm: "{filters.title}"
+                  Tìm kiếm: "{appliedFilters.search}"
                 </span>
               )}
-              {filters.status && (
+              {appliedFilters.status && (
                 <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                  Trạng thái: {getFilterLabel("status", filters.status)}
+                  Trạng thái: {getFilterLabel("status", appliedFilters.status)}
                 </span>
               )}
-              {filters.doc_type && (
+              {appliedFilters.doc_type && (
                 <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
-                  Loại: {getFilterLabel("doc_type", filters.doc_type)}
+                  Loại: {getFilterLabel("doc_type", appliedFilters.doc_type)}
                 </span>
               )}
-              {filters.level && (
+              {appliedFilters.level && (
                 <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-orange-100 text-orange-800">
-                  Trình độ: {getFilterLabel("level", filters.level)}
+                  Trình độ: {getFilterLabel("level", appliedFilters.level)}
                 </span>
               )}
-              {filters.intensive !== undefined && (
+              {appliedFilters.intensive !== undefined && (
                 <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
-                  Chuyên sâu: {filters.intensive ? "Có" : "Không"}
+                  Chuyên sâu: {appliedFilters.intensive ? "Có" : "Không"}
                 </span>
               )}
-              {filters.published_year && (
+              {appliedFilters.published_year && (
                 <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-pink-100 text-pink-800">
-                  Năm: {filters.published_year}
+                  Năm: {appliedFilters.published_year}
                 </span>
               )}
             </div>
