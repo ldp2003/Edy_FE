@@ -4,8 +4,8 @@ import { message, Spin, Button } from "antd";
 import { ArrowLeftOutlined } from "@ant-design/icons";
 import { DocumentService } from "../../../utils/DocumentService";
 import type { Document } from "../../../models/document";
-import DocumentList from "../../../components/admin/document/compare/DocumentList";
-import SecurePdfViewer from "../../../components/admin/document/compare/SecurePdfViewer";
+import DocumentViewer from "../../../components/admin/document/compare/DocumentViewer";
+import DocumentListPanel from "../../../components/admin/document/compare/DocumentListPanel";
 
 const DocumentComparePage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -72,7 +72,7 @@ const DocumentComparePage: React.FC = () => {
   }
 
   return (
-    <div className="h-screen bg-[var(--secondary-background-color)] overflow-hidden flex flex-col">
+    <div className="h-screen bg-[var(--secondary-background-color)] flex flex-col">
       {/* Header */}
       <div className="bg-white shadow-sm flex-shrink-0">
         <div className="px-2 py-2">
@@ -96,132 +96,31 @@ const DocumentComparePage: React.FC = () => {
       </div>
 
       {/* Content */}
-      <div className="flex-1 p-1 overflow-hidden">
+      <div className="flex-1 p-1 min-h-0">
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-5 gap-2 h-full">
-          {/* Left Panel - Selected Document Viewer */}
-          <div className="col-span-1 xl:col-span-2 bg-white shadow-sm overflow-hidden flex flex-col">
-            <div className="p-2 border-b border-gray-200 bg-gray-50 flex-shrink-0">
-              <h2 className="text-base font-medium text-[var(--primary-text-color)]">
-                Tài liệu được chọn
-              </h2>
-              <p className="text-xs text-gray-600 mt-1 truncate">
-                {selectedDocument.title}
-              </p>
-            </div>
-            <div className="flex-1 overflow-hidden">
-              {selectedDocument.url ? (
-                selectedDocument.file_type === "PDF" ? (
-                  <SecurePdfViewer url={selectedDocument.url} />
-                ) : selectedDocument.file_type === "WORD" ? (
-                  <iframe
-                    src={`https://docs.google.com/viewer?url=${encodeURIComponent(
-                      selectedDocument.url
-                    )}&embedded=true`}
-                    width="100%"
-                    height="100%"
-                    style={{ border: "none" }}
-                    title="Selected Document Viewer"
-                  />
-                ) : (
-                  <div className="flex items-center justify-center h-full bg-gray-100">
-                    <div className="text-center p-4">
-                      <p className="text-gray-600 mb-4">
-                        Không thể xem trước file này
-                      </p>
-                      <Button
-                        type="primary"
-                        onClick={() =>
-                          window.open(selectedDocument.url, "_blank")
-                        }
-                      >
-                        Mở file trong tab mới
-                      </Button>
-                    </div>
-                  </div>
-                )
-              ) : (
-                <div className="flex items-center justify-center h-full bg-gray-100">
-                  <p className="text-gray-600">Không có file để hiển thị</p>
-                </div>
-              )}
-            </div>
+          {/* Left Panel */}
+          <div className="col-span-1 xl:col-span-2 min-h-0 flex flex-col">
+            <DocumentViewer
+              document={selectedDocument}
+              title="Tài liệu được chọn"
+            />
           </div>
 
-          {/* Middle Panel - Compare Document Viewer */}
-          <div className="col-span-1 xl:col-span-2 bg-white shadow-sm overflow-hidden flex flex-col">
-            <div className="p-2 border-b border-gray-200 bg-gray-50 flex-shrink-0">
-              <h2 className="text-base font-medium text-[var(--primary-text-color)]">
-                Tài liệu so sánh
-              </h2>
-              <p className="text-xs text-gray-600 mt-1 truncate">
-                {compareDocument
-                  ? compareDocument.title
-                  : "Chưa chọn tài liệu để so sánh"}
-              </p>
-            </div>
-            <div className="flex-1 overflow-hidden">
-              {compareDocument ? (
-                compareDocument.url ? (
-                  compareDocument.file_type === "PDF" ? (
-                    <SecurePdfViewer url={compareDocument.url} />
-                  ) : compareDocument.file_type === "WORD" ? (
-                    <iframe
-                      src={`https://docs.google.com/viewer?url=${encodeURIComponent(
-                        compareDocument.url
-                      )}&embedded=true`}
-                      width="100%"
-                      height="100%"
-                      style={{ border: "none" }}
-                      title="Compare Document Viewer"
-                    />
-                  ) : (
-                    <div className="flex items-center justify-center h-full bg-gray-100">
-                      <div className="text-center p-4">
-                        <p className="text-gray-600 mb-4">
-                          Không thể xem trước file này
-                        </p>
-                        <Button
-                          type="primary"
-                          onClick={() =>
-                            window.open(compareDocument.url, "_blank")
-                          }
-                        >
-                          Mở file trong tab mới
-                        </Button>
-                      </div>
-                    </div>
-                  )
-                ) : (
-                  <div className="flex items-center justify-center h-full bg-gray-100">
-                    <p className="text-gray-600">Không có file để hiển thị</p>
-                  </div>
-                )
-              ) : (
-                <div className="flex items-center justify-center h-full text-gray-500">
-                  <div className="text-center">
-                    <p>Vui lòng chọn tài liệu từ danh sách bên phải</p>
-                  </div>
-                </div>
-              )}
-            </div>
+          {/* Middle Panel */}
+          <div className="col-span-1 xl:col-span-2 min-h-0 flex flex-col">
+            <DocumentViewer
+              document={compareDocument}
+              title="Tài liệu so sánh"
+              subtitle="Vui lòng chọn tài liệu từ danh sách bên phải"
+            />
           </div>
 
-          {/* Right Panel - Document List */}
-          <div className="col-span-1 bg-white shadow-sm overflow-hidden flex flex-col">
-            <div className="p-2 border-b border-gray-200 bg-gray-50 flex-shrink-0">
-              <h2 className="text-base font-medium text-[var(--primary-text-color)]">
-                Danh sách tài liệu
-              </h2>
-              <p className="text-xs text-gray-600 mt-1">
-                Chọn tài liệu để so sánh
-              </p>
-            </div>
-            <div className="flex-1 overflow-hidden">
-              <DocumentList
-                onSelectDocument={handleSelectDocument}
-                selectedDocumentId={compareDocument?._id}
-              />
-            </div>
+          {/* Right Panel */}
+          <div className="col-span-1 min-h-0 flex flex-col">
+            <DocumentListPanel
+              onSelectDocument={handleSelectDocument}
+              selectedDocumentId={compareDocument?._id}
+            />
           </div>
         </div>
       </div>
