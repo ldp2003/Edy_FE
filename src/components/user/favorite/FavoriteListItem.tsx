@@ -21,7 +21,7 @@ const FavoriteListItem: React.FC<FavoriteListItemProps> = ({
 
   const handleImageError = (e: React.SyntheticEvent<HTMLImageElement>) => {
     const target = e.target as HTMLImageElement;
-    target.src = "/public/image/thumb_1200_1553.png";
+    target.src = "/public/image/default_cover.png";
   };
 
   return (
@@ -33,9 +33,9 @@ const FavoriteListItem: React.FC<FavoriteListItemProps> = ({
         {/* Document Image */}
         <div className="flex-shrink-0 bg-[var(--card-background-color)] p-2 rounded-md">
           <img
-            src={document.cover_page || "/public/image/thumb_1200_1553.png"}
+            src={document.cover_page || "/public/image/default_cover.png"}
             alt={document.title}
-            className="w-20 h-28 object-cover rounded-md"
+            className="w-20 h-28 object-fill rounded-md bg-white"
             onError={handleImageError}
           />
         </div>

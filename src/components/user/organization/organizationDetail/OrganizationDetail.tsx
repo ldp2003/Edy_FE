@@ -112,7 +112,7 @@ const OrganizationDetail: React.FC = () => {
     () =>
       recentDocuments.slice(
         0,
-        isRecentDocsCollapsed ? 4 : recentDocsDisplayedCount
+        isRecentDocsCollapsed ? 5 : recentDocsDisplayedCount
       ),
     [recentDocuments, recentDocsDisplayedCount, isRecentDocsCollapsed]
   );

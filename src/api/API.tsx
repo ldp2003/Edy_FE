@@ -88,9 +88,9 @@ export const OrganizationAPI = {
     }
   },
 
-  getOrganizations: async () => {
+  getOrganizations: async (params?: { is_dropdown?: boolean }) => {
     try {
-      const response = await apiClient.get("/organizations");
+      const response = await apiClient.get("/organizations", { params });
       return response.data;
     } catch (error) {
       console.error("Error fetching organizations:", error);
@@ -398,6 +398,8 @@ export const DocumentAPI = {
     level?: string;
     subject?: string;
     status?: string;
+    public_mode?: string;
+    createdAt?: string;
   }) => {
     try {
       const response = await apiClient.get("/documents/my-documents", {
@@ -691,6 +693,20 @@ export const DocumentAPI = {
       throw error;
     }
   },
+
+  // Get similar documents
+  getSimilarDocuments: async (documentId: string, limit?: number) => {
+    try {
+      const params = limit ? { limit } : {};
+      const response = await apiClient.get(`/documents/${documentId}/similar`, {
+        params,
+      });
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching similar documents:", error);
+      throw error;
+    }
+  },
 };
 export const AccessRequestAPI = {
   // Create access request for private share
@@ -753,11 +769,10 @@ export const AccessRequestAPI = {
   },
 
   // Deny access request
-  denyAccessRequest: async (requestId: string, data?: { reason?: string }) => {
+  denyAccessRequest: async (requestId: string) => {
     try {
       const response = await apiClient.put(
-        `/access-requests/${requestId}/deny`,
-        data || {}
+        `/access-requests/${requestId}/deny`
       );
       return response.data;
     } catch (error) {

@@ -112,13 +112,11 @@ const AccessRequestService = {
    */
   async denyAccessRequest(
     requestId: string,
-    data?: { reason?: string }
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   ): Promise<any> {
     try {
       const response = await AccessRequestAPI.denyAccessRequest(
-        requestId,
-        data
+        requestId
       );
       return response.data || response;
     } catch (error) {

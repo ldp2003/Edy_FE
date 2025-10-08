@@ -13,9 +13,11 @@ export const OrganizationService = {
     }
   },
 
-  getOrganizations: async (): Promise<OrganizationDetailed[]> => {
+  getOrganizations: async (params?: {
+    is_dropdown?: boolean;
+  }): Promise<OrganizationDetailed[]> => {
     try {
-      const response = await OrganizationAPI.getOrganizations();
+      const response = await OrganizationAPI.getOrganizations(params);
       if (response && Array.isArray(response.organizations)) {
         console.log("Fetched organizations:", response.organizations);
         return response.organizations;
@@ -25,6 +27,16 @@ export const OrganizationService = {
       }
     } catch (error) {
       console.error("Failed to fetch organizations:", error);
+      throw error;
+    }
+  },
+
+  // Method để lấy danh sách tổ chức cho dropdown
+  getDropdownOrganizations: async (): Promise<OrganizationDetailed[]> => {
+    try {
+      return await OrganizationService.getOrganizations({ is_dropdown: true });
+    } catch (error) {
+      console.error("Failed to fetch dropdown organizations:", error);
       throw error;
     }
   },

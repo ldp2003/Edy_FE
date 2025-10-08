@@ -161,7 +161,7 @@ const DocumentReview: React.FC<DocumentReviewProps> = ({
   }
 
   return (
-    <div className="py-6 min-h-screen text-left">
+    <div className="pb-6 min-h-screen text-left">
       {contextHolder}
 
       {/* User Info Header */}
@@ -223,6 +223,7 @@ const DocumentReview: React.FC<DocumentReviewProps> = ({
             summaryAction={summaryAction}
             summaryRejectReason={summaryRejectReason}
             processing={processing}
+            documentId={document._id}
             onApprove={onApprove}
             onReject={onReject}
             onDelete={onDelete}

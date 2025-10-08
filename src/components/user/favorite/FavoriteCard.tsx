@@ -36,20 +36,20 @@ const FavoriteCard: React.FC<FavoriteCardProps> = ({ document, onRemove }) => {
 
   const handleImageError = (e: React.SyntheticEvent<HTMLImageElement>) => {
     const target = e.target as HTMLImageElement;
-    target.src = "/public/image/thumb_1200_1553.png";
+    target.src = "/public/image/default_cover.png";
   };
 
   return (
     <div
-      className="bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-md transition-shadow cursor-pointer"
+      className="bg-white text-left rounded-lg border border-gray-200 overflow-hidden hover:shadow-md transition-shadow cursor-pointer"
       onClick={handleCardClick}
     >
       {/* Image with heart icon */}
       <div className="relative bg-[var(--card-background-color)] flex justify-center items-center py-2">
         <img
-          src={document.cover_page || "/public/image/thumb_1200_1553.png"}
+          src={document.cover_page || "/public/image/default_cover.png"}
           alt={document.title}
-          className="w-[90%] object-fill h-32 shadow-sm rounded-lg"
+          className="w-[90%] bg-white object-fill h-32 shadow-sm rounded-lg"
           onError={handleImageError}
         />
 

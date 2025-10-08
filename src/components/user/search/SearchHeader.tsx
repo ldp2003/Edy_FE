@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { Input, Button, Drawer } from "antd";
 import { Search, Filter } from "lucide-react";
 import SearchFilters from "./SearchFilters";
@@ -19,6 +19,64 @@ const SearchHeader: React.FC<SearchHeaderProps> = ({
 }) => {
   const [query, setQuery] = useState(initialQuery);
   const [filterDrawerOpen, setFilterDrawerOpen] = useState(false);
+  const [isFixed, setIsFixed] = useState(false);
+  const [appliedFilters, setAppliedFilters] = useState<ISearchFilters | null>(
+    null
+  );
+
+  // Memoize scroll handler để tránh tạo lại function mỗi lần render
+  const handleScroll = useCallback((event: Event) => {
+    const target = event.target as HTMLElement;
+    if (!target) return;
+    const scrollTop = target.scrollTop;
+
+    // Cố định vị trí khi cuộn xuống quá 200px trong main content
+    const shouldBeFixed = scrollTop > 100;
+
+    // Chỉ update state khi có thay đổi để tránh re-render liên tục
+    setIsFixed((prev) => {
+      if (prev !== shouldBeFixed) {
+        return shouldBeFixed;
+      }
+      return prev;
+    });
+  }, []);
+
+  useEffect(() => {
+    // Tìm container cha có overflow-y-auto chứa SearchHeader này
+    const findScrollableParent = (element: HTMLElement): HTMLElement | null => {
+      if (!element || element === window.document.body) return null;
+      const computedStyle = window.getComputedStyle(element);
+      if (
+        computedStyle.overflowY === "auto" ||
+        computedStyle.overflowY === "scroll"
+      ) {
+        return element;
+      }
+      return findScrollableParent(element.parentElement!);
+    };
+    // Tìm element hiện tại và container scroll cha của nó
+    const currentElement = window.document.querySelector(
+      `[data-search-header]`
+    ) as HTMLElement;
+    let scrollContainer: HTMLElement | null = null;
+    if (currentElement) {
+      scrollContainer = findScrollableParent(currentElement.parentElement!);
+    } else {
+      // Fallback: tìm container với class overflow-y-auto trong cùng page
+      scrollContainer = window.document.querySelector(
+        ".flex-1.overflow-y-auto"
+      ) as HTMLElement;
+    }
+    if (scrollContainer) {
+      scrollContainer.addEventListener("scroll", handleScroll);
+    }
+    return () => {
+      if (scrollContainer) {
+        scrollContainer.removeEventListener("scroll", handleScroll);
+      }
+    };
+  }, [handleScroll]);
 
   useEffect(() => {
     setQuery(initialQuery);
@@ -42,9 +100,24 @@ const SearchHeader: React.FC<SearchHeaderProps> = ({
     return filterKeys.length > 0;
   };
 
+  const handleApplyFilters = (newFilters: ISearchFilters) => {
+    setAppliedFilters(newFilters);
+    if (onFilterChange) {
+      onFilterChange(newFilters);
+    }
+  };
+
   return (
     <>
-      <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl p-4 mb-6 shadow-sm">
+      {/* Normal Header - ẩn hoàn toàn khi isFixed = true */}
+      <div
+        data-search-header
+        className={`bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl p-4 mb-6 shadow-sm transition-all duration-300 ${
+          isFixed
+            ? "opacity-0 pointer-events-none h-0 mb-0 overflow-hidden"
+            : "opacity-100"
+        }`}
+      >
         <div className="w-full mx-auto">
           {/* Header Title */}
           <div className="text-left mb-4">
@@ -100,18 +173,6 @@ const SearchHeader: React.FC<SearchHeaderProps> = ({
               size="middle"
             >
               Bộ lọc
-              {hasActiveFilters() && (
-                <span className="bg-white bg-opacity-20 text-xs px-2 py-1 rounded-full ml-1 font-semibold">
-                  {
-                    Object.keys(filters || {}).filter(
-                      (key) =>
-                        key !== "search" &&
-                        key !== "ordering" &&
-                        key !== "order"
-                    ).length
-                  }
-                </span>
-              )}
             </Button>
           </div>
 
@@ -130,8 +191,7 @@ const SearchHeader: React.FC<SearchHeaderProps> = ({
                 <button
                   key={tag}
                   onClick={() => {
-                    setQuery(tag);
-                    onSearch(tag);
+                    setQuery(tag); // Set the query in the search bar
                   }}
                   className="px-3 py-1.5 bg-white bg-opacity-70 hover:bg-white hover:shadow-sm border border-gray-200 rounded-full text-xs text-gray-700 hover:text-blue-600 transition-all duration-200"
                 >
@@ -140,15 +200,157 @@ const SearchHeader: React.FC<SearchHeaderProps> = ({
               ))}
             </div>
           </div>
+          {appliedFilters &&
+            Object.keys(appliedFilters).some(
+              (key) =>
+                key !== "search" &&
+                key !== "ordering" &&
+                key !== "order" &&
+                appliedFilters[key as keyof typeof appliedFilters]
+            ) && (
+              <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 mt-4">
+                <div className="flex items-center gap-2 mb-3">
+                  <Filter className="w-4 h-4 text-blue-600" />
+                  <h3 className="text-sm font-semibold text-blue-800">
+                    Bộ lọc đang áp dụng
+                  </h3>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  {Object.entries(appliedFilters).map(([key, value]) => {
+                    if (
+                      !value ||
+                      key === "search" ||
+                      key === "ordering" ||
+                      key === "order"
+                    )
+                      return null;
+
+                    const getFilterLabel = (key: string) => {
+                      const labels: { [key: string]: string } = {
+                        doc_type: "Loại tài liệu",
+                        level: "Trình độ",
+                        organization: "Tổ chức",
+                        author: "Tác giả",
+                        publisher: "Nhà xuất bản",
+                        published_year: "Năm xuất bản",
+                        subject: "Môn học",
+                        keyword: "Từ khóa",
+                        intensive: "Chuyên sâu",
+                        view_count: "Lượt xem",
+                        download_count: "Lượt tải",
+                        page: "Số trang",
+                      };
+                      return labels[key] || key;
+                    };
+
+                    const getFilterValue = (
+                      key: string,
+                      value: string | number | boolean | string[]
+                    ) => {
+                      if (key === "intensive") return value ? "Có" : "Không";
+                      if (key === "doc_type" && typeof value === "string") {
+                        const types: { [key: string]: string } = {
+                          RESEARCH_REPORT: "Nghiên cứu",
+                          VIDEO: "Video",
+                          STUDY_GUIDE: "Đề cương",
+                          TEXTBOOK: "Giáo trình",
+                          ESSAY: "Tiểu luận",
+                          SOLUTION_SET: "Bài giải",
+                          THESIS: "Luận văn",
+                          LECTURE: "Bài giảng",
+                          OTHER: "Khác",
+                        };
+                        return types[value] || value;
+                      }
+                      if (key === "level" && typeof value === "string") {
+                        const levels: { [key: string]: string } = {
+                          STUDENT: "Học sinh",
+                          UNIVERSITY: "Đại học",
+                          LECTURER: "Giảng viên",
+                          RESEARCHER: "Nghiên cứu sinh",
+                          OTHER: "Khác",
+                        };
+                        return levels[value] || value;
+                      }
+                      return Array.isArray(value)
+                        ? value.join(", ")
+                        : value.toString();
+                    };
+
+                    return (
+                      <span
+                        key={key}
+                        className="inline-flex items-center gap-1 px-3 py-1.5 bg-white border border-blue-300 rounded-full text-xs font-medium text-blue-700 shadow-sm"
+                      >
+                        <span className="font-semibold">
+                          {getFilterLabel(key)}:
+                        </span>
+                        <span>{getFilterValue(key, value)}</span>
+                      </span>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
         </div>
       </div>
+
+      {/* Sticky Header - hiển thị khi isFixed = true */}
+      {isFixed && (
+        <div className="sticky top-0 mx-[-16px] bg-white/95 backdrop-blur-sm border-b border-gray-200 shadow-lg z-50 transition-all duration-300">
+          <div className="max-w-7xl mx-auto px-4 py-3">
+            <div className="flex items-center gap-4">
+              {/* Sticky Search Input */}
+              <div className="flex-1">
+                <div className="relative">
+                  <Input
+                    size="middle"
+                    value={query}
+                    onChange={(e) => setQuery(e.target.value)}
+                    onKeyPress={handleKeyPress}
+                    placeholder="Tìm kiếm tài liệu..."
+                    prefix={<Search className="text-gray-400 w-4 h-4" />}
+                    suffix={
+                      <Button
+                        type="primary"
+                        onClick={handleSearch}
+                        className="border-0 shadow-none bg-blue-600 hover:bg-blue-700"
+                        size="small"
+                      >
+                        Tìm
+                      </Button>
+                    }
+                    className="pr-0 h-10 border-gray-200 hover:border-blue-400 focus:border-blue-500 rounded-lg"
+                  />
+                </div>
+              </div>
+
+              {/* Sticky Filter Button */}
+              <Button
+                type={hasActiveFilters() ? "primary" : "default"}
+                icon={<Filter className="w-4 h-4" />}
+                onClick={() => setFilterDrawerOpen(true)}
+                className={`flex items-center gap-2 h-10 px-4 rounded-lg font-medium transition-all duration-200 ${
+                  hasActiveFilters()
+                    ? "bg-blue-600 hover:bg-blue-700 border-blue-600"
+                    : "bg-white hover:bg-gray-50 border-gray-200 hover:border-blue-400"
+                }`}
+              >
+                Lọc
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Display applied filters */}
 
       {/* Filter Drawer - Enhanced styling */}
       <Drawer
         title={
           <div className="flex items-center gap-3">
-            <Filter className="w-5 h-5 text-blue-600" />
-            <span className="text-lg font-semibold text-gray-800">
+            <Filter className="w-5 h-5 text-[var(--primary-text-color)]" />
+            <span className="text-lg font-semibold text-[var(--primary-text-color)]">
               Bộ lọc tìm kiếm
             </span>
           </div>
@@ -158,18 +360,14 @@ const SearchHeader: React.FC<SearchHeaderProps> = ({
         onClose={() => setFilterDrawerOpen(false)}
         width={420}
         className="filter-drawer"
-        headerStyle={{
-          borderBottom: "1px solid #e5e7eb",
-          padding: "20px 24px",
-          background: "linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%)",
-        }}
-        bodyStyle={{
-          padding: "24px",
-          background: "#fafafa",
-        }}
       >
-        {filters && onFilterChange && (
-          <SearchFilters filters={filters} onFilterChange={onFilterChange} />
+        {filters && (
+          <SearchFilters
+            filters={filters}
+            onFilterChange={handleApplyFilters}
+            onApply={() => setFilterDrawerOpen(false)}
+            onReset={() => setFilterDrawerOpen(false)}
+          />
         )}
       </Drawer>
     </>

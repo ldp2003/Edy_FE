@@ -26,22 +26,9 @@ const DocumentPreview: React.FC<DocumentPreviewProps> = ({
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i];
   };
 
-  const getPreviewImage = () => {
-    if (document?.cover_page) {
-      return document.cover_page;
-    }
-
-    if (document?.url) {
-      if (document.file_type === "PDF") {
-        return document.url.replace(
-          "/upload/",
-          "/upload/c_thumb,w_300,h_400,f_jpg/"
-        );
-      }
-      return document.url;
-    }
-
-    return "https://cdn-icons-png.flaticon.com/512/2425/2425541.png";
+  const handleImageError = (e: React.SyntheticEvent<HTMLImageElement>) => {
+    const target = e.target as HTMLImageElement;
+    target.src = "/public/image/default_cover.png";
   };
 
   // Calculate estimated file size (placeholder since we don't have actual size)
@@ -51,11 +38,12 @@ const DocumentPreview: React.FC<DocumentPreviewProps> = ({
     <div className="space-y-4">
       <div className="mb-0 relative group">
         <img
-          src={getPreviewImage()}
+          src={document.cover_page || "/public/image/default_cover.png"}
           alt="Document preview"
-          className="border border-gray-200 rounded object-cover cursor-pointer hover:opacity-90 transition-opacity"
+          className="border bg-white border-gray-200 rounded object-cover cursor-pointer hover:opacity-90 transition-opacity"
           style={{ maxHeight: "300px", width: "100%" }}
           onClick={onViewDocument}
+          onError={handleImageError}
         />
         {/* Overlay with view icon */}
         <div
