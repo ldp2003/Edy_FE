@@ -193,7 +193,11 @@ const CommentList: React.FC<CommentListProps> = ({
           parentComments.map((comment) => (
             <div key={comment._id}>
               {/* Parent Comment */}
-              <CommentItem comment={comment} onReply={handleReply} />
+              <CommentItem
+                comment={comment}
+                documentId={documentId}
+                onReply={handleReply}
+              />
 
               {/* Replies */}
               {comment.replies && comment.replies.length > 0 && (
@@ -211,6 +215,7 @@ const CommentList: React.FC<CommentListProps> = ({
                           <CommentItem
                             key={reply._id}
                             comment={reply}
+                            documentId={documentId}
                             isReply={true}
                           />
                         ))}
