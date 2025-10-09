@@ -1,6 +1,7 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { ThumbsDown } from "lucide-react";
 import React, { useState, useEffect } from "react";
-import { DocumentAPI } from "../../../api/API";
+import { DocumentService } from "../../../utils/DocumentService";
 import { message } from "antd";
 
 interface DislikeButtonProps {
@@ -12,10 +13,12 @@ interface DislikeButtonProps {
 const DislikeButton: React.FC<DislikeButtonProps> = ({
   documentId,
   initialDislikeCount = 0,
-  initialUserReaction = null
+  initialUserReaction = null,
 }) => {
   const [dislikeCount, setDislikeCount] = useState(initialDislikeCount);
-  const [userReaction, setUserReaction] = useState<"LIKE" | "DISLIKE" | null>(initialUserReaction);
+  const [userReaction, setUserReaction] = useState<"LIKE" | "DISLIKE" | null>(
+    initialUserReaction
+  );
   const [loading, setLoading] = useState(false);
 
   const handleDislikeClick = async () => {
@@ -30,16 +33,17 @@ const DislikeButton: React.FC<DislikeButtonProps> = ({
         newReaction = "DISLIKE";
       }
 
-      await DocumentAPI.reactDocument(documentId, newReaction);
+      await DocumentService.reactDocument(documentId, newReaction);
 
       // Trigger refetch reactions từ parent
-      window.dispatchEvent(new CustomEvent('reactionChanged', {
-        detail: {
-          documentId,
-          action: newReaction
-        }
-      }));
-
+      window.dispatchEvent(
+        new CustomEvent("reactionChanged", {
+          detail: {
+            documentId,
+            action: newReaction,
+          },
+        })
+      );
     } catch (error: any) {
       console.error("Error reacting to document:", error);
       message.error("Không thể thực hiện hành động này!");
@@ -57,8 +61,9 @@ const DislikeButton: React.FC<DislikeButtonProps> = ({
       }
     };
 
-    window.addEventListener('reactionRefetch', handleReactionRefetch);
-    return () => window.removeEventListener('reactionRefetch', handleReactionRefetch);
+    window.addEventListener("reactionRefetch", handleReactionRefetch);
+    return () =>
+      window.removeEventListener("reactionRefetch", handleReactionRefetch);
   }, [documentId]);
 
   const isDisliked = userReaction === "DISLIKE";
@@ -66,10 +71,11 @@ const DislikeButton: React.FC<DislikeButtonProps> = ({
   return (
     <div>
       <button
-        className={`text-xs flex items-center space-x-2 rounded-2xl border px-3 py-1 font-semibold cursor-pointer transition-colors duration-300 ${isDisliked
+        className={`text-xs flex items-center space-x-2 rounded-2xl border px-3 py-1 font-semibold cursor-pointer transition-colors duration-300 ${
+          isDisliked
             ? "bg-[var(--red-button-color)] text-white border-[var(--red-button-color)]"
             : "bg-white border-gray-300 text-[var(--red-button-color)] hover:bg-[#d63847] hover:text-white"
-          } ${loading ? "opacity-50 cursor-not-allowed" : ""}`}
+        } ${loading ? "opacity-50 cursor-not-allowed" : ""}`}
         onClick={handleDislikeClick}
         disabled={loading}
       >

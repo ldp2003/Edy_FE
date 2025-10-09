@@ -1,6 +1,7 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import RecentItem from "../document/documentCard/RecentItem";
+import { fetchMultipleDocumentRatings } from "../../../utils/CalcRate";
 
 interface Post {
   key: string;
@@ -27,6 +28,58 @@ interface PostListViewProps {
 
 const PostListView: React.FC<PostListViewProps> = ({ data, loading }) => {
   const navigate = useNavigate();
+  const [documentRating, setDocumentRating] = React.useState<{
+    [key: string]: { ratingPercentage: number; formattedRating: string };
+  }>({});
+
+  // Fetch document ratings when data changes
+  React.useEffect(() => {
+    const fetchRatings = async () => {
+      if (data && data.length > 0) {
+        try {
+          const documentIds = data.map((doc) => doc.key);
+          const ratingsMap = await fetchMultipleDocumentRatings(documentIds);
+
+          const ratings: {
+            [key: string]: {
+              ratingPercentage: number;
+              formattedRating: string;
+            };
+          } = {};
+          documentIds.forEach((id) => {
+            const rating = ratingsMap.get(id);
+            if (rating) {
+              ratings[id] = rating;
+            } else {
+              ratings[id] = { ratingPercentage: 0, formattedRating: "0%" };
+            }
+          });
+
+          setDocumentRating(ratings);
+        } catch (error) {
+          console.error("Error fetching document ratings:", error);
+          // Set default values on error
+          const defaultRatings: {
+            [key: string]: {
+              ratingPercentage: number;
+              formattedRating: string;
+            };
+          } = {};
+          data.forEach((doc) => {
+            defaultRatings[doc.key] = {
+              ratingPercentage: 0,
+              formattedRating: "0%",
+            };
+          });
+          setDocumentRating(defaultRatings);
+        }
+      } else {
+        setDocumentRating({});
+      }
+    };
+
+    fetchRatings();
+  }, [data]);
 
   // Nếu loading, hiển thị skeleton hoặc rỗng
   const displayData = loading ? [] : data;
@@ -85,9 +138,9 @@ const PostListView: React.FC<PostListViewProps> = ({ data, loading }) => {
                   )
                 }
                 views={post.views}
-                rating={parseInt(post.rating.replace("%", ""))}
+                rating={documentRating[post.key]?.ratingPercentage || 0}
                 pages={Math.floor(Math.random() * 50) + 10}
-                date={new Date(post.createdAt)  }
+                date={new Date(post.createdAt)}
                 intensive={post.intensive}
               />
             </div>

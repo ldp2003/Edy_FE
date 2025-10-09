@@ -8,6 +8,7 @@ import AdminDocumentFilterSearch, {
   type AdminFilterSearchParams,
 } from "./AdminDocumentFilterSearch";
 import { DocumentService } from "../../../utils/DocumentService";
+import { fetchMultipleDocumentRatings } from "../../../utils/CalcRate";
 
 const { Option } = Select;
 
@@ -43,12 +44,15 @@ const AdminDocumentTable: React.FC = () => {
   const [appliedFilters, setAppliedFilters] = useState<AdminFilterSearchParams>(
     {}
   );
+  const [documentRatings, setDocumentRatings] = useState<
+    Map<string, { ratingPercentage: number; formattedRating: string }>
+  >(new Map());
   const isInitialized = useRef(false);
 
   // Initialize filter from URL params on mount - only once
   useEffect(() => {
     if (isInitialized.current) return;
-    
+
     const urlParams: AdminFilterSearchParams = {};
 
     // Extract all params from URL
@@ -103,14 +107,25 @@ const AdminDocumentTable: React.FC = () => {
         };
 
         const response = await DocumentService.getAllDocuments(apiParams);
+        const fetchedDocuments = response.documents || [];
 
-        setDocuments(response.documents || []);
+        setDocuments(fetchedDocuments);
         setTotalDocuments(response.total || 0);
+
+        // Fetch ratings cho các documents vừa lấy
+        if (fetchedDocuments.length > 0) {
+          const documentIds = fetchedDocuments.map((doc: Document) => doc._id);
+          const ratingsMap = await fetchMultipleDocumentRatings(documentIds);
+          setDocumentRatings(ratingsMap);
+        } else {
+          setDocumentRatings(new Map());
+        }
       } catch (error) {
         console.error("Error fetching documents:", error);
         message.error("Không thể tải danh sách tài liệu!");
         setDocuments([]);
         setTotalDocuments(0);
+        setDocumentRatings(new Map());
       } finally {
         setLoading(false);
       }
@@ -119,10 +134,13 @@ const AdminDocumentTable: React.FC = () => {
     fetchDocuments();
   }, [currentPage, pageSize, appliedFilters]);
 
-  const handleFilterChange = useCallback((newParams: AdminFilterSearchParams) => {
-    // Chỉ cập nhật form filter, không gọi API
-    setFilterParams(newParams);
-  }, []);
+  const handleFilterChange = useCallback(
+    (newParams: AdminFilterSearchParams) => {
+      // Chỉ cập nhật form filter, không gọi API
+      setFilterParams(newParams);
+    },
+    []
+  );
 
   const updateURLParams = (params: AdminFilterSearchParams) => {
     const newSearchParams = new URLSearchParams();
@@ -351,7 +369,30 @@ const AdminDocumentTable: React.FC = () => {
       title: "Đánh giá",
       key: "rating",
       align: "center",
-      render: () => "0%", // Placeholder since rating calculation isn't in the model
+      render: (_, record: DocumentDisplay) => {
+        const rating = documentRatings.get(record._id);
+        if (!rating) {
+          return <span className="text-gray-400">-</span>;
+        }
+
+        const percentage = rating.ratingPercentage;
+        let colorClass = "text-gray-600";
+
+        if (percentage >= 90) colorClass = "text-green-600 font-semibold";
+        else if (percentage >= 70) colorClass = "text-blue-600 font-medium";
+        else if (percentage >= 50) colorClass = "text-yellow-600";
+        else if (percentage >= 30) colorClass = "text-orange-600";
+        else if (percentage > 0) colorClass = "text-red-600";
+
+        return (
+          <span
+            className={colorClass}
+            title={`${rating.ratingPercentage}% tích cực`}
+          >
+            {rating.formattedRating}
+          </span>
+        );
+      },
     },
     {
       title: "Lượt tải",

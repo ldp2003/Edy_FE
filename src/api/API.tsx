@@ -595,10 +595,9 @@ export const DocumentAPI = {
     reaction: "LIKE" | "DISLIKE" | "UNREACT"
   ) => {
     try {
-      const response = await apiClient.post(
-        `/documents/${documentId}/react`,
-        { reaction }
-      );
+      const response = await apiClient.post(`/documents/${documentId}/react`, {
+        reaction,
+      });
       return response.data;
     } catch (error) {
       console.error("Error reacting to document:", error);
@@ -844,6 +843,93 @@ export const AccessRequestAPI = {
       return response.data;
     } catch (error) {
       console.error("Error canceling access request:", error);
+      throw error;
+    }
+  },
+};
+
+export const CommentAPI = {
+  // Tạo bình luận mới cho tài liệu
+  createComment: async (
+    documentId: string,
+    data: { content: string; parentId?: string | null }
+  ) => {
+    try {
+      const response = await apiClient.post(
+        `/comments/documents/${documentId}`,
+        data
+      );
+      return response.data;
+    } catch (error) {
+      console.error("Error creating comment:", error);
+      throw error;
+    }
+  },
+
+  // Lấy danh sách bình luận của tài liệu
+  getCommentsByDocument: async (
+    documentId: string,
+    params?: { page?: number; limit?: number }
+  ) => {
+    try {
+      const response = await apiClient.get(
+        `/comments/documents/${documentId}`,
+        { params }
+      );
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching comments by document:", error);
+      throw error;
+    }
+  },
+
+  // Lấy danh sách replies của một bình luận
+  getRepliesByComment: async (
+    commentId: string,
+    params?: { page?: number; limit?: number }
+  ) => {
+    try {
+      const response = await apiClient.get(`/comments/${commentId}/replies`, {
+        params,
+      });
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching replies by comment:", error);
+      throw error;
+    }
+  },
+
+  // Cập nhật nội dung bình luận
+  updateComment: async (commentId: string, data: { content: string }) => {
+    try {
+      const response = await apiClient.put(`/comments/${commentId}`, data);
+      return response.data;
+    } catch (error) {
+      console.error("Error updating comment:", error);
+      throw error;
+    }
+  },
+
+  // Xóa bình luận
+  deleteComment: async (commentId: string) => {
+    try {
+      const response = await apiClient.delete(`/comments/${commentId}`);
+      return response.data;
+    } catch (error) {
+      console.error("Error deleting comment:", error);
+      throw error;
+    }
+  },
+
+  // Lấy thống kê bình luận của tài liệu
+  getCommentStats: async (documentId: string) => {
+    try {
+      const response = await apiClient.get(
+        `/comments/documents/${documentId}/stats`
+      );
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching comment stats:", error);
       throw error;
     }
   },
