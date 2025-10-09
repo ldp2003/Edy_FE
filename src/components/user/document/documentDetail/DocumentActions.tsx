@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useState, useEffect } from "react";
 import DownloadButton from "../../../common/buttons/DownloadButton";
 import ReportButton from "../../../common/buttons/ReportButton";
@@ -7,7 +8,7 @@ import FavoriteButton from "../../../common/buttons/FavoriteButton";
 import ShareButton from "../../../common/buttons/ShareButton";
 import type { Document } from "../../../../models/document";
 import { UserContext } from "../../../../contexts/UserContext";
-import { DocumentAPI } from "../../../../api/API";
+import { DocumentService } from "../../../../utils/DocumentService";
 
 interface DocumentActionsProps {
   document: Document;
@@ -38,7 +39,7 @@ const DocumentActions: React.FC<DocumentActionsProps> = ({
     const fetchReactions = async () => {
       try {
         setReactionsLoading(true);
-        const response = await DocumentAPI.getDocumentReactions(document._id);
+        const response = await DocumentService.getDocumentReactions(document._id);
 
         const userReactionValue = response.reacted === 'NONE' ? null : response.reacted;
 
@@ -69,7 +70,7 @@ const DocumentActions: React.FC<DocumentActionsProps> = ({
 
   const refetchReactions = async () => {
     try {
-      const response = await DocumentAPI.getDocumentReactions(document._id);
+      const response = await DocumentService.getDocumentReactions(document._id);
       const userReactionValue = response.reacted === 'NONE' ? null : response.reacted;
 
       const newReactionData = {

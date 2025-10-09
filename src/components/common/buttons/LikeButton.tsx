@@ -1,6 +1,7 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { ThumbsUp } from "lucide-react";
 import React, { useState, useEffect } from "react";
-import { DocumentAPI } from "../../../api/API";
+import { DocumentService } from "../../../utils/DocumentService";
 import { message } from "antd";
 
 interface LikeButtonProps {
@@ -12,10 +13,12 @@ interface LikeButtonProps {
 const LikeButton: React.FC<LikeButtonProps> = ({
   documentId,
   initialLikeCount = 0,
-  initialUserReaction = null
+  initialUserReaction = null,
 }) => {
   const [likeCount, setLikeCount] = useState(initialLikeCount);
-  const [userReaction, setUserReaction] = useState<"LIKE" | "DISLIKE" | null>(initialUserReaction);
+  const [userReaction, setUserReaction] = useState<"LIKE" | "DISLIKE" | null>(
+    initialUserReaction
+  );
   const [loading, setLoading] = useState(false);
 
   const handleLikeClick = async () => {
@@ -30,16 +33,17 @@ const LikeButton: React.FC<LikeButtonProps> = ({
         newReaction = "LIKE";
       }
 
-      await DocumentAPI.reactDocument(documentId, newReaction);
+      await DocumentService.reactDocument(documentId, newReaction);
 
       // Trigger refetch reactions từ parent
-      window.dispatchEvent(new CustomEvent('reactionChanged', {
-        detail: {
-          documentId,
-          action: newReaction
-        }
-      }));
-
+      window.dispatchEvent(
+        new CustomEvent("reactionChanged", {
+          detail: {
+            documentId,
+            action: newReaction,
+          },
+        })
+      );
     } catch (error: any) {
       console.error("Error reacting to document:", error);
       message.error("Không thể thực hiện hành động này!");
@@ -57,8 +61,9 @@ const LikeButton: React.FC<LikeButtonProps> = ({
       }
     };
 
-    window.addEventListener('reactionRefetch', handleReactionRefetch);
-    return () => window.removeEventListener('reactionRefetch', handleReactionRefetch);
+    window.addEventListener("reactionRefetch", handleReactionRefetch);
+    return () =>
+      window.removeEventListener("reactionRefetch", handleReactionRefetch);
   }, [documentId]);
 
   const isLiked = userReaction === "LIKE";
@@ -66,10 +71,11 @@ const LikeButton: React.FC<LikeButtonProps> = ({
   return (
     <div>
       <button
-        className={`text-xs flex items-center space-x-2 rounded-2xl border px-3 py-1 font-semibold cursor-pointer transition-colors duration-300 ${isLiked
-          ? "bg-[var(--green-button-color)] text-white border-[var(--green-button-color)]"
-          : "bg-white border-gray-300 text-[var(--green-button-color)] hover:bg-[#27a743] hover:text-white"
-          } ${loading ? "opacity-50 cursor-not-allowed" : ""}`}
+        className={`text-xs flex items-center space-x-2 rounded-2xl border px-3 py-1 font-semibold cursor-pointer transition-colors duration-300 ${
+          isLiked
+            ? "bg-[var(--green-button-color)] text-white border-[var(--green-button-color)]"
+            : "bg-white border-gray-300 text-[var(--green-button-color)] hover:bg-[#27a743] hover:text-white"
+        } ${loading ? "opacity-50 cursor-not-allowed" : ""}`}
         onClick={handleLikeClick}
         disabled={loading}
       >

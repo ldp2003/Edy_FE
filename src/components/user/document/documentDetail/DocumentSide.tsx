@@ -20,7 +20,7 @@ const DocumentSide: React.FC<DocumentSideProps> = ({
         <DocumentInfo document={document} />
         <Description document={document} isUser={isUser} />
         <div className="mt-14"></div>
-        <Comment />
+        <Comment documentId={document._id} />
         <RelatedDocument doc_id={document._id} />
       </div>
     </aside>
