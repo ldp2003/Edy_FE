@@ -1,13 +1,16 @@
-import React, { useEffect, useState } from "react";
-import { NotificationService } from "../../utils/NotificationService";
-import type { Notification } from "../../models/notification";
+import React, { useContext, useEffect, useState } from "react";
+import { NotificationService } from "../../../utils/NotificationService";
+import type { Notification } from "../../../models/notification";
+import NotificationListItem from "../../../components/common/Notification/NotificationListItem";
+import { UserContext } from "../../../contexts/UserContext";
 
 const NotificationListPage: React.FC = () => {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [loading, setLoading] = useState(false);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-
+  const { user: user } = useContext(UserContext);
+  console.log("user", user);
   useEffect(() => {
     setLoading(true);
     NotificationService.getNotifications({ page, limit: 10 })
@@ -28,21 +31,19 @@ const NotificationListPage: React.FC = () => {
   };
 
   return (
-    <div className="p-4">
-      <h1 className="text-xl font-bold mb-4">Danh sách thông báo</h1>
+    <div className="p-4 bg-white rounded shadow mt-6 text-left">
+      <h1 className="text-base text-[var(--primary-text-color)] font-bold mb-4">
+        Danh sách thông báo
+      </h1>
       {loading ? (
         <p>Đang tải...</p>
       ) : notifications.length > 0 ? (
         <ul>
           {notifications.map((notification) => (
-            <li key={notification._id} className="mb-2 border-b pb-2">
-              <p>{notification.message}</p>
-              <small className="text-gray-500">
-                {NotificationService.formatNotificationTime(
-                  notification.createdAt
-                )}
-              </small>
-            </li>
+            <NotificationListItem
+              key={notification._id}
+              notification={notification}
+            />
           ))}
         </ul>
       ) : (

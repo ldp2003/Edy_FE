@@ -130,12 +130,12 @@ export class NotificationService {
   /**
    * Tạo thông báo mới (chỉ dành cho admin)
    */
-  static async createNotification(
-    data: CreateNotificationRequest
-  ): Promise<{
+  static async createNotification(data: CreateNotificationRequest): Promise<{
     success: boolean;
     message: string;
     notification: Notification;
+    docId?: string;
+    cmtId?: string;
   }> {
     try {
       const response = await NotificationAPI.createNotification(data);
@@ -143,6 +143,8 @@ export class NotificationService {
         success: true,
         message: response.message || "Đã tạo thông báo thành công",
         notification: response.notification,
+        docId: response.docId,
+        cmtId: response.cmtId,
       };
     } catch (error) {
       console.error("Error in NotificationService.createNotification:", error);

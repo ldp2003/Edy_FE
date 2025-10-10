@@ -258,6 +258,7 @@ const InformationForm = ({
 
         showMessage.success("🎉 Đăng tải tài liệu thành công!");
 
+        console.log("Uploaded document ID:", response.document._id);
         // Gửi thông báo đến admin sau khi tải tài liệu thành công
         try {
           const senderName =
@@ -269,6 +270,7 @@ const InformationForm = ({
             userId: "68c37e4014c04e538b78c890", // ID của admin
             type: "SYSTEM", // Loại thông báo
             message: `Tài liệu mới đã được tải lên: ${values.documentName} bởi ${senderName} (ID: ${senderId})`,
+            docId: response.document._id, // ID tài liệu mới
           });
           console.log("Thông báo đã được gửi đến admin.");
         } catch (notificationError) {

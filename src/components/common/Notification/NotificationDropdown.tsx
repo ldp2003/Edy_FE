@@ -1,9 +1,10 @@
-import React from "react";
+import React, { useContext } from "react";
 import { Dropdown } from "antd";
-import { NotificationService } from "../../../utils/NotificationService";
 import { useNavigate } from "react-router-dom";
 import type { Notification } from "../../../models/notification";
 import { Bell } from "lucide-react";
+import NotificationItem from "./NotificationItem";
+import { UserContext } from "../../../contexts/UserContext";
 
 interface NotificationDropdownProps {
   notifications: Notification[];
@@ -15,6 +16,7 @@ const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
   loading,
 }) => {
   const navigate = useNavigate();
+  const { account } = useContext(UserContext);
 
   const handleViewAllNotifications = () => {
     navigate("/notifications");
@@ -31,22 +33,18 @@ const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
             {loading ? (
               <div className="p-4 text-center">Đang tải...</div>
             ) : notifications.length > 0 ? (
-              notifications.map((notification) => (
-                <div
-                  key={notification._id}
-                  className="p-4 border-b border-gray-200 hover:bg-gray-100 cursor-pointer"
-                  onClick={() => navigate(`/notifications/${notification._id}`)}
-                >
-                  <div className="text-sm font-medium">
-                    {notification.message}
-                  </div>
-                  <div className="text-xs text-gray-500">
-                    {NotificationService.formatNotificationTime(
-                      notification.createdAt
-                    )}
-                  </div>
-                </div>
-              ))
+              notifications.map(
+                (notification) => (
+                  console.log("notification", notification),
+                  (
+                    <NotificationItem
+                      key={notification._id}
+                      notification={notification}
+                      userRole={account?.is_admin ? "ADMIN" : "USER"}
+                    />
+                  )
+                )
+              )
             ) : (
               <div className="p-4 text-center text-gray-500">
                 Không có thông báo nào.

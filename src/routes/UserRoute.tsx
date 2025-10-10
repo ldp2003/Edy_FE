@@ -21,7 +21,7 @@ import NotFoundPage from "../pages/NotFoundPage";
 import DirectDownload from "../pages/user/download/DirectDownload";
 import ShareAccess from "../pages/user/share/ShareAccess";
 import SearchPage from "../pages/user/search/SearchPage";
-import NotificationListPage from "../pages/Notification/NotificationListPage";
+import NotificationListPage from "../pages/user/Notification/NotificationListPage";
 
 const UserRoute: React.FC = () => {
   return (

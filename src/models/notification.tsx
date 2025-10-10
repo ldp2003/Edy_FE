@@ -1,8 +1,8 @@
 export interface Notification {
   _id: string;
   user: string | User;
-  doc?: string | Document;
-  cmt?: string | Comment;
+  doc?:  Document;
+  cmt?: Comment;
   type: NotificationType;
   message: string;
   isRead: boolean;
