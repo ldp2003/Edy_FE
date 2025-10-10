@@ -990,3 +990,107 @@ export const ReportAPI = {
     }
   },
 };
+
+export const NotificationAPI = {
+  // Get user notifications
+  getNotifications: async (params?: {
+    page?: number;
+    limit?: number;
+    isRead?: boolean;
+  }) => {
+    try {
+      const response = await apiClient.get("/notifications", { params });
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching notifications:", error);
+      throw error;
+    }
+  },
+
+  // Get unread notifications count
+  getUnreadCount: async () => {
+    try {
+      const response = await apiClient.get("/notifications/unread-count");
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching unread count:", error);
+      throw error;
+    }
+  },
+
+  // Get notification statistics
+  getNotificationStats: async () => {
+    try {
+      const response = await apiClient.get("/notifications/stats");
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching notification stats:", error);
+      throw error;
+    }
+  },
+
+  // Mark notification as read
+  markAsRead: async (notificationId: string) => {
+    try {
+      const response = await apiClient.patch(
+        `/notifications/${notificationId}/read`
+      );
+      return response.data;
+    } catch (error) {
+      console.error("Error marking notification as read:", error);
+      throw error;
+    }
+  },
+
+  // Mark all notifications as read
+  markAllAsRead: async () => {
+    try {
+      const response = await apiClient.patch("/notifications/mark-all-read");
+      return response.data;
+    } catch (error) {
+      console.error("Error marking all notifications as read:", error);
+      throw error;
+    }
+  },
+
+  // Delete notification
+  deleteNotification: async (notificationId: string) => {
+    try {
+      const response = await apiClient.delete(
+        `/notifications/${notificationId}`
+      );
+      return response.data;
+    } catch (error) {
+      console.error("Error deleting notification:", error);
+      throw error;
+    }
+  },
+
+  // Delete all read notifications
+  deleteAllRead: async () => {
+    try {
+      const response = await apiClient.delete("/notifications/delete-all-read");
+      return response.data;
+    } catch (error) {
+      console.error("Error deleting all read notifications:", error);
+      throw error;
+    }
+  },
+
+  // Create notification (admin only)
+  createNotification: async (data: {
+    userId: string;
+    docId?: string;
+    cmtId?: string;
+    type: string;
+    message: string;
+  }) => {
+    try {
+      const response = await apiClient.post("/notifications/create", data);
+      return response.data;
+    } catch (error) {
+      console.error("Error creating notification:", error);
+      throw error;
+    }
+  },
+};
