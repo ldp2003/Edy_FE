@@ -1,15 +1,20 @@
-import { Search, Bell, Shield, User } from "lucide-react";
+import { Search, Shield, User } from "lucide-react";
 import { Dropdown } from "antd";
 import logo from "/public/image/Logo.png";
 import AvatarDropdown from "../dropdown/AvatarDropdown";
 import UploadHeaderButton from "../buttons/UploadHeaderButton";
-import { useContext } from "react";
+import { useContext, useEffect, useState } from "react";
 import UserDropdown from "../dropdown/UserDropdown";
 import AdminDropdown from "../dropdown/AdminDropdown";
 import { UserContext } from "../../../contexts/UserContext";
+import { NotificationService } from "../../../utils/NotificationService";
+import type { Notification } from "../../../models/notification";
+import NotificationDropdown from "../Notification/NotificationDropdown";
 
 export function Header() {
   const { isLoggedIn, user, account } = useContext(UserContext);
+  const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [loading, setLoading] = useState(false);
 
   // Detect if we're on admin page
   const isOnAdminPage = window.location.pathname.startsWith("/admin");
@@ -23,6 +28,22 @@ export function Header() {
       window.location.href = "/admin";
     }
   };
+
+  useEffect(() => {
+    if (isLoggedIn) {
+      setLoading(true);
+      NotificationService.getNotifications({ page: 1, limit: 5 })
+        .then((response) => {
+          setNotifications(response.notifications);
+        })
+        .catch((error) => {
+          console.error("Error fetching notifications:", error);
+        })
+        .finally(() => {
+          setLoading(false);
+        });
+    }
+  }, [isLoggedIn]);
 
   return (
     <header className="bg-white border-b border-gray-200 px-6 py-2 w-full flex-shrink-0 shadow-sm">
@@ -113,9 +134,11 @@ export function Header() {
                 </button>
               )}
 
-              <button className="p-2 hover:bg-gray-100 rounded-md transition-colors">
-                <Bell className="w-5 h-5" />
-              </button>
+              <NotificationDropdown
+                notifications={notifications}
+                loading={loading}
+              />
+
               <Dropdown
                 overlay={
                   account?.is_admin ? <AdminDropdown /> : <UserDropdown />
