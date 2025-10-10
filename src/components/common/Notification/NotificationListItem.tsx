@@ -14,6 +14,13 @@ const NotificationListItem: React.FC<NotificationListItemProps> = ({
   const navigate = useNavigate();
   const { role: userRole } = useContext(UserContext);
 
+  const isAdminRole = Array.isArray(userRole)
+    ? userRole.some(
+        (role) =>
+          typeof role === "string" && role.toUpperCase().includes("ADMIN")
+      )
+    : typeof userRole === "string" && userRole.toUpperCase().includes("ADMIN");
+
   const handleClick = async () => {
     if (!notification.isRead) {
       try {
@@ -25,10 +32,9 @@ const NotificationListItem: React.FC<NotificationListItemProps> = ({
     }
 
     const docId = notification?.doc?._id;
-    const targetPath =
-      userRole === "ADMIN"
-        ? `/admin/documents/review/${docId ?? ""}`
-        : `/personal-posts/document-detail/${docId ?? ""}`;
+    const targetPath = isAdminRole
+      ? `/admin/documents/review/${docId ?? ""}`
+      : `/personal-posts/document-detail/${docId ?? ""}`;
 
     if (docId) {
       navigate(targetPath);

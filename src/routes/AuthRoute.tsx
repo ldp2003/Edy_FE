@@ -60,7 +60,7 @@ const AuthRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
         if (data) {
           setIsLoggedIn(true);
           setUser(data.user); // Full user data
-          setRole(data.role); // User role
+          setRole(data.roles); // User role
           setAccount(data.account); // Account data
           setFavoriteDocuments(favoriteDocuments);
 

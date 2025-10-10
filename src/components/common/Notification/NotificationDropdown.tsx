@@ -1,10 +1,9 @@
-import React, { useContext } from "react";
+import React from "react";
 import { Dropdown } from "antd";
 import { useNavigate } from "react-router-dom";
 import type { Notification } from "../../../models/notification";
 import { Bell } from "lucide-react";
 import NotificationItem from "./NotificationItem";
-import { UserContext } from "../../../contexts/UserContext";
 
 interface NotificationDropdownProps {
   notifications: Notification[];
@@ -16,7 +15,6 @@ const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
   loading,
 }) => {
   const navigate = useNavigate();
-  const { account } = useContext(UserContext);
 
   const handleViewAllNotifications = () => {
     navigate("/notifications");
@@ -40,7 +38,6 @@ const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
                     <NotificationItem
                       key={notification._id}
                       notification={notification}
-                      userRole={account?.is_admin ? "ADMIN" : "USER"}
                     />
                   )
                 )

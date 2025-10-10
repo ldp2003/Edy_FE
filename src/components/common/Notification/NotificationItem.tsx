@@ -1,26 +1,32 @@
-import React from "react";
+import React, { useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { NotificationService } from "../../../utils/NotificationService";
+import { UserContext } from "../../../contexts/UserContext";
 import type { Notification } from "../../../models/notification";
 import { CheckCircle, Circle } from "lucide-react";
 
 interface NotificationItemProps {
   notification: Notification;
-  userRole: "ADMIN" | "USER";
 }
 
 const NotificationItem: React.FC<NotificationItemProps> = ({
   notification,
-  userRole,
 }) => {
   const navigate = useNavigate();
+  const { role: userRole } = useContext(UserContext);
+
+  const isAdminRole = Array.isArray(userRole)
+    ? userRole.some(
+        (role) =>
+          typeof role === "string" && role.toUpperCase().includes("ADMIN")
+      )
+    : typeof userRole === "string" && userRole.toUpperCase().includes("ADMIN");
 
   const handleClick = () => {
     const docId = notification?.doc?._id;
-    const targetPath =
-      userRole === "ADMIN"
-        ? `/admin/documents/review/${docId ?? ""}`
-        : `/personal-posts/document-detail/${docId ?? ""}`;
+    const targetPath = isAdminRole
+      ? `/admin/documents/review/${docId ?? ""}`
+      : `/personal-posts/document-detail/${docId ?? ""}`;
 
     console.log("targetPath", targetPath);
     if (docId) {
