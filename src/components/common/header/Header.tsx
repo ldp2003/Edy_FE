@@ -1,15 +1,25 @@
-import { Search, Bell, Shield, User } from "lucide-react";
+import { Badge } from "antd";
+import { Search, Shield, User } from "lucide-react";
 import { Dropdown } from "antd";
 import logo from "/public/image/Logo.png";
 import AvatarDropdown from "../dropdown/AvatarDropdown";
 import UploadHeaderButton from "../buttons/UploadHeaderButton";
-import { useContext } from "react";
+import { useContext, useEffect, useState } from "react";
 import UserDropdown from "../dropdown/UserDropdown";
 import AdminDropdown from "../dropdown/AdminDropdown";
 import { UserContext } from "../../../contexts/UserContext";
+import NotificationDropdown from "../Notification/NotificationDropdown";
 
 export function Header() {
-  const { isLoggedIn, user, account } = useContext(UserContext);
+  const {
+    isLoggedIn,
+    user,
+    account,
+    notifications,
+    unreadCount,
+    refreshNotifications,
+  } = useContext(UserContext);
+  const [loading, setLoading] = useState(false);
 
   // Detect if we're on admin page
   const isOnAdminPage = window.location.pathname.startsWith("/admin");
@@ -23,6 +33,14 @@ export function Header() {
       window.location.href = "/admin";
     }
   };
+
+  useEffect(() => {
+    if (isLoggedIn) {
+      setLoading(true);
+      refreshNotifications();
+      setLoading(false);
+    }
+  }, [isLoggedIn, refreshNotifications]);
 
   return (
     <header className="bg-white border-b border-gray-200 px-6 py-2 w-full flex-shrink-0 shadow-sm">
@@ -113,9 +131,17 @@ export function Header() {
                 </button>
               )}
 
-              <button className="p-2 hover:bg-gray-100 rounded-md transition-colors">
-                <Bell className="w-5 h-5" />
-              </button>
+              <Badge
+                count={unreadCount > 9 ? "9+" : unreadCount}
+                overflowCount={9}
+                style={{ backgroundColor: "#ff4d4f" }}
+              >
+                <NotificationDropdown
+                  notifications={notifications}
+                  loading={loading}
+                />
+              </Badge>
+
               <Dropdown
                 overlay={
                   account?.is_admin ? <AdminDropdown /> : <UserDropdown />

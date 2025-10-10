@@ -21,6 +21,7 @@ import NotFoundPage from "../pages/NotFoundPage";
 import DirectDownload from "../pages/user/download/DirectDownload";
 import ShareAccess from "../pages/user/share/ShareAccess";
 import SearchPage from "../pages/user/search/SearchPage";
+import NotificationListPage from "../pages/user/Notification/NotificationListPage";
 
 const UserRoute: React.FC = () => {
   return (
@@ -59,6 +60,7 @@ const UserRoute: React.FC = () => {
           <Route path="upload-document" element={<UploadPage />} />
           <Route path="edit-profile" element={<EditProfile />} />
           <Route path="favorites" element={<FavoritePage />} />
+          <Route path="notifications" element={<NotificationListPage />} />
 
           {/* 404 Page */}
           <Route path="*" element={<NotFoundPage />} />

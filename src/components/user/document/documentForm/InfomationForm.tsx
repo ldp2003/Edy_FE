@@ -7,6 +7,7 @@ import { DocumentService } from "../../../../utils/DocumentService";
 import { UserContext } from "../../../../contexts/UserContext";
 import SubjectService from "../../../../utils/SubjectService";
 import type { Subject } from "../../../../models/subject";
+import { NotificationService } from "../../../../utils/NotificationService";
 
 const { TextArea } = Input;
 const { Option } = Select;
@@ -257,6 +258,28 @@ const InformationForm = ({
 
         showMessage.success("🎉 Đăng tải tài liệu thành công!");
 
+        console.log("Uploaded document ID:", response.document._id);
+        // Gửi thông báo đến admin sau khi tải tài liệu thành công
+        try {
+          const senderName =
+            `${user?.first_name || ""} ${user?.last_name || ""}`.trim() ||
+            "Người dùng không xác định";
+          const senderId = user?._id || "";
+
+          await NotificationService.createNotification({
+            userId: "68c37e4014c04e538b78c890", // ID của admin
+            type: "SYSTEM", // Loại thông báo
+            message: `Tài liệu mới đã được tải lên: ${values.documentName} bởi ${senderName} (ID: ${senderId})`,
+            docId: response.document._id, // ID tài liệu mới
+          });
+          console.log("Thông báo đã được gửi đến admin.");
+        } catch (notificationError) {
+          console.error(
+            "Không thể gửi thông báo đến admin:",
+            notificationError
+          );
+        }
+
         // Reset form sau khi thành công
         form.resetFields();
         setAuthors([""]);
@@ -264,9 +287,6 @@ const InformationForm = ({
         if (onUploadSuccess) {
           onUploadSuccess();
         }
-
-        // Hiển thị thông báo và chuyển hướng sau 2 giây
-        showMessage.info("Đang chuyển hướng đến trang tài liệu cá nhân...", 1);
 
         setTimeout(() => {
           navigate("/personal-posts");
