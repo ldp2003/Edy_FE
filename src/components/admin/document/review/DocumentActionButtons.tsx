@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Button, Modal, message, Input } from "antd";
 import { useNavigate } from "react-router-dom";
+import { NotificationService } from "../../../../utils/NotificationService";
 
 const { TextArea } = Input;
 
@@ -81,6 +82,14 @@ const DocumentActionButtons: React.FC<DocumentActionButtonsProps> = ({
 
       await onApprove(approvalData);
       messageApi.success("Tài liệu đã được duyệt thành công!");
+
+      // Send notification to the document owner
+      await NotificationService.createNotification({
+        userId: documentRequest.requester,
+        type: "SYSTEM",
+        message: `Tài liệu của bạn đã được duyệt: ${documentRequest.doc}`,
+        docId: documentRequest.doc,
+      });
     } catch (error) {
       console.error("Approve error:", error);
       messageApi.error("Có lỗi xảy ra khi duyệt tài liệu!");
@@ -103,6 +112,14 @@ const DocumentActionButtons: React.FC<DocumentActionButtonsProps> = ({
       messageApi.success("Tài liệu đã được từ chối!");
       setRejectModalVisible(false);
       setRejectReason("");
+
+      // Send notification to the document owner
+      await NotificationService.createNotification({
+        userId: documentRequest.requester,
+        type: "SYSTEM",
+        message: `Tài liệu của bạn đã bị từ chối: ${documentRequest.doc}. Lý do: ${rejectReason}`,
+        docId: documentRequest.doc,
+      });
     } catch (error) {
       console.error("Reject error:", error);
       messageApi.error("Có lỗi xảy ra khi từ chối tài liệu!");
@@ -120,6 +137,14 @@ const DocumentActionButtons: React.FC<DocumentActionButtonsProps> = ({
       messageApi.success("Tài liệu đã được xóa!");
       setDeleteModalVisible(false);
       setDeleteReason("");
+
+      // Send notification to the document owner
+      await NotificationService.createNotification({
+        userId: documentRequest?.requester || "",
+        type: "SYSTEM",
+        message: `Tài liệu của bạn đã bị xóa: ${documentRequest?.doc}. Lý do: ${deleteReason}`,
+        docId: documentRequest?.doc,
+      });
     } catch (error) {
       console.error("Delete error:", error);
       messageApi.error("Có lỗi xảy ra khi xóa tài liệu!");

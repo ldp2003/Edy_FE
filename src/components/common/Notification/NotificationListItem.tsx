@@ -12,7 +12,7 @@ const NotificationListItem: React.FC<NotificationListItemProps> = ({
   notification,
 }) => {
   const navigate = useNavigate();
-  const { role: userRole } = useContext(UserContext);
+  const { role: userRole, refreshNotifications } = useContext(UserContext);
 
   const isAdminRole = Array.isArray(userRole)
     ? userRole.some(
@@ -26,6 +26,8 @@ const NotificationListItem: React.FC<NotificationListItemProps> = ({
       try {
         await NotificationService.markAsRead(notification._id);
         console.log("Notification marked as read");
+        // Refresh notifications in context after marking as read
+        refreshNotifications();
       } catch (error) {
         console.error("Failed to mark notification as read", error);
       }

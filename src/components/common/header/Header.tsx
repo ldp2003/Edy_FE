@@ -1,3 +1,4 @@
+import { Badge } from "antd";
 import { Search, Shield, User } from "lucide-react";
 import { Dropdown } from "antd";
 import logo from "/public/image/Logo.png";
@@ -7,13 +8,17 @@ import { useContext, useEffect, useState } from "react";
 import UserDropdown from "../dropdown/UserDropdown";
 import AdminDropdown from "../dropdown/AdminDropdown";
 import { UserContext } from "../../../contexts/UserContext";
-import { NotificationService } from "../../../utils/NotificationService";
-import type { Notification } from "../../../models/notification";
 import NotificationDropdown from "../Notification/NotificationDropdown";
 
 export function Header() {
-  const { isLoggedIn, user, account } = useContext(UserContext);
-  const [notifications, setNotifications] = useState<Notification[]>([]);
+  const {
+    isLoggedIn,
+    user,
+    account,
+    notifications,
+    unreadCount,
+    refreshNotifications,
+  } = useContext(UserContext);
   const [loading, setLoading] = useState(false);
 
   // Detect if we're on admin page
@@ -32,18 +37,10 @@ export function Header() {
   useEffect(() => {
     if (isLoggedIn) {
       setLoading(true);
-      NotificationService.getNotifications({ page: 1, limit: 5 })
-        .then((response) => {
-          setNotifications(response.notifications);
-        })
-        .catch((error) => {
-          console.error("Error fetching notifications:", error);
-        })
-        .finally(() => {
-          setLoading(false);
-        });
+      refreshNotifications();
+      setLoading(false);
     }
-  }, [isLoggedIn]);
+  }, [isLoggedIn, refreshNotifications]);
 
   return (
     <header className="bg-white border-b border-gray-200 px-6 py-2 w-full flex-shrink-0 shadow-sm">
@@ -134,10 +131,16 @@ export function Header() {
                 </button>
               )}
 
-              <NotificationDropdown
-                notifications={notifications}
-                loading={loading}
-              />
+              <Badge
+                count={unreadCount > 9 ? "9+" : unreadCount}
+                overflowCount={9}
+                style={{ backgroundColor: "#ff4d4f" }}
+              >
+                <NotificationDropdown
+                  notifications={notifications}
+                  loading={loading}
+                />
+              </Badge>
 
               <Dropdown
                 overlay={

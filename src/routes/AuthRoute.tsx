@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { getCurrentUser, refreshToken } from "../utils/AuthService";
-import { UserContext } from "../contexts/UserContext";
+import { UserProvider } from "../contexts/UserProvider";
 import type { User } from "../models/user";
 import { defaultUser } from "../models/user";
 import { ROLE_CODES } from "../constants/RoleConstants";
@@ -240,18 +240,16 @@ const AuthRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   }
 
   return (
-    <UserContext.Provider
-      value={{
-        isLoggedIn,
-        user,
-        account,
-        role,
-        favoriteDocuments,
-        setFavoriteDocuments,
-      }}
+    <UserProvider
+      isLoggedIn={isLoggedIn}
+      user={user}
+      account={account}
+      role={role}
+      favoriteDocuments={favoriteDocuments}
+      setFavoriteDocuments={setFavoriteDocuments}
     >
       {children}
-    </UserContext.Provider>
+    </UserProvider>
   );
 };
 

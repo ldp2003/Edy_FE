@@ -13,7 +13,7 @@ const NotificationItem: React.FC<NotificationItemProps> = ({
   notification,
 }) => {
   const navigate = useNavigate();
-  const { role: userRole } = useContext(UserContext);
+  const { role: userRole, refreshNotifications } = useContext(UserContext);
 
   const isAdminRole = Array.isArray(userRole)
     ? userRole.some(
@@ -22,7 +22,18 @@ const NotificationItem: React.FC<NotificationItemProps> = ({
       )
     : typeof userRole === "string" && userRole.toUpperCase().includes("ADMIN");
 
-  const handleClick = () => {
+  const handleClick = async () => {
+    // Mark as read if not already read
+    if (!notification.isRead) {
+      try {
+        await NotificationService.markAsRead(notification._id);
+        // Refresh notifications in context after marking as read
+        refreshNotifications();
+      } catch (error) {
+        console.error("Failed to mark notification as read", error);
+      }
+    }
+
     const docId = notification?.doc?._id;
     const targetPath = isAdminRole
       ? `/admin/documents/review/${docId ?? ""}`
@@ -36,7 +47,7 @@ const NotificationItem: React.FC<NotificationItemProps> = ({
 
   return (
     <div
-      className={`p-3 border-b text-left cursor-pointer ${
+      className={`p-3 text-left cursor-pointer ${
         notification.isRead ? "bg-white" : "bg-gray-100"
       } hover:bg-gray-200`}
       onClick={handleClick}

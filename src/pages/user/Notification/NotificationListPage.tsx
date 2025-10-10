@@ -1,16 +1,15 @@
 import React, { useContext, useEffect, useState } from "react";
 import { NotificationService } from "../../../utils/NotificationService";
-import type { Notification } from "../../../models/notification";
 import NotificationListItem from "../../../components/common/Notification/NotificationListItem";
 import { UserContext } from "../../../contexts/UserContext";
 
 const NotificationListPage: React.FC = () => {
-  const [notifications, setNotifications] = useState<Notification[]>([]);
   const [loading, setLoading] = useState(false);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const { user: user } = useContext(UserContext);
-  console.log("user", user);
+  const { notifications, setNotifications, refreshNotifications } =
+    useContext(UserContext);
+
   useEffect(() => {
     setLoading(true);
     NotificationService.getNotifications({ page, limit: 10 })
@@ -24,7 +23,12 @@ const NotificationListPage: React.FC = () => {
       .finally(() => {
         setLoading(false);
       });
-  }, [page]);
+  }, [page, setNotifications]);
+
+  // Refresh notifications when component mounts
+  useEffect(() => {
+    refreshNotifications();
+  }, [refreshNotifications]);
 
   const handlePageChange = (newPage: number) => {
     setPage(newPage);
