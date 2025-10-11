@@ -54,6 +54,13 @@ const DocumentActionButtons: React.FC<DocumentActionButtonsProps> = ({
   const [rejectReason, setRejectReason] = useState("");
   const [deleteReason, setDeleteReason] = useState("");
 
+  // Check if document has been processed (approved or rejected)
+  const isDocumentProcessed =
+    documentRequest?.status === "APPROVED" ||
+    documentRequest?.status === "REJECTED";
+  const isDocumentApproved = documentRequest?.status === "APPROVED";
+  const isDocumentRejected = documentRequest?.status === "REJECTED";
+
   const handleApprove = async () => {
     if (!documentRequest) {
       messageApi.error("Không tìm thấy request tài liệu!");
@@ -161,29 +168,48 @@ const DocumentActionButtons: React.FC<DocumentActionButtonsProps> = ({
       {/* Action buttons */}
       <div className="flex items-center justify-between mt-8 pt-6 border-t border-gray-200">
         <div className="flex gap-3">
-          <Button
-            style={{
-              backgroundColor: "#22c55e",
-              borderColor: "#22c55e",
-              color: "white",
-            }}
-            onClick={handleApprove}
-            loading={processing}
-            disabled={processing}
-          >
-            Duyệt bài
-          </Button>
-          <Button
-            style={{
-              backgroundColor: "#ef4444",
-              borderColor: "#ef4444",
-              color: "white",
-            }}
-            onClick={() => setRejectModalVisible(true)}
-            disabled={processing}
-          >
-            Từ chối
-          </Button>
+          {/* Status indicator if document is already processed */}
+          {isDocumentApproved && (
+            <div className="flex items-center gap-2 px-4 py-2 bg-green-100 border border-green-300 rounded-md">
+              <span className="text-green-700 font-medium">✓ Đã duyệt</span>
+            </div>
+          )}
+          {isDocumentRejected && (
+            <div className="flex items-center gap-2 px-4 py-2 bg-red-100 border border-red-300 rounded-md">
+              <span className="text-red-700 font-medium">✗ Đã từ chối</span>
+            </div>
+          )}
+
+          {/* Show action buttons only if not processed yet */}
+          {!isDocumentProcessed && (
+            <>
+              <Button
+                style={{
+                  backgroundColor: "#22c55e",
+                  borderColor: "#22c55e",
+                  color: "white",
+                }}
+                onClick={handleApprove}
+                loading={processing}
+                disabled={processing}
+              >
+                Duyệt bài
+              </Button>
+              <Button
+                style={{
+                  backgroundColor: "#ef4444",
+                  borderColor: "#ef4444",
+                  color: "white",
+                }}
+                onClick={() => setRejectModalVisible(true)}
+                disabled={processing}
+              >
+                Từ chối
+              </Button>
+            </>
+          )}
+
+          {/* These buttons are always available */}
           <Button
             style={{
               backgroundColor: "#f59e0b",
@@ -193,7 +219,7 @@ const DocumentActionButtons: React.FC<DocumentActionButtonsProps> = ({
             onClick={() => setDeleteModalVisible(true)}
             disabled={processing}
           >
-            Yêu cầu chỉnh sửa
+            {isDocumentProcessed ? "Xóa bài" : "Yêu cầu chỉnh sửa"}
           </Button>
           <Button
             style={{
