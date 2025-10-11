@@ -14,20 +14,6 @@ const DislikeButton: React.FC<DislikeButtonProps> = ({
   documentId,
   initialDislikeCount = 0,
   initialUserReaction = null,
-import React, { useState, useEffect } from "react";
-import { DocumentAPI } from "../../../api/API";
-import { message } from "antd";
-
-interface DislikeButtonProps {
-  documentId: string;
-  initialDislikeCount?: number;
-  initialUserReaction?: "LIKE" | "DISLIKE" | null;
-}
-
-const DislikeButton: React.FC<DislikeButtonProps> = ({
-  documentId,
-  initialDislikeCount = 0,
-  initialUserReaction = null
 }) => {
   const [dislikeCount, setDislikeCount] = useState(initialDislikeCount);
   const [userReaction, setUserReaction] = useState<"LIKE" | "DISLIKE" | null>(
