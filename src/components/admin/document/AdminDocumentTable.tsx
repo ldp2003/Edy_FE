@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { Table, Select, Button, message } from "antd";
 import { useNavigate, useSearchParams } from "react-router-dom";
@@ -104,6 +105,7 @@ const AdminDocumentTable: React.FC = () => {
           published_year: appliedFilters.published_year,
           start_date: appliedFilters.dateRange?.[0],
           end_date: appliedFilters.dateRange?.[1],
+          public_mode: "PUBLIC"
         };
 
         const response = await DocumentService.getAllDocuments(apiParams);
@@ -414,6 +416,55 @@ const AdminDocumentTable: React.FC = () => {
           minute: "2-digit",
           second: "2-digit",
         });
+      },
+    },
+
+    {
+      title: "Người đăng tải",
+      dataIndex: "user",
+      key: "user",
+      align: "center",
+      render: (user: {
+        avatar: string;
+        first_name: string;
+        last_name: string;
+      }) => {
+        if (!user) return "N/A";
+        return (
+          <div className="flex items-center gap-2">
+            <img
+              src={user.avatar}
+              alt="Avatar"
+              className="w-8 h-8 rounded-full object-cover"
+            />
+            <div>
+              <div className="font-medium text-left">{`${user.first_name} ${user.last_name}`}</div>
+            </div>
+          </div>
+        );
+      },
+    },
+    {
+      title: "Chế độ",
+      dataIndex: "public_mode",
+      key: "public_mode",
+      align: "center",
+      render: (mode: string) => {
+        const modeConfig: { [key: string]: { text: string; color: string } } = {
+          PUBLIC: { text: "Công khai", color: "bg-green-100 text-green-800" },
+          PRIVATE: { text: "Riêng tư", color: "bg-red-100 text-red-800" },
+        };
+        const config = modeConfig[mode] || {
+          text: mode,
+          color: "bg-gray-100 text-gray-800",
+        };
+        return (
+          <span
+            className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${config.color}`}
+          >
+            {config.text}
+          </span>
+        );
       },
     },
     {
