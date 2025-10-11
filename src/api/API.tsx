@@ -618,6 +618,33 @@ export const DocumentAPI = {
     }
   },
 
+  reactDocument: async (
+    documentId: string,
+    reaction: "LIKE" | "DISLIKE" | "UNREACT"
+  ) => {
+    try {
+      const response = await apiClient.post(`/documents/${documentId}/react`, {
+        reaction,
+      });
+      return response.data;
+    } catch (error) {
+      console.error("Error reacting to document:", error);
+      throw error;
+    }
+  },
+
+  getDocumentReactions: async (documentId: string) => {
+    try {
+      const response = await apiClient.get(
+        `/documents/${documentId}/reactions`
+      );
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching document reactions:", error);
+      throw error;
+    }
+  },
+
   // Get pending documents (for admin)
   getPendingDocuments: async (params?: {
     page?: number;
@@ -849,6 +876,93 @@ export const AccessRequestAPI = {
   },
 };
 
+export const CommentAPI = {
+  // Tạo bình luận mới cho tài liệu
+  createComment: async (
+    documentId: string,
+    data: { content: string; parentId?: string | null }
+  ) => {
+    try {
+      const response = await apiClient.post(
+        `/comments/documents/${documentId}`,
+        data
+      );
+      return response.data;
+    } catch (error) {
+      console.error("Error creating comment:", error);
+      throw error;
+    }
+  },
+
+  // Lấy danh sách bình luận của tài liệu
+  getCommentsByDocument: async (
+    documentId: string,
+    params?: { page?: number; limit?: number }
+  ) => {
+    try {
+      const response = await apiClient.get(
+        `/comments/documents/${documentId}`,
+        { params }
+      );
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching comments by document:", error);
+      throw error;
+    }
+  },
+
+  // Lấy danh sách replies của một bình luận
+  getRepliesByComment: async (
+    commentId: string,
+    params?: { page?: number; limit?: number }
+  ) => {
+    try {
+      const response = await apiClient.get(`/comments/${commentId}/replies`, {
+        params,
+      });
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching replies by comment:", error);
+      throw error;
+    }
+  },
+
+  // Cập nhật nội dung bình luận
+  updateComment: async (commentId: string, data: { content: string }) => {
+    try {
+      const response = await apiClient.put(`/comments/${commentId}`, data);
+      return response.data;
+    } catch (error) {
+      console.error("Error updating comment:", error);
+      throw error;
+    }
+  },
+
+  // Xóa bình luận
+  deleteComment: async (commentId: string) => {
+    try {
+      const response = await apiClient.delete(`/comments/${commentId}`);
+      return response.data;
+    } catch (error) {
+      console.error("Error deleting comment:", error);
+      throw error;
+    }
+  },
+
+  // Lấy thống kê bình luận của tài liệu
+  getCommentStats: async (documentId: string) => {
+    try {
+      const response = await apiClient.get(
+        `/comments/documents/${documentId}/stats`
+      );
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching comment stats:", error);
+      throw error;
+    }
+  },
+};
+
 export const ReportAPI = {
   // Create a new report
   createReport: async (data: {
@@ -900,6 +1014,110 @@ export const ReportAPI = {
       return response.data;
     } catch (error) {
       console.error("Error resolving report:", error);
+      throw error;
+    }
+  },
+};
+
+export const NotificationAPI = {
+  // Get user notifications
+  getNotifications: async (params?: {
+    page?: number;
+    limit?: number;
+    isRead?: boolean;
+  }) => {
+    try {
+      const response = await apiClient.get("/notifications", { params });
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching notifications:", error);
+      throw error;
+    }
+  },
+
+  // Get unread notifications count
+  getUnreadCount: async () => {
+    try {
+      const response = await apiClient.get("/notifications/unread-count");
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching unread count:", error);
+      throw error;
+    }
+  },
+
+  // Get notification statistics
+  getNotificationStats: async () => {
+    try {
+      const response = await apiClient.get("/notifications/stats");
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching notification stats:", error);
+      throw error;
+    }
+  },
+
+  // Mark notification as read
+  markAsRead: async (notificationId: string) => {
+    try {
+      const response = await apiClient.patch(
+        `/notifications/${notificationId}/read`
+      );
+      return response.data;
+    } catch (error) {
+      console.error("Error marking notification as read:", error);
+      throw error;
+    }
+  },
+
+  // Mark all notifications as read
+  markAllAsRead: async () => {
+    try {
+      const response = await apiClient.patch("/notifications/mark-all-read");
+      return response.data;
+    } catch (error) {
+      console.error("Error marking all notifications as read:", error);
+      throw error;
+    }
+  },
+
+  // Delete notification
+  deleteNotification: async (notificationId: string) => {
+    try {
+      const response = await apiClient.delete(
+        `/notifications/${notificationId}`
+      );
+      return response.data;
+    } catch (error) {
+      console.error("Error deleting notification:", error);
+      throw error;
+    }
+  },
+
+  // Delete all read notifications
+  deleteAllRead: async () => {
+    try {
+      const response = await apiClient.delete("/notifications/delete-all-read");
+      return response.data;
+    } catch (error) {
+      console.error("Error deleting all read notifications:", error);
+      throw error;
+    }
+  },
+
+  // Create notification (admin only)
+  createNotification: async (data: {
+    userId: string;
+    docId?: string;
+    cmtId?: string;
+    type: string;
+    message: string;
+  }) => {
+    try {
+      const response = await apiClient.post("/notifications/create", data);
+      return response.data;
+    } catch (error) {
+      console.error("Error creating notification:", error);
       throw error;
     }
   },

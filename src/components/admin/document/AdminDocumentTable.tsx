@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { Table, Select, Button, message } from "antd";
 import { useNavigate, useSearchParams } from "react-router-dom";
@@ -8,6 +9,7 @@ import AdminDocumentFilterSearch, {
   type AdminFilterSearchParams,
 } from "./AdminDocumentFilterSearch";
 import { DocumentService } from "../../../utils/DocumentService";
+import { fetchMultipleDocumentRatings } from "../../../utils/CalcRate";
 
 const { Option } = Select;
 
@@ -43,12 +45,15 @@ const AdminDocumentTable: React.FC = () => {
   const [appliedFilters, setAppliedFilters] = useState<AdminFilterSearchParams>(
     {}
   );
+  const [documentRatings, setDocumentRatings] = useState<
+    Map<string, { ratingPercentage: number; formattedRating: string }>
+  >(new Map());
   const isInitialized = useRef(false);
 
   // Initialize filter from URL params on mount - only once
   useEffect(() => {
     if (isInitialized.current) return;
-    
+
     const urlParams: AdminFilterSearchParams = {};
 
     // Extract all params from URL
@@ -100,17 +105,29 @@ const AdminDocumentTable: React.FC = () => {
           published_year: appliedFilters.published_year,
           start_date: appliedFilters.dateRange?.[0],
           end_date: appliedFilters.dateRange?.[1],
+          public_mode: "PUBLIC"
         };
 
         const response = await DocumentService.getAllDocuments(apiParams);
+        const fetchedDocuments = response.documents || [];
 
-        setDocuments(response.documents || []);
+        setDocuments(fetchedDocuments);
         setTotalDocuments(response.total || 0);
+
+        // Fetch ratings cho các documents vừa lấy
+        if (fetchedDocuments.length > 0) {
+          const documentIds = fetchedDocuments.map((doc: Document) => doc._id);
+          const ratingsMap = await fetchMultipleDocumentRatings(documentIds);
+          setDocumentRatings(ratingsMap);
+        } else {
+          setDocumentRatings(new Map());
+        }
       } catch (error) {
         console.error("Error fetching documents:", error);
         message.error("Không thể tải danh sách tài liệu!");
         setDocuments([]);
         setTotalDocuments(0);
+        setDocumentRatings(new Map());
       } finally {
         setLoading(false);
       }
@@ -119,10 +136,13 @@ const AdminDocumentTable: React.FC = () => {
     fetchDocuments();
   }, [currentPage, pageSize, appliedFilters]);
 
-  const handleFilterChange = useCallback((newParams: AdminFilterSearchParams) => {
-    // Chỉ cập nhật form filter, không gọi API
-    setFilterParams(newParams);
-  }, []);
+  const handleFilterChange = useCallback(
+    (newParams: AdminFilterSearchParams) => {
+      // Chỉ cập nhật form filter, không gọi API
+      setFilterParams(newParams);
+    },
+    []
+  );
 
   const updateURLParams = (params: AdminFilterSearchParams) => {
     const newSearchParams = new URLSearchParams();
@@ -351,7 +371,30 @@ const AdminDocumentTable: React.FC = () => {
       title: "Đánh giá",
       key: "rating",
       align: "center",
-      render: () => "0%", // Placeholder since rating calculation isn't in the model
+      render: (_, record: DocumentDisplay) => {
+        const rating = documentRatings.get(record._id);
+        if (!rating) {
+          return <span className="text-gray-400">-</span>;
+        }
+
+        const percentage = rating.ratingPercentage;
+        let colorClass = "text-gray-600";
+
+        if (percentage >= 90) colorClass = "text-green-600 font-semibold";
+        else if (percentage >= 70) colorClass = "text-blue-600 font-medium";
+        else if (percentage >= 50) colorClass = "text-yellow-600";
+        else if (percentage >= 30) colorClass = "text-orange-600";
+        else if (percentage > 0) colorClass = "text-red-600";
+
+        return (
+          <span
+            className={colorClass}
+            title={`${rating.ratingPercentage}% tích cực`}
+          >
+            {rating.formattedRating}
+          </span>
+        );
+      },
     },
     {
       title: "Lượt tải",
@@ -401,6 +444,55 @@ const AdminDocumentTable: React.FC = () => {
           minute: "2-digit",
           second: "2-digit",
         });
+      },
+    },
+
+    {
+      title: "Người đăng tải",
+      dataIndex: "user",
+      key: "user",
+      align: "center",
+      render: (user: {
+        avatar: string;
+        first_name: string;
+        last_name: string;
+      }) => {
+        if (!user) return "N/A";
+        return (
+          <div className="flex items-center gap-2">
+            <img
+              src={user.avatar}
+              alt="Avatar"
+              className="w-8 h-8 rounded-full object-cover"
+            />
+            <div>
+              <div className="font-medium text-left">{`${user.first_name} ${user.last_name}`}</div>
+            </div>
+          </div>
+        );
+      },
+    },
+    {
+      title: "Chế độ",
+      dataIndex: "public_mode",
+      key: "public_mode",
+      align: "center",
+      render: (mode: string) => {
+        const modeConfig: { [key: string]: { text: string; color: string } } = {
+          PUBLIC: { text: "Công khai", color: "bg-green-100 text-green-800" },
+          PRIVATE: { text: "Riêng tư", color: "bg-red-100 text-red-800" },
+        };
+        const config = modeConfig[mode] || {
+          text: mode,
+          color: "bg-gray-100 text-gray-800",
+        };
+        return (
+          <span
+            className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${config.color}`}
+          >
+            {config.text}
+          </span>
+        );
       },
     },
     {

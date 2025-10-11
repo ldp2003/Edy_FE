@@ -3,17 +3,22 @@ import { Button, Input, message } from "antd";
 import { SendOutlined } from "@ant-design/icons";
 import CommentItem from "./CommentItem";
 import type { Comment } from "../../../../models/comment";
+import { CommentService } from "../../../../utils/CommentService";
 
 const { TextArea } = Input;
 
 interface CommentListProps {
+  documentId: string;
   comments: Comment[];
   onAddComment?: (content: string, parentId?: string) => Promise<void>;
+  onCommentsUpdate?: (updatedComments: Comment[]) => void;
 }
 
 const CommentList: React.FC<CommentListProps> = ({
+  documentId,
   comments,
   onAddComment,
+  onCommentsUpdate,
 }) => {
   const [newComment, setNewComment] = useState("");
   const [replyingTo, setReplyingTo] = useState<string | null>(null);
@@ -22,36 +27,30 @@ const CommentList: React.FC<CommentListProps> = ({
   const [expandedReplies, setExpandedReplies] = useState<
     Record<string, number>
   >({});
+  const [messageApi, contextHolder] = message.useMessage();
 
-  // Nhóm comments theo parent
+  // Với API mới, comments đã được nhóm sẵn với replies array
   const parentComments = comments.filter((comment) => !comment.parent);
-  const repliesMap = comments.reduce((acc, comment) => {
-    if (comment.parent) {
-      const parentId =
-        typeof comment.parent === "string"
-          ? comment.parent
-          : comment.parent._id;
-      if (!acc[parentId]) acc[parentId] = [];
-      acc[parentId].push(comment);
-    }
-    return acc;
-  }, {} as Record<string, Comment[]>);
 
   const handleSubmitComment = async () => {
     if (!newComment.trim()) {
-      message.warning("Vui lòng nhập nội dung bình luận!");
+      messageApi.warning("Vui lòng nhập nội dung bình luận!");
       return;
     }
 
     setLoading(true);
     try {
-      if (onAddComment) {
+      // Ưu tiên sử dụng service trước, fallback về callback
+      if (onCommentsUpdate) {
+        await handleAddCommentService(newComment.trim());
+        setNewComment("");
+      } else if (onAddComment) {
         await onAddComment(newComment.trim());
         setNewComment("");
-        message.success("Đã thêm bình luận!");
+        messageApi.success("Đã thêm bình luận!");
       }
     } catch {
-      message.error("Không thể thêm bình luận!");
+      messageApi.error("Không thể thêm bình luận!");
     } finally {
       setLoading(false);
     }
@@ -59,20 +58,25 @@ const CommentList: React.FC<CommentListProps> = ({
 
   const handleSubmitReply = async () => {
     if (!replyContent.trim() || !replyingTo) {
-      message.warning("Vui lòng nhập nội dung trả lời!");
+      messageApi.warning("Vui lòng nhập nội dung trả lời!");
       return;
     }
 
     setLoading(true);
     try {
-      if (onAddComment) {
+      // Ưu tiên sử dụng service trước, fallback về callback
+      if (onCommentsUpdate) {
+        await handleAddCommentService(replyContent.trim(), replyingTo);
+        setReplyContent("");
+        setReplyingTo(null);
+      } else if (onAddComment) {
         await onAddComment(replyContent.trim(), replyingTo);
         setReplyContent("");
         setReplyingTo(null);
-        message.success("Đã thêm trả lời!");
+        messageApi.success("Đã thêm trả lời!");
       }
     } catch {
-      message.error("Không thể thêm trả lời!");
+      messageApi.error("Không thể thêm trả lời!");
     } finally {
       setLoading(false);
     }
@@ -100,12 +104,54 @@ const CommentList: React.FC<CommentListProps> = ({
       [commentId]: Math.max((prev[commentId] || 1) - 4, 1),
     }));
   };
+  const handleAddCommentService = async (
+    content: string,
+    parentId?: string
+  ) => {
+    try {
+      const res = await CommentService.createComment(documentId, {
+        content,
+        parentId: parentId || null,
+      });
+      if (res.success && onCommentsUpdate) {
+        if (parentId) {
+          // Nếu là reply, cập nhật parent comment's replies array
+          const updatedComments = comments.map((comment) => {
+            if (comment._id === parentId) {
+              return {
+                ...comment,
+                replies: [...(comment.replies || []), res.data],
+                reply_count: (comment.reply_count || 0) + 1,
+              };
+            }
+            return comment;
+          });
+          onCommentsUpdate(updatedComments);
+        } else {
+          // Nếu là comment mới, thêm vào đầu danh sách
+          const updatedComments = [res.data, ...comments];
+          onCommentsUpdate(updatedComments);
+        }
+        message.success(parentId ? "Đã thêm trả lời!" : "Đã thêm bình luận!");
+      }
+    } catch (err) {
+      console.error("Error adding comment:", err);
+      message.error("Không thể thêm bình luận!");
+    }
+  };
 
   return (
     <div className="py-6 border-b-gray-200 border-b">
+      {contextHolder}
       {/* Header */}
       <h4 className="font-bold text-sm mb-4 text-[var(--secondary-text-color)]">
-        Bình luận ({comments.length}):
+        Bình luận (
+        {comments.length +
+          comments.reduce(
+            (acc, comment) => acc + (comment.reply_count || 0),
+            0
+          )}
+        ):
       </h4>
 
       {/* Add New Comment */}
@@ -147,13 +193,17 @@ const CommentList: React.FC<CommentListProps> = ({
           parentComments.map((comment) => (
             <div key={comment._id}>
               {/* Parent Comment */}
-              <CommentItem comment={comment} onReply={handleReply} />
+              <CommentItem
+                comment={comment}
+                documentId={documentId}
+                onReply={handleReply}
+              />
 
               {/* Replies */}
-              {repliesMap[comment._id] && (
+              {comment.replies && comment.replies.length > 0 && (
                 <div className="mt-3">
                   {(() => {
-                    const replies = repliesMap[comment._id];
+                    const replies = comment.replies || [];
                     const visibleCount = expandedReplies[comment._id] || 1;
                     const visibleReplies = replies.slice(0, visibleCount);
                     const hasMore = replies.length > visibleCount;
@@ -161,10 +211,11 @@ const CommentList: React.FC<CommentListProps> = ({
 
                     return (
                       <>
-                        {visibleReplies.map((reply) => (
+                        {visibleReplies.map((reply: Comment) => (
                           <CommentItem
                             key={reply._id}
                             comment={reply}
+                            documentId={documentId}
                             isReply={true}
                           />
                         ))}

@@ -1,6 +1,11 @@
 import React, { useState, useEffect } from "react";
-import { useParams, useNavigate, useSearchParams } from "react-router-dom";
-import { message, Spin } from "antd";
+import {
+  useParams,
+  useNavigate,
+  useSearchParams,
+  useLocation,
+} from "react-router-dom";
+import { message, Spin, Alert } from "antd";
 import DocumentReview from "../../../components/admin/document/DocumentReview";
 import { DocumentService } from "../../../utils/DocumentService";
 import type { Document } from "../../../models/document";
@@ -9,10 +14,19 @@ import { AdminBreadcrumb } from "../../../components/admin/common/AdminBreadcrum
 const DocumentReviewPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const location = useLocation();
   const [searchParams] = useSearchParams();
   const requestId = searchParams.get("requestId");
   const [document, setDocument] = useState<Document | null>(null);
   const [loading, setLoading] = useState(true);
+
+  // Get duplicate document info from navigation state
+  const duplicateDocument = location.state?.duplicateDocument as
+    | {
+        duplicateId: string;
+        duplicateTitle: string;
+      }
+    | undefined;
 
   useEffect(() => {
     const fetchDocument = async () => {
@@ -144,8 +158,33 @@ const DocumentReviewPage: React.FC = () => {
   ];
 
   return (
-    <div className="max-w-7xl mx-auto p-6">
+    <div className="max-w-7xl text-left mx-auto p-6">
       <AdminBreadcrumb items={breadcrumbItems} />
+
+      {/* Show duplicate document alert if came from compare page */}
+      {duplicateDocument && (
+        <Alert
+          message="Phát hiện tài liệu trùng lặp"
+          description={
+            <div>
+              <p className="mb-2">
+                <strong>Tài liệu trùng lặp:</strong>{" "}
+                {duplicateDocument.duplicateTitle}
+              </p>
+              <p className="text-sm text-gray-600">
+                <strong>ID:</strong> {duplicateDocument.duplicateId}
+              </p>
+              <p className="text-sm text-orange-600 mt-2">
+                Vui lòng xem xét và xử lý tài liệu này do có nội dung trùng lặp.
+              </p>
+            </div>
+          }
+          type="warning"
+          showIcon
+          className="mb-4"
+          closable
+        />
+      )}
 
       <DocumentReview
         document={document}

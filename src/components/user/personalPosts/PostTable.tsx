@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Table, Dropdown, Modal, message } from "antd";
 import type { ColumnsType } from "antd/es/table";
 import {
@@ -14,7 +14,6 @@ import { useNavigate } from "react-router-dom";
 import {
   createStatusTag,
   createPublicModeTag,
-  createRatingDisplay,
   createFileTypeTag,
 } from "../../../locales/translationUtils";
 import {
@@ -24,6 +23,7 @@ import {
 } from "../../../models/document";
 import ShareModal from "../share/ShareModal";
 import { DocumentService } from "../../../utils/DocumentService";
+import { fetchMultipleDocumentRatings } from "../../../utils/CalcRate";
 
 interface Post {
   key: string;
@@ -62,6 +62,29 @@ const PostTable: React.FC<PostTableProps> = ({ data, loading }) => {
   const [pendingMode, setPendingMode] = useState<PublicModeType | null>(null);
   const [selectedPost, setSelectedPost] = useState<Post | null>(null);
   const [updatedData, setUpdatedData] = useState<Post[]>(data);
+  const [postRatings, setPostRatings] = useState<
+    Map<string, { ratingPercentage: number; formattedRating: string }>
+  >(new Map());
+
+  // Fetch ratings khi data thay đổi
+  useEffect(() => {
+    const fetchRatings = async () => {
+      if (data && data.length > 0) {
+        const documentIds = data.map((post) => post._id || post.key);
+        try {
+          const ratingsMap = await fetchMultipleDocumentRatings(documentIds);
+          setPostRatings(ratingsMap);
+        } catch (error) {
+          console.error("Error fetching post ratings:", error);
+          setPostRatings(new Map());
+        }
+      } else {
+        setPostRatings(new Map());
+      }
+    };
+
+    fetchRatings();
+  }, [data]);
 
   // Get icon for public mode
   const getPublicModeIcon = (mode: string) => {
@@ -291,7 +314,32 @@ const PostTable: React.FC<PostTableProps> = ({ data, loading }) => {
       key: "rating",
       align: "center",
       width: 100,
-      render: (rating: string) => createRatingDisplay(rating),
+      render: (_, record: Post) => {
+        const documentId = record._id || record.key;
+        const rating = postRatings.get(documentId);
+
+        if (!rating) {
+          return <span className="text-gray-400">-</span>;
+        }
+
+        const percentage = rating.ratingPercentage;
+        let colorClass = "text-gray-600";
+
+        if (percentage >= 90) colorClass = "text-green-600 font-semibold";
+        else if (percentage >= 70) colorClass = "text-blue-600 font-medium";
+        else if (percentage >= 50) colorClass = "text-yellow-600";
+        else if (percentage >= 30) colorClass = "text-orange-600";
+        else if (percentage > 0) colorClass = "text-red-600";
+
+        return (
+          <span
+            className={colorClass}
+            title={`${rating.ratingPercentage}% tích cực`}
+          >
+            {rating.formattedRating}
+          </span>
+        );
+      },
     },
 
     {

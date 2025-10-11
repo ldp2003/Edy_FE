@@ -1,19 +1,23 @@
-import React from "react";
+import React, { useState } from "react";
 import { Avatar, Button } from "antd";
 import { UserOutlined } from "@ant-design/icons";
 import type { Comment } from "../../../../models/comment";
+import CommentReportModal from "../../report/CommentReportModal";
 
 interface CommentItemProps {
   comment: Comment;
+  documentId: string;
   onReply?: (commentId: string) => void;
   isReply?: boolean;
 }
 
 const CommentItem: React.FC<CommentItemProps> = ({
   comment,
+  documentId,
   onReply,
   isReply = false,
 }) => {
+  const [showReportModal, setShowReportModal] = useState(false);
   const formatTimeAgo = (dateString: string) => {
     const date = new Date(dateString);
     const now = new Date();
@@ -72,9 +76,7 @@ const CommentItem: React.FC<CommentItemProps> = ({
               </svg>
             }
             title="Báo cáo bình luận"
-            onClick={() => {
-              /* TODO: handle report */
-            }}
+            onClick={() => setShowReportModal(true)}
           />
         </div>
 
@@ -95,6 +97,16 @@ const CommentItem: React.FC<CommentItemProps> = ({
           </Button>
         )}
       </div>
+
+      {/* Comment Report Modal */}
+      <CommentReportModal
+        visible={showReportModal}
+        onClose={() => setShowReportModal(false)}
+        documentId={documentId}
+        commentId={comment._id}
+        commentContent={comment.content}
+        commentAuthor={`${comment.user.first_name} ${comment.user.last_name}`}
+      />
     </div>
   );
 };

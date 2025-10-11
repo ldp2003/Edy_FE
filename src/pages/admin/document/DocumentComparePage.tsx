@@ -79,7 +79,7 @@ const DocumentComparePage: React.FC = () => {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <Button
-                type="text"
+                type="primary"
                 icon={<ArrowLeftOutlined />}
                 onClick={handleBackToReview}
                 className="flex items-center"
@@ -91,6 +91,24 @@ const DocumentComparePage: React.FC = () => {
                 So sánh tài liệu trùng lặp
               </h1>
             </div>
+
+            {/* Confirm Duplicate Button */}
+            {compareDocument && (
+              <button
+                onClick={() => {
+                  const duplicateInfo = {
+                    duplicateId: compareDocument._id,
+                    duplicateTitle: compareDocument.title,
+                  };
+                  navigate(`/admin/documents/review/${id}`, {
+                    state: { duplicateDocument: duplicateInfo },
+                  });
+                }}
+                className="text-xs bg-orange-500 hover:bg-orange-600 text-white font-medium px-2 py-1 rounded-md shadow-sm transition-all duration-200 hover:shadow-md border border-orange-500 hover:border-orange-600 cursor-pointer focus:outline-none focus:ring-2 focus:ring-orange-300 active:scale-95"
+              >
+                Xác nhận trùng lặp
+              </button>
+            )}
           </div>
         </div>
       </div>

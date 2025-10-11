@@ -1,101 +1,27 @@
-import React, { useState, useCallback, useEffect, useContext } from "react";
-import { useParams, useNavigate } from "react-router-dom";
-import { message } from "antd";
-import { UserContext } from "../../../contexts/UserContext";
+import React, { useState, useCallback, useEffect } from "react";
+import { useParams } from "react-router-dom";
 import DocumentSide from "../../../components/user/document/documentDetail/DocumentSide";
 import DocumentActions from "../../../components/user/document/documentDetail/DocumentActions";
 import AuthorInfo from "../../../components/common/userInfo/AuthorInfo";
 import DocumentViewer from "../../../components/user/document/documentView/DocumentViewer";
 import DocumentPagination from "../../../components/user/document/documentView/DocumentPagination";
-import DocumentAccessError from "../../../components/common/error/DocumentAccessError";
 import { DocumentService } from "../../../utils/DocumentService";
 import type { Document } from "../../../models/document";
 
 const DocumentDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
-  const navigate = useNavigate();
-  const { user } = useContext(UserContext);
   const [document, setDocument] = useState<Document | null>(null);
   const [loading, setLoading] = useState(true);
-  const [accessError, setAccessError] = useState<{
-    type: "private" | "restricted" | "not-found" | "unauthorized";
-    message?: string;
-  } | null>(null);
-  const [messageApi, contextHolder] = message.useMessage();
 
   // State for pagination
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(0);
   const [zoom, setZoom] = useState(1.5);
 
-  // Function to check document access permission
-  const checkDocumentAccess = useCallback(
-    (doc: Document, currentUser: typeof user) => {
-      // Kiểm tra xem tài liệu có bị xóa không
-      if (doc.is_deleted) {
-        return {
-          hasAccess: false,
-          type: "not-found" as const,
-          message: "Tài liệu đã bị xóa.",
-        };
-      }
-
-      // Kiểm tra public mode
-      switch (doc.public_mode) {
-        case "PRIVATE":
-          // Chỉ tác giả mới có thể xem
-          if (!currentUser || doc.user._id !== currentUser._id) {
-            return { hasAccess: false, type: "private" as const };
-          }
-          break;
-
-        case "PRIVATE_SHARED":
-          // Tác giả và những người được chia sẻ (tạm thời cho phép truy cập)
-          if (!currentUser || doc.user._id !== currentUser._id) {
-            return { hasAccess: false, type: "restricted" as const };
-          }
-          break;
-
-        case "SHARE_ORGANIZATION":
-          // Chỉ những người trong cùng tổ chức
-          if (
-            !currentUser ||
-            (doc.user._id !== currentUser._id &&
-              (!currentUser.organization ||
-                (typeof doc.user.organization === "object"
-                  ? doc.user.organization._id
-                  : doc.user.organization) !==
-                  (typeof currentUser.organization === "object"
-                    ? currentUser.organization._id
-                    : currentUser.organization)))
-          ) {
-            return {
-              hasAccess: false,
-              type: "restricted" as const,
-              message: "Tài liệu chỉ dành cho thành viên trong tổ chức.",
-            };
-          }
-          break;
-
-        case "PUBLIC":
-        default:
-          // Công khai - ai cũng có thể xem
-          break;
-      }
-
-      return { hasAccess: true };
-    },
-    []
-  );
-
   // Fetch document data
   useEffect(() => {
     const fetchDocument = async () => {
       if (!id) {
-        setAccessError({
-          type: "not-found",
-          message: "ID tài liệu không hợp lệ!",
-        });
         setLoading(false);
         return;
       }
@@ -103,27 +29,17 @@ const DocumentDetail: React.FC = () => {
       try {
         setLoading(true);
         const documentData = await DocumentService.getDocumentById(id);
-
-        // Kiểm tra xem tài liệu có thuộc về người dùng hiện tại không
-        if (user && documentData.user._id === user._id) {
-          // Nếu là tài liệu của người dùng, chuyển hướng sang PersonalPostDetail
-          navigate(`/personal-posts/document-detail/${id}`, { replace: true });
-          return;
-        }
         setDocument(documentData);
       } catch (error) {
         console.error("Error fetching document:", error);
-        setAccessError({
-          type: "not-found",
-          message: "Không thể tải thông tin tài liệu!",
-        });
+        setDocument(null);
       } finally {
         setLoading(false);
       }
     };
 
     fetchDocument();
-  }, [id, messageApi, user, navigate, checkDocumentAccess]);
+  }, [id]);
 
   // Handle page change from document viewer
   const handlePageChange = useCallback((current: number, total: number) => {
@@ -187,8 +103,8 @@ const DocumentDetail: React.FC = () => {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Đang tải tài liệu...</p>
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="mt-2 text-gray-600">Đang tải tài liệu...</p>
         </div>
       </div>
     );
@@ -196,28 +112,32 @@ const DocumentDetail: React.FC = () => {
 
   if (!document) {
     return (
-      <DocumentAccessError
-        type={accessError?.type}
-        message={accessError?.message}
-      />
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-center">
+          <h2 className="text-xl font-semibold text-gray-800 mb-2">
+            Không tìm thấy tài liệu
+          </h2>
+          <p className="text-gray-600">
+            Tài liệu bạn tìm kiếm không tồn tại hoặc đã bị xóa.
+          </p>
+        </div>
+      </div>
     );
   }
 
   return (
     <div className="h-screen flex overflow-hidden">
-      {contextHolder}
-
       {/* Document Side - cố định bên trái như sidebar */}
-      <DocumentSide document={document} />
+      <DocumentSide document={document!} />
 
       {/* Main content - có thể scroll */}
       <div className="flex-1 overflow-y-auto">
         <div className="p-4">
-          <AuthorInfo document={document} />
-          <DocumentActions document={document} />
+          <AuthorInfo document={document!} />
+          <DocumentActions document={document!} />
           <DocumentViewer
-            url={document.url}
-            type={getViewerFileType(document.file_type)}
+            url={document!.url}
+            type={getViewerFileType(document!.file_type)}
             onPageChange={handlePageChange}
             currentPage={currentPage}
             onPageUpdate={handlePageUpdate}

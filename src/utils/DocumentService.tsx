@@ -344,4 +344,27 @@ export const DocumentService = {
       throw error;
     }
   },
+
+  // Thực hiện phản ứng với tài liệu (like/dislike/unreact)
+  async reactDocument(
+    documentId: string,
+    reaction: "LIKE" | "DISLIKE" | "UNREACT"
+  ) {
+    try {
+      return await DocumentAPI.reactDocument(documentId, reaction);
+    } catch (error) {
+      console.error("Error in DocumentService.reactDocument:", error);
+      throw error;
+    }
+  },
+
+  // Lấy thông tin phản ứng của tài liệu
+  async getDocumentReactions(documentId: string) {
+    try {
+      return await DocumentAPI.getDocumentReactions(documentId);
+    } catch (error) {
+      console.error("Error in DocumentService.getDocumentReactions:", error);
+      throw error;
+    }
+  },
 };
