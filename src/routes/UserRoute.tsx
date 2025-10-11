@@ -22,6 +22,7 @@ import DirectDownload from "../pages/user/download/DirectDownload";
 import ShareAccess from "../pages/user/share/ShareAccess";
 import SearchPage from "../pages/user/search/SearchPage";
 import NotificationListPage from "../pages/user/Notification/NotificationListPage";
+import DocumentRouteWrapper from "../components/common/DocumentRouteGuard";
 
 const UserRoute: React.FC = () => {
   return (
@@ -38,7 +39,14 @@ const UserRoute: React.FC = () => {
           {/* Public pages - accessible by anyone */}
           <Route index element={<HomePage />} />
           <Route path="search" element={<SearchPage />} />
-          <Route path="document-detail/:id" element={<DocumentDetail />} />
+          <Route
+            path="document-detail/:id"
+            element={
+              <DocumentRouteWrapper type="public">
+                <DocumentDetail />
+              </DocumentRouteWrapper>
+            }
+          />
           <Route path="organizations" element={<OrganizationListPage />} />
           <Route path="organization/:id" element={<OrganizationDetailPage />} />
           <Route
@@ -50,7 +58,11 @@ const UserRoute: React.FC = () => {
           <Route path="personal-posts" element={<PersonalPost />} />
           <Route
             path="personal-posts/document-detail/:id"
-            element={<PersonalPostDetail />}
+            element={
+              <DocumentRouteWrapper type="personal">
+                <PersonalPostDetail />
+              </DocumentRouteWrapper>
+            }
           />
           <Route
             path="personal-posts/edit/:id"

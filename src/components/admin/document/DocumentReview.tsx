@@ -224,6 +224,7 @@ const DocumentReview: React.FC<DocumentReviewProps> = ({
             summaryRejectReason={summaryRejectReason}
             processing={processing}
             documentId={document._id}
+            documentStatus={document.status}
             onApprove={onApprove}
             onReject={onReject}
             onDelete={onDelete}

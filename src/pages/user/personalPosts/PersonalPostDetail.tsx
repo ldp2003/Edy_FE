@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useEffect } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { message, Modal } from "antd";
 import PersonalPostHeader from "../../../components/user/personalPosts/PersonalPostHeader";
 import DocumentSide from "../../../components/user/document/documentDetail/DocumentSide";
@@ -12,7 +12,6 @@ import type { Document } from "../../../models/document";
 const PersonalPostDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-
   const [document, setDocument] = useState<Document | null>(null);
   const [loading, setLoading] = useState(true);
   const [messageApi, contextHolder] = message.useMessage();
@@ -22,7 +21,7 @@ const PersonalPostDetail: React.FC = () => {
   const [totalPages, setTotalPages] = useState(0);
   const [zoom, setZoom] = useState(1.5);
 
-  // Fetch document data
+  // Fetch document data - ownership verification is handled at route level
   useEffect(() => {
     const fetchDocument = async () => {
       if (!id) {
@@ -38,13 +37,14 @@ const PersonalPostDetail: React.FC = () => {
       } catch (error) {
         console.error("Error fetching document:", error);
         messageApi.error("Không thể tải thông tin tài liệu!");
+        navigate("/personal-posts", { replace: true });
       } finally {
         setLoading(false);
       }
     };
 
     fetchDocument();
-  }, [id, messageApi]);
+  }, [id, messageApi, navigate]);
 
   // Handle page change from document viewer
   const handlePageChange = useCallback((current: number, total: number) => {
@@ -183,7 +183,20 @@ const PersonalPostDetail: React.FC = () => {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <p className="text-gray-600">Không tìm thấy tài liệu!</p>
+          <div className="text-6xl mb-4">📄</div>
+          <h1 className="text-2xl font-bold text-gray-800 mb-2">
+            Không tìm thấy tài liệu
+          </h1>
+          <p className="text-gray-600 mb-6">
+            Tài liệu bạn đang tìm kiếm không tồn tại hoặc bạn không có quyền
+            truy cập.
+          </p>
+          <button
+            onClick={() => navigate("/personal-posts")}
+            className="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-md transition-colors"
+          >
+            Quay lại danh sách tài liệu
+          </button>
         </div>
       </div>
     );

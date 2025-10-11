@@ -24,6 +24,7 @@ interface DocumentActionButtonsProps {
   summaryRejectReason: string;
   processing: boolean;
   documentId: string;
+  documentStatus?: string; // Thêm status của document
   onApprove: (approvalData: {
     documentRequestId: string;
     summaryRequestId?: string;
@@ -43,6 +44,7 @@ const DocumentActionButtons: React.FC<DocumentActionButtonsProps> = ({
   summaryRejectReason,
   processing,
   documentId,
+  documentStatus,
   onApprove,
   onReject,
   onDelete,
@@ -53,6 +55,12 @@ const DocumentActionButtons: React.FC<DocumentActionButtonsProps> = ({
   const [deleteModalVisible, setDeleteModalVisible] = useState(false);
   const [rejectReason, setRejectReason] = useState("");
   const [deleteReason, setDeleteReason] = useState("");
+
+  // Check document status - sử dụng documentStatus từ props thay vì documentRequest
+  const isPending = documentStatus === "PENDING";
+  const isApproved = documentStatus === "APPROVED";
+  const isRejected = documentStatus === "REJECTED";
+  const isRequestedEdit = documentStatus === "REQUESTED_EDIT";
 
   const handleApprove = async () => {
     if (!documentRequest) {
@@ -161,40 +169,156 @@ const DocumentActionButtons: React.FC<DocumentActionButtonsProps> = ({
       {/* Action buttons */}
       <div className="flex items-center justify-between mt-8 pt-6 border-t border-gray-200">
         <div className="flex gap-3">
-          <Button
-            style={{
-              backgroundColor: "#22c55e",
-              borderColor: "#22c55e",
-              color: "white",
-            }}
-            onClick={handleApprove}
-            loading={processing}
-            disabled={processing}
-          >
-            Duyệt bài
-          </Button>
-          <Button
-            style={{
-              backgroundColor: "#ef4444",
-              borderColor: "#ef4444",
-              color: "white",
-            }}
-            onClick={() => setRejectModalVisible(true)}
-            disabled={processing}
-          >
-            Từ chối
-          </Button>
-          <Button
-            style={{
-              backgroundColor: "#f59e0b",
-              borderColor: "#f59e0b",
-              color: "white",
-            }}
-            onClick={() => setDeleteModalVisible(true)}
-            disabled={processing}
-          >
-            Yêu cầu chỉnh sửa
-          </Button>
+          {/* Status indicators */}
+          {isApproved && (
+            <div className="flex items-center text-xs gap-2 px-2 bg-green-100 border border-green-300 rounded-md">
+              <span className="text-green-700 font-medium">✓ Đã duyệt</span>
+            </div>
+          )}
+          {isRejected && (
+            <div className="flex items-center text-xs gap-2 px-2 bg-red-100 border border-red-300 rounded-md">
+              <span className="text-red-700 font-medium">✗ Đã từ chối</span>
+            </div>
+          )}
+          {isRequestedEdit && (
+            <div className="flex items-center text-xs gap-2 px-2 bg-yellow-100 border border-yellow-300 rounded-md">
+              <span className="text-yellow-700 font-medium">
+                ⚠ Yêu cầu chỉnh sửa
+              </span>
+            </div>
+          )}
+          {isPending && (
+            <div className="flex items-center text-xs gap-2 px-2 bg-blue-100 border border-blue-300 rounded-md">
+              <span className="text-blue-700 font-medium">
+                ⏳ Đang chờ duyệt
+              </span>
+            </div>
+          )}
+
+          {/* Action buttons based on status */}
+          {isPending && (
+            <>
+              <Button
+                style={{
+                  backgroundColor: "#22c55e",
+                  borderColor: "#22c55e",
+                  color: "white",
+                }}
+                onClick={handleApprove}
+                loading={processing}
+                disabled={processing}
+              >
+                Duyệt bài
+              </Button>
+              <Button
+                style={{
+                  backgroundColor: "#ef4444",
+                  borderColor: "#ef4444",
+                  color: "white",
+                }}
+                onClick={() => setRejectModalVisible(true)}
+                disabled={processing}
+              >
+                Từ chối
+              </Button>
+              <Button
+                style={{
+                  backgroundColor: "#f59e0b",
+                  borderColor: "#f59e0b",
+                  color: "white",
+                }}
+                onClick={() => setDeleteModalVisible(true)}
+                disabled={processing}
+              >
+                Yêu cầu chỉnh sửa
+              </Button>
+            </>
+          )}
+
+          {isApproved && (
+            <>
+              <Button
+                style={{
+                  backgroundColor: "#f59e0b",
+                  borderColor: "#f59e0b",
+                  color: "white",
+                }}
+                onClick={() => setDeleteModalVisible(true)}
+                disabled={processing}
+              >
+                Xóa bài
+              </Button>
+            </>
+          )}
+
+          {isRejected && (
+            <>
+              <Button
+                style={{
+                  backgroundColor: "#22c55e",
+                  borderColor: "#22c55e",
+                  color: "white",
+                }}
+                onClick={handleApprove}
+                loading={processing}
+                disabled={processing}
+              >
+                Duyệt lại
+              </Button>
+              <Button
+                style={{
+                  backgroundColor: "#f59e0b",
+                  borderColor: "#f59e0b",
+                  color: "white",
+                }}
+                onClick={() => setDeleteModalVisible(true)}
+                disabled={processing}
+              >
+                Xóa bài
+              </Button>
+            </>
+          )}
+
+          {isRequestedEdit && (
+            <>
+              <Button
+                style={{
+                  backgroundColor: "#22c55e",
+                  borderColor: "#22c55e",
+                  color: "white",
+                }}
+                onClick={handleApprove}
+                loading={processing}
+                disabled={processing}
+              >
+                Duyệt bài
+              </Button>
+              <Button
+                style={{
+                  backgroundColor: "#ef4444",
+                  borderColor: "#ef4444",
+                  color: "white",
+                }}
+                onClick={() => setRejectModalVisible(true)}
+                disabled={processing}
+              >
+                Từ chối
+              </Button>
+              <Button
+                style={{
+                  backgroundColor: "#f59e0b",
+                  borderColor: "#f59e0b",
+                  color: "white",
+                }}
+                onClick={() => setDeleteModalVisible(true)}
+                disabled={processing}
+              >
+                Xóa bài
+              </Button>
+            </>
+          )}
+
+          {/* Button "Xem trùng" luôn hiển thị */}
           <Button
             style={{
               backgroundColor: "#8b5cf6",
