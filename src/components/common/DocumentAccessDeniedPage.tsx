@@ -15,7 +15,7 @@ const DocumentAccessDeniedPage: React.FC<DocumentAccessDeniedPageProps> = ({
   const getErrorContent = () => {
     // Đơn giản hóa thành thông báo chung
     return {
-      icon: "�",
+      icon: "🚫",
       title: "Tài liệu không khả dụng",
       description: message || "Tài liệu này hiện không thể truy cập được.",
       actionText: "Quay lại trang chủ",
