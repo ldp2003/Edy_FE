@@ -1,6 +1,6 @@
 import type { Document } from "../models/document";
 import type { User } from "../models/user";
-import { DocumentStatus } from "../models/document";
+import { DocumentStatus, PublicMode } from "../models/document";
 
 interface DocumentAccessError {
   type:
@@ -52,33 +52,35 @@ export const checkDocumentAccess = (
     };
   } // Kiểm tra public mode
   switch (doc.public_mode) {
-    case "PRIVATE":
+    case PublicMode.PRIVATE:
       // Chỉ tác giả mới có thể xem
       if (!currentUser || doc.user._id !== currentUser._id) {
         return {
           hasAccess: false,
           error: {
             type: "private",
-            message: "Tài liệu này chỉ dành cho tác giả.",
+            message: "Tài liệu này là riêng tư và không thể truy cập.",
           },
         };
       }
       break;
 
-    case "PRIVATE_SHARED":
-      // Tác giả và những người được chia sẻ (tạm thời cho phép truy cập)
-      if (!currentUser || doc.user._id !== currentUser._id) {
+    case PublicMode.PRIVATE_SHARED:
+      // Tác giả và những người được chia sẻ - tạm thời cho phép tất cả user đăng nhập truy cập
+      // TODO: Cần thêm logic kiểm tra danh sách người được chia sẻ
+      if (!currentUser) {
         return {
           hasAccess: false,
           error: {
             type: "restricted",
-            message: "Bạn không có quyền truy cập vào tài liệu này.",
+            message: "Bạn cần đăng nhập để xem tài liệu này.",
           },
         };
       }
+      // Cho phép truy cập nếu đã đăng nhập
       break;
 
-    case "SHARE_ORGANIZATION":
+    case PublicMode.SHARE_ORGANIZATION:
       // Chỉ những người trong cùng tổ chức
       if (
         !currentUser ||
@@ -101,7 +103,7 @@ export const checkDocumentAccess = (
       }
       break;
 
-    case "PUBLIC":
+    case PublicMode.PUBLIC:
     default:
       // Công khai - ai cũng có thể xem
       break;
