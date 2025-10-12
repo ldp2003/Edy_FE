@@ -132,7 +132,7 @@ const ShareAccess: React.FC = () => {
       });
 
       // Simulate API call for now
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      await new Promise((resolve) => setTimeout(resolve, 500));
 
       setRequestSent(true);
       setModalVisible(false);
