@@ -23,6 +23,7 @@ import ShareAccess from "../pages/user/share/ShareAccess";
 import SearchPage from "../pages/user/search/SearchPage";
 import NotificationListPage from "../pages/user/Notification/NotificationListPage";
 import DocumentRouteWrapper from "../components/common/DocumentRouteGuard";
+import ReadHistoryPage from "../pages/user/history/ReadHistoryPage";
 
 const UserRoute: React.FC = () => {
   return (
@@ -72,6 +73,7 @@ const UserRoute: React.FC = () => {
           <Route path="upload-document" element={<UploadPage />} />
           <Route path="edit-profile" element={<EditProfile />} />
           <Route path="favorites" element={<FavoritePage />} />
+          <Route path="recent" element={<ReadHistoryPage />} />
           <Route path="notifications" element={<NotificationListPage />} />
 
           {/* 404 Page */}
