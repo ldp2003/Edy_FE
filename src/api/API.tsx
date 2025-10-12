@@ -1094,3 +1094,118 @@ export const NotificationAPI = {
     }
   },
 };
+
+export const RoleAPI = {
+  // Get all roles
+  getAllRoles: async () => {
+    try {
+      const response = await apiClient.get("/admin/roles");
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching roles:", error);
+      throw error;
+    }
+  },
+
+  // Update role status
+  updateRoleStatus: async (roleId: string, isActive: boolean) => {
+    try {
+      const response = await apiClient.patch(`/admin/roles/${roleId}/status`, {
+        is_active: isActive,
+      });
+      return response.data;
+    } catch (error) {
+      console.error("Error updating role status:", error);
+      throw error;
+    }
+  },
+
+  // Create role
+  createRole: async (data: {
+    name: string;
+    description: string;
+    permissions: string[];
+    code: string;
+  }) => {
+    try {
+      const response = await apiClient.post("/admin/roles", data);
+      return response.data;
+    } catch (error) {
+      console.error("Error creating role:", error);
+      throw error;
+    }
+  },
+
+  // Update role
+  updateRole: async (roleId: string, data: {
+    name: string;
+    description: string;
+    permissions: string[];
+  }) => {
+    try {
+      const response = await apiClient.put(`/admin/roles/${roleId}`, data);
+      return response.data;
+    } catch (error) {
+      console.error("Error updating role:", error);
+      throw error;
+    }
+  },
+};
+
+export const AssignmentAPI = {
+  // Get all assignments
+  getAllAssignments: async () => {
+    try {
+      const response = await apiClient.get("/admin/assignments");
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching assignments:", error);
+      throw error;
+    }
+  },
+
+  // Update assignment status
+  updateAssignmentStatus: async (assignmentId: string, isActive: boolean) => {
+    try {
+      const response = await apiClient.patch(`/admin/assignments/${assignmentId}/status`, {
+        is_active: isActive,
+      });
+      return response.data;
+    } catch (error) {
+      console.error("Error updating assignment status:", error);
+      throw error;
+    }
+  },
+
+  // Create assignment
+  createAssignment: async (data: {
+    account_id: string;
+    role_id: string;
+    organization_id: string;
+    subject_id: string;
+  }) => {
+    try {
+      const response = await apiClient.post("/admin/assignments", data);
+      return response.data;
+    } catch (error) {
+      console.error("Error creating assignment:", error);
+      throw error;
+    }
+  },
+
+  // Update assignment
+  updateAssignment: async (assignmentId: string, data: {
+    account: string;
+    role: string;
+    organization: string;
+    subject: string;
+  }) => {
+    try {
+      const response = await apiClient.put(`/admin/assignments/${assignmentId}`, data);
+      return response.data;
+    } catch (error) {
+      console.error("Error updating assignment:", error);
+      throw error;
+    }
+  },
+}

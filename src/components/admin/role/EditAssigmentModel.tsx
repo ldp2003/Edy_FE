@@ -1,0 +1,174 @@
+import React, { useState, useEffect } from "react";
+import { Modal, Form, Select, message } from "antd";
+import { RoleService } from "../../../utils/RoleService";
+import { ROLE_DISPLAY_NAMES } from "../../../constants/RoleConstants";
+import { AssignmentService } from "../../../utils/AssignmentService";
+import { OrganizationService } from "../../../utils/OrganizationService";
+import SubjectService from "../../../utils/SubjectService";
+
+interface EditRoleModalProps {
+  visible: boolean;
+  onCancel: () => void;
+  onSuccess: () => void;
+  assignment: {
+    _id: string;
+    role: {
+      _id: string;
+      name: string;
+    };
+    subject?: {
+      _id: string;
+      name: string;
+    };
+    organization?: {
+      _id: string;
+      name: string;
+    };
+  };
+}
+
+const EditRoleModal: React.FC<EditRoleModalProps> = ({
+  visible,
+  onCancel,
+  onSuccess,
+  assignment,
+}) => {
+  const [form] = Form.useForm();
+  const [roles, setRoles] = useState<any[]>([]);
+  const [subjects, setSubjects] = useState<any[]>([]);
+  const [organizations, setOrganizations] = useState<any[]>([]);
+  const [messageApi, contextHolder] = message.useMessage();
+
+  useEffect(() => {
+    if (visible) {
+      fetchData();
+      form.setFieldsValue({
+        role: assignment.role._id,
+        subject: assignment.subject?._id,
+        organization: assignment.organization?._id,
+      });
+    }
+  }, [visible, assignment]);
+
+  const fetchData = async () => {
+    try {
+      // Fetch roles
+      const rolesResponse = await RoleService.getAllRoles();
+      setRoles(rolesResponse);
+
+      // Fetch subjects
+      // const subjectsResponse = await SubjectService.get();
+      // setSubjects(subjectsResponse);
+
+      // Fetch organizations
+      const orgsResponse = await OrganizationService.getOrganizations();
+      setOrganizations(orgsResponse);
+    } catch (error) {
+      console.error('Error fetching data:', error);
+    }
+  };
+
+  const handleSubmit = async (values: any) => {
+    try {
+      await AssignmentService.updateAssignment(assignment._id, {
+        role: values.role,
+        subject: values.subject,
+        organization: values.organization,
+      });
+      messageApi.success("Cập nhật phân quyền thành công");
+      onSuccess();
+      form.resetFields();
+    } catch (error: any) {
+      console.error('Error updating assignment:', error);
+      messageApi.error(error.response?.data?.message || "Không thể cập nhật phân quyền");
+    }
+  };
+
+  return (
+    <>
+      {contextHolder}
+      <Modal
+        title="Chỉnh sửa phân quyền"
+        open={visible}
+        onCancel={onCancel}
+        onOk={() => form.submit()}
+        okText="Lưu"
+        cancelText="Hủy"
+      >
+        <Form
+          form={form}
+          layout="vertical"
+          onFinish={handleSubmit}
+        >
+          <Form.Item
+            name="role"
+            label="Vai trò"
+            rules={[{ required: true, message: "Vui lòng chọn vai trò" }]}
+          >
+            <Select
+              showSearch
+              placeholder="Chọn vai trò"
+              optionFilterProp="label"
+            >
+              {roles.map(role => (
+                <Select.Option
+                  key={role._id}
+                  value={role._id}
+                  label={ROLE_DISPLAY_NAMES[role.name] || role.name}
+                >
+                  {ROLE_DISPLAY_NAMES[role.name] || role.name}
+                </Select.Option>
+              ))}
+            </Select>
+          </Form.Item>
+
+          {/* <Form.Item
+            name="subject"
+            label="Môn học"
+          >
+            <Select
+              showSearch
+              placeholder="Chọn môn học"
+              optionFilterProp="label"
+              allowClear
+            >
+              {subjects.map(subject => (
+                <Select.Option 
+                  key={subject._id} 
+                  value={subject._id}
+                  label={subject.name}
+                >
+                  {subject.name}
+                </Select.Option>
+              ))}
+            </Select>
+          </Form.Item> */}
+
+          <Form.Item
+            name="organization"
+            label="Tổ chức"
+          >
+            <Select
+              showSearch
+              placeholder="Chọn tổ chức"
+              optionFilterProp="label"
+              allowClear
+            >
+              {organizations.map(org => (
+                <Select.Option
+                  key={org._id}
+                  value={org._id}
+                  label={org.name}
+                >
+                  {org.name}
+                </Select.Option>
+              ))}
+            </Select>
+          </Form.Item>
+        </Form>
+      </Modal>
+    </>
+  );
+};
+
+export default EditRoleModal;
