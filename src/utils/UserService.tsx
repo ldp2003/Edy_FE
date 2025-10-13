@@ -1,4 +1,4 @@
-import { UserAPI, AuthAPI } from "../api/API";
+import { UserAPI } from "../api/API";
 
 export const UserService = {
   async verifyUser(organization: string, field_of_study: string) {
@@ -128,40 +128,6 @@ export const UserService = {
       throw error;
     }
   },
-
-  async getReadHistory() {
-    try {
-      const response = await AuthAPI.getCurrentUser();
-      const readHistory = response.user.read_history || [];
-      return readHistory.filter((item: any) => {
-        const doc = item.document;
-        // Kiểm tra document có được approved không
-        if (doc.status !== "APPROVED") return false;
-
-        // Kiểm tra quyền truy cập dựa trên public_mode
-        if (doc.public_mode === "PUBLIC") return true;
-
-        const currentUser = response.user;
-        
-        // Kiểm tra nếu là SHARE_ORGANIZATION
-        if (doc.public_mode === "SHARE_ORGANIZATION") {
-          return currentUser.organization?._id === doc.organization;
-        }
-
-        // Kiểm tra nếu là PRIVATE_SHARE
-        if (doc.public_mode === "PRIVATE_SHARED") {
-          return currentUser.shared_documents?.some(
-            (shared: any) => shared.document._id === doc._id
-          );
-        }
-
-        return false;
-      });
-    } catch (error) {
-      console.error("Error in UserService.getReadHistory:", error);
-      throw error;
-    }
-  }
 };
 
 // Legacy exports for backward compatibility

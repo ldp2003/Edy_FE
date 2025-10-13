@@ -1,49 +1,21 @@
-import React, { useState, useEffect } from "react";
-import { Table, Input, Avatar, Tag, Card, Space } from "antd";
-import type { ColumnsType } from "antd/es/table";
-import { UserService } from "../../../utils/UserService";
-import { formatDistanceToNow } from "date-fns";
-import { vi } from "date-fns/locale";
+import React, { useState, useContext, useMemo } from "react";
+import { Input, Empty } from "antd";
+import { format, startOfDay } from "date-fns";
 import { useNavigate } from "react-router-dom";
+import {
+  UserContext,
+  type ReadHistoryItem,
+} from "../../../contexts/UserContext";
+import ReadHistoryGroup from "./ReadHistoryGroup";
 
 const { Search } = Input;
 
-interface ReadHistoryItem {
-  document: {
-    _id: string;
-    title: string;
-    cover_page: string;
-    status: string;
-    public_mode: string;
-    organization: string;
-  };
-  read_at: string;
-  _id: string;
-}
-
 const ReadHistoryTable: React.FC = () => {
   const navigate = useNavigate();
-  const [history, setHistory] = useState<ReadHistoryItem[]>([]);
-  const [loading, setLoading] = useState(false);
+  const { readHistory } = useContext(UserContext);
   const [searchText, setSearchText] = useState("");
 
-  const fetchHistory = async () => {
-    try {
-      setLoading(true);
-      const response = await UserService.getReadHistory();
-      setHistory(response);
-    } catch (error) {
-      console.error("Error fetching history:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchHistory();
-  }, []);
-
-  const filteredHistory = history.filter((item) =>
+  const filteredHistory = readHistory.filter((item: ReadHistoryItem) =>
     item.document.title.toLowerCase().includes(searchText.toLowerCase())
   );
 
@@ -51,47 +23,37 @@ const ReadHistoryTable: React.FC = () => {
     navigate(`/document-detail/${documentId}`);
   };
 
-  const columns: ColumnsType<ReadHistoryItem> = [
-    {
-      title: "Tài liệu",
-      key: "document",
-      render: (_, record) => (
-        <Space 
-          className="cursor-pointer" 
-          onClick={() => handleDocumentClick(record.document._id)}
-        >
-          <Avatar
-            shape="square"
-            size={64}
-            src={record.document.cover_page}
-          />
-          <div>
-            <div className="font-medium hover:text-blue-600">
-              {record.document.title}
-            </div>
-          </div>
-        </Space>
+  // Group history by date
+  const groupedHistory = useMemo(() => {
+    const groups: { [key: string]: ReadHistoryItem[] } = {};
+
+    filteredHistory.forEach((item) => {
+      const date = format(startOfDay(new Date(item.read_at)), "yyyy-MM-dd");
+      if (!groups[date]) {
+        groups[date] = [];
+      }
+      groups[date].push(item);
+    });
+
+    // Sort dates in descending order
+    const sortedDates = Object.keys(groups).sort(
+      (a, b) => new Date(b).getTime() - new Date(a).getTime()
+    );
+
+    return sortedDates.map((date) => ({
+      date,
+      items: groups[date].sort(
+        (a, b) => new Date(b.read_at).getTime() - new Date(a.read_at).getTime()
       ),
-    },
-    {
-      title: "Thời gian xem",
-      key: "read_at",
-      width: 200,
-      render: (_, record) => (
-        <span>
-          {formatDistanceToNow(new Date(record.read_at), {
-            addSuffix: true,
-            locale: vi,
-          })}
-        </span>
-      ),
-    },
-  ];
+    }));
+  }, [filteredHistory]);
 
   return (
     <div className="space-y-4">
       <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-bold">Lịch sử xem</h1>
+        <h1 className="text-base font-bold text-[var(--primary-text-color)]">
+          Lịch sử xem
+        </h1>
         <Search
           placeholder="Tìm kiếm theo tiêu đề"
           allowClear
@@ -101,15 +63,23 @@ const ReadHistoryTable: React.FC = () => {
         />
       </div>
 
-      <Card>
-        <Table
-          columns={columns}
-          dataSource={filteredHistory}
-          rowKey={(record) => record._id}
-          loading={loading}
-          pagination={false}
+      {groupedHistory.length === 0 ? (
+        <Empty
+          description="Chưa có lịch sử xem tài liệu nào"
+          className="py-8"
         />
-      </Card>
+      ) : (
+        <div className="space-y-4">
+          {groupedHistory.map((group) => (
+            <ReadHistoryGroup
+              key={group.date}
+              date={group.date}
+              items={group.items}
+              onItemClick={handleDocumentClick}
+            />
+          ))}
+        </div>
+      )}
     </div>
   );
 };

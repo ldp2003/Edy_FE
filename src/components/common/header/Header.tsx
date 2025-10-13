@@ -43,7 +43,7 @@ export function Header() {
   }, [isLoggedIn, refreshNotifications]);
 
   return (
-    <header className="bg-white border-b border-gray-200 px-6 py-2 w-full flex-shrink-0 shadow-sm">
+    <header className="bg-white border-b border-gray-200 px-6 py-2 w-full flex-shrink-0 shadow-sm text-sm">
       <div className="flex items-center justify-between">
         {/* Logo */}
         <div
@@ -135,6 +135,8 @@ export function Header() {
                 count={unreadCount > 9 ? "9+" : unreadCount}
                 overflowCount={9}
                 style={{ backgroundColor: "#ff4d4f" }}
+                offset={[-4, 8]}
+                size="small"
               >
                 <NotificationDropdown
                   notifications={notifications}

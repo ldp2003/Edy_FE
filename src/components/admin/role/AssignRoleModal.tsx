@@ -1,11 +1,11 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useState, useEffect } from "react";
-import { Modal, Form, Select, Avatar, Space } from "antd";
+import { Modal, Form, Select, Avatar } from "antd";
 import { RoleService } from "../../../utils/RoleService";
 import { ROLE_DISPLAY_NAMES } from "../../../constants/RoleConstants";
 import { AssignmentService } from "../../../utils/AssignmentService";
 import { UserService } from "../../../utils/UserService";
 import { OrganizationService } from "../../../utils/OrganizationService";
-import SubjectService from "../../../utils/SubjectService";
 import { message } from "antd";
 
 interface AssignRoleModalProps {
@@ -30,7 +30,6 @@ const AssignRoleModal: React.FC<AssignRoleModalProps> = ({
   const [form] = Form.useForm();
   const [roles, setRoles] = useState<any[]>([]);
   const [users, setUsers] = useState<any[]>([]);
-  const [subjects, setSubjects] = useState<any[]>([]);
   const [organizations, setOrganizations] = useState<any[]>([]);
   const [messageApi, contextHolder] = message.useMessage();
 

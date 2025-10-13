@@ -2,6 +2,15 @@ import React, { useState, useContext } from "react";
 import { Menu, message, Modal } from "antd";
 import { logout } from "../../../utils/AuthService";
 import { UserContext } from "../../../contexts/UserContext";
+import {
+  User,
+  Upload,
+  Edit,
+  History,
+  BarChart2,
+  LogOut,
+  Settings,
+} from "lucide-react";
 
 const UserDropdown: React.FC = () => {
   const [messageApi, contextHolder] = message.useMessage();
@@ -55,42 +64,73 @@ const UserDropdown: React.FC = () => {
       items={[
         {
           key: "profile",
-          label: "Trang cá nhân",
-          icon: <i className="icon-user" />,
+          label: (
+            <div className="flex justify-between items-center gap-4">
+              <span>Trang cá nhân</span>
+              <User size={16} />
+            </div>
+          ),
         },
         {
           key: "upload",
-          label: "Đăng tải",
-          icon: <i className="icon-upload" />,
+          label: (
+            <div className="flex justify-between items-center gap-4">
+              <span>Đăng tải</span>
+              <Upload size={16} />
+            </div>
+          ),
         },
         {
           key: "edit",
-          label: "Chỉnh sửa thông tin",
-          icon: <i className="icon-edit" />,
+          label: (
+            <div className="flex justify-between items-center gap-4">
+              <span>Chỉnh sửa thông tin</span>
+              <Edit size={16} />
+            </div>
+          ),
         },
         {
           key: "history",
-          label: "Lịch sử tích điểm",
-          icon: <i className="icon-history" />,
+          label: (
+            <div className="flex justify-between items-center gap-4">
+              <span>Lịch sử tích điểm</span>
+              <History size={16} />
+            </div>
+          ),
         },
-        { key: "stats", label: "Thống kê", icon: <i className="icon-stats" /> },
+        {
+          key: "stats",
+          label: (
+            <div className="flex justify-between items-center gap-4">
+              <span>Thống kê</span>
+              <BarChart2 size={16} />
+            </div>
+          ),
+        },
         {
           type: "divider",
         },
-        // Only show admin switch if user is admin
         ...(account?.is_admin
           ? [
               {
                 key: "switch-to-admin",
-                label: "Chuyển sang trang quản trị",
-                icon: <i className="icon-admin" />,
+                label: (
+                  <div className="flex justify-between items-center gap-4">
+                    <span>Chuyển sang trang quản trị</span>
+                    <Settings size={16} />
+                  </div>
+                ),
               },
             ]
           : []),
         {
           key: "logout",
-          label: "Đăng xuất",
-          icon: <i className="icon-logout" />,
+          label: (
+            <div className="flex justify-between items-center gap-4">
+              <span>Đăng xuất</span>
+              <LogOut size={16} />
+            </div>
+          ),
         },
       ]}
     />

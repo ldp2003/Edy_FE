@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Menu, message, Modal } from "antd";
 import { logout } from "../../../utils/AuthService";
+import { LogOut } from "lucide-react";
 
 const AccountDropdown: React.FC = () => {
   const [messageApi, contextHolder] = message.useMessage();
@@ -33,8 +34,12 @@ const AccountDropdown: React.FC = () => {
       items={[
         {
           key: "logout",
-          label: "Đăng xuất",
-          icon: <i className="icon-logout" />,
+          label: (
+            <div className="flex justify-between items-center gap-4">
+              <span>Đăng xuất</span>
+              <LogOut size={16} />
+            </div>
+          ),
         },
       ]}
     />
