@@ -362,7 +362,7 @@ const InformationForm = ({
   const isSubmitDisabled = !fileInfo || isUploading || submitting;
 
   return (
-    <div className="py-6 min-h-screen text-left">
+    <div className="py-6 min-h-screen text-left bg-white p-4 rounded-lg border border-[var(--border-color)] my-6">
       <div className="font-bold text-base mb-6 text-[var(--primary-text-color)]">
         Nhập thông tin
         {isUploading && (

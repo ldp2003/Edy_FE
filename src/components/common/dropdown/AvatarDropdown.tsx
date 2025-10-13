@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Menu, Modal, message } from "antd";
+import { LogIn, UserPlus } from "lucide-react";
 import LoginForm from "../entry/LoginForm";
 import RegisterForm from "../entry/RegisterForm";
 
@@ -38,8 +39,18 @@ const AvatarDropdown: React.FC = () => {
 
   const menu = (
     <Menu onClick={handleMenuClick}>
-      <Menu.Item key="login">Đăng nhập</Menu.Item>
-      <Menu.Item key="register">Đăng ký</Menu.Item>
+      <Menu.Item key="login" icon={null}>
+        <div className="flex justify-between items-center gap-4">
+          <span>Đăng nhập</span>
+          <LogIn size={16} />
+        </div>
+      </Menu.Item>
+      <Menu.Item key="register" icon={null}>
+        <div className="flex justify-between items-center gap-4">
+          <span>Đăng ký</span>
+          <UserPlus size={16} />
+        </div>
+      </Menu.Item>
     </Menu>
   );
 

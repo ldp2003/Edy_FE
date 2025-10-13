@@ -13,7 +13,7 @@ export function NavigationMenu({ isCompact }: NavigationMenuProps) {
     { icon: FileText, label: "Bài đăng của tôi", path: "/personal-posts" },
     { icon: Heart, label: "Yêu thích", path: "/favorites" },
     { icon: Users, label: "Danh sách theo dõi", path: "/following" },
-    { icon: Clock, label: "Đã xem gần đây", path: "/recent" },
+    { icon: Clock, label: "Đã xem gần đây", path: "/history" },
   ];
 
   return (

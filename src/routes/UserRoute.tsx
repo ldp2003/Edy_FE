@@ -73,7 +73,7 @@ const UserRoute: React.FC = () => {
           <Route path="upload-document" element={<UploadPage />} />
           <Route path="edit-profile" element={<EditProfile />} />
           <Route path="favorites" element={<FavoritePage />} />
-          <Route path="recent" element={<ReadHistoryPage />} />
+          <Route path="history" element={<ReadHistoryPage />} />
           <Route path="notifications" element={<NotificationListPage />} />
 
           {/* 404 Page */}
