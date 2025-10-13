@@ -9,6 +9,7 @@ import type { RoleCode } from "../models/role";
 import { getIsAdminMode } from "../utils/CookieUtils";
 import { UserService } from "../utils/UserService";
 import type { Document } from "../models/document";
+import type { ReadHistoryItem } from "../contexts/UserContext";
 
 const AuthRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const navigate = useNavigate();
@@ -20,6 +21,7 @@ const AuthRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [isInitialLoad, setIsInitialLoad] = useState(true);
   const [favoriteDocuments, setFavoriteDocuments] = useState<Document[]>([]);
+  const [readHistory, setReadHistory] = useState<ReadHistoryItem[]>([]);
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -63,6 +65,11 @@ const AuthRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
           setRole(data.roles); // User role
           setAccount(data.account); // Account data
           setFavoriteDocuments(favoriteDocuments);
+
+          // Extract read history from user data
+          const userReadHistory: ReadHistoryItem[] =
+            data.user?.read_history || [];
+          setReadHistory(userReadHistory);
 
           // Debug user verification status
           console.log("🔍 Checking verification status:");
@@ -127,6 +134,7 @@ const AuthRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
           setAccount(null);
           setRole(null);
           setFavoriteDocuments([]);
+          setReadHistory([]);
 
           // Allow access to public pages without redirecting
           const publicPages = ["/", "/document-detail", "/search"];
@@ -247,6 +255,8 @@ const AuthRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
       role={role}
       favoriteDocuments={favoriteDocuments}
       setFavoriteDocuments={setFavoriteDocuments}
+      readHistory={readHistory}
+      setReadHistory={setReadHistory}
     >
       {children}
     </UserProvider>
