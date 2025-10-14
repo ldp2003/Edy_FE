@@ -15,7 +15,7 @@ export default function HomePage() {
   const [subjects, setSubjects] = useState<Subject[]>([]);
   const [loading, setLoading] = useState(true);
   const [messageApi, contextHolder] = message.useMessage();
-  const { user } = useContext(UserContext);
+  const { user, readHistory } = useContext(UserContext);
 
   useEffect(() => {
     const fetchDocuments = async () => {
@@ -100,6 +100,13 @@ export default function HomePage() {
             subjects={subjects}
             onSubjectClick={handleSubjectClick}
           />
+          {readHistory && readHistory.length > 0 && (
+            // hiện tối đa 5 tài liệu gần đây
+            <DocumentGrid
+              title="Đã xem gần đây"
+              documents={readHistory.slice(0, 5).map((item) => item.document)}
+            />
+          )}
           <DocumentGrid
             title="Tài liệu nổi bật"
             documents={featuredDocuments}

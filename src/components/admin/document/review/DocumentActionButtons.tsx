@@ -95,7 +95,7 @@ const DocumentActionButtons: React.FC<DocumentActionButtonsProps> = ({
       await NotificationService.createNotification({
         userId: documentRequest.requester,
         type: "SYSTEM",
-        message: `Tài liệu của bạn đã được duyệt: ${documentRequest.doc}`,
+        message: `Quản trị viên đã duyệt tài liệu của bạn.`,
         docId: documentRequest.doc,
       });
     } catch (error) {
@@ -125,7 +125,7 @@ const DocumentActionButtons: React.FC<DocumentActionButtonsProps> = ({
       await NotificationService.createNotification({
         userId: documentRequest.requester,
         type: "SYSTEM",
-        message: `Tài liệu của bạn đã bị từ chối: ${documentRequest.doc}. Lý do: ${rejectReason}`,
+        message: `Quản trị viên đã từ chối tài liệu của bạn. Lý do: ${rejectReason}`,
         docId: documentRequest.doc,
       });
     } catch (error) {
@@ -150,7 +150,7 @@ const DocumentActionButtons: React.FC<DocumentActionButtonsProps> = ({
       await NotificationService.createNotification({
         userId: documentRequest?.requester || "",
         type: "SYSTEM",
-        message: `Tài liệu của bạn đã bị xóa: ${documentRequest?.doc}. Lý do: ${deleteReason}`,
+        message: `Quản trị viên đã xóa tài liệu của bạn. Lý do: ${deleteReason}`,
         docId: documentRequest?.doc,
       });
     } catch (error) {

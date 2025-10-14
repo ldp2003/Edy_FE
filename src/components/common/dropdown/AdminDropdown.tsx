@@ -1,6 +1,14 @@
 import React, { useState } from "react";
 import { Menu, message, Modal } from "antd";
 import { logout } from "../../../utils/AuthService";
+import {
+  FileText,
+  Users,
+  Book,
+  Building,
+  LogOut,
+  LayoutDashboard,
+} from "lucide-react";
 
 const AdminDropdown: React.FC = () => {
   const [messageApi, contextHolder] = message.useMessage();
@@ -55,36 +63,60 @@ const AdminDropdown: React.FC = () => {
       items={[
         {
           key: "dashboard",
-          label: "Trang quản trị",
-          icon: <i className="icon-dashboard" />,
+          label: (
+            <div className="flex justify-between items-center gap-4">
+              <span>Trang quản trị</span>
+              <LayoutDashboard size={16} />
+            </div>
+          ),
         },
         {
           key: "documents",
-          label: "Quản lý tài liệu",
-          icon: <i className="icon-document" />,
+          label: (
+            <div className="flex justify-between items-center gap-4">
+              <span>Quản lý tài liệu</span>
+              <FileText size={16} />
+            </div>
+          ),
         },
         {
           key: "users",
-          label: "Quản lý người dùng",
-          icon: <i className="icon-users" />,
+          label: (
+            <div className="flex justify-between items-center gap-4">
+              <span>Quản lý người dùng</span>
+              <Users size={16} />
+            </div>
+          ),
         },
         {
           key: "subjects",
-          label: "Quản lý môn học",
-          icon: <i className="icon-subjects" />,
+          label: (
+            <div className="flex justify-between items-center gap-4">
+              <span>Quản lý môn học</span>
+              <Book size={16} />
+            </div>
+          ),
         },
         {
           key: "organizations",
-          label: "Quản lý tổ chức",
-          icon: <i className="icon-organization" />,
+          label: (
+            <div className="flex justify-between items-center gap-4">
+              <span>Quản lý tổ chức</span>
+              <Building size={16} />
+            </div>
+          ),
         },
         {
           type: "divider",
         },
         {
           key: "logout",
-          label: "Đăng xuất",
-          icon: <i className="icon-logout" />,
+          label: (
+            <div className="flex justify-between items-center gap-4">
+              <span>Đăng xuất</span>
+              <LogOut size={16} />
+            </div>
+          ),
         },
       ]}
     />

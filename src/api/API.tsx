@@ -264,6 +264,16 @@ export const SubjectAPI = {
       throw error;
     }
   },
+  //Search Subject
+  // http://localhost:3000/api/subjects/search?keyword=To%C3%A1n
+  searchSubjects: async (keyword: string) => {
+    try {
+      return await apiClient.get("/subjects/search", { params: { keyword } });
+    } catch (error) {
+      console.error("Error searching subjects:", error);
+      throw error;
+    }
+  },
 
   // Get subject by ID
   getSubjectById: async (subjectId: string) => {
@@ -1137,11 +1147,14 @@ export const RoleAPI = {
   },
 
   // Update role
-  updateRole: async (roleId: string, data: {
-    name: string;
-    description: string;
-    permissions: string[];
-  }) => {
+  updateRole: async (
+    roleId: string,
+    data: {
+      name: string;
+      description: string;
+      permissions: string[];
+    }
+  ) => {
     try {
       const response = await apiClient.put(`/admin/roles/${roleId}`, data);
       return response.data;
@@ -1167,9 +1180,12 @@ export const AssignmentAPI = {
   // Update assignment status
   updateAssignmentStatus: async (assignmentId: string, isActive: boolean) => {
     try {
-      const response = await apiClient.patch(`/admin/assignments/${assignmentId}/status`, {
-        is_active: isActive,
-      });
+      const response = await apiClient.patch(
+        `/admin/assignments/${assignmentId}/status`,
+        {
+          is_active: isActive,
+        }
+      );
       return response.data;
     } catch (error) {
       console.error("Error updating assignment status:", error);
@@ -1194,18 +1210,24 @@ export const AssignmentAPI = {
   },
 
   // Update assignment
-  updateAssignment: async (assignmentId: string, data: {
-    account: string;
-    role: string;
-    organization: string;
-    subject: string;
-  }) => {
+  updateAssignment: async (
+    assignmentId: string,
+    data: {
+      account: string;
+      role: string;
+      organization: string;
+      subject: string;
+    }
+  ) => {
     try {
-      const response = await apiClient.put(`/admin/assignments/${assignmentId}`, data);
+      const response = await apiClient.put(
+        `/admin/assignments/${assignmentId}`,
+        data
+      );
       return response.data;
     } catch (error) {
       console.error("Error updating assignment:", error);
       throw error;
     }
   },
-}
+};
