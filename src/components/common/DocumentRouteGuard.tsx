@@ -91,7 +91,8 @@ const DocumentRouteWrapper: React.FC<DocumentRouteWrapperProps> = ({
     };
 
     checkAndRoute();
-  }, [id, user, navigate, type]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [id, user?._id, type]);
 
   if (!shouldRender) {
     return (
