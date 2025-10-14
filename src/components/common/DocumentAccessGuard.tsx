@@ -43,7 +43,8 @@ const DocumentAccessGuard: React.FC<DocumentAccessGuardProps> = ({
         setAccessError(null);
       }
     }
-  }, [document, user, loading, onAccessError]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [document?._id, user?._id, loading]);
 
   if (loading) {
     return (

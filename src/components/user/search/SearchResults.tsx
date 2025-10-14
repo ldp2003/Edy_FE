@@ -13,6 +13,7 @@ const { Option } = Select;
 
 interface SearchResultsProps {
   documents: Document[];
+  subjects?: Subject[]; // Optional, only needed if displaying subjects
   loading: boolean;
   total: number;
   currentPage: number;
@@ -27,6 +28,7 @@ interface SearchResultsProps {
 
 const SearchResults: React.FC<SearchResultsProps> = ({
   documents,
+  subjects,
   loading,
   total,
   currentPage,
@@ -67,141 +69,7 @@ const SearchResults: React.FC<SearchResultsProps> = ({
     const order = orderStr === "desc" ? -1 : 1;
     onSortChange(ordering, order);
   };
-  // Mock data for subjects - replace with actual API call
-  const mockSubjects: Subject[] = [
-    {
-      _id: "1",
-      name: "Kinh tế chính trị Mác Lênin",
-      code: "KTCT101",
-      organization: {
-        _id: "org1",
-        name: "Trường Đại học Công nghiệp Thành phố Hồ Chí Minh",
-      },
-      created_by: {
-        _id: "user1",
-        first_name: "Admin",
-        last_name: "User",
-        contact_email: "admin@iuh.edu.vn",
-        organization: "org1",
-        shared_documents: [],
-      },
-      is_checked: true,
-      is_deleted: false,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-      doc_count: 25,
-    },
-    {
-      _id: "2",
-      name: "Triết học Mác Lênin",
-      code: "TH101",
-      organization: {
-        _id: "org1",
-        name: "Trường Đại học Công nghiệp Thành phố Hồ Chí Minh",
-      },
-      created_by: {
-        _id: "user1",
-        first_name: "Admin",
-        last_name: "User",
-        contact_email: "admin@iuh.edu.vn",
-        organization: "org1",
-        shared_documents: [],
-      },
-      is_checked: true,
-      is_deleted: false,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-      doc_count: 18,
-    },
-    {
-      _id: "3",
-      name: "Lịch sử Đảng Cộng sản Việt Nam",
-      code: "LS101",
-      organization: {
-        _id: "org1",
-        name: "Trường Đại học Công nghiệp Thành phố Hồ Chí Minh",
-      },
-      created_by: {
-        _id: "user1",
-        first_name: "Admin",
-        last_name: "User",
-        contact_email: "admin@iuh.edu.vn",
-        organization: "org1",
-        shared_documents: [],
-      },
-      is_checked: true,
-      is_deleted: false,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-      doc_count: 32,
-    },
-    {
-      _id: "4",
-      name: "Pháp luật đại cương",
-      code: "PL101",
-      organization: {
-        _id: "org2",
-        name: "Trường Đại học Bách Khoa TP.HCM",
-      },
-      created_by: {
-        _id: "user2",
-        first_name: "Admin",
-        last_name: "User",
-        contact_email: "admin@hcmut.edu.vn",
-        organization: "org2",
-        shared_documents: [],
-      },
-      is_checked: true,
-      is_deleted: false,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-      doc_count: 15,
-    },
-    {
-      _id: "5",
-      name: "Tin học đại cương",
-      code: "TH101",
-      organization: {
-        _id: "org2",
-        name: "Trường Đại học Bách Khoa TP.HCM",
-      },
-      created_by: {
-        _id: "user2",
-        first_name: "Admin",
-        last_name: "User",
-        contact_email: "admin@hcmut.edu.vn",
-        organization: "org2",
-        shared_documents: [],
-      },
-      is_checked: true,
-      is_deleted: false,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-      doc_count: 42,
-    },
-    {
-      _id: "6",
-      name: "Toán cao cấp",
-      code: "TC101",
-      organization: {
-        _id: "org3",
-        name: "Trường Đại học Khoa học Tự nhiên",
-      },
-      created_by: {
-        _id: "user3",
-        first_name: "Admin",
-        last_name: "User",
-        contact_email: "admin@hcmus.edu.vn",
-        organization: "org3",
-        shared_documents: [],
-      },
-      is_checked: true,
-      is_deleted: false,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-      doc_count: 67,
-    },
-  ];
+  
 
   return (
     <div className="space-y-4">
@@ -225,7 +93,7 @@ const SearchResults: React.FC<SearchResultsProps> = ({
         /* Subject Grid Only */
         <SubjectGrid
           title=""
-          subjects={mockSubjects}
+          subjects={subjects}
           onSubjectClick={(subject) => {
             // Navigate to subject documents page
             window.location.href = `/subject/${subject._id}/documents`;
@@ -236,7 +104,7 @@ const SearchResults: React.FC<SearchResultsProps> = ({
           {/* Subject Grid for All tab */}
           <SubjectGrid
             title="Môn học"
-            subjects={mockSubjects}
+            subjects={subjects}
             onSubjectClick={(subject) => {
               // Navigate to subject documents page
               window.location.href = `/subject/${subject._id}/documents`;

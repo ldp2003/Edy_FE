@@ -46,7 +46,8 @@ const DocumentDetail: React.FC = () => {
     };
 
     fetchDocument();
-  }, [id, isLoggedIn, addToReadHistory]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [id, isLoggedIn]);
 
   // Handle page change from document viewer
   const handlePageChange = useCallback((current: number, total: number) => {
