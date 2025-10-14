@@ -23,6 +23,7 @@ const SearchHeader: React.FC<SearchHeaderProps> = ({
   const [appliedFilters, setAppliedFilters] = useState<ISearchFilters | null>(
     null
   );
+  const [lastSearchQuery, setLastSearchQuery] = useState<string>("");
 
   // Memoize scroll handler để tránh tạo lại function mỗi lần render
   const handleScroll = useCallback((event: Event) => {
@@ -79,11 +80,56 @@ const SearchHeader: React.FC<SearchHeaderProps> = ({
   }, [handleScroll]);
 
   useEffect(() => {
+    console.log("SearchHeader initialQuery changed:", initialQuery);
     setQuery(initialQuery);
+    setLastSearchQuery(initialQuery);
   }, [initialQuery]);
 
+  // Listen for search events from Header component
+  useEffect(() => {
+    const handleHeaderSearchEvent = (event: CustomEvent) => {
+      console.log("Header search event received:", event.detail);
+      const { query: headerQuery } = event.detail;
+      const trimmedHeaderQuery = headerQuery?.trim();
+      console.log("Trimmed header query:", trimmedHeaderQuery);
+      console.log("Current lastSearchQuery:", lastSearchQuery);
+
+      if (trimmedHeaderQuery && trimmedHeaderQuery !== lastSearchQuery) {
+        console.log("Processing header search for:", trimmedHeaderQuery);
+        setQuery(trimmedHeaderQuery);
+        setLastSearchQuery(trimmedHeaderQuery);
+        onSearch(trimmedHeaderQuery);
+      } else {
+        console.log("Skipping header search - duplicate or empty");
+      }
+    };
+
+    window.addEventListener(
+      "headerSearch",
+      handleHeaderSearchEvent as EventListener
+    );
+
+    return () => {
+      window.removeEventListener(
+        "headerSearch",
+        handleHeaderSearchEvent as EventListener
+      );
+    };
+  }, [onSearch, lastSearchQuery]);
+
   const handleSearch = () => {
-    onSearch(query.trim());
+    const trimmedQuery = query.trim();
+    console.log("SearchHeader handleSearch called with:", trimmedQuery);
+    console.log("Last search query was:", lastSearchQuery);
+
+    // Avoid duplicate API calls
+    if (trimmedQuery && trimmedQuery !== lastSearchQuery) {
+      console.log("Calling onSearch with:", trimmedQuery);
+      setLastSearchQuery(trimmedQuery);
+      onSearch(trimmedQuery);
+    } else {
+      console.log("Skipping search - duplicate query or empty");
+    }
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {

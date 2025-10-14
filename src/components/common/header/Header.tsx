@@ -23,6 +23,35 @@ export function Header() {
 
   // Detect if we're on admin page
   const isOnAdminPage = window.location.pathname.startsWith("/admin");
+  const isOnSearchPage = window.location.pathname.startsWith("/search");
+
+  const handleHeaderSearch = () => {
+    const input = document.getElementById("search-input") as HTMLInputElement;
+    const query = input?.value.trim();
+    console.log("Header handleHeaderSearch called with:", query);
+    console.log("isOnSearchPage:", isOnSearchPage);
+
+    if (!query) {
+      console.log("No query provided, returning");
+      return;
+    }
+
+    if (isOnSearchPage) {
+      // If already on search page, trigger SearchHeader's search function
+      console.log("On search page, dispatching headerSearch event");
+      const event = new CustomEvent("headerSearch", { detail: { query } });
+      window.dispatchEvent(event);
+      // Clear the header input after search
+      input.value = "";
+    } else {
+      // If not on search page, navigate to search page
+      console.log(
+        "Not on search page, navigating to:",
+        `/search?q=${encodeURIComponent(query)}`
+      );
+      window.location.href = `/search?q=${encodeURIComponent(query)}`;
+    }
+  };
 
   const handleModeToggle = () => {
     if (isOnAdminPage) {
@@ -68,28 +97,13 @@ export function Header() {
               className="pl-10 text-sm pr-24 py-2 w-full border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               onKeyPress={(e) => {
                 if (e.key === "Enter") {
-                  const query = (e.target as HTMLInputElement).value.trim();
-                  if (query) {
-                    window.location.href = `/search?q=${encodeURIComponent(
-                      query
-                    )}`;
-                  }
+                  handleHeaderSearch();
                 }
               }}
             />
             <button
               className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-[var(--primary-color)] hover:bg-gray-700 text-white px-4 py-1 text-xs rounded transition-colors"
-              onClick={() => {
-                const input = document.getElementById(
-                  "search-input"
-                ) as HTMLInputElement;
-                const query = input?.value.trim();
-                if (query) {
-                  window.location.href = `/search?q=${encodeURIComponent(
-                    query
-                  )}`;
-                }
-              }}
+              onClick={handleHeaderSearch}
             >
               Tìm kiếm
             </button>

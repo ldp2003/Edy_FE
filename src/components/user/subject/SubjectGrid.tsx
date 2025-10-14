@@ -4,7 +4,7 @@ import type { Subject } from "../../../models/subject";
 
 interface SubjectGridProps {
   title: string;
-  subjects: Subject[];
+  subjects? : Subject[];
   onSubjectClick?: (subject: Subject) => void;
 }
 

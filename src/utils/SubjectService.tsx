@@ -49,6 +49,17 @@ const SubjectService = {
     }
   },
 
+  async searchSubjects(keyword: string): Promise<Subject[]> {
+    try {
+      const response = await SubjectAPI.searchSubjects(keyword);
+      const subjects = response.data || [];
+      return subjects;
+    } catch (error) {
+      console.error("Error in SubjectService.searchSubjects:", error);
+      throw error;
+    }
+  },
+
   /**
    * Get subject by ID
    * @param subjectId - ID của môn học
