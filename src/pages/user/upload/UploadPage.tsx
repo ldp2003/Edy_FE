@@ -40,8 +40,8 @@ const UploadPage: React.FC = () => {
   return (
     <div>
       {contextHolder}
-      <div className="bg-white p-6 rounded-lg border border-[var(--border-color)] my-6">
-        <h1 className="text-base text-[var(--primary-text-color)] text-left font-bold">
+      <div className="bg-white p-4 rounded-lg border border-[var(--border-color)] my-6">
+        <h1 className="text-base text-[var(--primary-text-color)] text-left font-bold mb-2">
           Tải lên tài liệu
         </h1>
         <UploadDocument

@@ -31,17 +31,12 @@ const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
             {loading ? (
               <div className="p-4 text-center">Đang tải...</div>
             ) : notifications.length > 0 ? (
-              notifications.map(
-                (notification) => (
-                  console.log("notification", notification),
-                  (
-                    <NotificationItem
-                      key={notification._id}
-                      notification={notification}
-                    />
-                  )
-                )
-              )
+              notifications.map((notification) => (
+                <NotificationItem
+                  key={notification._id}
+                  notification={notification}
+                />
+              ))
             ) : (
               <div className="p-4 text-center text-gray-500">
                 Không có thông báo nào.

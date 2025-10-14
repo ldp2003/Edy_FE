@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect } from "react";
+import React, { useState, useCallback, useEffect, useContext } from "react";
 import { useParams } from "react-router-dom";
 import DocumentSide from "../../../components/user/document/documentDetail/DocumentSide";
 import DocumentActions from "../../../components/user/document/documentDetail/DocumentActions";
@@ -7,9 +7,11 @@ import DocumentViewer from "../../../components/user/document/documentView/Docum
 import DocumentPagination from "../../../components/user/document/documentView/DocumentPagination";
 import { DocumentService } from "../../../utils/DocumentService";
 import type { Document } from "../../../models/document";
+import { UserContext } from "../../../contexts/UserContext";
 
 const DocumentDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
+  const { isLoggedIn, addToReadHistory } = useContext(UserContext);
   const [document, setDocument] = useState<Document | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -30,6 +32,11 @@ const DocumentDetail: React.FC = () => {
         setLoading(true);
         const documentData = await DocumentService.getDocumentById(id);
         setDocument(documentData);
+
+        // Add to read history if user is logged in
+        if (isLoggedIn && documentData) {
+          addToReadHistory(documentData);
+        }
       } catch (error) {
         console.error("Error fetching document:", error);
         setDocument(null);
@@ -39,7 +46,8 @@ const DocumentDetail: React.FC = () => {
     };
 
     fetchDocument();
-  }, [id]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [id, isLoggedIn]);
 
   // Handle page change from document viewer
   const handlePageChange = useCallback((current: number, total: number) => {

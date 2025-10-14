@@ -11,11 +11,11 @@ const RelatedDocument: React.FC<RelatedDocumentProps> = ({ doc_id }) => {
   const fetchSimilarDocuments = async () => {
     const respone = await DocumentService.getSimilarDocuments(doc_id);
     setSimilarDocuments(respone.documents);
-    console.log(respone);
   };
   React.useEffect(() => {
     fetchSimilarDocuments();
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [doc_id]);
   return (
     <div className="pt-6">
       <h4 className="font-bold text-sm text-[var(--secondary-text-color)] mb-3">

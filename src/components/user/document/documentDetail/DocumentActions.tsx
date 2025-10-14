@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import DownloadButton from "../../../common/buttons/DownloadButton";
 import ReportButton from "../../../common/buttons/ReportButton";
 import LikeButton from "../../../common/buttons/LikeButton";
@@ -30,7 +30,7 @@ const DocumentActions: React.FC<DocumentActionsProps> = ({
   const [reactionData, setReactionData] = useState<ReactionData>({
     likes: 0,
     dislikes: 0,
-    userReaction: null
+    userReaction: null,
   });
   const [reactionsLoading, setReactionsLoading] = useState(true);
 
@@ -39,14 +39,17 @@ const DocumentActions: React.FC<DocumentActionsProps> = ({
     const fetchReactions = async () => {
       try {
         setReactionsLoading(true);
-        const response = await DocumentService.getDocumentReactions(document._id);
+        const response = await DocumentService.getDocumentReactions(
+          document._id
+        );
 
-        const userReactionValue = response.reacted === 'NONE' ? null : response.reacted;
+        const userReactionValue =
+          response.reacted === "NONE" ? null : response.reacted;
 
         setReactionData({
           likes: response.likes || 0,
           dislikes: response.dislikes || 0,
-          userReaction: userReactionValue
+          userReaction: userReactionValue,
         });
       } catch (error) {
         console.error("Error fetching reactions:", error);
@@ -54,7 +57,7 @@ const DocumentActions: React.FC<DocumentActionsProps> = ({
         setReactionData({
           likes: 0,
           dislikes: 0,
-          userReaction: null
+          userReaction: null,
         });
       } finally {
         setReactionsLoading(false);
@@ -66,32 +69,36 @@ const DocumentActions: React.FC<DocumentActionsProps> = ({
     } else {
       setReactionsLoading(false);
     }
-  }, [document._id, user]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [document._id, user?._id]);
 
-  const refetchReactions = async () => {
+  const refetchReactions = useCallback(async () => {
     try {
       const response = await DocumentService.getDocumentReactions(document._id);
-      const userReactionValue = response.reacted === 'NONE' ? null : response.reacted;
+      const userReactionValue =
+        response.reacted === "NONE" ? null : response.reacted;
 
       const newReactionData = {
         likes: response.likes || 0,
         dislikes: response.dislikes || 0,
-        userReaction: userReactionValue
+        userReaction: userReactionValue,
       };
 
       setReactionData(newReactionData);
 
       // Dispatch event để update cả 2 buttons
-      window.dispatchEvent(new CustomEvent('reactionRefetch', {
-        detail: {
-          documentId: document._id,
-          ...newReactionData
-        }
-      }));
+      window.dispatchEvent(
+        new CustomEvent("reactionRefetch", {
+          detail: {
+            documentId: document._id,
+            ...newReactionData,
+          },
+        })
+      );
     } catch (error) {
       console.error("Error refetching reactions:", error);
     }
-  };
+  }, [document._id]);
 
   // Thêm listener để trigger refetch khi có reaction
   useEffect(() => {
@@ -101,9 +108,10 @@ const DocumentActions: React.FC<DocumentActionsProps> = ({
       }
     };
 
-    window.addEventListener('reactionChanged', handleReactionChange);
-    return () => window.removeEventListener('reactionChanged', handleReactionChange);
-  }, [document._id]);
+    window.addEventListener("reactionChanged", handleReactionChange);
+    return () =>
+      window.removeEventListener("reactionChanged", handleReactionChange);
+  }, [document._id, refetchReactions]);
 
   useEffect(() => {
     const handleScroll = (event: Event) => {
@@ -161,15 +169,14 @@ const DocumentActions: React.FC<DocumentActionsProps> = ({
     }
   }, [document._id]);
 
-  console.log("Document for actions:", document._id);
-
   return (
     <div
       data-document-actions={document._id}
-      className={`flex items-center justify-between p-2 transition-all duration-300 ${isFixed
-        ? "sticky top-0 bg-[var(--secondary-background-color)] shadow-md z-10 mx-[-16px] px-4"
-        : ""
-        }`}
+      className={`flex items-center justify-between p-2 transition-all duration-300 ${
+        isFixed
+          ? "sticky top-0 bg-[var(--secondary-background-color)] shadow-md z-10 mx-[-16px] px-4"
+          : ""
+      }`}
     >
       <DownloadButton
         point={document.intensive ? 6 : 4}

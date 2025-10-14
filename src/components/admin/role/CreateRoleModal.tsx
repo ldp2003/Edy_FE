@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Modal, Form, Input, Select, message } from 'antd';
-import { PERMISSIONS, PERMISSION_LABELS } from '../../../constants/PermissionConstants';
+import { PERMISSIONS } from '../../../constants/PermissionConstants';
 import { RoleService } from '../../../utils/RoleService';
 
 interface CreateRoleModalProps {

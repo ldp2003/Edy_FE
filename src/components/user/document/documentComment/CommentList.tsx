@@ -1,9 +1,11 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { Button, Input, message } from "antd";
 import { SendOutlined } from "@ant-design/icons";
 import CommentItem from "./CommentItem";
 import type { Comment } from "../../../../models/comment";
 import { CommentService } from "../../../../utils/CommentService";
+import { NotificationService } from "../../../../utils/NotificationService";
+import { UserContext } from "../../../../contexts/UserContext";
 
 const { TextArea } = Input;
 
@@ -28,6 +30,7 @@ const CommentList: React.FC<CommentListProps> = ({
     Record<string, number>
   >({});
   const [messageApi, contextHolder] = message.useMessage();
+  const { user } = useContext(UserContext);
 
   // Với API mới, comments đã được nhóm sẵn với replies array
   const parentComments = comments.filter((comment) => !comment.parent);
@@ -132,6 +135,30 @@ const CommentList: React.FC<CommentListProps> = ({
           const updatedComments = [res.data, ...comments];
           onCommentsUpdate(updatedComments);
         }
+
+        // Send notification to the document owner
+        await NotificationService.createNotification({
+          userId: user?._id ?? "", // Use the correct user ID from the comment data, fallback to empty string
+          type: "SYSTEM",
+          message: `${res.data.user.first_name} ${res.data.user.last_name} đã bình luận vào tài liệu của bạn.`,
+          docId: documentId,
+        });
+
+        // // Send notification for replies
+        // if (parentId) {
+        //   const parentComment = comments.find(
+        //     (comment) => comment._id === parentId
+        //   );
+        //   if (parentComment) {
+        //     await NotificationService.createNotification({
+        //       userId: parentComment.user._id, // Notify the parent comment's author
+        //       type: "SYSTEM",
+        //       message: `${user?.first_name} ${user?.last_name} đã trả lời bình luận của bạn trong tài liệu.`,
+        //       docId: documentId,
+        //     });
+        //   }
+        // }
+
         message.success(parentId ? "Đã thêm trả lời!" : "Đã thêm bình luận!");
       }
     } catch (err) {

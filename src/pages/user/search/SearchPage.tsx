@@ -1,10 +1,12 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import { useSearchParams } from "react-router-dom";
 import { message } from "antd";
 import { DocumentService } from "../../../utils/DocumentService";
 import type { Document } from "../../../models/document";
 import SearchHeader from "../../../components/user/search/SearchHeader";
 import SearchResults from "../../../components/user/search/SearchResults";
+import SubjectService from "../../../utils/SubjectService";
+import type { Subject } from "../../../models/subject";
 // import SubjectSection from "../../../components/user/search/SubjectSection";
 
 export interface SearchFilters {
@@ -35,12 +37,14 @@ export type TabMode = "all" | "subjects";
 const SearchPage: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [documents, setDocuments] = useState<Document[]>([]);
+  const [subjects, setSubjects] = useState<Subject[]>([]);
   const [loading, setLoading] = useState(false);
   const [totalDocuments, setTotalDocuments] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize] = useState(12);
   const [viewMode, setViewMode] = useState<ViewMode>("grid");
   const [currentTab, setCurrentTab] = useState<TabMode>("all");
+  const isUpdatingFromCode = useRef(false);
 
   // Extract filters from URL
   const getFiltersFromURL = useCallback((): SearchFilters => {
@@ -95,9 +99,15 @@ const SearchPage: React.FC = () => {
 
   // Fetch documents based on filters
   const fetchDocuments = useCallback(async () => {
+    console.log("=== FETCH DOCUMENTS CALLED ===");
+    console.log("Current tab:", currentTab);
+    console.log("Current filters:", filters);
+    console.log("Current page:", currentPage);
+
     // Skip fetching documents for subjects tab, only show subjects
     if (currentTab === "subjects") {
       setDocuments([]);
+      setSubjects([]);
       setTotalDocuments(6); // Mock count for subjects
       return;
     }
@@ -111,13 +121,18 @@ const SearchPage: React.FC = () => {
         status: "APPROVED", // Chỉ lấy tài liệu đã duyệt
       };
 
+      console.log("API call with params:", params);
       const response = await DocumentService.fetchNewestDocuments(params);
+      const subRes = await SubjectService.searchSubjects(filters.search || "");
+      console.log("Fetched subjects:", subRes);
       setDocuments(response.documents || []);
+      setSubjects(subRes || []);
       setTotalDocuments(response.total || 0);
     } catch (error) {
       console.error("Error fetching documents:", error);
       message.error("Có lỗi xảy ra khi tìm kiếm tài liệu");
       setDocuments([]);
+      setSubjects([]);
       setTotalDocuments(0);
     } finally {
       setLoading(false);
@@ -179,6 +194,18 @@ const SearchPage: React.FC = () => {
 
   // Handle filter changes
   const handleFilterChange = (newFilters: SearchFilters) => {
+    console.log("SearchPage handleFilterChange called with:", newFilters);
+    console.log("Previous filters were:", filters);
+
+    // Prevent unnecessary updates if filters are the same
+    const filtersChanged =
+      JSON.stringify(filters) !== JSON.stringify(newFilters);
+    if (!filtersChanged) {
+      console.log("Filters unchanged, skipping update");
+      return;
+    }
+
+    isUpdatingFromCode.current = true;
     setFilters(newFilters);
     setCurrentPage(1);
     updateURL(newFilters, 1);
@@ -222,11 +249,24 @@ const SearchPage: React.FC = () => {
     fetchDocuments();
   }, [fetchDocuments]);
 
-  // Update filters when URL changes
+  // Update filters when URL changes (only on initial load or external URL changes)
   useEffect(() => {
+    // Skip if we're updating from code (to avoid circular updates)
+    if (isUpdatingFromCode.current) {
+      isUpdatingFromCode.current = false;
+      return;
+    }
+
     const urlFilters = getFiltersFromURL();
-    setFilters(urlFilters);
-  }, [searchParams, getFiltersFromURL]);
+
+    // Only update if filters actually differ (avoid unnecessary re-renders)
+    const filtersChanged =
+      JSON.stringify(filters) !== JSON.stringify(urlFilters);
+    if (filtersChanged) {
+      console.log("URL filters changed, updating filters:", urlFilters);
+      setFilters(urlFilters);
+    }
+  }, [searchParams, getFiltersFromURL, filters]);
 
   // Handle tab state from URL
   useEffect(() => {
@@ -283,6 +323,7 @@ const SearchPage: React.FC = () => {
             <div className="">
               <SearchResults
                 documents={documents}
+                subjects={subjects}
                 loading={loading}
                 total={totalDocuments}
                 currentPage={currentPage}
