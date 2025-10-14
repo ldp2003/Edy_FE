@@ -144,20 +144,20 @@ const CommentList: React.FC<CommentListProps> = ({
           docId: documentId,
         });
 
-        // Send notification for replies
-        if (parentId) {
-          const parentComment = comments.find(
-            (comment) => comment._id === parentId
-          );
-          if (parentComment) {
-            await NotificationService.createNotification({
-              userId: parentComment.user._id, // Notify the parent comment's author
-              type: "SYSTEM",
-              message: `${user?.first_name} ${user?.last_name} đã trả lời bình luận của bạn trong tài liệu.`,
-              docId: documentId,
-            });
-          }
-        }
+        // // Send notification for replies
+        // if (parentId) {
+        //   const parentComment = comments.find(
+        //     (comment) => comment._id === parentId
+        //   );
+        //   if (parentComment) {
+        //     await NotificationService.createNotification({
+        //       userId: parentComment.user._id, // Notify the parent comment's author
+        //       type: "SYSTEM",
+        //       message: `${user?.first_name} ${user?.last_name} đã trả lời bình luận của bạn trong tài liệu.`,
+        //       docId: documentId,
+        //     });
+        //   }
+        // }
 
         message.success(parentId ? "Đã thêm trả lời!" : "Đã thêm bình luận!");
       }
