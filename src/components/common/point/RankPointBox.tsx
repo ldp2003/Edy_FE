@@ -10,7 +10,7 @@ const RankPointBox: React.FC<RankPointBoxProps> = ({
   accountStatus,
 }) => {
   return (
-    <div className="p-4 bg-[var(--field-background-color)] w-full rounded-md text-left shadow-md">
+    <div className="p-4 bg-[var(--field-background-color)] w-[30%] rounded-md text-left shadow-md">
       <div
         className="flex flex-col justify-between text-left gap-3"
         style={{ color: "var(--third-text-color)" }}
@@ -29,6 +29,14 @@ const RankPointBox: React.FC<RankPointBoxProps> = ({
             {accountStatus}
           </p>
         </div>
+      </div>
+      <div
+        className="text-right mt-4 border-t-[0.5px] pt-4"
+        style={{ borderColor: "var(--secondary-text-color)" }}
+      >
+        <a href="#" className=" text-xs" style={{ color: "var(--link-color)" }}>
+          Tìm hiểu thêm &gt;
+        </a>
       </div>
     </div>
   );

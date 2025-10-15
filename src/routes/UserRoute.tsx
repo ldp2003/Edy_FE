@@ -24,6 +24,7 @@ import SearchPage from "../pages/user/search/SearchPage";
 import NotificationListPage from "../pages/user/Notification/NotificationListPage";
 import DocumentRouteWrapper from "../components/user/document/AccessCheck/DocumentRouteGuard";
 import ReadHistoryPage from "../pages/user/history/ReadHistoryPage";
+import UserProfilePage from "../pages/user/userInfo/UserProfilePage";
 
 const UserRoute: React.FC = () => {
   return (
@@ -75,6 +76,7 @@ const UserRoute: React.FC = () => {
           <Route path="favorites" element={<FavoritePage />} />
           <Route path="history" element={<ReadHistoryPage />} />
           <Route path="notifications" element={<NotificationListPage />} />
+          <Route path="user-profile/:userId" element={<UserProfilePage />} />
 
           {/* 404 Page */}
           <Route path="*" element={<NotFoundPage />} />
