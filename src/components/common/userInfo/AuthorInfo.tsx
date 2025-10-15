@@ -7,6 +7,10 @@ interface AuthorInfoProps {
 }
 
 const AuthorInfo: React.FC<AuthorInfoProps> = ({ document }) => {
+  const handlerOnclick = () => {
+    // user-profile/:userId
+    window.location.href = `/user-profile/${document.user._id}`;
+  };
   return (
     <div className="flex text-left items-center justify-between p-4 bg-white border-b border-gray-200 rounded-xl mb-6 shadow">
       <div className="flex items-center flex-row gap-4">
@@ -15,18 +19,21 @@ const AuthorInfo: React.FC<AuthorInfoProps> = ({ document }) => {
             <img
               src={document.user.avatar}
               alt="Avatar"
-              className="w-full h-full object-cover"
+              className="cursor-pointer w-full h-full object-cover"
+              onClick={handlerOnclick}
             />
           ) : (
             <img
               src="/placeholder.svg?height=100&width=100"
               alt="Avatar"
-              className="w-full h-full object-cover"
+              className="cursor-pointer w-full h-full object-cover"
+              onClick={handlerOnclick}
+              
             />
           )}
         </Avatar>
         <div className="flex flex-col gap-3">
-          <h3 className="font-semibold text-base text-[var(--primary-color)]">
+          <h3 className="font-semibold text-base text-[var(--primary-color)] cursor-pointer" onClick={handlerOnclick}>
             {document.user.first_name} {document.user.last_name}
           </h3>
           <div className="flex flex-row gap-2 items-center">
