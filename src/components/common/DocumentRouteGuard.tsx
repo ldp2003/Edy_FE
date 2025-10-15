@@ -2,7 +2,6 @@ import React, { useEffect, useContext, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { UserContext } from "../../contexts/UserContext";
 import { DocumentService } from "../../utils/DocumentService";
-import { DocumentStatus } from "../../models/document";
 import DocumentAccessGuard from "./DocumentAccessGuard";
 import DocumentAccessDeniedPage from "./DocumentAccessDeniedPage";
 
@@ -36,7 +35,16 @@ const DocumentRouteWrapper: React.FC<DocumentRouteWrapperProps> = ({
       try {
         setLoading(true);
         const documentData = await DocumentService.getDocumentById(id);
+
+        // DEBUG: Log toàn bộ response để kiểm tra
+        console.log("📄 Document Data:", documentData);
+        console.log("📄 Document Status:", documentData?.status);
+        console.log("📄 Document Public Mode:", documentData?.public_mode);
+        console.log("👤 Current User:", user);
+        console.log("👤 Document Owner:", documentData?.user);
+
         const isOwner = user && documentData.user._id === user._id;
+        console.log("🔑 Is Owner:", isOwner);
 
         if (type === "personal") {
           // Personal posts route - must be owner
@@ -62,25 +70,12 @@ const DocumentRouteWrapper: React.FC<DocumentRouteWrapperProps> = ({
             return;
           }
 
-          // Kiểm tra trạng thái duyệt - không cho phép truy cập tài liệu chờ duyệt hoặc bị từ chối
-          if (
-            documentData.status === DocumentStatus.PENDING ||
-            documentData.status === DocumentStatus.REJECTED
-          ) {
-            const message =
-              documentData.status === DocumentStatus.PENDING
-                ? "Tài liệu đang chờ duyệt và chưa được công bố."
-                : "Tài liệu đã bị từ chối duyệt.";
-            setAccessDenied({ message });
-            setShouldRender(true);
-            return;
-          }
-
           setDocument(documentData);
           setShouldRender(true);
         }
       } catch (error) {
-        console.error("Error checking document ownership:", error);
+        console.error("❌ Error checking document ownership:", error);
+        console.error("❌ Error details:", JSON.stringify(error, null, 2));
         setAccessDenied({
           message: "Không thể tải thông tin tài liệu.",
         });
