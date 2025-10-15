@@ -1,7 +1,5 @@
-import React, { useContext, useEffect, useState } from "react";
-import { UserContext } from "../../contexts/UserContext";
+import React from "react";
 import type { Document } from "../../models/document";
-import { checkDocumentAccess } from "../../utils/DocumentAccessUtils";
 import DocumentAccessDeniedPage from "./DocumentAccessDeniedPage";
 
 interface DocumentAccessError {
@@ -26,25 +24,9 @@ const DocumentAccessGuard: React.FC<DocumentAccessGuardProps> = ({
   document,
   loading,
   children,
-  onAccessError,
 }) => {
-  const { user } = useContext(UserContext);
-  const [accessError, setAccessError] = useState<DocumentAccessError | null>(
-    null
-  );
-
-  useEffect(() => {
-    if (!loading && document) {
-      const accessCheck = checkDocumentAccess(document, user);
-      if (!accessCheck.hasAccess && accessCheck.error) {
-        setAccessError(accessCheck.error);
-        onAccessError?.(accessCheck.error);
-      } else {
-        setAccessError(null);
-      }
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [document?._id, user?._id, loading]);
+  // BỎ QUA TẤT CẢ KIỂM TRA - CHỈ TIN VÀO API
+  // Nếu API trả về document, cho phép render
 
   if (loading) {
     return (
@@ -57,10 +39,13 @@ const DocumentAccessGuard: React.FC<DocumentAccessGuardProps> = ({
     );
   }
 
-  if (!document || accessError) {
-    return <DocumentAccessDeniedPage message={accessError?.message} />;
+  if (!document) {
+    return (
+      <DocumentAccessDeniedPage message="Không thể tải thông tin tài liệu." />
+    );
   }
 
+  // API đã trả về document → cho phép truy cập
   return <>{children}</>;
 };
 
