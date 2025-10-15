@@ -105,7 +105,6 @@ const AdminDocumentTable: React.FC = () => {
           published_year: appliedFilters.published_year,
           start_date: appliedFilters.dateRange?.[0],
           end_date: appliedFilters.dateRange?.[1],
-          public_mode: "PUBLIC"
         };
 
         const response = await DocumentService.getAllDocuments(apiParams);
