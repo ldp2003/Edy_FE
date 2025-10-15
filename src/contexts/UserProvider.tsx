@@ -17,6 +17,8 @@ interface UserProviderProps {
   setFavoriteDocuments: (docs: Document[]) => void;
   readHistory: ReadHistoryItem[];
   setReadHistory: (history: ReadHistoryItem[]) => void;
+  personalDocuments: Document[] ;
+  setPersonalDocuments: (docs: Document[]) => void;
 }
 
 export const UserProvider: React.FC<UserProviderProps> = ({
@@ -29,6 +31,8 @@ export const UserProvider: React.FC<UserProviderProps> = ({
   setFavoriteDocuments,
   readHistory,
   setReadHistory,
+  personalDocuments,
+  setPersonalDocuments,
 }) => {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
@@ -81,12 +85,14 @@ export const UserProvider: React.FC<UserProviderProps> = ({
     setFavoriteDocuments,
     readHistory,
     setReadHistory,
-    addToReadHistory,
+    personalDocuments,
+    setPersonalDocuments,
     notifications,
     setNotifications,
     unreadCount,
     setUnreadCount,
     refreshNotifications,
+    addToReadHistory, // Added to context value
   };
 
   return (

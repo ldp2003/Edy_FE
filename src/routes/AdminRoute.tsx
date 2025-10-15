@@ -9,7 +9,7 @@ import AdminUsersPage from "../pages/admin/user/AdminUsersPage";
 import UserDetailPage from "../pages/admin/user/UserDetailPage";
 import UserEditPage from "../pages/admin/user/UserEditPage";
 import AuthRoute from "./AuthRoute";
-import NotFoundPage from "../pages/NotFoundPage";
+import NotFoundPage from "../pages/Error/NotFoundPage";
 import ReportsPage from "../pages/admin/report/ReportsPage";
 import ManageRolesPage from "../pages/admin/user/ManageRolesPage";
 import AssignRolesPage from "../pages/admin/user/AssignRolesPage";
