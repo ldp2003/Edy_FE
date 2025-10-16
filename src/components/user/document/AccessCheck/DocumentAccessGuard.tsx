@@ -1,6 +1,6 @@
 import React from "react";
-import type { Document } from "../../models/document";
-import DocumentAccessDeniedPage from "./DocumentAccessDeniedPage";
+import type { Document } from "../../../../models/document";
+import DocumentAccessDeniedPage from "../../../../pages/Error/DocumentAccessDeniedPage";
 
 interface DocumentAccessError {
   type:

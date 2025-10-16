@@ -10,6 +10,7 @@ import { getIsAdminMode } from "../utils/CookieUtils";
 import { UserService } from "../utils/UserService";
 import type { Document } from "../models/document";
 import type { ReadHistoryItem } from "../contexts/UserContext";
+import { DocumentService } from "../utils/DocumentService";
 
 const AuthRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const navigate = useNavigate();
@@ -22,6 +23,23 @@ const AuthRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [isInitialLoad, setIsInitialLoad] = useState(true);
   const [favoriteDocuments, setFavoriteDocuments] = useState<Document[]>([]);
   const [readHistory, setReadHistory] = useState<ReadHistoryItem[]>([]);
+  const [personalDocuments, setPersonalDocuments] = useState<Document[]>([]);
+
+  const fetchUserDocuments = async () => {
+    try {
+      const response = await DocumentService.getMyDocuments({
+        page: 1,
+        limit: 100,
+      });
+      if (response && response.documents) {
+        return response.documents;
+      }
+      return [];
+    } catch (error) {
+      console.error("Error fetching user documents:", error);
+      return [];
+    }
+  };
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -30,16 +48,10 @@ const AuthRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
         setIsLoading(true);
       }
       try {
-        console.log("🔄 Starting auth check...");
-
-        console.log("🔄 Step 1: Refreshing token...");
         await refreshToken();
-        console.log("✅ Token refreshed successfully");
-
-        console.log("🔄 Step 2: Getting current user...");
         const data = await getCurrentUser();
-        console.log("✅ Got current user data:", data);
-
+        const personalDocs = await fetchUserDocuments();
+        setPersonalDocuments(personalDocs);
         // Try to get favorites, but don't fail if it errors
         let favoriteDocuments: Document[] = [];
         try {
@@ -135,6 +147,7 @@ const AuthRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
           setRole(null);
           setFavoriteDocuments([]);
           setReadHistory([]);
+          setPersonalDocuments([]);
 
           // Allow access to public pages without redirecting
           const publicPages = ["/", "/document-detail", "/search"];
@@ -210,6 +223,7 @@ const AuthRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
         setAccount(null);
         setRole(null);
         setFavoriteDocuments([]);
+        setReadHistory([]);
 
         // Allow access to public pages even when auth fails
         const publicPages = ["/", "/document-detail", "/search"];
@@ -257,6 +271,8 @@ const AuthRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
       setFavoriteDocuments={setFavoriteDocuments}
       readHistory={readHistory}
       setReadHistory={setReadHistory}
+      personalDocuments={personalDocuments}
+      setPersonalDocuments={setPersonalDocuments}
     >
       {children}
     </UserProvider>

@@ -127,9 +127,7 @@ export class NotificationService {
     }
   }
 
-  /**
-   * Tạo thông báo mới (chỉ dành cho admin)
-   */
+
   static async createNotification(data: CreateNotificationRequest): Promise<{
     success: boolean;
     message: string;

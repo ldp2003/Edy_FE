@@ -128,6 +128,32 @@ export const UserService = {
       throw error;
     }
   },
+  //   followUser: async (userId: string) => {
+  //   return await apiClient.post(`/users/${userId}/follow`);
+  // },
+  // unfollowUser: async (userId: string) => {
+  //   return await apiClient.post(`/users/${userId}/unfollow`);
+  // },
+  async followUser(userId: string) {
+    try {
+      const result = await UserAPI.followUser(userId);
+      console.log("Followed user successfully:", result);
+      return result;
+    } catch (error) {
+      console.error("Failed to follow user:", error);
+      throw error;
+    }
+  },
+  async unfollowUser(userId: string) {
+    try {
+      const result = await UserAPI.unfollowUser(userId);
+      console.log("Unfollowed user successfully:", result);
+      return result;
+    } catch (error) {
+      console.error("Failed to unfollow user:", error);
+      throw error;
+    }
+  },
 };
 
 // Legacy exports for backward compatibility
@@ -141,3 +167,5 @@ export const updateUser = UserService.updateUser;
 export const getListFavorites = UserService.getListFavorites;
 export const addToFavorites = UserService.addToFavorites;
 export const removeFromFavorites = UserService.removeFromFavorites;
+export const followUser = UserService.followUser;
+export const unfollowUser = UserService.unfollowUser;
