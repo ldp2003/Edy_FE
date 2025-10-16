@@ -4,7 +4,6 @@ import { useSearchParams } from "react-router-dom";
 import { ReportService } from "../../../utils/ReportService";
 import type { Report } from "../../../models/report";
 import { AdminBreadcrumb } from "../../../components/admin/common/AdminBreadcrumb";
-
 import AdminReportTable from "../../../components/admin/report/AdminReportTable";
 import AdminReportDetailModal from "../../../components/admin/report/AdminReportDetailModal";
 import type { AdminReportFilterParams } from "../../../components/admin/report/AdminReportFilterSearch";
@@ -17,7 +16,11 @@ const ReportsPage: React.FC = () => {
   const [reports, setReports] = useState<Report[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedReport, setSelectedReport] = useState<Report | null>(null);
-  const [modalVisible, setModalVisible] = useState(false);
+  const [resolveModalVisible, setResolveModalVisible] = useState(false);
+
+  // Modal preview tài liệu (placeholder)
+  const [docPreviewVisible, setDocPreviewVisible] = useState(false);
+  const [previewDoc, setPreviewDoc] = useState<{ _id: string; title: string } | null>(null);
 
   // Lấy params từ URL
   const getCurrentPage = useCallback(
@@ -31,7 +34,7 @@ const ReportsPage: React.FC = () => {
   const getCurrentFilters = useCallback(
     (): AdminReportFilterParams => ({
       search: searchParams.get("search") || "",
-      status: searchParams.get("status") || "",
+      status: searchParams.get("status") || "PROCESSING",  // Mặc định lấy báo cáo đang xử lý
       type: searchParams.get("type") || "",
     }),
     [searchParams]
@@ -40,7 +43,9 @@ const ReportsPage: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(5);
   const [total, setTotal] = useState(0);
-  const [filters, setFilters] = useState<AdminReportFilterParams>({});
+  const [filters, setFilters] = useState<AdminReportFilterParams>({
+    status: "PROCESSING"  // Khởi tạo với trạng thái mặc định
+  });
 
   // Cập nhật URL params
   const updateUrlParams = useCallback(
@@ -129,19 +134,35 @@ const ReportsPage: React.FC = () => {
   };
 
   const handleViewDetail = (report: Report) => {
-    setSelectedReport(report);
-    setModalVisible(true);
+    const docObj = typeof report.doc === "object" ? report.doc : null;
+    if (docObj?._id) {
+      setPreviewDoc({ _id: docObj._id, title: docObj.title || "Tài liệu" });
+      setDocPreviewVisible(true);
+    } else {
+      message.info("Không có thông tin tài liệu để xem trước");
+    }
   };
 
-  const handleResolve = async (report: Report) => {
+  const openResolveModal = (report: Report) => {
+    setSelectedReport(report);
+    setResolveModalVisible(true);
+  };
+
+  const handleSubmitResolution = async (params: {
+    validTypes: string[];
+    action: string;
+    resolveReason: string;
+  }) => {
+    if (!selectedReport?._id) return;
     try {
-      // Gọi API để resolve report
-      await ReportService.resolveReport(report._id, {
-        validTypes: report.type || [],
-        action: "APPROVED",
-        resolveReason: "Đã xử lý báo cáo",
+      await ReportService.resolveReport(selectedReport._id, {
+        validTypes: params.validTypes,
+        action: params.action,
+        resolveReason: params.resolveReason,
       });
       message.success("Đã giải quyết báo cáo thành công");
+      setResolveModalVisible(false);
+      setSelectedReport(null);
       fetchReports();
     } catch (error) {
       console.error("Error resolving report:", error);
@@ -190,8 +211,8 @@ const ReportsPage: React.FC = () => {
           reports={reports}
           loading={loading}
           onRowClick={handleViewDetail}
-          onViewDetail={handleViewDetail}
-          onResolve={handleResolve}
+          onViewDetail={handleViewDetail}     // mở modal preview
+          onResolve={openResolveModal}        // mở modal duyệt
           onDelete={handleDelete}
         />
 
@@ -217,14 +238,41 @@ const ReportsPage: React.FC = () => {
           </div>
         )}
 
+        {/* Modal preview tài liệu (placeholder) */}
+        <Modal
+          open={docPreviewVisible}
+          onCancel={() => setDocPreviewVisible(false)}
+          footer={null}
+          title="Xem chi tiết tài liệu"
+        >
+          {previewDoc ? (
+            <div className="space-y-3">
+              <div className="font-medium">{previewDoc.title}</div>
+              <div className="text-sm text-gray-500">
+                URL: /document-detail/{previewDoc._id}
+              </div>
+              <Button
+                type="primary"
+                onClick={() =>
+                  window.open(`/document-detail/${previewDoc._id}`, "_blank")
+                }
+              >
+                Mở trang chi tiết
+              </Button>
+            </div>
+          ) : (
+            <div>Không có dữ liệu tài liệu</div>
+          )}
+        </Modal>
+
         <AdminReportDetailModal
           report={selectedReport}
-          visible={modalVisible}
+          visible={resolveModalVisible}
           onClose={() => {
-            setModalVisible(false);
+            setResolveModalVisible(false);
             setSelectedReport(null);
           }}
-          onResolve={handleResolve}
+          onResolve={handleSubmitResolution} // nhận validTypes, action, resolveReason từ form
         />
       </div>
     </div>
