@@ -76,7 +76,7 @@ const UserRoute: React.FC = () => {
           <Route path="favorites" element={<FavoritePage />} />
           <Route path="history" element={<ReadHistoryPage />} />
           <Route path="notifications" element={<NotificationListPage />} />
-          <Route path="user-profile/:userId" element={<UserProfilePage />} />
+          <Route path="user/:userId" element={<UserProfilePage />} />
 
           {/* 404 Page */}
           <Route path="*" element={<NotFoundPage />} />

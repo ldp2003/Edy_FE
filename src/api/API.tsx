@@ -233,6 +233,12 @@ export const UserAPI = {
       throw error;
     }
   },
+  followUser: async (userId: string) => {
+    return await apiClient.post(`/users/${userId}/follow`);
+  },
+  unfollowUser: async (userId: string) => {
+    return await apiClient.post(`/users/${userId}/unfollow`);
+  },
 };
 
 export const SubjectAPI = {
