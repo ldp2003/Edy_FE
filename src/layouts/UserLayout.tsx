@@ -34,7 +34,7 @@ const UserLayout: React.FC = () => {
                   ? "" // No padding for document detail page
                   : isSidebarVisible
                   ? "px-20" // Normal padding when sidebar is open
-                  : "px-25 min-w-xl" // Center content when sidebar is closed
+                  : "px-30 min-w-lg" // Center content when sidebar is closed
               }`}
             >
               <Outlet />
