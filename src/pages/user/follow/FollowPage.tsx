@@ -1,5 +1,6 @@
-import React, { useEffect } from "react";
-import { Tabs } from "antd";
+import React, { useEffect, useState } from "react";
+import { Tabs, Input, Button } from "antd";
+import { SearchOutlined } from "@ant-design/icons";
 import { useContext } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { UserContext } from "../../../contexts/UserContext";
@@ -10,6 +11,8 @@ const FollowPage: React.FC = () => {
   const { user } = useContext(UserContext);
   const location = useLocation();
   const navigate = useNavigate();
+  const [searchTerm, setSearchTerm] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
 
   const followerList: User[] = (user?.follower || []).map((follower) => {
     if (typeof follower === "string") {
@@ -25,6 +28,34 @@ const FollowPage: React.FC = () => {
     return following;
   });
 
+  const filteredFollowerList = followerList.filter(
+    (follower) =>
+      follower.first_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      follower.last_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (typeof follower.organization === "object" &&
+        follower.organization !== null &&
+        follower.organization.name
+          ?.toLowerCase()
+          .includes(searchQuery.toLowerCase())) ||
+      (typeof follower.organization === "string" &&
+        follower.organization.toLowerCase().includes(searchQuery.toLowerCase()))
+  );
+
+  const filteredFollowingList = followingList.filter(
+    (following) =>
+      following.first_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      following.last_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (typeof following.organization === "object" &&
+        following.organization !== null &&
+        following.organization.name
+          ?.toLowerCase()
+          .includes(searchQuery.toLowerCase())) ||
+      (typeof following.organization === "string" &&
+        following.organization
+          .toLowerCase()
+          .includes(searchQuery.toLowerCase()))
+  );
+
   // Determine the active tab based on the URL
   const activeTab = location.pathname.includes("following") ? "2" : "1";
 
@@ -34,6 +65,16 @@ const FollowPage: React.FC = () => {
     } else {
       navigate("/following");
     }
+  };
+
+  const handleSearch = () => {
+    setSearchQuery(searchTerm);
+    const normalizedSearchTerm = searchTerm
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/\p{Diacritic}/gu, "")
+      .replace(/\s+/g, "_");
+    navigate(`${location.pathname}?search=${normalizedSearchTerm}`);
   };
 
   useEffect(() => {
@@ -47,19 +88,26 @@ const FollowPage: React.FC = () => {
 
   return (
     <div className="p-4 mt-6 bg-white rounded-lg shadow-md text-left">
-      {activeTab === "1" ? (
+      <div className="flex items-center justify-between mb-4">
         <div className="text-[var(--primary-text-color)] font-bold">
-          Danh sách người theo dõi
+          {activeTab === "1"
+            ? "Danh sách người theo dõi"
+            : "Danh sách đang theo dõi"}
         </div>
-      ) : (
-        <div className="text-[var(--primary-text-color)] font-bold">
-          Danh sách đang theo dõi
+        <div className="flex items-center gap-2">
+          <Input
+            placeholder="Tìm kiếm theo tên hoặc trường học"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            prefix={<SearchOutlined />}
+          />
+          <Button onClick={handleSearch}>Tìm kiếm</Button>
         </div>
-      )}
+      </div>
       <Tabs activeKey={activeTab} onChange={handleTabChange}>
         <Tabs.TabPane tab="Người theo dõi" key="1">
-          {followerList.length > 0 ? (
-            followerList.map((follower) => (
+          {filteredFollowerList.length > 0 ? (
+            filteredFollowerList.map((follower) => (
               <FollowItem key={follower._id} user={follower} />
             ))
           ) : (
@@ -67,8 +115,8 @@ const FollowPage: React.FC = () => {
           )}
         </Tabs.TabPane>
         <Tabs.TabPane tab="Đang theo dõi" key="2">
-          {followingList.length > 0 ? (
-            followingList.map((following) => (
+          {filteredFollowingList.length > 0 ? (
+            filteredFollowingList.map((following) => (
               <FollowItem key={following._id} user={following} />
             ))
           ) : (
