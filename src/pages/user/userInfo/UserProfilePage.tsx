@@ -4,12 +4,22 @@ import UserInfoHeader from "../../../components/user/userInfo/UserInfoHeader";
 import UserDocument from "../../../components/user/userInfo/UserDocument";
 import type { User } from "../../../models/user";
 import { UserService } from "../../../utils/UserService";
+import { useContext } from "react";
+import { useNavigate } from "react-router-dom";
+import { UserContext } from "../../../contexts/UserContext";
 
 const UserProfilePage: React.FC = () => {
   const { userId } = useParams<{ userId: string }>();
+  const { user: currentUser } = useContext(UserContext);
   const [user, setUser] = useState<User | null>(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
+    if (currentUser?._id === userId) {
+      navigate("/personal-profile");
+      return;
+    }
+
     const fetchUserData = async () => {
       if (!userId) return;
       try {
@@ -22,7 +32,7 @@ const UserProfilePage: React.FC = () => {
     };
 
     fetchUserData();
-  }, [userId]);
+  }, [userId, currentUser, navigate]);
 
   if (!user) {
     return <div>Loading...</div>;
