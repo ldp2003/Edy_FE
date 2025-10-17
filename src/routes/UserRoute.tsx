@@ -71,7 +71,16 @@ const UserRoute: React.FC = () => {
             path="personal-posts/edit/:id"
             element={<EditDocumentPage />}
           />
-          <Route path="personal-profile" element={<PersonalProfile />} />
+          <Route path="personal-profile/*" element={<PersonalProfile />} />
+          <Route path="personal-profile/recent" element={<PersonalProfile />} />
+          <Route
+            path="personal-profile/field-of-study"
+            element={<PersonalProfile />}
+          />
+          <Route
+            path="personal-profile/shared-documents"
+            element={<PersonalProfile />}
+          />
           <Route path="upload-document" element={<UploadPage />} />
           <Route path="edit-profile" element={<EditProfile />} />
           <Route path="favorites" element={<FavoritePage />} />

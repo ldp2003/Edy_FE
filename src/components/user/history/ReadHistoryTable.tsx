@@ -15,8 +15,10 @@ const ReadHistoryTable: React.FC = () => {
   const { readHistory } = useContext(UserContext);
   const [searchText, setSearchText] = useState("");
 
-  const filteredHistory = readHistory.filter((item: ReadHistoryItem) =>
-    item.document.title.toLowerCase().includes(searchText.toLowerCase())
+  const filteredHistory = readHistory.filter(
+    (item: ReadHistoryItem) =>
+      item.document?.title.toLowerCase().includes(searchText.toLowerCase()) || // Check if title matches search text
+      (!item.document && searchText === "") // Allow null/undefined documents when search text is empty
   );
 
   const handleDocumentClick = (documentId: string) => {
