@@ -23,6 +23,7 @@ const DocumentGrid: React.FC<DocumentGridProps> = ({ title, documents }) => {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
         {documents
           .filter((doc): doc is Document => doc !== null && doc !== undefined) // Filter out null and undefined documents
+          .slice(0, 5) // Limit to 5 documents
           .map((doc) => (
             <DocumentCard
               key={doc._id}
