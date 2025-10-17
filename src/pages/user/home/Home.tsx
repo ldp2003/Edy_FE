@@ -104,7 +104,7 @@ export default function HomePage() {
             // hiện tối đa 5 tài liệu gần đây
             <DocumentGrid
               title="Đã xem gần đây"
-              documents={readHistory.slice(0, 5).map((item) => item.document)}
+              documents={readHistory.slice(0, 10).map((item) => item.document)}
             />
           )}
           <DocumentGrid
