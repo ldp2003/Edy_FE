@@ -1,4 +1,5 @@
-import React from "react";
+import React, { useState } from "react";
+import { Modal } from "antd";
 import { format } from "date-fns";
 import { vi } from "date-fns/locale";
 import type { ReadHistoryItem as ReadHistoryItemType } from "../../../contexts/UserContext";
@@ -9,7 +10,13 @@ interface ReadHistoryItemProps {
 }
 
 const ReadHistoryItem: React.FC<ReadHistoryItemProps> = ({ item, onClick }) => {
+  const [isModalVisible, setIsModalVisible] = useState(false);
+
   const handleClick = () => {
+    if (!item.document) {
+      setIsModalVisible(true);
+      return;
+    }
     onClick(item.document._id);
   };
 
@@ -36,52 +43,71 @@ const ReadHistoryItem: React.FC<ReadHistoryItemProps> = ({ item, onClick }) => {
   };
 
   return (
-    <div
-      className="flex items-start p-3 hover:bg-gray-50 cursor-pointer rounded-lg transition-colors"
-      onClick={handleClick}
-    >
-      <img
-        src={item.document.cover_page}
-        alt={item.document.title}
-        onError={handleImageError}
-        className="w-16 h-16 object-cover rounded-lg bg-white border border-gray-200 flex-shrink-0"
-      />
+    <>
+      <div
+        className={`flex items-start p-3 hover:bg-gray-50 cursor-pointer rounded-lg transition-colors ${
+          !item.document ? "opacity-50 cursor-not-allowed" : ""
+        }`}
+        onClick={handleClick}
+      >
+        <img
+          src={item.document?.cover_page || "/public/image/default_cover.png"}
+          alt={item.document?.title || "Tài liệu không khả dụng"}
+          onError={handleImageError}
+          className="w-16 h-16 object-cover rounded-lg bg-white border border-gray-200 flex-shrink-0"
+        />
 
-      <div className="flex-1 ml-3 min-w-0">
-        <div className="flex justify-between items-start mb-2">
-          <div className="font-medium text-[var(--primary-text-color)] hover:text-[var(--primary-color)] text-sm truncate pr-2">
-            {item.document.title}
+        <div className="flex-1 ml-3 min-w-0">
+          <div className="flex justify-between items-start mb-2">
+            <div className="font-medium text-[var(--primary-text-color)] hover:text-[var(--primary-color)] text-sm truncate pr-2">
+              {item.document?.title || "Tài liệu không khả dụng"}
+            </div>
+            {item.document && (
+              <div className="text-xs text-[var(--secondary-text-color)] flex-shrink-0">
+                {format(new Date(item.read_at), "dd/MM/yyyy HH:mm", {
+                  locale: vi,
+                })}
+              </div>
+            )}
           </div>
-          <div className="text-xs text-[var(--secondary-text-color)] flex-shrink-0">
-            {format(new Date(item.read_at), "dd/MM/yyyy HH:mm", { locale: vi })}
-          </div>
-        </div>
 
-        <div className="flex flex-wrap gap-2 text-xs">
-          {item.document.subject && (
-            <span className="text-[var(--link-color)] bg-[var(--field-background-color)] px-2 py-1 rounded">
-              {item.document.subject.name}
-            </span>
-          )}
+          {item.document && (
+            <div className="flex flex-wrap gap-2 text-xs">
+              {item.document.subject && (
+                <span className="text-[var(--link-color)] bg-[var(--field-background-color)] px-2 py-1 rounded">
+                  {item.document.subject.name}
+                </span>
+              )}
 
-          {item.document.file_type && (
-            <span
-              className={`px-2 py-1 rounded font-medium ${getFileTypeStyle(
-                item.document.file_type
-              )}`}
-            >
-              {item.document.file_type}
-            </span>
-          )}
+              {item.document.file_type && (
+                <span
+                  className={`px-2 py-1 rounded font-medium ${getFileTypeStyle(
+                    item.document.file_type
+                  )}`}
+                >
+                  {item.document.file_type}
+                </span>
+              )}
 
-          {item.document.user && (
-            <span className="font-medium  px-2 py-1 text-[var(--third-text-color)]">
-              {item.document.user.first_name} {item.document.user.last_name}
-            </span>
+              {item.document.user && (
+                <span className="font-medium  px-2 py-1 text-[var(--third-text-color)]">
+                  {item.document.user.first_name} {item.document.user.last_name}
+                </span>
+              )}
+            </div>
           )}
         </div>
       </div>
-    </div>
+
+      <Modal
+        title="Thông báo"
+        visible={isModalVisible}
+        onCancel={() => setIsModalVisible(false)}
+        footer={null}
+      >
+        <p>Tài liệu không khả dụng.</p>
+      </Modal>
+    </>
   );
 };
 
