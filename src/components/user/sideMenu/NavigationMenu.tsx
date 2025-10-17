@@ -9,11 +9,15 @@ export function NavigationMenu({ isCompact }: NavigationMenuProps) {
   const location = useLocation();
 
   const menuItems = [
-    { icon: Home, label: "Trang chủ", path: "/" },
-    { icon: FileText, label: "Bài đăng của tôi", path: "/personal-posts" },
-    { icon: Heart, label: "Yêu thích", path: "/favorites" },
-    { icon: Users, label: "Danh sách theo dõi", path: "/following" },
-    { icon: Clock, label: "Đã xem gần đây", path: "/history" },
+    { icon: Home, label: "Trang chủ", path: ["/"] },
+    { icon: FileText, label: "Bài đăng của tôi", path: ["/personal-posts"] },
+    { icon: Heart, label: "Yêu thích", path: ["/favorites"] },
+    {
+      icon: Users,
+      label: "Danh sách theo dõi",
+      path: ["/follower", "/following"],
+    },
+    { icon: Clock, label: "Đã xem gần đây", path: ["/history"] },
   ];
 
   return (
@@ -26,11 +30,11 @@ export function NavigationMenu({ isCompact }: NavigationMenuProps) {
         {menuItems.map((item, index) => (
           <li key={index}>
             <Link
-              to={item.path}
+              to={item.path[0]}
               className={`flex items-center justify-${
                 isCompact ? "center" : "start"
               } gap-3 px-3 py-2 rounded-md transition-colors text-sm ${
-                location.pathname === item.path
+                item.path.includes(location.pathname)
                   ? "bg-blue-100 text-[var(--primary-color)]"
                   : "text-[var(--secondary-text-color)] hover:bg-gray-100"
               }`}

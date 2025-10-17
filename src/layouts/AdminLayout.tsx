@@ -1,15 +1,14 @@
 import React, { useState } from "react";
 import { Header } from "../components/common/header/Header";
 import { AdminSidebar } from "../components/admin/sideMenu/AdminSidebar";
+import AdminFooter from "../components/common/footer/AdminFooter";
 import { Outlet } from "react-router-dom";
 
 const AdminLayout: React.FC = () => {
   const [isSidebarVisible, setIsSidebarVisible] = useState(true);
 
   return (
-    <div
-      className="h-screen flex flex-col overflow-hidden bg-[var(--secondary-background-color)]"
-    >
+    <div className="h-screen flex flex-col overflow-hidden bg-[var(--secondary-background-color)]">
       {/* Header - cố định ở trên cùng */}
       <div className="relative z-10 flex-shrink-0">
         <Header />
@@ -25,8 +24,12 @@ const AdminLayout: React.FC = () => {
 
         {/* Page content - có thể scroll */}
         <main className="flex-1 relative overflow-y-auto focus:outline-none">
-          <div className="p-4">
-            <Outlet />
+          <div className="flex flex-col min-h-full">
+            <div className="flex-1 p-4">
+              <Outlet />
+            </div>
+            {/* Footer - ở cuối content */}
+            <AdminFooter />
           </div>
         </main>
       </div>

@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Header } from "../components/common/header/Header";
 import { Sidebar } from "../components/user/sideMenu/SideBar";
+import UserFooter from "../components/common/footer/UserFooter";
 import { Outlet, useLocation } from "react-router-dom";
 
 const UserLayout: React.FC = () => {
@@ -26,16 +27,20 @@ const UserLayout: React.FC = () => {
 
         {/* Page content - có thể scroll */}
         <main className="flex-1 relative overflow-y-auto focus:outline-none">
-          <div
-            className={`transition-all duration-300 ${
-              isDocumentDetailPage
-                ? "" // No padding for document detail page
-                : isSidebarVisible
-                ? "px-20" // Normal padding when sidebar is open
-                : "px-20 mx-auto max-w-7xl" // Center content when sidebar is closed
-            }`}
-          >
-            <Outlet />
+          <div className="flex flex-col min-h-full">
+            <div
+              className={`flex-1 transition-all duration-300 ${
+                isDocumentDetailPage
+                  ? "" // No padding for document detail page
+                  : isSidebarVisible
+                  ? "px-20" // Normal padding when sidebar is open
+                  : "px-30 min-w-lg" // Center content when sidebar is closed
+              }`}
+            >
+              <Outlet />
+            </div>
+            {/* Footer - ở cuối content */}
+            <UserFooter />
           </div>
         </main>
       </div>

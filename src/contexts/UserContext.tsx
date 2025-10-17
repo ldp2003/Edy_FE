@@ -15,6 +15,10 @@ export const UserContext = createContext({
   user: null as User | null,
   account: null as Account | null,
   role: null as string | null,
+  personalDocuments: [] as Document[],
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  setPersonalDocuments: (_docs: Document[]) => {},
+
   favoriteDocuments: [] as Document[],
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   setFavoriteDocuments: (_docs: Document[]) => {},
