@@ -7,12 +7,12 @@ import NotificationItem from "./NotificationItem";
 
 interface NotificationDropdownProps {
   notifications: Notification[];
-  loading: boolean;
+  loading?: boolean;
 }
 
 const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
   notifications,
-  loading,
+  loading = false,
 }) => {
   const navigate = useNavigate();
 

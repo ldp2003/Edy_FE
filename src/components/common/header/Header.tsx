@@ -4,22 +4,15 @@ import { Dropdown } from "antd";
 import logo from "/public/image/Logo.png";
 import AvatarDropdown from "../dropdown/AvatarDropdown";
 import UploadHeaderButton from "../buttons/UploadHeaderButton";
-import { useContext, useEffect, useState } from "react";
+import { useContext } from "react";
 import UserDropdown from "../dropdown/UserDropdown";
 import AdminDropdown from "../dropdown/AdminDropdown";
 import { UserContext } from "../../../contexts/UserContext";
 import NotificationDropdown from "../Notification/NotificationDropdown";
 
 export function Header() {
-  const {
-    isLoggedIn,
-    user,
-    account,
-    notifications,
-    unreadCount,
-    refreshNotifications,
-  } = useContext(UserContext);
-  const [loading, setLoading] = useState(false);
+  const { isLoggedIn, user, account, notifications, unreadCount } =
+    useContext(UserContext);
 
   // Detect if we're on admin page
   const isOnAdminPage = window.location.pathname.startsWith("/admin");
@@ -63,13 +56,7 @@ export function Header() {
     }
   };
 
-  useEffect(() => {
-    if (isLoggedIn) {
-      setLoading(true);
-      refreshNotifications();
-      setLoading(false);
-    }
-  }, [isLoggedIn, refreshNotifications]);
+  // Remove unnecessary notification fetching - handled by AuthRoute
 
   return (
     <header className="bg-white border-b border-gray-200 px-6 py-2 w-full flex-shrink-0 shadow-sm text-sm">
@@ -152,10 +139,7 @@ export function Header() {
                 offset={[-4, 8]}
                 size="small"
               >
-                <NotificationDropdown
-                  notifications={notifications}
-                  loading={loading}
-                />
+                <NotificationDropdown notifications={notifications} />
               </Badge>
 
               <Dropdown
