@@ -1,6 +1,10 @@
 import React, { useState, useCallback } from "react";
 import type { ReactNode } from "react";
-import { UserContext, type ReadHistoryItem } from "./UserContext";
+import {
+  UserContext,
+  type ReadHistoryItem,
+  type SharedDocumentItem,
+} from "./UserContext";
 import { NotificationService } from "../utils/NotificationService";
 import type { User } from "../models/user";
 import type { Account } from "../models/account";
@@ -17,8 +21,10 @@ interface UserProviderProps {
   setFavoriteDocuments: (docs: Document[]) => void;
   readHistory: ReadHistoryItem[];
   setReadHistory: (history: ReadHistoryItem[]) => void;
-  personalDocuments: Document[] ;
+  personalDocuments: Document[];
   setPersonalDocuments: (docs: Document[]) => void;
+  sharedDocuments: SharedDocumentItem[];
+  setSharedDocuments: (docs: SharedDocumentItem[]) => void;
 }
 
 export const UserProvider: React.FC<UserProviderProps> = ({
@@ -33,6 +39,8 @@ export const UserProvider: React.FC<UserProviderProps> = ({
   setReadHistory,
   personalDocuments,
   setPersonalDocuments,
+  sharedDocuments,
+  setSharedDocuments,
 }) => {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
@@ -87,6 +95,8 @@ export const UserProvider: React.FC<UserProviderProps> = ({
     setReadHistory,
     personalDocuments,
     setPersonalDocuments,
+    sharedDocuments,
+    setSharedDocuments,
     notifications,
     setNotifications,
     unreadCount,

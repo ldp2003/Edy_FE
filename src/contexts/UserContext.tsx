@@ -10,6 +10,12 @@ export interface ReadHistoryItem {
   _id: string;
 }
 
+export interface SharedDocumentItem {
+  document: Document | null;
+  shared_at: string;
+  _id: string;
+}
+
 export const UserContext = createContext({
   isLoggedIn: false,
   user: null as User | null,
@@ -18,6 +24,10 @@ export const UserContext = createContext({
   personalDocuments: [] as Document[],
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   setPersonalDocuments: (_docs: Document[]) => {},
+
+  sharedDocuments: [] as SharedDocumentItem[],
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  setSharedDocuments: (_docs: SharedDocumentItem[]) => {},
 
   favoriteDocuments: [] as Document[],
   // eslint-disable-next-line @typescript-eslint/no-unused-vars

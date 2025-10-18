@@ -6,7 +6,6 @@ import PageCount from "../documentElement/PageCount";
 import IntensiveMark from "../documentElement/IntensiveMark";
 import type { ReactNode } from "react";
 
-
 type RecentItemProps = {
   title: string | ReactNode;
   views: number;
@@ -27,7 +26,7 @@ const RecentItem: React.FC<RecentItemProps> = ({
   return (
     <div className="flex text-left w-full gap-4 justify-between px-2 py-1 border rounded-lg shadow-md bg-white mb-2">
       <div className="flex items-center">
-        <div className="icon bg-blue-500 text-white p-2 rounded-full mr-4">
+        <div className="icon bg-[var(--primary-color)] text-white p-2 rounded-full mr-4">
           <FileText size={24} />
         </div>
         <div>

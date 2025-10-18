@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { getCurrentUser, refreshToken } from "../utils/AuthService";
@@ -9,7 +10,10 @@ import type { RoleCode } from "../models/role";
 import { getIsAdminMode } from "../utils/CookieUtils";
 import { UserService } from "../utils/UserService";
 import type { Document } from "../models/document";
-import type { ReadHistoryItem } from "../contexts/UserContext";
+import type {
+  ReadHistoryItem,
+  SharedDocumentItem,
+} from "../contexts/UserContext";
 import { DocumentService } from "../utils/DocumentService";
 
 const AuthRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -24,6 +28,9 @@ const AuthRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [favoriteDocuments, setFavoriteDocuments] = useState<Document[]>([]);
   const [readHistory, setReadHistory] = useState<ReadHistoryItem[]>([]);
   const [personalDocuments, setPersonalDocuments] = useState<Document[]>([]);
+  const [sharedDocuments, setSharedDocuments] = useState<SharedDocumentItem[]>(
+    []
+  );
 
   const fetchUserDocuments = async () => {
     try {
@@ -52,6 +59,20 @@ const AuthRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
         const data = await getCurrentUser();
         const personalDocs = await fetchUserDocuments();
         setPersonalDocuments(personalDocs);
+
+        // Get shared documents from user data (populated with full document objects)
+        const rawSharedDocs = data.user?.shared_documents || [];
+        const userSharedDocs: SharedDocumentItem[] = rawSharedDocs.map(
+          (item: any) => ({
+            document:
+              typeof item.document === "string"
+                ? null
+                : (item.document as Document | null),
+            shared_at: item.shared_at,
+            _id: item._id || `shared_${item.shared_at}`,
+          })
+        );
+        setSharedDocuments(userSharedDocs);
         // Try to get favorites, but don't fail if it errors
         let favoriteDocuments: Document[] = [];
         try {
@@ -148,6 +169,7 @@ const AuthRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
           setFavoriteDocuments([]);
           setReadHistory([]);
           setPersonalDocuments([]);
+          setSharedDocuments([]);
 
           // Allow access to public pages without redirecting
           const publicPages = ["/", "/document-detail", "/search"];
@@ -224,6 +246,7 @@ const AuthRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
         setRole(null);
         setFavoriteDocuments([]);
         setReadHistory([]);
+        setSharedDocuments([]);
 
         // Allow access to public pages even when auth fails
         const publicPages = ["/", "/document-detail", "/search"];
@@ -273,6 +296,8 @@ const AuthRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
       setReadHistory={setReadHistory}
       personalDocuments={personalDocuments}
       setPersonalDocuments={setPersonalDocuments}
+      sharedDocuments={sharedDocuments}
+      setSharedDocuments={setSharedDocuments}
     >
       {children}
     </UserProvider>
