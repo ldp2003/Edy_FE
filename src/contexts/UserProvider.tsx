@@ -1,7 +1,10 @@
-import React, { useState, useCallback } from "react";
+import React, { useCallback } from "react";
 import type { ReactNode } from "react";
-import { UserContext, type ReadHistoryItem } from "./UserContext";
-import { NotificationService } from "../utils/NotificationService";
+import {
+  UserContext,
+  type ReadHistoryItem,
+  type SharedDocumentItem,
+} from "./UserContext";
 import type { User } from "../models/user";
 import type { Account } from "../models/account";
 import type { Document } from "../models/document";
@@ -17,8 +20,15 @@ interface UserProviderProps {
   setFavoriteDocuments: (docs: Document[]) => void;
   readHistory: ReadHistoryItem[];
   setReadHistory: (history: ReadHistoryItem[]) => void;
-  personalDocuments: Document[] ;
+  personalDocuments: Document[];
   setPersonalDocuments: (docs: Document[]) => void;
+  sharedDocuments: SharedDocumentItem[];
+  setSharedDocuments: (docs: SharedDocumentItem[]) => void;
+  notifications: Notification[];
+  setNotifications: (notifications: Notification[]) => void;
+  unreadCount: number;
+  setUnreadCount: (count: number) => void;
+  refreshNotifications?: () => Promise<void>;
 }
 
 export const UserProvider: React.FC<UserProviderProps> = ({
@@ -33,28 +43,22 @@ export const UserProvider: React.FC<UserProviderProps> = ({
   setReadHistory,
   personalDocuments,
   setPersonalDocuments,
+  sharedDocuments,
+  setSharedDocuments,
+  notifications,
+  setNotifications,
+  unreadCount,
+  setUnreadCount,
+  refreshNotifications: propRefreshNotifications,
 }) => {
-  const [notifications, setNotifications] = useState<Notification[]>([]);
-  const [unreadCount, setUnreadCount] = useState(0);
-
+  // Refresh notifications function - use the one passed from AuthRoute
   const refreshNotifications = useCallback(async () => {
-    if (!isLoggedIn) return;
-
-    try {
-      const response = await NotificationService.getNotifications({
-        page: 1,
-        limit: 50,
-      });
-      setNotifications(response.notifications);
-
-      const unread = response.notifications.filter(
-        (notification) => !notification.isRead
-      ).length;
-      setUnreadCount(unread);
-    } catch (error) {
-      console.error("Error refreshing notifications:", error);
+    if (propRefreshNotifications) {
+      await propRefreshNotifications();
+    } else {
+      console.log("No refresh function provided from AuthRoute");
     }
-  }, [isLoggedIn]);
+  }, [propRefreshNotifications]);
 
   // Function to add a document to read history
   const addToReadHistory = useCallback(
@@ -87,6 +91,8 @@ export const UserProvider: React.FC<UserProviderProps> = ({
     setReadHistory,
     personalDocuments,
     setPersonalDocuments,
+    sharedDocuments,
+    setSharedDocuments,
     notifications,
     setNotifications,
     unreadCount,
