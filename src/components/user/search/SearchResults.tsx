@@ -7,7 +7,7 @@ import SubjectGrid from "../subject/SubjectGrid";
 import type { Document } from "../../../models/document";
 import type { Subject } from "../../../models/subject";
 import type { ViewMode, TabMode } from "../../../pages/user/search/SearchPage";
-import { fetchMultipleDocumentRatings } from "../../../utils/CalcRate";
+import { calculateDocumentRating } from "../../../utils/CalcRate";
 
 const { Option } = Select;
 
@@ -40,36 +40,11 @@ const SearchResults: React.FC<SearchResultsProps> = ({
   onViewModeChange,
   onSortChange,
 }) => {
-  const [documentRatings, setDocumentRatings] = React.useState<
-    Map<string, { ratingPercentage: number; formattedRating: string }>
-  >(new Map());
-
-  // Fetch ratings when documents change
-  React.useEffect(() => {
-    const fetchRatings = async () => {
-      if (documents && documents.length > 0) {
-        try {
-          const documentIds = documents.map((doc) => doc._id);
-          const ratingsMap = await fetchMultipleDocumentRatings(documentIds);
-          setDocumentRatings(ratingsMap);
-        } catch (error) {
-          console.error("Error fetching document ratings:", error);
-          setDocumentRatings(new Map());
-        }
-      } else {
-        setDocumentRatings(new Map());
-      }
-    };
-
-    fetchRatings();
-  }, [documents]);
-
   const handleSortChange = (value: string) => {
     const [ordering, orderStr] = value.split(":");
     const order = orderStr === "desc" ? -1 : 1;
     onSortChange(ordering, order);
   };
-  
 
   return (
     <div className="space-y-4">
@@ -216,8 +191,10 @@ const SearchResults: React.FC<SearchResultsProps> = ({
                           title={document.title}
                           views={document.view}
                           rating={
-                            documentRatings.get(document._id)
-                              ?.ratingPercentage || 0
+                            calculateDocumentRating(
+                              document.like || 0,
+                              document.dislike || 0
+                            ).ratingPercentage
                           }
                           pages={document.page || 0}
                           date={new Date(document.createdAt).toLocaleDateString(

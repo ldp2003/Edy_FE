@@ -2,75 +2,14 @@ import React from "react";
 import { Row, Col, Spin } from "antd";
 import DocumentCard from "../document/documentCard/DocumentCard";
 import type { Document } from "../../../models/document";
-interface Post {
-  key: string;
-  index: number;
-  title: string;
-  views: number;
-  comments: number;
-  rating: string;
-  status: string;
-  mode: string;
-  public_mode: string;
-  url: string;
-  cover_page?: string;
-  createdAt: string;
-  content_rejection?: {
-    message: string;
-  };
-}
 
 interface PostGridViewProps {
-  data: Post[];
+  data: Document[];
   loading?: boolean;
 }
 
 const PostGridView: React.FC<PostGridViewProps> = ({ data, loading }) => {
   const displayData = loading ? [] : data;
-
-  // Transform Post to Document format for DocumentCard
-  const transformPostToDocument = (post: Post): Document => {
-    return {
-      _id: post.key,
-      title: post.title,
-      url: post.url,
-      cover_page: post.cover_page,
-      view: post.views,
-      comment_count: post.comments,
-      createdAt: post.createdAt,
-      status: post.status as
-        | "PENDING"
-        | "APPROVED"
-        | "PENDING_SUMMARY"
-        | "REJECTED"
-        | "REQUESTED_EDIT",
-      public_mode: post.public_mode as
-        | "PUBLIC"
-        | "PRIVATE"
-        | "PRIVATE_SHARED"
-        | "SHARE_ORGANIZATION",
-      // Required fields for Document interface
-      user: {
-        _id: "",
-        first_name: "",
-        last_name: "",
-        contact_email: "",
-        organization: { _id: "", name: "" },
-        shared_documents: [],
-      },
-      author: [],
-      file_type: "PDF",
-      organization: { _id: "", name: "" },
-      level: "STUDENT",
-      subject: { _id: "", name: "" },
-      doc_type: "OTHER",
-      intensive: false,
-      download_count: 0,
-      description: {
-        summary_by_user: `${post.views} lượt xem • ${post.comments} bình luận • Đánh giá: ${post.rating}`,
-      },
-    };
-  };
 
   if (loading) {
     return (
@@ -83,17 +22,17 @@ const PostGridView: React.FC<PostGridViewProps> = ({ data, loading }) => {
   return (
     <div className="w-full">
       <Row gutter={[16, 16]} justify="start">
-        {displayData.map((post) => {
-          const documentData = transformPostToDocument(post);
-          const isRejected = post.status === "REJECTED";
+        {displayData.map((document) => {
+          const isRejected = document.status === "REJECTED";
           const isRequestedEdit =
-            post.status === "REQUESTED_EDIT" || post.status === "PENDING_EDIT";
-          const hasRejectionMessage = post.content_rejection?.message;
+            document.status === "REQUESTED_EDIT" ||
+            document.status === "PENDING_EDIT";
+          const hasRejectionMessage = document.content_rejection?.message;
           const showRejectionReason =
             (isRejected || isRequestedEdit) && hasRejectionMessage;
           return (
             <Col
-              key={post.key}
+              key={document._id}
               xs={24}
               sm={12}
               md={12}
@@ -121,7 +60,7 @@ const PostGridView: React.FC<PostGridViewProps> = ({ data, loading }) => {
                           }
                           style={{ fontSize: "12px" }}
                         >
-                          {post.title}
+                          {document.title}
                         </div>
                         <div
                           style={{
@@ -132,20 +71,22 @@ const PostGridView: React.FC<PostGridViewProps> = ({ data, loading }) => {
                           }}
                         >
                           {isRejected ? "Lý do từ chối" : "Yêu cầu chỉnh sửa"}:{" "}
-                          {post.content_rejection?.message}
+                          {document.content_rejection?.message}
                         </div>
                       </div>
                     ) : (
-                      post.title
+                      document.title
                     )
                   }
-                  description={`${post.views} lượt xem • ${post.comments} bình luận • Đánh giá: ${post.rating}`}
-                  imageUrl={post.cover_page}
-                  document={documentData}
+                  description={`${document.view || 0} lượt xem • ${
+                    document.comment_count || 0
+                  } bình luận`}
+                  imageUrl={document.cover_page}
+                  document={document}
                   navigationPath={
                     isRejected
                       ? undefined
-                      : `/personal-posts/document-detail/${post.key}`
+                      : `/personal-posts/document-detail/${document._id}`
                   }
                   disableClick={!!isRejected}
                 />

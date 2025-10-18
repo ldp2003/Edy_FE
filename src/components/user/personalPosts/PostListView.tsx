@@ -1,85 +1,16 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import RecentItem from "../document/documentCard/RecentItem";
-import { fetchMultipleDocumentRatings } from "../../../utils/CalcRate";
-
-interface Post {
-  key: string;
-  index: number;
-  title: string;
-  views: number;
-  comments: number;
-  rating: string;
-  status: string;
-  mode: string;
-  public_mode: string;
-  url: string;
-  intensive?: boolean;
-  createdAt: string;
-  content_rejection?: {
-    message: string;
-  };
-}
+import { calculateDocumentRating } from "../../../utils/CalcRate";
+import type { Document } from "../../../models/document";
 
 interface PostListViewProps {
-  data: Post[];
+  data: Document[];
   loading?: boolean;
 }
 
 const PostListView: React.FC<PostListViewProps> = ({ data, loading }) => {
   const navigate = useNavigate();
-  const [documentRating, setDocumentRating] = React.useState<{
-    [key: string]: { ratingPercentage: number; formattedRating: string };
-  }>({});
-
-  // Fetch document ratings when data changes
-  React.useEffect(() => {
-    const fetchRatings = async () => {
-      if (data && data.length > 0) {
-        try {
-          const documentIds = data.map((doc) => doc.key);
-          const ratingsMap = await fetchMultipleDocumentRatings(documentIds);
-
-          const ratings: {
-            [key: string]: {
-              ratingPercentage: number;
-              formattedRating: string;
-            };
-          } = {};
-          documentIds.forEach((id) => {
-            const rating = ratingsMap.get(id);
-            if (rating) {
-              ratings[id] = rating;
-            } else {
-              ratings[id] = { ratingPercentage: 0, formattedRating: "0%" };
-            }
-          });
-
-          setDocumentRating(ratings);
-        } catch (error) {
-          console.error("Error fetching document ratings:", error);
-          // Set default values on error
-          const defaultRatings: {
-            [key: string]: {
-              ratingPercentage: number;
-              formattedRating: string;
-            };
-          } = {};
-          data.forEach((doc) => {
-            defaultRatings[doc.key] = {
-              ratingPercentage: 0,
-              formattedRating: "0%",
-            };
-          });
-          setDocumentRating(defaultRatings);
-        }
-      } else {
-        setDocumentRating({});
-      }
-    };
-
-    fetchRatings();
-  }, [data]);
 
   // Nếu loading, hiển thị skeleton hoặc rỗng
   const displayData = loading ? [] : data;
@@ -97,7 +28,7 @@ const PostListView: React.FC<PostListViewProps> = ({ data, loading }) => {
             (isRejected || isRequestedEdit) && hasRejectionMessage;
           return (
             <div
-              key={post.key}
+              key={post._id}
               className={
                 isRejected
                   ? "cursor-not-allowed opacity-60"
@@ -106,7 +37,7 @@ const PostListView: React.FC<PostListViewProps> = ({ data, loading }) => {
               onClick={
                 isRejected
                   ? undefined
-                  : () => navigate(`/personal-posts/${post.key}`)
+                  : () => navigate(`/personal-posts/${post._id}`)
               }
             >
               <RecentItem
@@ -137,9 +68,12 @@ const PostListView: React.FC<PostListViewProps> = ({ data, loading }) => {
                     post.title
                   )
                 }
-                views={post.views}
-                rating={documentRating[post.key]?.ratingPercentage || 0}
-                pages={Math.floor(Math.random() * 50) + 10}
+                views={post.view || 0}
+                rating={
+                  calculateDocumentRating(post.like || 0, post.dislike || 0)
+                    .ratingPercentage
+                }
+                pages={post.page || 0}
                 date={new Date(post.createdAt)}
                 intensive={post.intensive}
               />

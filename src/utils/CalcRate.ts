@@ -1,5 +1,3 @@
-import { DocumentService } from "./DocumentService";
-
 /**
  * Interface cho dữ liệu phản ứng của tài liệu
  */
@@ -52,90 +50,44 @@ export const formatRatingPercentage = (percentage: number): string => {
 };
 
 /**
- * Lấy dữ liệu phản ứng từ API và tính toán tỷ lệ đánh giá
- * @param documentId - ID của tài liệu
- * @returns Promise chứa dữ liệu phản ứng và tỷ lệ đánh giá
+ * Tính toán tỷ lệ đánh giá từ số lượt like và dislike
+ * @param likes - Số lượt like
+ * @param dislikes - Số lượt dislike
+ * @returns Object chứa ratingPercentage và formattedRating
  */
-export const fetchDocumentRating = async (
-  documentId: string
-): Promise<{
-  reactionData: ReactionData;
-  ratingPercentage: number;
-  formattedRating: string;
-}> => {
-  try {
-    const response = await DocumentService.getDocumentReactions(documentId);
+export const calculateDocumentRating = (
+  likes: number = 0,
+  dislikes: number = 0
+): { ratingPercentage: number; formattedRating: string } => {
+  const ratingPercentage = calculateRatingPercentage(likes, dislikes);
+  const formattedRating = formatRatingPercentage(ratingPercentage);
 
-    const reactionData: ReactionData = {
-      likes: response.likes || 0,
-      dislikes: response.dislikes || 0,
-      userReaction: response.reacted === "NONE" ? null : response.reacted,
-    };
-
-    const ratingPercentage = calculateRatingPercentage(
-      reactionData.likes,
-      reactionData.dislikes
-    );
-    const formattedRating = formatRatingPercentage(ratingPercentage);
-
-    return {
-      reactionData,
-      ratingPercentage,
-      formattedRating,
-    };
-  } catch (error) {
-    console.error("Error fetching document rating:", error);
-
-    // Trả về giá trị mặc định khi có lỗi
-    const defaultReactionData: ReactionData = {
-      likes: 0,
-      dislikes: 0,
-      userReaction: null,
-    };
-
-    return {
-      reactionData: defaultReactionData,
-      ratingPercentage: 0,
-      formattedRating: "0%",
-    };
-  }
+  return { ratingPercentage, formattedRating };
 };
 
 /**
- * Tính toán tỷ lệ đánh giá cho nhiều tài liệu
- * @param documentIds - Mảng các ID tài liệu
- * @returns Promise chứa Map với key là documentId và value là rating data
+ * Tính toán tỷ lệ đánh giá cho nhiều tài liệu từ dữ liệu like/dislike trực tiếp
+ * @param documents - Mảng các document có chứa _id, like và dislike
+ * @returns Map với key là documentId và value là rating data
+ * @deprecated Sử dụng calculateDocumentRating thay thế
  */
-export const fetchMultipleDocumentRatings = async (
-  documentIds: string[]
-): Promise<
-  Map<string, { ratingPercentage: number; formattedRating: string }>
-> => {
+export const calculateMultipleDocumentRatings = (
+  documents: Array<{ _id: string; like?: number; dislike?: number }>
+): Map<string, { ratingPercentage: number; formattedRating: string }> => {
   const ratingMap = new Map();
 
-  // Thực hiện các request song song để tăng hiệu suất
-  const promises = documentIds.map(async (documentId) => {
-    try {
-      const result = await fetchDocumentRating(documentId);
-      return {
-        documentId,
-        ratingPercentage: result.ratingPercentage,
-        formattedRating: result.formattedRating,
-      };
-    } catch (error) {
-      console.error(`Error fetching rating for document ${documentId}:`, error);
-      return {
-        documentId,
-        ratingPercentage: 0,
-        formattedRating: "0%",
-      };
+  documents.forEach((document) => {
+    // Đảm bảo _id tồn tại
+    if (!document._id) {
+      console.warn("Document missing _id:", document);
+      return;
     }
-  });
 
-  const results = await Promise.all(promises);
+    const likes = document.like || 0;
+    const dislikes = document.dislike || 0;
 
-  results.forEach(({ documentId, ratingPercentage, formattedRating }) => {
-    ratingMap.set(documentId, { ratingPercentage, formattedRating });
+    const rating = calculateDocumentRating(likes, dislikes);
+    ratingMap.set(document._id, rating);
   });
 
   return ratingMap;
