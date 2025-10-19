@@ -21,7 +21,7 @@ const ReadHistoryGroup: React.FC<ReadHistoryGroupProps> = ({
     const diffTime = today.getTime() - targetDate.getTime();
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
-    if (diffDays === 1 && today.getDate() === targetDate.getDate()) {
+    if ((diffDays === 1 || diffDays === 0) && today.getDate() === targetDate.getDate()) {
       return "Hôm nay";
     } else if (diffDays === 2 && today.getDate() - targetDate.getDate() === 1) {
       return "Hôm qua";
