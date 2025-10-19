@@ -101,10 +101,20 @@ const AuthRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
           setRole(data.roles);
           setAccount(data.account);
 
-          // Extract read history from user data
-          const userReadHistory: ReadHistoryItem[] =
-            data.user?.read_history || [];
+          // Extract read history from user data and ensure type safety
+          const rawReadHistory = data.user?.read_history || [];
+          const userReadHistory: ReadHistoryItem[] = rawReadHistory.map(
+            (item: any) => ({
+              document:
+                item.document && typeof item.document === "object"
+                  ? (item.document as Document)
+                  : null,
+              read_at: item.read_at,
+              _id: item._id,
+            })
+          );
           setReadHistory(userReadHistory);
+          console.log("📚 User Read History:", userReadHistory.length, "items");
 
           // Get shared documents from user data (populated with full document objects)
           const rawSharedDocs = data.user?.shared_documents || [];

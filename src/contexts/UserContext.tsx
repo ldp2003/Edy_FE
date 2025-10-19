@@ -5,7 +5,7 @@ import type { Document } from "../models/document";
 import type { Notification } from "../models/notification";
 
 export interface ReadHistoryItem {
-  document: Document;
+  document: Document | null;
   read_at: string;
   _id: string;
 }
