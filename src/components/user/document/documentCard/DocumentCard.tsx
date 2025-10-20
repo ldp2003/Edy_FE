@@ -1,4 +1,4 @@
-import { Heart, GraduationCap, User } from "lucide-react";
+import { Heart, GraduationCap, User, FileText } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect, useContext } from "react";
 import { UserContext } from "../../../../contexts/UserContext";
@@ -54,9 +54,14 @@ const DocumentCard: React.FC<DocumentCardProps> = ({
     }
   };
 
+  const handleImageError = (e: React.SyntheticEvent<HTMLImageElement>) => {
+    const target = e.target as HTMLImageElement;
+    target.src = "/public/image/default_cover.png";
+  };
+
   return (
     <div
-      className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden cursor-pointer hover:shadow-md transition-shadow duration-200 w-[160px] md:w-full flex-shrink-0"
+      className="bg-white text-left rounded-lg shadow-sm border border-gray-200 overflow-hidden cursor-pointer hover:shadow-md transition-shadow duration-200 w-[160px] md:w-full flex-shrink-0"
       onClick={handleCardClick}
     >
       {contextHolder}
@@ -65,35 +70,59 @@ const DocumentCard: React.FC<DocumentCardProps> = ({
         <img
           src={document.cover_page || "/image/default_cover.png"}
           alt={document.title}
-          className="w-full h-full object-cover"
+          className="w-full h-full object-contain bg-[var(--secondary-background-color)]"
           loading="lazy"
+          onError={handleImageError}
         />
         <button
           onClick={handleFavoriteClick}
           className={`absolute top-2 right-2 p-1.5 rounded-full ${
             isFavorite
               ? "bg-red-500 text-white"
-              : "bg-white/80 text-gray-600 hover:bg-white"
+              : "bg-white/80 text-[var(--secondary-text-color)] hover:bg-white"
           }`}
         >
           <Heart className="w-3.5 h-3.5" />
         </button>
+        {/* Số trang */}
+        {document.page && (
+          <div className="absolute bottom-0 right-0 bg-white text-[var(--primary-text-color)] text-xs px-2 py-1 rounded-t-lg flex items-center gap-1">
+            <FileText className="w-3 h-3" />
+            <span>{document.page}</span>
+          </div>
+        )}
       </div>
 
       {/* Content */}
-      <div className="p-2 md:p-3">
-        <h3 className="text-xs md:text-sm font-medium text-gray-900 line-clamp-2 mb-1">
+      <div className="p-2 md:p-3 h-[72px] md:h-[88px]">
+        <h3 className="text-xs md:text-sm font-medium text-[var(--primary-text-color)] line-clamp-2 mb-1">
           {document.title}
         </h3>
-        <div className="flex items-center gap-1 text-gray-600 text-[10px] md:text-xs">
-          {document.subject ? (
-            <GraduationCap className="w-3 h-3 flex-shrink-0" />
-          ) : (
-            <User className="w-3 h-3 flex-shrink-0" />
-          )}
-          <span className="truncate">
-            {document.subject?.name || document.user?.first_name}
-          </span>
+        <div className="space-y-1">
+          {/* Môn học */}
+          <div className="flex items-center gap-1 text-[var(--secondary-text-color)] text-[10px] md:text-xs h-[14px] md:h-[16px]">
+            {document.subject ? (
+              <>
+                <GraduationCap className="w-3 h-3 flex-shrink-0" />
+                <span className="truncate">{document.subject.name}</span>
+              </>
+            ) : (
+              <span className="opacity-0">Placeholder</span>
+            )}
+          </div>
+          {/* Người đăng */}
+          <div className="flex items-center gap-1 text-[var(--secondary-text-color)] text-[10px] md:text-xs h-[14px] md:h-[16px]">
+            {document.user ? (
+              <>
+                <User className="w-3 h-3 flex-shrink-0" />
+                <span className="truncate">
+                  {document.user.first_name} {document.user.last_name}
+                </span>
+              </>
+            ) : (
+              <span className="opacity-0">Placeholder</span>
+            )}
+          </div>
         </div>
       </div>
     </div>

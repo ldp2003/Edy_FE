@@ -1,21 +1,20 @@
 import React, { useState, useCallback, useEffect, useContext } from "react";
 import { useParams } from "react-router-dom";
-import { User } from "lucide-react";
 import DocumentSide from "../../../components/user/document/documentDetail/DocumentSide";
 import MobileDocumentHeader from "../../../components/user/document/documentDetail/MobileDocumentHeader";
-import AuthorInfo from "../../../components/common/userInfo/AuthorInfo";
 import DocumentViewer from "../../../components/user/document/documentView/DocumentViewer";
 import DocumentPagination from "../../../components/user/document/documentView/DocumentPagination";
 import { DocumentService } from "../../../utils/DocumentService";
 import type { Document } from "../../../models/document";
 import { UserContext } from "../../../contexts/UserContext";
+import AuthorInfo from "../../../components/common/userInfo/AuthorInfo";
+import DocumentActions from "../../../components/user/document/documentDetail/DocumentActions";
 
 const DocumentDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const { isLoggedIn, addToReadHistory } = useContext(UserContext);
   const [document, setDocument] = useState<Document | null>(null);
   const [loading, setLoading] = useState(true);
-  const [showAuthor, setShowAuthor] = useState(false);
 
   // State for pagination
   const [currentPage, setCurrentPage] = useState(1);
@@ -37,7 +36,7 @@ const DocumentDetail: React.FC = () => {
 
         // Add to read history if user is logged in
         if (isLoggedIn && documentData) {
-          addToReadHistory(documentData);
+          void addToReadHistory(documentData);
         }
       } catch (error) {
         console.error("Error fetching document:", error);
@@ -48,7 +47,7 @@ const DocumentDetail: React.FC = () => {
     };
 
     fetchDocument();
-  }, [id, isLoggedIn, addToReadHistory]);
+  }, [id, isLoggedIn]);
 
   // Handle page change from document viewer
   const handlePageChange = useCallback((current: number, total: number) => {
@@ -147,30 +146,13 @@ const DocumentDetail: React.FC = () => {
       </div>
 
       {/* Main content - có thể scroll */}
-      <div className="flex-1 overflow-y-auto">
+      <div className="flex-1 overflow-y-auto pb-[72px] md:pb-0">
         <div className="p-4">
-          {/* Mobile Author Button */}
-          <div className="fixed bottom-4 right-4 md:hidden z-50">
-            <button
-              onClick={() => setShowAuthor(!showAuthor)}
-              className="w-12 h-12 bg-white rounded-full shadow-lg flex items-center justify-center text-[var(--primary-color)] border border-[var(--border-color)]"
-            >
-              <User size={24} />
-            </button>
-          </div>
-
-          {/* Mobile Author Panel */}
-          {showAuthor && (
-            <div className="md:hidden fixed bottom-20 right-4 bg-white shadow-lg rounded-lg z-40 p-4 w-72 animate-in slide-in-from-right">
-              <AuthorInfo document={document!} />
-            </div>
-          )}
-
-          {/* Desktop Author Info */}
-          <div className="hidden md:block mb-4">
+          <div className="hidden sm:flex flex-col">
             <AuthorInfo document={document!} />
+            <DocumentActions document={document!} />
           </div>
-
+          
           <DocumentViewer
             url={document!.url}
             type={getViewerFileType(document!.file_type)}
@@ -195,6 +177,8 @@ const DocumentDetail: React.FC = () => {
           zoom={zoom}
         />
       )}
+
+   
     </div>
   );
 };
