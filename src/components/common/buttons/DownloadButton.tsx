@@ -232,7 +232,7 @@ const DownloadButton: React.FC<DownloadButtonProps> = ({
         }}
         footer={null}
         width={500}
-        destroyOnClose
+        destroyOnHidden
       >
         <div className="py-4">
           {errorMessage && (

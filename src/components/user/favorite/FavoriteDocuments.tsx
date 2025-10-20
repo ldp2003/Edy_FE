@@ -41,8 +41,11 @@ const FavoriteDocuments: React.FC = () => {
   };
 
   useEffect(() => {
+    const controller = new AbortController();
     fetchFavoriteDocuments();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    return () => {
+      controller.abort();
+    };
   }, []);
 
   // Show loading state

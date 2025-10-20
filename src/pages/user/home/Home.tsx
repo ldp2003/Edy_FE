@@ -70,11 +70,6 @@ export default function HomePage() {
     fetchDocuments();
   }, [messageApi, user]);
 
-  const handleSubjectClick = (subject: Subject) => {
-    // This function is intentionally empty as SubjectItem handles its own navigation
-    console.log("Subject clicked:", subject.name);
-  };
-
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -90,16 +85,17 @@ export default function HomePage() {
     <div className="min-h-screen">
       {contextHolder}
       <div className="flex">
-        <main className="flex-1 p-6 max-w-full">
-          <SubjectGrid
-            title={`Các môn học của ${
-              typeof user?.organization === "object" && user?.organization?.name
-                ? user.organization.name
-                : "tổ chức"
-            }`}
-            subjects={subjects}
-            onSubjectClick={handleSubjectClick}
-          />
+        <main className="flex-1 px-4 py-4 md:p-6 max-w-full space-y-6">
+          {subjects && subjects.length > 0 && (
+            <SubjectGrid
+              title={`Các môn học của ${
+                typeof user?.organization === "object" && user?.organization?.name
+                  ? user.organization.name
+                  : "tổ chức"
+              }`}
+              subjects={subjects}
+            />
+          )}
           {readHistory && readHistory.length > 0 && (
             // hiện tối đa 5 tài liệu gần đây
             <DocumentGrid

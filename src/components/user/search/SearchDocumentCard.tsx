@@ -21,10 +21,11 @@ const SearchDocumentCard: React.FC<SearchDocumentCardProps> = ({
 
   // Sync with context
   useEffect(() => {
-    if (document._id) {
-      setIsFavorite(favoriteDocuments.some((doc) => doc._id === document._id));
+    const isFav = document._id ? favoriteDocuments.some((doc) => doc._id === document._id) : false;
+    if (isFav !== isFavorite) {
+      setIsFavorite(isFav);
     }
-  }, [favoriteDocuments, document._id]);
+  }, [document._id, favoriteDocuments, isFavorite]);
 
   const handleCardClick = () => {
     window.location.href = `/documents/${document._id}`;

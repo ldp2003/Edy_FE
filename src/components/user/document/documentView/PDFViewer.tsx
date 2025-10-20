@@ -35,36 +35,55 @@ const PDFViewer: React.FC<PDFViewerProps> = ({
 
   const renderPages = useCallback(
     async (pdf: pdfjsLib.PDFDocumentProxy) => {
-      // If user owns the document, show all pages. Otherwise, limit to 10 pages
-      const pageCount = isUser ? pdf.numPages : Math.min(pdf.numPages, 10);
-      const canvasImages: string[] = [];
+      try {
+        const numPages = pdf.numPages;
+        const pagesToRender = isUser ? numPages : Math.min(numPages, 10);
+        const newCanvases: string[] = [];
 
-      for (let i = 1; i <= pageCount; i++) {
-        const page = await pdf.getPage(i);
-        const viewport = page.getViewport({ scale: zoom });
-        const canvas = document.createElement("canvas");
-        const context = canvas.getContext("2d");
-        canvas.height = viewport.height;
-        canvas.width = viewport.width;
+        for (let i = 1; i <= pagesToRender; i++) {
+          const page = await pdf.getPage(i);
+          const viewport = page.getViewport({ scale: zoom });
+          const canvas = document.createElement("canvas");
+          const context = canvas.getContext("2d");
 
-        await page.render({ canvasContext: context!, viewport, canvas })
-          .promise;
-        canvasImages.push(canvas.toDataURL());
+          if (!context) continue;
+
+          canvas.height = viewport.height;
+          canvas.width = viewport.width;
+
+          const renderTask = page.render({
+            canvasContext: context,
+            viewport: viewport,
+            canvas: canvas // Thêm thuộc tính canvas theo yêu cầu của RenderParameters
+          });
+
+          try {
+            await renderTask.promise;
+            newCanvases.push(canvas.toDataURL());
+          } catch (renderError) {
+            console.error(`Error rendering page ${i}:`, renderError);
+            continue;
+          } finally {
+            // Cleanup page object
+            page.cleanup();
+          }
+        }
+
+        setCanvases(newCanvases);
+        if (onPageChange) {
+          onPageChange(currentPage, pagesToRender);
+        }
+      } catch (error) {
+        console.error("Error rendering pages:", error);
       }
-
-      setCanvases(canvasImages);
-
-      // Notify parent about page count (full pages if user's doc, limited if not)
-      if (onPageChange) {
-        onPageChange(1, pageCount);
-      }
-
-      console.log("Rendered canvases:", canvasImages.length);
     },
-    [zoom, onPageChange, isUser]
+    [zoom, onPageChange, isUser, currentPage]
   );
 
   useEffect(() => {
+    let isMounted = true;
+    let currentPdf: pdfjsLib.PDFDocumentProxy | null = null;
+
     const loadPDF = async () => {
       try {
         setLoading(true);
@@ -83,11 +102,13 @@ const PDFViewer: React.FC<PDFViewerProps> = ({
         }
 
         const pdf = await pdfjsLib.getDocument(url).promise;
-        console.log("Loaded PDF:", pdf);
+        if (!isMounted) return;
+        
+        currentPdf = pdf;
         setPdfDocument(pdf);
-
         await renderPages(pdf);
       } catch (error) {
+        if (!isMounted) return;
         console.error("Error loading PDF:", error);
         if (error instanceof Error) {
           if (error.message.includes("401")) {
@@ -105,27 +126,34 @@ const PDFViewer: React.FC<PDFViewerProps> = ({
           setError("Đã xảy ra lỗi không xác định khi tải tài liệu.");
         }
       } finally {
-        setLoading(false);
+        if (isMounted) {
+          setLoading(false);
+        }
       }
     };
 
     loadPDF();
-  }, [url, renderPages]);
+
+    return () => {
+      isMounted = false;
+      if (currentPdf) {
+        currentPdf.destroy();
+      }
+    };
+  }, [url]);
 
   useEffect(() => {
-    // Update visible page when currentPage prop changes
     if (currentPage !== visiblePage) {
       setVisiblePage(currentPage);
       scrollToPage(currentPage);
     }
   }, [currentPage, visiblePage]);
 
-  // Re-render pages when zoom changes
   useEffect(() => {
     if (pdfDocument) {
       renderPages(pdfDocument);
     }
-  }, [zoom, pdfDocument, renderPages]);
+  }, [zoom, pdfDocument]);
 
   const scrollToPage = (pageNumber: number) => {
     const pageElement = document.getElementById(`pdf-page-${pageNumber}`);
