@@ -10,27 +10,9 @@ import UploadButton from "../../common/buttons/UploadButton";
 import type { Document } from "../../../models/document";
 import { DocumentService } from "../../../utils/DocumentService";
 
-interface Post {
-  key: string;
-  index: number;
-  title: string;
-  views: number;
-  comments: number;
-  download_count: number;
-  rating: string;
-  status: string;
-  mode: string;
-  public_mode: string;
-  url: string;
-  createdAt: string;
-  content_rejection?: {
-    message: string;
-  };
-}
-
 const PersonalPostList: React.FC = () => {
   const [viewMode, setViewMode] = useState("table");
-  const [documents, setDocuments] = useState<Post[]>([]);
+  const [documents, setDocuments] = useState<Document[]>([]);
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(5);
@@ -55,28 +37,8 @@ const PersonalPostList: React.FC = () => {
       const data = await DocumentService.getMyDocuments(apiParams);
       console.log("API Response:", data); // Debug log
 
-      // Map dữ liệu BE sang Post[]
-      const docs = Array.isArray(data?.documents)
-        ? data.documents.map((doc: Document, idx: number) => ({
-            key: doc._id,
-            index: (currentPage - 1) * pageSize + idx + 1,
-            title: doc.title,
-            views: doc.view || 0,
-            comments: doc.comment_count || 0,
-            rating: "0%", // Nếu có trường rating thì lấy, không thì để mặc định
-            status: doc.status || "PENDING",
-            mode: doc.file_type || "PDF",
-            public_mode: doc.public_mode || "PRIVATE",
-            url: doc.url,
-            createdAt: doc.createdAt,
-            download_count: doc.download_count || 0,
-            content_rejection: doc.content_rejection
-              ? {
-                  message: doc.content_rejection.message,
-                }
-              : undefined,
-          }))
-        : [];
+      // Sử dụng trực tiếp Document[] từ API
+      const docs = Array.isArray(data?.documents) ? data.documents : [];
 
       setDocuments(docs);
       setTotal(data?.total || 0);

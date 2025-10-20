@@ -14,7 +14,7 @@ const SearchScopeInput: React.FC<{
 
   const handleAddScope = () => {
     if (inputValue.trim() && !scopes.includes(inputValue.trim())) {
-      setScopes([...scopes, inputValue.trim()]);
+      setScopes([...scopes, inputValue.trim()]); 
       setInputValue("");
     }
   };

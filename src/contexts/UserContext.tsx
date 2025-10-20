@@ -5,8 +5,14 @@ import type { Document } from "../models/document";
 import type { Notification } from "../models/notification";
 
 export interface ReadHistoryItem {
-  document: Document;
+  document: Document | null;
   read_at: string;
+  _id: string;
+}
+
+export interface SharedDocumentItem {
+  document: Document | null;
+  shared_at: string;
   _id: string;
 }
 
@@ -18,6 +24,10 @@ export const UserContext = createContext({
   personalDocuments: [] as Document[],
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   setPersonalDocuments: (_docs: Document[]) => {},
+
+  sharedDocuments: [] as SharedDocumentItem[],
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  setSharedDocuments: (_docs: SharedDocumentItem[]) => {},
 
   favoriteDocuments: [] as Document[],
   // eslint-disable-next-line @typescript-eslint/no-unused-vars

@@ -1,3 +1,5 @@
+import type { Document } from "./document";
+
 export interface Organization {
   _id: string;
   name: string;
@@ -28,8 +30,9 @@ export interface User {
     read_at: string;
   }[];
   shared_documents: {
-    document: string;
+    document: string | Document;
     shared_at: string;
+    _id?: string;
   }[];
   favorites?: {
     document: string;

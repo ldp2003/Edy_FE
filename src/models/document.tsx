@@ -106,6 +106,8 @@ export interface Document {
   last_approved_at?: string;
   createdAt: string;
   updatedAt?: string;
+  like?: number;
+  dislike?: number;
   content_rejection?: {
     _id: string;
     doc: string;

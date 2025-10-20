@@ -46,6 +46,7 @@ const DocumentDetail: React.FC = () => {
     };
 
     fetchDocument();
+    console.log("Doc data:", document);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id, isLoggedIn]);
 
