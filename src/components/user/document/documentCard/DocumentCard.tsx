@@ -1,25 +1,18 @@
-import { Heart } from "lucide-react";
+import { Heart, GraduationCap, User } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect, useContext } from "react";
 import { UserContext } from "../../../../contexts/UserContext";
 import type { Document } from "../../../../models/document";
 import { UserService } from "../../../../utils/UserService";
 import { message } from "antd";
-import type { ReactNode } from "react";
 
 interface DocumentCardProps {
-  title: string | ReactNode;
-  description: string;
-  imageUrl?: string;
-  document?: Document;
+  document: Document;
   navigationPath?: string; // Optional custom navigation path
   disableClick?: boolean;
 }
 
 const DocumentCard: React.FC<DocumentCardProps> = ({
-  title,
-  description,
-  imageUrl,
   document,
   navigationPath,
   disableClick = false,
@@ -31,23 +24,23 @@ const DocumentCard: React.FC<DocumentCardProps> = ({
 
   // Sync with context
   useEffect(() => {
-    if (document?._id) {
+    if (document._id) {
       setIsFavorite(favoriteDocuments.some((doc) => doc._id === document._id));
     }
-  }, [favoriteDocuments, document?._id]);
+  }, [favoriteDocuments, document._id]);
 
   const handleCardClick = () => {
     if (disableClick) return;
-    if (document?._id && navigationPath) {
+    if (document._id && navigationPath) {
       navigate(navigationPath);
-    } else if (document?._id) {
+    } else if (document._id) {
       navigate(`/document-detail/${document._id}`);
     }
   };
 
   const handleSaveClick = async (e: React.MouseEvent) => {
     e.stopPropagation();
-    if (!document?._id) return;
+    if (!document._id) return;
     try {
       if (isFavorite) {
         await UserService.removeFromFavorites(document._id);
@@ -85,8 +78,8 @@ const DocumentCard: React.FC<DocumentCardProps> = ({
       {contextHolder}
       <div className="bg-[var(--card-background-color)] rounded-md relative flex justify-center items-center">
         <img
-          src={imageUrl || "/public/image/default_cover.png"}
-          alt={typeof title === "string" ? title : "Tài liệu"}
+          src={document.cover_page || "/public/image/default_cover.png"}
+          alt={document.title}
           className="h-40 m-3 w-full object-fill rounded-md bg-white"
           onError={handleImageError}
         />
@@ -95,9 +88,20 @@ const DocumentCard: React.FC<DocumentCardProps> = ({
       <div className="flex flex-col justify-between p-4 text-[var(--primary-text-color)]">
         <div>
           <h3 className="font-bold lg:text-xs mb-2 line-clamp-2 min-h-8">
-            {title}
+            {document.title}
           </h3>
-          <p className="text-xs mb-3 truncate">{description}</p>
+          {/* Tên người đăng */}
+          <p className="text-xs mb-1 text-[var(--secondary-text-color)] truncate flex items-center gap-1">
+            <User className="w-3 h-3" />
+            {document.user?.first_name
+              ? `${document.user.first_name} ${document.user.last_name || ""}`
+              : "Người dùng ẩn danh"}
+          </p>
+          {/* Môn học */}
+          <p className="text-xs mb-3 truncate flex items-center gap-1">
+            <GraduationCap className="w-3 h-3" />
+            {document.subject?.name || "Chưa có môn học"}
+          </p>
         </div>
         <button
           className="w-full  flex bg-white items-center justify-center gap-2 px-3 py-1 font-bold text-xs border border-gray-300 rounded-md cursor-pointer hover:bg-gray-50 transition-colors"
