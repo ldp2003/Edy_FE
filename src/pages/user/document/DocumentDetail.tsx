@@ -1,13 +1,14 @@
 import React, { useState, useCallback, useEffect, useContext } from "react";
 import { useParams } from "react-router-dom";
 import DocumentSide from "../../../components/user/document/documentDetail/DocumentSide";
-import DocumentActions from "../../../components/user/document/documentDetail/DocumentActions";
-import AuthorInfo from "../../../components/common/userInfo/AuthorInfo";
+import MobileDocumentHeader from "../../../components/user/document/documentDetail/MobileDocumentHeader";
 import DocumentViewer from "../../../components/user/document/documentView/DocumentViewer";
 import DocumentPagination from "../../../components/user/document/documentView/DocumentPagination";
 import { DocumentService } from "../../../utils/DocumentService";
 import type { Document } from "../../../models/document";
 import { UserContext } from "../../../contexts/UserContext";
+import AuthorInfo from "../../../components/common/userInfo/AuthorInfo";
+import DocumentActions from "../../../components/user/document/documentDetail/DocumentActions";
 
 const DocumentDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -35,7 +36,7 @@ const DocumentDetail: React.FC = () => {
 
         // Add to read history if user is logged in
         if (isLoggedIn && documentData) {
-          addToReadHistory(documentData);
+          void addToReadHistory(documentData);
         }
       } catch (error) {
         console.error("Error fetching document:", error);
@@ -46,8 +47,6 @@ const DocumentDetail: React.FC = () => {
     };
 
     fetchDocument();
-    console.log("Doc data:", document);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id, isLoggedIn]);
 
   // Handle page change from document viewer
@@ -135,15 +134,25 @@ const DocumentDetail: React.FC = () => {
   }
 
   return (
-    <div className="h-screen flex overflow-hidden">
-      {/* Document Side - cố định bên trái như sidebar */}
-      <DocumentSide document={document!} />
+    <div className="h-screen flex flex-col md:flex-row overflow-hidden">
+      {/* Document Side - ẩn trên mobile, hiện trên desktop */}
+      <div className="hidden md:block md:w-80">
+        <DocumentSide document={document!} />
+      </div>
+
+      {/* Mobile Header */}
+      <div className="md:hidden">
+        <MobileDocumentHeader document={document!} />
+      </div>
 
       {/* Main content - có thể scroll */}
-      <div className="flex-1 overflow-y-auto">
+      <div className="flex-1 overflow-y-auto pb-[72px] md:pb-0">
         <div className="p-4">
-          <AuthorInfo document={document!} />
-          <DocumentActions document={document!} />
+          <div className="hidden sm:flex flex-col">
+            <AuthorInfo document={document!} />
+            <DocumentActions document={document!} />
+          </div>
+          
           <DocumentViewer
             url={document!.url}
             type={getViewerFileType(document!.file_type)}
@@ -168,6 +177,8 @@ const DocumentDetail: React.FC = () => {
           zoom={zoom}
         />
       )}
+
+   
     </div>
   );
 };

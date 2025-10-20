@@ -246,8 +246,10 @@ const SearchPage: React.FC = () => {
 
   // Fetch documents when filters, page, or tab change
   useEffect(() => {
-    fetchDocuments();
-  }, [fetchDocuments]);
+    if (filters && currentTab) {
+      fetchDocuments();
+    }
+  }, [filters, currentTab, fetchDocuments]);
 
   // Update filters when URL changes (only on initial load or external URL changes)
   useEffect(() => {

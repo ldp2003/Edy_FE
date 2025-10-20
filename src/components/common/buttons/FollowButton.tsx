@@ -3,7 +3,7 @@ import React from "react";
 import { Button, message } from "antd";
 import { UserPlus, UserMinus } from "lucide-react";
 import type { User } from "../../../models/user";
-import { useContext, useState, useEffect } from "react";
+import { useContext, useState, useEffect, useCallback } from "react";
 import { UserContext } from "../../../contexts/UserContext";
 import { UserService } from "../../../utils/UserService";
 import { NotificationService } from "../../../utils/NotificationService";
@@ -20,26 +20,20 @@ const FollowButton: React.FC<FollowButtonProps> = ({
   onFollowerCountChange,
 }) => {
   const { user: currentUser } = useContext(UserContext);
-  const [isFollowing, setIsFollowing] = useState(
-    currentUser?.following?.some(
-      (followedUser: any) => followedUser._id === user._id
-    )
-  );
+  const [isFollowing, setIsFollowing] = useState(false);
   const [messageApi, contextHolder] = message.useMessage();
-  console.log("isFollowing", currentUser?.following);
-  console.log("user._id", user._id);
 
+  // Kiểm tra trạng thái following một lần khi component mount hoặc khi currentUser.following thay đổi
   useEffect(() => {
     if (currentUser?.following) {
-      setIsFollowing(
-        currentUser.following.some(
-          (followedUser: any) => followedUser._id === user._id
-        )
+      const isUserFollowed = currentUser.following.some(
+        (followedUser: any) => followedUser._id === user._id
       );
+      setIsFollowing(isUserFollowed);
     }
   }, [currentUser?.following, user._id]);
 
-  const handleFollow = async () => {
+  const handleFollow = useCallback(async () => {
     try {
       const response = await UserService.followUser(user._id);
       if (response) {
@@ -49,16 +43,16 @@ const FollowButton: React.FC<FollowButtonProps> = ({
           message: `${currentUser?.first_name} ${currentUser?.last_name} đã theo dõi bạn.`,
         });
         setIsFollowing(true);
-        onFollowerCountChange?.(true); // Tăng số lượng người theo dõi
+        onFollowerCountChange?.(true);
         messageApi.success("Theo dõi thành công!");
       }
     } catch (error) {
       console.error("Error following user:", error);
       messageApi.error("Theo dõi thất bại. Vui lòng thử lại sau.");
     }
-  };
+  }, [currentUser?.first_name, currentUser?.last_name, messageApi, onFollowerCountChange, user._id]);
 
-  const handleUnfollow = async () => {
+  const handleUnfollow = useCallback(async () => {
     try {
       const confirmUnfollow = window.confirm(
         "Bạn có chắc chắn muốn bỏ theo dõi người dùng này không?"
@@ -67,13 +61,13 @@ const FollowButton: React.FC<FollowButtonProps> = ({
 
       await UserService.unfollowUser(user._id);
       setIsFollowing(false);
-      onFollowerCountChange?.(false); // Giảm số lượng người theo dõi
+      onFollowerCountChange?.(false);
       messageApi.success("Bỏ theo dõi thành công!");
     } catch (error) {
       console.error("Error unfollowing user:", error);
       messageApi.error("Bỏ theo dõi thất bại. Vui lòng thử lại sau.");
     }
-  };
+  }, [messageApi, onFollowerCountChange, user._id]);
 
   // Style cho size small (như trong FollowItem)
   const smallButtonStyle = {

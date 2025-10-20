@@ -31,7 +31,7 @@ export const UserContext = createContext({
 
   favoriteDocuments: [] as Document[],
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  setFavoriteDocuments: (_docs: Document[]) => {},
+  setFavoriteDocuments: (_docs: Document[] | ((prev: Document[]) => Document[])) => {},
   readHistory: [] as ReadHistoryItem[],
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   setReadHistory: (_history: ReadHistoryItem[]) => {},

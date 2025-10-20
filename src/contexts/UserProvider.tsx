@@ -17,7 +17,7 @@ interface UserProviderProps {
   account: Account | null;
   role: string | null;
   favoriteDocuments: Document[];
-  setFavoriteDocuments: (docs: Document[]) => void;
+  setFavoriteDocuments: (docs: Document[] | ((prev: Document[]) => Document[])) => void;
   readHistory: ReadHistoryItem[];
   setReadHistory: (history: ReadHistoryItem[]) => void;
   personalDocuments: Document[];
