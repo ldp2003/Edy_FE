@@ -239,6 +239,9 @@ export const UserAPI = {
   unfollowUser: async (userId: string) => {
     return await apiClient.post(`/users/${userId}/unfollow`);
   },
+  getPermissionByUserId: async (userId: string) => {
+    return await apiClient.get(`/users/${userId}/roles`);
+  },
 };
 
 export const SubjectAPI = {
