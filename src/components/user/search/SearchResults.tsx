@@ -56,24 +56,41 @@ const SearchResults: React.FC<SearchResultsProps> = ({
             <span className="text-blue-600 ml-2">"{searchQuery}"</span>
           )}
         </h2>
-        <p className="text-sm text-gray-600">
-          {currentTab === "subjects"
-            ? `Hiển thị ${total.toLocaleString()} môn học`
-            : `Tìm thấy ${total.toLocaleString()} tài liệu`}
-        </p>
       </div>
 
       {/* Results Content */}
       {currentTab === "subjects" ? (
         /* Subject Grid Only */
-        <SubjectGrid
-          title=""
-          subjects={subjects}
-          onSubjectClick={(subject) => {
-            // Navigate to subject documents page
-            window.location.href = `/subject/${subject._id}/documents`;
-          }}
-        />
+        loading ? (
+          <div className="flex justify-center items-center py-12">
+            <Spin size="large" />
+          </div>
+        ) : subjects && subjects.length > 0 ? (
+          <SubjectGrid
+            title=""
+            subjects={subjects}
+            onSubjectClick={(subject: Subject) => {
+              // Navigate to subject documents page
+              window.location.href = `/subject/${subject._id}/documents`;
+            }}
+          />
+        ) : (
+          <Card>
+            <Empty
+              description={
+                <div className="text-center">
+                  <p className="text-gray-500 mb-2">
+                    Không tìm thấy môn học nào phù hợp
+                  </p>
+                  <p className="text-sm text-gray-400">
+                    Thử thay đổi từ khóa tìm kiếm
+                  </p>
+                </div>
+              }
+              className="py-12"
+            />
+          </Card>
+        )
       ) : (
         <>
           {/* Subject Grid for All tab */}
@@ -88,14 +105,14 @@ const SearchResults: React.FC<SearchResultsProps> = ({
           {/* Controls */}
           <div className="bg-white">
             <div className="flex flex-col sm:flex-row justify-start items-start sm:items-center gap-4">
-              <div className="flex items-center gap-3">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
                 {/* Sort Dropdown */}
                 <div className="flex items-center gap-2">
                   <span className="text-sm text-gray-600">Sắp xếp:</span>
                   <Select
                     placeholder="Chọn cách sắp xếp"
                     onChange={handleSortChange}
-                    className="w-40"
+                    className="w-full sm:w-40"
                     size="small"
                     defaultValue="createdAt:desc"
                   >
@@ -160,17 +177,9 @@ const SearchResults: React.FC<SearchResultsProps> = ({
             <>
               {/* Grid View */}
               {viewMode === "grid" && (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4 justify-items-center">
                   {documents.map((document) => (
-                    <DocumentCard
-                      key={document._id}
-                      title={document.title}
-                      description={`${document.page || 0} trang • ${
-                        document.view || 0
-                      } lượt xem • ${document.download_count || 0} lượt tải`}
-                      imageUrl={document.cover_page}
-                      document={document}
-                    />
+                    <DocumentCard key={document._id} document={document} />
                   ))}
                 </div>
               )}

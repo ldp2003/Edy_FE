@@ -176,7 +176,7 @@ const SearchHeader: React.FC<SearchHeaderProps> = ({
             </p>
           </div>
 
-          <div className="flex items-center gap-4">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
             {/* Search Input - Enhanced styling */}
             <div className="flex-1">
               <div className="relative">
@@ -345,7 +345,7 @@ const SearchHeader: React.FC<SearchHeaderProps> = ({
       {isFixed && (
         <div className="sticky top-0 mx-[-16px] bg-white/95 backdrop-blur-sm border-b border-gray-200 shadow-lg z-50 transition-all duration-300">
           <div className="max-w-7xl mx-auto px-4 py-3">
-            <div className="flex items-center gap-4">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
               {/* Sticky Search Input */}
               <div className="flex-1">
                 <div className="relative">
