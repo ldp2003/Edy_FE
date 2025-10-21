@@ -16,21 +16,21 @@ const DocumentDetailActions: React.FC<DocumentDetailActionsProps> = ({
     <div className=" bg-white border-t border-gray-200 p-4 z-50">
       <div className="flex items-center justify-between max-w-screen-xl mx-auto">
         {/* Nút tải xuống */}
-        <button className="px-4 py-2 bg-[var(--primary-color)] text-white rounded-lg text-sm font-medium flex items-center gap-2 hover:opacity-90">
+        <button className="px-4 py-2 bg-[var(--green-button-color)] text-white rounded-lg text-sm font-medium flex items-center gap-2 hover:opacity-90">
           <Download size={16} />
           <span>Tải xuống</span>
         </button>
 
         <div className="flex items-center gap-4">
           {/* Nút yêu thích */}
-          <button className="text-[var(--primary-color)] hover:text-[var(--primary-color)]/80">
+          <button className="text-[var(--primary-text-color)] hover:text-[var(--primary-color)]/80">
             <Heart size={24} />
           </button>
 
           {/* Nút xem thông tin người đăng */}
           <button
             onClick={() => setShowAuthorInfo(!showAuthorInfo)}
-            className="text-[var(--primary-color)] hover:text-[var(--primary-color)]/80"
+            className="text-[var(--primary-text-color)] hover:text-[var(--primary-color)]/80"
           >
             <User size={24} />
           </button>

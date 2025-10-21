@@ -53,12 +53,20 @@ const WordViewer: React.FC<WordViewerProps> = ({
   }, [url, onPageChange]);
 
   return (
-    <div className="lg:max-w-[1400px] z-0" style={{ minHeight: 200 }}>
-      {loading && <div>Đang tải file Word...</div>}
-      {error && <div style={{ color: "red" }}>{error}</div>}
+    <div className="w-full lg:max-w-[1400px] z-0 min-h-[200px]">
+      {loading && (
+        <div className="flex items-center justify-center py-10">
+          <div className="text-gray-600 text-sm sm:text-base">Đang tải file Word...</div>
+        </div>
+      )}
+      {error && (
+        <div className="text-red-600 text-sm sm:text-base px-4 py-3 bg-red-50 rounded-lg mx-2 sm:mx-4">
+          {error}
+        </div>
+      )}
       <div
         ref={containerRef}
-        className="docx-wrapper"
+        className="docx-wrapper px-2 sm:px-4"
         style={{ width: "100%", overflowX: "auto" }}
       />
     </div>
