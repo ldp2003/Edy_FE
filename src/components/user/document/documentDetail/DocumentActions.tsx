@@ -174,7 +174,7 @@ const DocumentActions: React.FC<DocumentActionsProps> = ({
       data-document-actions={document._id}
       className={`flex items-center justify-between p-2 transition-all duration-300 ${
         isFixed
-          ? "fixed top-15 w-[calc(100%-415px)] bg-[var(--secondary-background-color)] shadow-md z-10 mx-[-16px] px-4"
+          ? "sticky top-0 bg-[var(--secondary-background-color)] shadow-md z-10 mx-[-16px] px-4"
           : ""
       }`}
     >

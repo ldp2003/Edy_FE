@@ -13,7 +13,7 @@ const DocumentDetailActions: React.FC<DocumentDetailActionsProps> = ({
   const [showAuthorInfo, setShowAuthorInfo] = useState(false);
 
   return (
-    <div className=" bg-white border-t border-gray-200 p-4 z-50">
+    <div className="bg-white border-t border-gray-200 p-4 z-20">
       <div className="flex items-center justify-between max-w-screen-xl mx-auto">
         {/* Nút tải xuống */}
         <button className="px-4 py-2 bg-[var(--green-button-color)] text-white rounded-lg text-sm font-medium flex items-center gap-2 hover:opacity-90">
@@ -37,9 +37,9 @@ const DocumentDetailActions: React.FC<DocumentDetailActionsProps> = ({
         </div>
       </div>
 
-      {/* Panel thông tin người đăng */}
+      {/* Panel thông tin người đăng - hiển thị như phần mở rộng của header */}
       {showAuthorInfo && (
-        <div className="fixed bottom-[72px] left-0 right-0 bg-white border-t border-gray-200 p-4 animate-in slide-in-from-bottom">
+        <div className="border-t border-gray-200 bg-gray-50 p-4 animate-in slide-in-from-top">
           <div className="max-w-screen-xl mx-auto">
             <AuthorInfo document={document} />
             <div className="flex items-center justify-center gap-8 mt-4">
