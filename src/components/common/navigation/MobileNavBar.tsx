@@ -27,6 +27,7 @@ export const MobileNavBar: React.FC<MobileNavBarProps> = ({
       border-t border-gray-200 dark:border-gray-700
       py-2 px-4
       md:hidden
+      z-20
      `}
     >
       <div className="flex justify-around items-center">

@@ -18,7 +18,7 @@ const PostsPointBox: React.FC<PostsPointBoxProps> = ({
   }
 
   return (
-    <div className="p-4 bg-[var(--field-background-color)] w-[30%] rounded-md text-left shadow-md ">
+    <div className="p-4 bg-[var(--field-background-color)] w-full md:w-[30%] rounded-md text-left shadow-md">
       <div className="flex flex-col justify-between text-left">
         <div className="flex flex-row justify-between">
           <p className="text-xs text-gray-600">Điểm hạng (RP)</p>

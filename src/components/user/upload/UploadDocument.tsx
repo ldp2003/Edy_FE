@@ -493,24 +493,24 @@ const UploadDocument: React.FC<UploadDocumentProps> = ({
             return true;
           }}
         >
-          <div className="flex flex-col items-center text-center">
+          <div className="flex flex-col items-center text-center p-4 sm:p-6">
             <CloudUpload
-              size={80}
+              size={window.innerWidth < 640 ? 60 : 80}
               color={uploading ? "#d1d5db" : "var(--primary-color)"}
-              className={uploading ? "animate-pulse" : ""}
+              className={`${uploading ? "animate-pulse" : ""} mb-4`}
             />
-            <p className="text-sm font-bold">
+            <p className="text-sm sm:text-base font-bold mb-2">
               {uploading
                 ? "Đang tải lên..."
                 : "Kéo thả hoặc tải file tài liệu lên"}
             </p>
-            <p className="text-xs text-back italic">
+            <p className="text-xs sm:text-sm text-gray-500 italic px-2">
               Các file có thể đăng tải lên hệ thống bao gồm: doc, docx, pdf,
               ppt, pptx, xls, xlsx tối đa 10MB
             </p>
 
             {uploading && (
-              <div className="mt-4 w-full max-w-xs">
+              <div className="mt-4 w-full max-w-xs sm:max-w-sm">
                 <Progress
                   percent={uploadProgress}
                   size="small"
@@ -520,7 +520,7 @@ const UploadDocument: React.FC<UploadDocumentProps> = ({
                     "100%": "#87d068",
                   }}
                 />
-                <p className="text-xs text-gray-500 mt-1">
+                <p className="text-xs sm:text-sm text-gray-500 mt-1">
                   Đang tải lên... {uploadProgress}%
                 </p>
               </div>
