@@ -11,7 +11,17 @@ import type { Document } from "../../../models/document";
 import { DocumentService } from "../../../utils/DocumentService";
 
 const PersonalPostList: React.FC = () => {
-  const [viewMode, setViewMode] = useState("table");
+  // Default to list view on mobile, table view on desktop
+  const [viewMode, setViewMode] = useState(() => {
+    // Check if we're on mobile (screen width < 768px)
+    if (typeof window !== "undefined" && window.innerWidth < 768) {
+      return "list";
+    }
+    return "table";
+  });
+  const [isDesktop, setIsDesktop] = useState(() => {
+    return typeof window !== "undefined" && window.innerWidth >= 768;
+  });
   const [documents, setDocuments] = useState<Document[]>([]);
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
@@ -31,11 +41,7 @@ const PersonalPostList: React.FC = () => {
         limit: pageSize,
         ...filters,
       };
-
-      console.log("API Params:", apiParams); // Debug log
-
       const data = await DocumentService.getMyDocuments(apiParams);
-      console.log("API Response:", data); // Debug log
 
       // Sử dụng trực tiếp Document[] từ API
       const docs = Array.isArray(data?.documents) ? data.documents : [];
@@ -50,6 +56,25 @@ const PersonalPostList: React.FC = () => {
       setLoading(false);
     }
   }, [currentPage, pageSize, filters]);
+
+  // Auto-switch to list view on mobile and track desktop state
+  useEffect(() => {
+    const handleResize = () => {
+      if (typeof window !== "undefined") {
+        const isMobile = window.innerWidth < 768;
+        const isDesktopNow = window.innerWidth >= 768;
+
+        setIsDesktop(isDesktopNow);
+
+        if (isMobile && viewMode !== "list") {
+          setViewMode("list");
+        }
+      }
+    };
+
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, [viewMode]);
 
   useEffect(() => {
     fetchDocuments();
@@ -139,7 +164,7 @@ const PersonalPostList: React.FC = () => {
       case "grid":
         return <PostGridView data={documents} loading={loading} />;
       default:
-        return <PostTable data={documents} loading={loading} />;
+        return <PostListView data={documents} loading={loading} />;
     }
   };
 
@@ -158,25 +183,28 @@ const PersonalPostList: React.FC = () => {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 md:space-y-6">
       {/* Filter and Search */}
       <PostFilterSearch onFilterChange={handleFilterChange} loading={loading} />
 
-      <div className="bg-white p-6 rounded-lg shadow-md">
-        <div className="flex flex-row justify-between items-center gap-4 mb-4">
-          <div className="flex flex-row items-center gap-4">
-            <h1 className="text-base font-bold text-[var(--primary-text-color)]">
+      <div className="bg-white p-4 md:p-6 rounded-lg shadow-md">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 md:gap-4 mb-4">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 md:gap-4 w-full sm:w-auto">
+            <h1 className="text-sm md:text-base font-bold text-[var(--primary-text-color)]">
               Tài liệu của tôi
             </h1>
-            <select
-              className="px-4 text-xs w-fit border rounded h-5"
-              value={viewMode}
-              onChange={(e) => setViewMode(e.target.value)}
-            >
-              <option value="table">Hiển thị dạng bảng</option>
-              <option value="list">Hiển thị dạng danh sách</option>
-              <option value="grid">Hiển thị dạng lưới</option>
-            </select>
+            {/* Only show view selector on desktop */}
+            {isDesktop ? (
+              <select
+                className="px-3 md:px-4 text-xs w-full sm:w-fit border rounded h-8 md:h-5"
+                value={viewMode}
+                onChange={(e) => setViewMode(e.target.value)}
+              >
+                <option value="table">Hiển thị dạng bảng</option>
+                <option value="list">Hiển thị dạng danh sách</option>
+                <option value="grid">Hiển thị dạng lưới</option>
+              </select>
+            ) : null}
           </div>
 
           <UploadButton onClick={() => navigate("/upload-document")} />
@@ -185,7 +213,7 @@ const PersonalPostList: React.FC = () => {
 
         {/* Pagination */}
         {total > 0 && (
-          <div className="flex justify-center mt-6">
+          <div className="flex justify-center mt-4 md:mt-6">
             <Pagination
               current={currentPage}
               total={total}
@@ -205,6 +233,7 @@ const PersonalPostList: React.FC = () => {
                 }
               }}
               pageSizeOptions={["5", "10", "20", "50"]}
+              className="text-xs md:text-sm"
             />
           </div>
         )}

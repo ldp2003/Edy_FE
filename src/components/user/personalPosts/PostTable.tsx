@@ -155,6 +155,7 @@ const PostTable: React.FC<PostTableProps> = ({ data, loading }) => {
       align: "center",
       width: 60,
       fixed: true,
+      responsive: ["md"],
     },
     {
       title: "Tên tài liệu",
@@ -162,6 +163,8 @@ const PostTable: React.FC<PostTableProps> = ({ data, loading }) => {
       key: "title",
       width: 300,
       fixed: "left",
+      sorter: (a, b) => a.title.localeCompare(b.title),
+      sortDirections: ["ascend", "descend"],
       render: (text: string, record: Document) => {
         const isRejected = record.status === "REJECTED";
         const isRequestedEdit =
@@ -212,6 +215,10 @@ const PostTable: React.FC<PostTableProps> = ({ data, loading }) => {
       key: "createdAt",
       align: "center",
       width: 120,
+      sorter: (a, b) =>
+        new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
+      sortDirections: ["ascend", "descend"],
+      responsive: ["sm"],
       render: (dateString: string) => {
         const date = new Date(dateString);
         return date.toLocaleDateString("vi-VN", {
@@ -227,6 +234,7 @@ const PostTable: React.FC<PostTableProps> = ({ data, loading }) => {
       key: "status",
       align: "center",
       width: 120,
+      responsive: ["md"],
       render: (status: string) => createStatusTag(status),
     },
     {
@@ -235,6 +243,7 @@ const PostTable: React.FC<PostTableProps> = ({ data, loading }) => {
       key: "public_mode",
       align: "center",
       width: 120,
+      responsive: ["md"],
       render: (mode: string) => createPublicModeTag(mode),
     },
 
@@ -244,6 +253,9 @@ const PostTable: React.FC<PostTableProps> = ({ data, loading }) => {
       key: "view",
       align: "center",
       width: 100,
+      sorter: (a, b) => (a.view || 0) - (b.view || 0),
+      sortDirections: ["ascend", "descend"],
+      responsive: ["sm"],
     },
     {
       title: "Bình luận",
@@ -251,6 +263,9 @@ const PostTable: React.FC<PostTableProps> = ({ data, loading }) => {
       key: "comment_count",
       align: "center",
       width: 100,
+      sorter: (a, b) => (a.comment_count || 0) - (b.comment_count || 0),
+      sortDirections: ["ascend", "descend"],
+      responsive: ["sm"],
     },
     {
       title: "Lượt tải",
@@ -258,6 +273,9 @@ const PostTable: React.FC<PostTableProps> = ({ data, loading }) => {
       key: "download_count",
       align: "center",
       width: 100,
+      sorter: (a, b) => (a.download_count || 0) - (b.download_count || 0),
+      sortDirections: ["ascend", "descend"],
+      responsive: ["sm"],
     },
     {
       title: "Loại file",
@@ -265,6 +283,7 @@ const PostTable: React.FC<PostTableProps> = ({ data, loading }) => {
       key: "file_type",
       align: "center",
       width: 100,
+      responsive: ["lg"],
       render: (fileType: string) => createFileTypeTag(fileType),
     },
     {
@@ -273,6 +292,19 @@ const PostTable: React.FC<PostTableProps> = ({ data, loading }) => {
       key: "rating",
       align: "center",
       width: 100,
+      sorter: (a, b) => {
+        const ratingA = calculateDocumentRating(
+          a.like || 0,
+          a.dislike || 0
+        ).ratingPercentage;
+        const ratingB = calculateDocumentRating(
+          b.like || 0,
+          b.dislike || 0
+        ).ratingPercentage;
+        return ratingA - ratingB;
+      },
+      sortDirections: ["ascend", "descend"],
+      responsive: ["md"],
       render: (_, record: Document) => {
         const rating = calculateDocumentRating(
           record.like || 0,
@@ -412,17 +444,20 @@ const PostTable: React.FC<PostTableProps> = ({ data, loading }) => {
   return (
     <>
       {contextHolder}
-      <div className="rounded-md overflow-hidden w-full border border-[rgba(0,0,0,0.2)]">
-        <Table
-          columns={columns}
-          dataSource={displayData}
-          loading={loading}
-          pagination={false}
-          size="small"
-          scroll={{ x: 1200, y: 600 }}
-          bordered
-          sticky={{ offsetHeader: 0 }}
-        />
+      <div className="w-full">
+        {/* Desktop Table View - Hidden on mobile */}
+        <div className="hidden md:block rounded-md overflow-hidden border border-[rgba(0,0,0,0.2)]">
+          <Table
+            columns={columns}
+            dataSource={displayData}
+            loading={loading}
+            pagination={false}
+            size="small"
+            scroll={{ x: 1200, y: 600 }}
+            bordered
+            sticky={{ offsetHeader: 0 }}
+          />
+        </div>
       </div>
 
       {/* Confirmation Modal */}

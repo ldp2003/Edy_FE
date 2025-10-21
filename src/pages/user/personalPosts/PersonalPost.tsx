@@ -4,7 +4,7 @@ import UserInfoHeader from "../../../components/user/personalPosts/UserInfoHeade
 
 const PersonalPost: React.FC = () => {
   return (
-    <div className="p-4">
+    <div className="p-2 md:p-4 min-h-screen bg-gray-50">
       <UserInfoHeader />
       <PersonalPostList />
     </div>

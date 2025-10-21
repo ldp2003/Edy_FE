@@ -177,9 +177,9 @@ const PostFilterSearch: React.FC<PostFilterSearchProps> = ({
 
   return (
     <>
-      <div className="bg-white p-4 rounded-lg border border-gray-200 mb-4">
+      <div className="bg-white p-3 md:p-4 rounded-lg border border-gray-200 mb-4">
         {/* Search Bar */}
-        <div className="flex gap-4 mb-4">
+        <div className="flex flex-col md:flex-row gap-3 md:gap-4 mb-4">
           <div className="flex-1">
             <Input
               placeholder="Tìm kiếm theo tên tài liệu, tác giả..."
@@ -191,28 +191,33 @@ const PostFilterSearch: React.FC<PostFilterSearchProps> = ({
               allowClear
             />
           </div>
-          <Button
-            type="primary"
-            icon={<Search size={16} />}
-            onClick={handleSearch}
-            loading={loading}
-          >
-            Tìm kiếm
-          </Button>
-          <Button
-            icon={<Filter size={16} />}
-            onClick={handleOpenDrawer}
-            type={Object.keys(filters).length > 1 ? "primary" : "default"}
-          >
-            Bộ lọc
-          </Button>
-          <Button
-            icon={<RotateCcw size={16} />}
-            onClick={handleReset}
-            disabled={loading}
-          >
-            Đặt lại
-          </Button>
+          <div className="flex flex-col sm:flex-row gap-2 md:gap-4">
+            <Button
+              type="primary"
+              icon={<Search size={16} />}
+              onClick={handleSearch}
+              loading={loading}
+              className="w-full sm:w-auto"
+            >
+              Tìm kiếm
+            </Button>
+            <Button
+              icon={<Filter size={16} />}
+              onClick={handleOpenDrawer}
+              type={Object.keys(filters).length > 1 ? "primary" : "default"}
+              className="w-full sm:w-auto"
+            >
+              Bộ lọc
+            </Button>
+            <Button
+              icon={<RotateCcw size={16} />}
+              onClick={handleReset}
+              disabled={loading}
+              className="w-full sm:w-auto"
+            >
+              Đặt lại
+            </Button>
+          </div>
         </div>
 
         {/* Filter Summary */}
