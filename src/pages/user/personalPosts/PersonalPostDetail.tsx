@@ -203,7 +203,7 @@ const PersonalPostDetail: React.FC = () => {
   }
 
   return (
-    <div className="h-screen flex overflow-hidden">
+    <div className="h-screen flex flex-col md:flex-row overflow-hidden">
       {contextHolder}
 
       {/* Document Side - cố định bên trái như sidebar */}
@@ -211,7 +211,7 @@ const PersonalPostDetail: React.FC = () => {
 
       {/* Main content - có thể scroll */}
       <div className="flex-1 overflow-y-auto">
-        <div className="p-4">
+        <div className="p-2 md:p-4">
           <PersonalPostHeader
             document={document}
             onEdit={handleEdit}
