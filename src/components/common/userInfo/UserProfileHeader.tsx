@@ -126,7 +126,7 @@ const UserProfileHeader: React.FC<UserProfileHeaderProps> = ({
   };
   return (
     <div
-      className="rounded-lg text-left p-4 shadow-lg"
+      className="rounded-lg text-center md:text-left p-4 shadow-lg"
       style={{ backgroundColor: "var(--card-background-color)" }}
     >
       <style>
@@ -153,19 +153,16 @@ const UserProfileHeader: React.FC<UserProfileHeaderProps> = ({
           customRequest={customUpload}
           beforeUpload={beforeUpload}
         >
-          {avatarUrl ? (
+          <div className="relative">
             <img
-              src={avatarUrl}
+              src={avatarUrl || avatar || "/default-avatar.png"}
               alt="avatar"
               style={{ width: "100%", height: "100%", borderRadius: "50%" }}
             />
-          ) : (
-            <img
-              src={avatar || "/default-avatar.png"}
-              alt="avatar"
-              style={{ width: "100%", height: "100%", borderRadius: "50%" }}
-            />
-          )}
+            <div className="absolute inset-0 bg-black bg-opacity-50 rounded-full flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
+              <span className="text-white text-xs">Thay đổi</span>
+            </div>
+          </div>
         </Upload>
 
         <div className="flex-1 flex flex-col gap-4">

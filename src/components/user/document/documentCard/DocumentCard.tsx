@@ -61,7 +61,7 @@ const DocumentCard: React.FC<DocumentCardProps> = ({
 
   return (
     <div
-      className="bg-white text-left rounded-lg shadow-sm border border-gray-200 overflow-hidden cursor-pointer hover:shadow-md transition-shadow duration-200 w-[160px] md:w-full flex-shrink-0"
+      className="bg-white text-center md:text-left rounded-lg shadow-sm border border-gray-200 overflow-hidden cursor-pointer hover:shadow-md transition-shadow duration-200 w-[160px] md:w-full flex-shrink-0"
       onClick={handleCardClick}
     >
       {contextHolder}

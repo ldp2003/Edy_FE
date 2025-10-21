@@ -15,7 +15,7 @@ const DocumentSide: React.FC<DocumentSideProps> = ({
   isUser = false,
 }) => {
   return (
-    <aside className="w-full md:w-80 text-left bg-white border-r border-gray-200 h-screen md:h-screen overflow-y-auto relative flex-shrink-0">
+    <aside className="w-full md:w-80 text-center md:text-left bg-white border-r border-gray-200 h-screen md:h-screen overflow-y-auto relative flex-shrink-0">
       <div className="pl-4 md:pl-8 p-4 md:p-6">
         <DocumentInfo document={document} />
         <Description document={document} isUser={isUser} />

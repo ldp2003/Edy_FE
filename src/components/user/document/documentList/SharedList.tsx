@@ -16,7 +16,7 @@ const SharedList: React.FC = () => {
     (item: SharedDocumentItem) => item.document && !item.document.is_deleted
   );
   return (
-    <div className="border-l pl-4">
+    <div className="border-l pl-2 md:pl-4">
       {displayItems.map((item: SharedDocumentItem) => {
         const doc = item.document!;
         const rating = calculateDocumentRating(doc.like || 0, doc.dislike || 0);

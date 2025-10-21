@@ -28,7 +28,7 @@ const EditProfile: React.FC = () => {
   }, []);
 
   return (
-    <div className="p-4 text-left">
+    <div className="p-4 text-center md:text-left">
       {contextHolder}
       <div className="bg-white p-6 rounded-lg border border-[var(--border-color)]">
         <h2 className="font-bold text-xs md:text-sm mb-6">

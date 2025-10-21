@@ -49,7 +49,7 @@ const SearchResults: React.FC<SearchResultsProps> = ({
   return (
     <div className="space-y-4">
       {/* Header Title - Top Left */}
-      <div className="text-left">
+      <div className="text-center md:text-left">
         <h2 className="text-lg font-semibold text-gray-800 mb-1">
           {currentTab === "subjects" ? "Danh sách môn học" : "Kết quả tìm kiếm"}
           {searchQuery && currentTab === "all" && (

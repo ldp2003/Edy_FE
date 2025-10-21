@@ -1,6 +1,7 @@
 import React, { useState, useCallback, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { message, Modal } from "antd";
+import { message, Modal, Avatar, Button } from "antd";
+import { Edit, Share } from "lucide-react";
 import PersonalPostHeader from "../../../components/user/personalPosts/PersonalPostHeader";
 import DocumentSide from "../../../components/user/document/documentDetail/DocumentSide";
 import DocumentActions from "../../../components/user/document/documentDetail/DocumentActions";
@@ -206,21 +207,65 @@ const PersonalPostDetail: React.FC = () => {
     <div className="h-screen flex flex-col md:flex-row overflow-hidden">
       {contextHolder}
 
-      {/* Document Side - cố định bên trái như sidebar */}
-      <DocumentSide document={document} isUser={true} />
+      {/* Document Side - ẩn trên mobile, hiện trên desktop */}
+      <div className="hidden md:block md:w-80">
+        <DocumentSide document={document} />
+      </div>
+
+      {/* Mobile Header */}
+      <div className="md:hidden bg-white shadow-lg">
+        <div className="p-4">
+          <div className="flex items-center justify-between">
+            <Avatar
+              size={40}
+              src={document.user.avatar}
+              alt={document.user.first_name}
+              className="mr-3"
+            >
+              {document.user.first_name?.[0] || "U"}
+            </Avatar>
+            <div className="flex-1">
+              <h2 className="text-sm font-medium text-gray-900 line-clamp-1">
+                {document.user.first_name} {document.user.last_name}
+              </h2>
+              <p className="text-xs text-gray-500">
+                {document.organization?.name}
+              </p>
+            </div>
+            <div className="flex items-center gap-2">
+              <Button
+                type="text"
+                size="small"
+                icon={<Edit size={16} />}
+                onClick={handleEdit}
+                className="text-gray-600 hover:text-blue-600"
+              />
+              <Button
+                type="text"
+                size="small"
+                icon={<Share size={16} />}
+                onClick={handleShare}
+                className="text-gray-600 hover:text-blue-600"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
 
       {/* Main content - có thể scroll */}
-      <div className="flex-1 overflow-y-auto">
+      <div className="flex-1 overflow-y-auto pb-[72px] md:pb-0">
         <div className="p-2 md:p-4">
-          <PersonalPostHeader
-            document={document}
-            onEdit={handleEdit}
-            onChangeVisibility={handleChangeVisibility}
-            onShare={handleShare}
-          />
+          <div className="hidden md:flex flex-col">
+            <PersonalPostHeader
+              document={document}
+              onEdit={handleEdit}
+              onChangeVisibility={handleChangeVisibility}
+              onShare={handleShare}
+            />
 
-          {/* Document Actions with isUser flag to disable description modal */}
-          <DocumentActions document={document} isUser={true} />
+            {/* Document Actions with isUser flag to disable description modal */}
+            <DocumentActions document={document} isUser={true} />
+          </div>
 
           {/* Document Viewer */}
           <DocumentViewer

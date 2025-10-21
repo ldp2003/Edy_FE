@@ -329,11 +329,11 @@ const EditInformationForm = ({
   };
 
   return (
-    <div className="py-6 min-h-screen text-left bg-white p-6 border border-[var(--border-color)] rounded-lg">
+    <div className="py-6 min-h-screen text-center md:text-left bg-white p-4 sm:p-6 border border-[var(--border-color)] rounded-lg">
       <div className="font-bold text-base mb-6 text-[var(--primary-text-color)]">
         Chỉnh sửa thông tin tài liệu
       </div>
-      <div className="mx-auto bg-white rounded-lg shadow-sm p-6">
+      <div className="mx-auto bg-white rounded-lg shadow-sm p-4 sm:p-6">
         <Form
           form={form}
           layout="vertical"
@@ -344,12 +344,9 @@ const EditInformationForm = ({
             authors: authors,
           }}
         >
-          <div
-            className="grid gap-6"
-            style={{ gridTemplateColumns: "290px 1fr 1fr" }}
-          >
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {/* Column 1 - Image and privacy */}
-            <div className="space-y-4">
+            <div className="space-y-4 md:col-span-1">
               <div className="mb-0">
                 <img
                   src={getPreviewImage()}
@@ -399,7 +396,7 @@ const EditInformationForm = ({
             </div>
 
             {/* Column 2 - Main form fields */}
-            <div className="space-y-4">
+            <div className="space-y-4 md:col-span-1">
               <Form.Item
                 style={{ marginBottom: 13.5 }}
                 name="documentName"
@@ -494,7 +491,7 @@ const EditInformationForm = ({
                 </Select>
               </Form.Item>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <Form.Item
                   style={{ marginBottom: 13.5 }}
                   name="pageCount"
@@ -529,7 +526,7 @@ const EditInformationForm = ({
             </div>
 
             {/* Column 3 - Summary */}
-            <div>
+            <div className="md:col-span-1">
               <Form.Item
                 style={{ marginBottom: 5 }}
                 name="summary"
@@ -551,11 +548,8 @@ const EditInformationForm = ({
             <div className="font-semibold text-base mb-4 text-gray-800">
               Thông tin khác
             </div>
-            <div
-              className="grid gap-6"
-              style={{ gridTemplateColumns: "290px 1fr 1fr" }}
-            >
-              <div className="col-span-2 grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="md:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-4">
                   <Form.Item
                     style={{ marginBottom: 5 }}
@@ -629,11 +623,12 @@ const EditInformationForm = ({
           </div>
 
           {/* Action buttons */}
-          <div className="flex items-center justify-between mt-8 pt-6 border-t border-gray-200">
-            <div className="flex gap-3">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mt-8 pt-6 border-t border-gray-200 gap-4">
+            <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
               <Button
                 onClick={() => navigate("/personal-posts")}
                 disabled={submitting}
+                className="w-full sm:w-auto"
               >
                 Hủy
               </Button>
@@ -642,6 +637,7 @@ const EditInformationForm = ({
                 htmlType="submit"
                 loading={submitting}
                 disabled={submitting}
+                className="w-full sm:w-auto"
               >
                 {submitting ? "Đang cập nhật..." : "Cập nhật tài liệu"}
               </Button>
@@ -656,6 +652,7 @@ const EditInformationForm = ({
           onCancel={handleModalCancel}
           footer={null}
           width={600}
+          className="max-w-[95vw] sm:max-w-[600px]"
         >
           <Form
             form={newSubjectForm}
@@ -696,9 +693,15 @@ const EditInformationForm = ({
               />
             </Form.Item>
 
-            <div className="flex justify-end gap-2 mt-6">
-              <Button onClick={handleModalCancel}>Hủy</Button>
-              <Button type="primary" htmlType="submit">
+            <div className="flex flex-col sm:flex-row justify-end gap-2 mt-6">
+              <Button onClick={handleModalCancel} className="w-full sm:w-auto">
+                Hủy
+              </Button>
+              <Button
+                type="primary"
+                htmlType="submit"
+                className="w-full sm:w-auto"
+              >
                 Tạo môn học
               </Button>
             </div>

@@ -166,7 +166,7 @@ const SearchHeader: React.FC<SearchHeaderProps> = ({
       >
         <div className="w-full mx-auto">
           {/* Header Title */}
-          <div className="text-left mb-4">
+          <div className="text-center md:text-left mb-4">
             <h1 className="text-base font-bold text-gray-900 mb-1">
               Khám phá tài liệu học tập
             </h1>
