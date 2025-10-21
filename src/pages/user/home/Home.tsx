@@ -85,7 +85,7 @@ export default function HomePage() {
     <div className="min-h-screen">
       {contextHolder}
       <div className="flex">
-        <main className="flex-1 px-4 py-4 md:p-6 max-w-full space-y-6">
+        <main className="flex-1 px-4 py-4 md:p-6 lg:max-w-full w-screen space-y-6">
           {subjects && subjects.length > 0 && (
             <SubjectGrid
               title={`Các môn học của ${

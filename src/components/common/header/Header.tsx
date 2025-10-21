@@ -63,7 +63,7 @@ export function Header({ onMenuToggle }: HeaderProps) {
   // Remove unnecessary notification fetching - handled by AuthRoute
 
   return (
-    <header className="bg-white border-b border-gray-200 px-4 lg:w-screen md:px-6 py-2 w-full flex-shrink-0 shadow-sm text-sm">
+    <header className="bg-white border-b border-gray-200 px-4 lg:w-screen md:px-6 py-2 w-full flex-shrink-0 shadow-lg text-sm">
       <div className="flex items-center justify-between">
         {/* Menu Toggle Button - Only visible on mobile */}
         <button
