@@ -14,16 +14,16 @@ const Description: React.FC<DescriptionProps> = ({
   const [activeTab, setActiveTab] = useState<"original" | "ai">("original");
 
   return (
-    <div className="mt-4 relative">
-      <h4 className="font-medium text-sm mb-2">Tóm tắt</h4>
+    <div className="relative">
+      <h4 className="font-medium text-base mb-4">Tóm tắt tài liệu</h4>
       <div
         style={{ backgroundColor: "var(--field-background-color)" }}
-        className="rounded-lg shadow-xl relative"
+        className="rounded-lg shadow-sm relative"
       >
-        <div className="flex bg-blue-50 rounded-lg p-1 mb-3 ">
+        <div className="flex bg-blue-50 rounded-t-lg p-1">
           <button
             onClick={() => setActiveTab("original")}
-            className={`cursor-pointer flex-1 py-2 px-3 text-xs font-medium rounded-md transition-colors ${
+            className={`cursor-pointer flex-1 py-2 px-3 text-sm font-medium rounded-md transition-colors ${
               activeTab === "original"
                 ? "bg-blue-200 text-[var(--primary-text-color)]"
                 : "text-[var(--primary-color)] hover:bg-blue-100"
@@ -33,7 +33,7 @@ const Description: React.FC<DescriptionProps> = ({
           </button>
           <button
             onClick={() => setActiveTab("ai")}
-            className={`cursor-pointer flex-1 py-2 px-3 text-xs font-medium rounded-md transition-colors ${
+            className={`cursor-pointer flex-1 py-2 px-3 text-sm font-medium rounded-md transition-colors ${
               activeTab === "ai"
                 ? "bg-blue-200 text-[var(--primary-text-color)]"
                 : "text-[var(--primary-color)] hover:bg-blue-100"
@@ -43,7 +43,7 @@ const Description: React.FC<DescriptionProps> = ({
           </button>
         </div>
 
-        <div className="text-[10px] text-gray-600 leading-relaxed relative">
+        <div className="text-sm text-gray-700 leading-relaxed relative">
           {activeTab === "original" ? (
             <p className="p-4">
               {document.description?.summary_by_user ||
