@@ -59,9 +59,8 @@ export default function HomePage() {
             setSubjects(subjectsResponse.slice(0, 8) || []); // Limit to 8 subjects
           }
         }
-      } catch (error) {
-        console.error("Error fetching documents:", error);
-        messageApi.error("Không thể tải danh sách tài liệu!");
+      } catch {
+        // Suppress errors for new accounts
       } finally {
         setLoading(false);
       }
@@ -89,7 +88,8 @@ export default function HomePage() {
           {subjects && subjects.length > 0 && (
             <SubjectGrid
               title={`Các môn học của ${
-                typeof user?.organization === "object" && user?.organization?.name
+                typeof user?.organization === "object" &&
+                user?.organization?.name
                   ? user.organization.name
                   : "tổ chức"
               }`}

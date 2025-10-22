@@ -26,6 +26,7 @@ import DocumentRouteWrapper from "../components/user/document/AccessCheck/Docume
 import ReadHistoryPage from "../pages/user/history/ReadHistoryPage";
 import UserProfilePage from "../pages/user/userInfo/UserProfilePage";
 import FollowPage from "../pages/user/follow/FollowPage";
+import StatsPage from "../pages/user/personalProfile/StatsPage";
 
 const UserRoute: React.FC = () => {
   return (
@@ -86,6 +87,7 @@ const UserRoute: React.FC = () => {
           <Route path="favorites" element={<FavoritePage />} />
           <Route path="history" element={<ReadHistoryPage />} />
           <Route path="notifications" element={<NotificationListPage />} />
+          <Route path="stats" element={<StatsPage />} />
           <Route path="user/:userId" element={<UserProfilePage />} />
           <Route path="following" element={<FollowPage />} />
           <Route path="follower" element={<FollowPage />} />

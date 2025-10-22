@@ -170,9 +170,18 @@ export function Header({ onMenuToggle }: HeaderProps) {
               </Badge>
 
               <Dropdown
-                overlay={
-                  account?.is_admin ? <AdminDropdown /> : <UserDropdown />
-                }
+                menu={{
+                  items: [
+                    {
+                      key: "user-menu",
+                      label: account?.is_admin ? (
+                        <AdminDropdown />
+                      ) : (
+                        <UserDropdown />
+                      ),
+                    },
+                  ],
+                }}
               >
                 <div className="flex items-center gap-2 cursor-pointer">
                   <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden">
@@ -219,7 +228,16 @@ export function Header({ onMenuToggle }: HeaderProps) {
               </Dropdown>
             </>
           ) : (
-            <Dropdown overlay={<AvatarDropdown />}>
+            <Dropdown
+              menu={{
+                items: [
+                  {
+                    key: "avatar-menu",
+                    label: <AvatarDropdown />,
+                  },
+                ],
+              }}
+            >
               <button
                 className="text-sm bg-[var(--primary-color)] hover:bg-white cursor-pointer hover:border-[var(--primary-color)] hover:border-1 hover:text-[var(--primary-color)] text-white px-4 py-2 rounded-md"
                 onClick={() => {
