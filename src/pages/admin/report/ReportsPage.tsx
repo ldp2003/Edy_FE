@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback } from "react";
-import { message, Pagination, Modal } from "antd";
+import { message, Pagination, Modal, Button } from "antd";
 import { useSearchParams } from "react-router-dom";
 import { ReportService } from "../../../utils/ReportService";
 import type { Report } from "../../../models/report";
@@ -20,7 +20,10 @@ const ReportsPage: React.FC = () => {
 
   // Modal preview tài liệu (placeholder)
   const [docPreviewVisible, setDocPreviewVisible] = useState(false);
-  const [previewDoc, setPreviewDoc] = useState<{ _id: string; title: string } | null>(null);
+  const [previewDoc, setPreviewDoc] = useState<{
+    _id: string;
+    title: string;
+  } | null>(null);
 
   // Lấy params từ URL
   const getCurrentPage = useCallback(
@@ -34,7 +37,7 @@ const ReportsPage: React.FC = () => {
   const getCurrentFilters = useCallback(
     (): AdminReportFilterParams => ({
       search: searchParams.get("search") || "",
-      status: searchParams.get("status") || "PROCESSING",  // Mặc định lấy báo cáo đang xử lý
+      status: searchParams.get("status") || "PROCESSING", // Mặc định lấy báo cáo đang xử lý
       type: searchParams.get("type") || "",
     }),
     [searchParams]
@@ -44,7 +47,7 @@ const ReportsPage: React.FC = () => {
   const [pageSize, setPageSize] = useState(5);
   const [total, setTotal] = useState(0);
   const [filters, setFilters] = useState<AdminReportFilterParams>({
-    status: "PROCESSING"  // Khởi tạo với trạng thái mặc định
+    status: "PROCESSING", // Khởi tạo với trạng thái mặc định
   });
 
   // Cập nhật URL params
@@ -210,9 +213,8 @@ const ReportsPage: React.FC = () => {
         <AdminReportTable
           reports={reports}
           loading={loading}
-          onRowClick={handleViewDetail}
-          onViewDetail={handleViewDetail}     // mở modal preview
-          onResolve={openResolveModal}        // mở modal duyệt
+          onViewDetail={handleViewDetail} // mở modal preview
+          onResolve={openResolveModal} // mở modal duyệt
           onDelete={handleDelete}
         />
 

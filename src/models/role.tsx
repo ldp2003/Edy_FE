@@ -19,7 +19,8 @@ export type RoleCode =
 
 export type Permission =
   | "MANAGE_DOCUMENT"
-  | "HANDLE_REPORT"
+  | "HANDLE_DOCUMENT_REPORT"
+  | "HANDLE_COMMENT_REPORT"
   | "MANAGE_USER"
   | "MANAGE_COMMENT"
   | "MANAGE_SERVER"

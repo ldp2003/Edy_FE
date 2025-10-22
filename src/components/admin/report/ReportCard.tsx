@@ -2,21 +2,18 @@ import React, { useState } from "react";
 import { Card, Avatar, Tag, Button } from "antd";
 import { Eye } from "lucide-react";
 import type { Report } from "../../../models/report";
+import type { Comment } from "../../../models/comment";
+import type { Document } from "../../../models/document";
 import DocumentViewModal from "../document/review/DocumentViewModal";
 
 interface ReportCardProps {
   report: Report;
-  onViewDetail?: (report: Report) => void;
   onResolve?: (report: Report) => void;
 }
 
-const ReportCard: React.FC<ReportCardProps> = ({
-  report,
-  onViewDetail,
-  onResolve,
-}) => {
+const ReportCard: React.FC<ReportCardProps> = ({ report, onResolve }) => {
   const getReportTypeLabels = (types: string[]) => {
-    return types.map(type => {
+    return types.map((type) => {
       switch (type) {
         case "INAPPROPRIATE":
           return { text: "Nội dung không phù hợp", color: "red" };
@@ -41,20 +38,30 @@ const ReportCard: React.FC<ReportCardProps> = ({
   };
 
   const typeLabels = getReportTypeLabels(report.type);
-  const reporterName = `${report.reporter.first_name} ${report.reporter.last_name}`;
+  const reporterObj =
+    typeof report.reporter === "object" ? report.reporter : null;
+  const reporterName = reporterObj
+    ? `${reporterObj.first_name} ${reporterObj.last_name}`
+    : "Không xác định";
   const docObj = typeof report.doc === "object" ? report.doc : null;
   const cmtObj = typeof report.cmt === "object" ? report.cmt : null;
   const isCommentReport = cmtObj !== null;
 
   // Lấy thông tin người đăng/người comment
-  const authorInfo = isCommentReport
-    ? cmtObj?.user
-    : docObj?.user;
+  const authorInfo =
+    isCommentReport && cmtObj
+      ? typeof (cmtObj as Comment).user === "object"
+        ? (cmtObj as Comment).user
+        : null
+      : docObj && typeof (docObj as Document).user === "object"
+      ? (docObj as Document).user
+      : null;
   const authorName = authorInfo
     ? `${authorInfo.first_name} ${authorInfo.last_name}`
     : "Không xác định";
 
-  const [documentViewModalVisible, setDocumentViewModalVisible] = useState(false);
+  const [documentViewModalVisible, setDocumentViewModalVisible] =
+    useState(false);
 
   const handleImageError = (e: React.SyntheticEvent<HTMLImageElement>) => {
     const target = e.target as HTMLImageElement;
@@ -68,7 +75,7 @@ const ReportCard: React.FC<ReportCardProps> = ({
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
             <Avatar
-              src={report.reporter.avatar}
+              src={reporterObj?.avatar}
               size={40}
               className="border-2 border-white shadow-sm"
             />
@@ -76,7 +83,10 @@ const ReportCard: React.FC<ReportCardProps> = ({
               <div className="flex items-center gap-2">
                 <span className="font-xs font-bold">{reporterName}</span>
                 <span className="text-gray-500 text-sm">
-                  đã báo cáo <span className="font-xs font-bold">{isCommentReport ? "bình luận" : "tài liệu"}</span>
+                  đã báo cáo{" "}
+                  <span className="font-xs font-bold">
+                    {isCommentReport ? "bình luận" : "tài liệu"}
+                  </span>
                 </span>
               </div>
               <div className="text-gray-500 text-sm">
@@ -85,20 +95,26 @@ const ReportCard: React.FC<ReportCardProps> = ({
                   minute: "2-digit",
                   day: "2-digit",
                   month: "2-digit",
-                  year: "numeric"
+                  year: "numeric",
                 })}
               </div>
             </div>
           </div>
           {report.status === "RESOLVED" && (
-            <Tag color={
-              report.action === "DELETE" ? "red" :
-                report.action === "EDIT_REQUESTED" ? "orange" :
-                  "green"
-            }>
-              {report.action === "DELETE" ? "Đã xóa" :
-                report.action === "EDIT_REQUESTED" ? "Yêu cầu chỉnh sửa" :
-                  "Báo cáo không hợp lệ"}
+            <Tag
+              color={
+                report.action === "DELETE"
+                  ? "red"
+                  : report.action === "EDIT_REQUESTED"
+                  ? "orange"
+                  : "green"
+              }
+            >
+              {report.action === "DELETE"
+                ? "Đã xóa"
+                : report.action === "EDIT_REQUESTED"
+                ? "Yêu cầu chỉnh sửa"
+                : "Báo cáo không hợp lệ"}
             </Tag>
           )}
         </div>
@@ -107,7 +123,10 @@ const ReportCard: React.FC<ReportCardProps> = ({
         <div className="flex gap-4">
           {/* Cover Image - Chỉ hiển thị khi báo cáo tài liệu */}
           {!isCommentReport && docObj?.cover_page && (
-            <div className="flex-shrink-0 relative group cursor-pointer" onClick={() => setDocumentViewModalVisible(true)}>
+            <div
+              className="flex-shrink-0 relative group cursor-pointer"
+              onClick={() => setDocumentViewModalVisible(true)}
+            >
               <img
                 src={docObj.cover_page}
                 alt="Document Cover"
@@ -136,11 +155,19 @@ const ReportCard: React.FC<ReportCardProps> = ({
                         window.location.href = `/user/${authorInfo._id}`;
                       }
                     }}
-                  >{authorName}</span>
+                  >
+                    {authorName}
+                  </span>
                 </div>
                 {/* Content */}
-                <div className={`font-xs line-clamp-2 ${!isCommentReport && "font-bold"}`}>
-                  {isCommentReport ? cmtObj?.content : docObj?.title}
+                <div
+                  className={`font-xs line-clamp-2 ${
+                    !isCommentReport && "font-bold"
+                  }`}
+                >
+                  {isCommentReport
+                    ? (cmtObj as Comment)?.content
+                    : docObj?.title}
                 </div>
 
                 {/* Report Reason */}
