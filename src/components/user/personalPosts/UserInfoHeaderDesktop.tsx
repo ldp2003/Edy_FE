@@ -24,7 +24,7 @@ const UserInfoHeaderDesktop: React.FC = () => {
             />
           </div>
           <div className="text-left">
-            <h3 className="text-base font-bold">
+            <h3 className="text-base font-bold text-center md:text-left">
               {isLoading ? (
                 <span className="animate-pulse bg-gray-300 rounded w-32 h-6 inline-block"></span>
               ) : (

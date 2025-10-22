@@ -363,7 +363,7 @@ const InformationForm = ({
 
   return (
     <div className="bg-white p-4 sm:p-6 rounded-lg border border-gray-200 shadow-sm">
-      <div className="font-bold text-lg sm:text-xl mb-6 text-gray-900">
+      <div className="font-bold text-lg sm:text-xl mb-6 text-gray-900 text-center md:text-left">
         Nhập thông tin
         {isUploading && (
           <span className="ml-2 text-sm text-orange-500 font-normal">
@@ -573,7 +573,7 @@ const InformationForm = ({
 
           {/* Thông tin khác */}
           <div className="mt-8 pt-6 border-t border-gray-200">
-            <div className="font-semibold text-lg mb-4 text-gray-800">
+            <div className="font-semibold text-lg mb-4 text-gray-800 text-center md:text-left">
               Thông tin khác
             </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -597,7 +597,7 @@ const InformationForm = ({
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm text-left  text-black mb-2">
                     Tác giả tài liệu
                   </label>
                   {authors.map((author, idx) => (

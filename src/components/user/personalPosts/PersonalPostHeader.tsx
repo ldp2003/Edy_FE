@@ -241,7 +241,7 @@ const PersonalPostHeader: React.FC<PersonalPostHeaderProps> = ({
               )}
             </Avatar>
             <div className="flex flex-col gap-3">
-              <h3 className="font-semibold text-base text-[var(--primary-color)]">
+              <h3 className="font-semibold text-base text-[var(--primary-color)] text-center md:text-left">
                 {document.user.first_name} {document.user.last_name}
               </h3>
               <div className="flex flex-row gap-2 items-center">

@@ -2,11 +2,6 @@ import React from "react";
 import { Empty, Pagination } from "antd";
 import DocumentCard from "../../document/documentCard/DocumentCard";
 import type { Document } from "../../../../models/document";
-import {
-  getDocumentTypeFromFileName,
-  documentTypeLabels,
-  DocumentType,
-} from "../../../../models/document";
 
 interface DocumentSectionProps {
   title: string;
@@ -49,7 +44,9 @@ const DocumentSection: React.FC<DocumentSectionProps> = ({
   if (loading) {
     return (
       <div className="bg-white rounded-lg border border-gray-200 p-6 mb-6">
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">{title}</h2>
+        <h2 className="text-lg font-semibold text-gray-900 mb-4 text-center md:text-left">
+          {title}
+        </h2>
         <div className="flex justify-center items-center py-12">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
         </div>
@@ -60,7 +57,9 @@ const DocumentSection: React.FC<DocumentSectionProps> = ({
   if (documents.length === 0) {
     return (
       <div className="bg-white rounded-lg border border-gray-200 p-6 mb-6">
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">{title}</h2>
+        <h2 className="text-lg font-semibold text-gray-900 mb-4 text-center md:text-left">
+          {title}
+        </h2>
         <Empty
           description={
             emptyMessage ||
@@ -77,7 +76,9 @@ const DocumentSection: React.FC<DocumentSectionProps> = ({
     <div className="bg-white rounded-lg border border-gray-200 p-6 mb-6">
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
-          <h2 className="text-lg font-semibold text-gray-900">{title}</h2>
+          <h2 className="text-lg font-semibold text-gray-900 text-center md:text-left">
+            {title}
+          </h2>
           {canExpand && hasMoreDocuments && (
             <button
               className="text-sm text-blue-600 hover:text-blue-800 font-medium"
@@ -99,23 +100,7 @@ const DocumentSection: React.FC<DocumentSectionProps> = ({
 
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mb-6">
         {displayDocuments.map((doc) => {
-          // Use doc_type from API or determine from filename as fallback
-          const docType =
-            doc.doc_type || getDocumentTypeFromFileName(doc.title);
-          const typeLabel =
-            documentTypeLabels[docType as keyof typeof DocumentType] || docType;
-
-          return (
-            <DocumentCard
-              key={doc._id}
-              title={doc.title}
-              description={`${doc.user?.first_name} ${doc.user?.last_name} • ${
-                doc.published_year || new Date(doc.createdAt).getFullYear()
-              } • ${typeLabel}`}
-              imageUrl={doc.cover_page}
-              document={doc}
-            />
-          );
+          return <DocumentCard key={doc._id} document={doc} />;
         })}
       </div>
 

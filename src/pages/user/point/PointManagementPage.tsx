@@ -47,7 +47,7 @@ const PointManagementPage: React.FC = () => {
     return (
       <div className="container mx-auto px-4 py-6 md:py-8">
         <div className="max-w-4xl mx-auto">
-          <h1 className="text-sm md:text-base md:text-left font-bold text-[var(--primary-text-color)] mb-4 md:mb-6">
+          <h1 className="text-xl md:text-2xl font-bold text-[var(--primary-text-color)] mb-4 md:mb-6 text-center md:text-left">
             Quản lý điểm
           </h1>
           <PointManagement transactions={transactions} loading={loading} />
@@ -59,7 +59,7 @@ const PointManagementPage: React.FC = () => {
   return (
     <div className="container mx-auto px-4 py-6 md:py-8">
       <div className="max-w-4xl mx-auto">
-        <h1 className="text-sm md:text-base md:text-left font-bold text-[var(--primary-text-color)] mb-4 md:mb-6">
+        <h1 className="text-xl md:text-2xl font-bold text-[var(--primary-text-color)] mb-4 md:mb-6 text-center md:text-left">
           Cơ chế tích tiêu điểm
         </h1>
         <PointMechanism />

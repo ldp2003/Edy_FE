@@ -112,7 +112,7 @@ const OrganizationListPage: React.FC = () => {
               <School size={24} className="text-white" />
             </div>
             <div>
-              <h1 className="text-2xl font-bold text-[var(--primary-text-color)]">
+              <h1 className="text-2xl font-bold text-[var(--primary-text-color)] text-center md:text-left">
                 Các tổ chức/trường học khác
               </h1>
               <p className="text-[var(--secondary-text-color)]">

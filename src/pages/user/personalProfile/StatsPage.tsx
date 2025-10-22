@@ -306,10 +306,10 @@ const StatsPage: React.FC = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Main Content */}
-      <div className="p-6"> 
+      <div className="p-6">
         {/* Header */}
         <div className="flex justify-between items-center mb-6">
-          <h1 className="text-xl font-bold text-gray-900">
+          <h1 className="text-xl font-bold text-gray-900 text-center md:text-left">
             THỐNG KÊ HOẠT ĐỘNG CÁ NHÂN
           </h1>
           <Select
