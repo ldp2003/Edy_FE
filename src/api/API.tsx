@@ -1263,3 +1263,17 @@ export const AssignmentAPI = {
     }
   },
 };
+
+export const PointTransactionAPI = {
+  getTransactionHistory: async (
+    userId: string,
+    params?: {
+      page?: number;
+      limit?: number;
+    }
+  ) => {
+    return await apiClient.get(`/point-transactions/${userId}/history`, {
+      params,
+    });
+  },
+};
