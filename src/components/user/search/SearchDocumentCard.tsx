@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import React from "react";
 import { Heart } from "lucide-react";
-import { useNavigate } from "react-router-dom";
 import { useState, useEffect, useContext } from "react";
 import { UserContext } from "../../../contexts/UserContext";
 import type { Document } from "../../../models/document";
@@ -21,7 +20,9 @@ const SearchDocumentCard: React.FC<SearchDocumentCardProps> = ({
 
   // Sync with context
   useEffect(() => {
-    const isFav = document._id ? favoriteDocuments.some((doc) => doc._id === document._id) : false;
+    const isFav = document._id
+      ? favoriteDocuments.some((doc) => doc._id === document._id)
+      : false;
     if (isFav !== isFavorite) {
       setIsFavorite(isFav);
     }

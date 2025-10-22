@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import { CloudDownload, Copy, ExternalLink, AlertCircle } from "lucide-react";
 import React, { useState } from "react";
 import { Modal, Button, message, Spin } from "antd";
@@ -19,13 +18,11 @@ const DownloadButton: React.FC<DownloadButtonProps> = ({
   const [confirmModalVisible, setConfirmModalVisible] = useState(false);
   const [loading, setLoading] = useState(false);
   const [downloadLink, setDownloadLink] = useState<string | null>(null);
-  const [linkId, setLinkId] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   // Helper function to reset modal state
   const resetModalState = () => {
     setDownloadLink(null);
-    setLinkId(null);
     setErrorMessage(null);
     setLoading(false);
   };
@@ -79,8 +76,6 @@ const DownloadButton: React.FC<DownloadButtonProps> = ({
       if (!downloadId || !url) {
         throw new Error("Không nhận được thông tin download từ server");
       }
-
-      setLinkId(downloadId);
 
       // Create full URL - if url is relative, make it absolute
       const fullDownloadUrl = url.startsWith("/")
