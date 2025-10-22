@@ -16,7 +16,7 @@ const SubjectGrid: React.FC<SubjectGridProps> = ({
   return (
     <section className="mb-4 bg-white p-4 rounded-lg border border-[var(--border-color)]">
       <div className="flex justify-between items-center mb-4">
-        <h2 className="text-sm md:text-base font-bold text-[var(--primary-text-color)]">
+        <h2 className="text-sm md:text-base font-bold text-[var(--primary-text-color)] text-center md:text-left">
           {title}
         </h2>
         <a

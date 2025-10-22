@@ -36,20 +36,19 @@ const FavoriteCard: React.FC<FavoriteCardProps> = ({ document, onRemove }) => {
 
   const handleImageError = (e: React.SyntheticEvent<HTMLImageElement>) => {
     const target = e.target as HTMLImageElement;
-    target.src = "/public/image/default_cover.png";
+    target.src = "/image/default_cover.png";
   };
 
   return (
     <div
       className="bg-white text-left rounded-lg border border-gray-200 overflow-hidden hover:shadow-md transition-shadow cursor-pointer"
-      onClick={document.has_access ? handleCardClick : undefined}
+      onClick={handleCardClick}
     >
       {/* Image with heart icon */}
-      {/* Nếu document không có quyền truy cập thì disabled */}
-      <div className={!document.has_access ? "cursor-not-allowed" : ""} >
+      <div className="relative bg-[var(--card-background-color)] flex justify-center items-center py-2">
         <div className="relative bg-[var(--card-background-color)] flex justify-center items-center py-2">
           <img
-            src={document.cover_page || "/public/image/default_cover.png"}
+            src={document.cover_page || "/image/default_cover.png"}
             alt={document.title}
             className="w-[90%] bg-white object-fill h-32 shadow-sm rounded-lg"
             onError={handleImageError}
@@ -62,10 +61,11 @@ const FavoriteCard: React.FC<FavoriteCardProps> = ({ document, onRemove }) => {
           >
             <Heart
               size={16}
-              className={`transition-colors ${isFavorite
+              className={`transition-colors ${
+                isFavorite
                   ? "fill-red-500 text-red-500"
                   : "text-gray-400 hover:text-red-500"
-                }`}
+              }`}
             />
           </div>
         </div>
@@ -89,7 +89,8 @@ const FavoriteCard: React.FC<FavoriteCardProps> = ({ document, onRemove }) => {
 
             {document.organization && (
               <div className="text-xs text-[var(--primary-color)] truncate">
-                <span className="font-medium"></span> {document.organization.name}
+                <span className="font-medium"></span>{" "}
+                {document.organization.name}
               </div>
             )}
           </div>

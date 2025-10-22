@@ -56,7 +56,7 @@ const DocumentCard: React.FC<DocumentCardProps> = ({
 
   const handleImageError = (e: React.SyntheticEvent<HTMLImageElement>) => {
     const target = e.target as HTMLImageElement;
-    target.src = "/public/image/default_cover.png";
+    target.src = "/image/default_cover.png";
   };
 
   return (
@@ -94,13 +94,13 @@ const DocumentCard: React.FC<DocumentCardProps> = ({
       </div>
 
       {/* Content */}
-      <div className="p-2 md:p-3 h-[72px] md:h-[88px]">
-        <h3 className="text-xs md:text-sm font-medium text-[var(--primary-text-color)] line-clamp-2 mb-1">
+      <div className="p-2 md:p-3 h-[88px] md:h-[104px]">
+        <h3 className="text-xs md:text-sm font-medium text-[var(--primary-text-color)] line-clamp-3 mb-1">
           {document.title}
         </h3>
         <div className="space-y-1">
           {/* Môn học */}
-          <div className="flex items-center gap-1 text-[var(--secondary-text-color)] text-[10px] md:text-xs h-[14px] md:h-[16px]">
+          <div className="flex items-center gap-1 text-[var(--secondary-text-color)] text-[10px] md:text-xs h-[16px] md:h-[18px]">
             {document.subject ? (
               <>
                 <GraduationCap className="w-3 h-3 flex-shrink-0" />
@@ -111,7 +111,7 @@ const DocumentCard: React.FC<DocumentCardProps> = ({
             )}
           </div>
           {/* Người đăng */}
-          <div className="flex items-center gap-1 text-[var(--secondary-text-color)] text-[10px] md:text-xs h-[14px] md:h-[16px]">
+          <div className="flex items-center gap-1 text-[var(--secondary-text-color)] text-[10px] md:text-xs h-[16px] md:h-[18px]">
             {document.user ? (
               <>
                 <User className="w-3 h-3 flex-shrink-0" />

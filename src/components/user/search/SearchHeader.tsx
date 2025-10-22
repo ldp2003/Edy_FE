@@ -167,7 +167,7 @@ const SearchHeader: React.FC<SearchHeaderProps> = ({
         <div className="w-full mx-auto">
           {/* Header Title */}
           <div className="text-center md:text-left mb-4">
-            <h1 className="text-base font-bold text-gray-900 mb-1">
+            <h1 className="text-base font-bold text-gray-900 mb-1 text-center md:text-left">
               Khám phá tài liệu học tập
             </h1>
             <p className="text-gray-600 text-sm">
@@ -343,7 +343,7 @@ const SearchHeader: React.FC<SearchHeaderProps> = ({
 
       {/* Sticky Header - hiển thị khi isFixed = true */}
       {isFixed && (
-        <div className="sticky top-0 mx-[-16px] bg-white/95 backdrop-blur-sm border-b border-gray-200 shadow-lg z-50 transition-all duration-300">
+        <div className="sticky top-0 mx-[-31px] bg-white/95 backdrop-blur-sm border-b border-gray-200 shadow-lg z-50 transition-all duration-300">
           <div className="max-w-7xl mx-auto px-4 py-3">
             <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
               {/* Sticky Search Input */}

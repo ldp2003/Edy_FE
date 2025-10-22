@@ -10,7 +10,7 @@ const DocumentGrid: React.FC<DocumentGridProps> = ({ title, documents }) => {
   return (
     <section className="mb-4 bg-white p-2 md:p-4 rounded-lg border border-[var(--border-color)] w-full sm:w-fit">
       <div className="flex justify-between items-center mb-4 sm:mb-2">
-        <h2 className="text-sm md:text-base font-bold text-[var(--primary-text-color)]">
+        <h2 className="text-sm md:text-base font-bold text-[var(--primary-text-color)] text-center md:text-left">
           {title}
         </h2>
         <a
@@ -25,7 +25,10 @@ const DocumentGrid: React.FC<DocumentGridProps> = ({ title, documents }) => {
           .filter((doc): doc is Document => doc !== null && doc !== undefined)
           .slice(0, 5)
           .map((doc) => (
-            <div key={doc._id} className="min-w-[160px] md:w-auto flex-shrink-0 snap-start">
+            <div
+              key={doc._id}
+              className="min-w-[160px] md:w-auto flex-shrink-0 snap-start"
+            >
               <DocumentCard document={doc} />
             </div>
           ))}

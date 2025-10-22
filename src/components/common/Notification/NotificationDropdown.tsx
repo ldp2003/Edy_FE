@@ -22,37 +22,44 @@ const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
 
   return (
     <Dropdown
-      overlay={
-        <div className="bg-white shadow-md rounded-md w-80">
-          <div className="p-4 border-b border-gray-200 font-medium">
-            Thông báo
-          </div>
-          <div className="max-h-64 overflow-y-auto">
-            {loading ? (
-              <div className="p-4 text-center">Đang tải...</div>
-            ) : notifications.length > 0 ? (
-              notifications.map((notification) => (
-                <NotificationItem
-                  key={notification._id}
-                  notification={notification}
-                />
-              ))
-            ) : (
-              <div className="p-4 text-center text-gray-500">
-                Không có thông báo nào.
+      menu={{
+        items: [
+          {
+            key: "notification",
+            label: (
+              <div className="bg-white shadow-md rounded-md w-80">
+                <div className="p-4 border-b border-gray-200 font-medium">
+                  Thông báo
+                </div>
+                <div className="max-h-64 overflow-y-auto">
+                  {loading ? (
+                    <div className="p-4 text-center">Đang tải...</div>
+                  ) : notifications.length > 0 ? (
+                    notifications.map((notification) => (
+                      <NotificationItem
+                        key={notification._id}
+                        notification={notification}
+                      />
+                    ))
+                  ) : (
+                    <div className="p-4 text-center text-gray-500">
+                      Không có thông báo nào.
+                    </div>
+                  )}
+                </div>
+                <div className="p-4 text-center">
+                  <button
+                    className="text-blue-500 hover:underline cursor-pointer"
+                    onClick={handleViewAllNotifications}
+                  >
+                    Xem tất cả
+                  </button>
+                </div>
               </div>
-            )}
-          </div>
-          <div className="p-4 text-center">
-            <button
-              className="text-blue-500 hover:underline cursor-pointer"
-              onClick={handleViewAllNotifications}
-            >
-              Xem tất cả
-            </button>
-          </div>
-        </div>
-      }
+            ),
+          },
+        ],
+      }}
       trigger={["hover"]}
     >
       <button

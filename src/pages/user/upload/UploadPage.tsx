@@ -60,14 +60,14 @@ const UploadPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen">
       {contextHolder}
 
       {/* Progress Bar */}
-      <div className="bg-gray-50 border-b border-gray-200 sticky top-0 z-10">
+      <div className="border-b border-gray-200">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="max-w-4xl mx-auto">
-            <h1 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4 text-center md:text-left">
+            <h1 className="text-xl sm:text-2xl font-bold text-[var(--primary-text-color)] mb-4 text-center md:text-left">
               Đăng tải tài liệu
             </h1>
             <Steps

@@ -12,6 +12,10 @@ const PersonalInfo: React.FC = () => {
     navigate("/edit-profile");
   };
 
+  const handleViewMorePoints = () => {
+    navigate("/point-management?showHistory=true");
+  };
+
   return (
     <div className="md:ml-6 w-full md:w-3/4">
       <div className="flex flex-row justify-between text-sm md:text-lg my-4 border-b border-gray-300 pb-2">
@@ -58,6 +62,7 @@ const PersonalInfo: React.FC = () => {
             freeDownloads={user?.free_download_count}
             usagePoints={user?.point}
             violations={user?.strike}
+            onViewMore={handleViewMorePoints}
           ></PointBox>
         </div>
       </div>

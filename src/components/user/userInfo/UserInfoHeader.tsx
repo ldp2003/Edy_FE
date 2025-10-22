@@ -35,7 +35,7 @@ const UserInfoHeader: React.FC<UserInfoHeaderProps> = ({ user }) => {
 
             {/* User Info */}
             <div className=" text-left flex flex-col gap-3">
-              <h3 className="font-semibold text-base text-[var(--primary-color)]">
+              <h3 className="font-semibold text-base text-[var(--primary-color)] text-center md:text-left">
                 {user.first_name} {user.last_name}
               </h3>
               <div className="flex flex-row gap-2 items-center">

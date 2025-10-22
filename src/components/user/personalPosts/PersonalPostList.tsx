@@ -190,7 +190,7 @@ const PersonalPostList: React.FC = () => {
       <div className="bg-white p-4 md:p-6 rounded-lg shadow-md">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 md:gap-4 mb-4">
           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 md:gap-4 w-full sm:w-auto">
-            <h1 className="text-sm md:text-base font-bold text-[var(--primary-text-color)]">
+            <h1 className="text-sm md:text-base font-bold text-[var(--primary-text-color)] text-center md:text-left">
               Tài liệu của tôi
             </h1>
             {/* Only show view selector on desktop */}

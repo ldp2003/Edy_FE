@@ -175,7 +175,7 @@ const OrganizationDetail: React.FC = () => {
   if (!organization) {
     return (
       <div className="text-center py-12">
-        <h2 className="text-xl font-semibold text-gray-600">
+        <h2 className="text-xl font-semibold text-gray-600 text-center md:text-left">
           Không tìm thấy thông tin tổ chức
         </h2>
       </div>
