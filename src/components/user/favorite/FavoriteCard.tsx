@@ -36,7 +36,7 @@ const FavoriteCard: React.FC<FavoriteCardProps> = ({ document, onRemove }) => {
 
   const handleImageError = (e: React.SyntheticEvent<HTMLImageElement>) => {
     const target = e.target as HTMLImageElement;
-    target.src = "/image/default_cover.png";
+    target.src = "/public/image/default_cover.png";
   };
 
   return (
@@ -48,7 +48,7 @@ const FavoriteCard: React.FC<FavoriteCardProps> = ({ document, onRemove }) => {
       <div className="relative bg-[var(--card-background-color)] flex justify-center items-center py-2">
         <div className="relative bg-[var(--card-background-color)] flex justify-center items-center py-2">
           <img
-            src={document.cover_page || "/image/default_cover.png"}
+            src={document.cover_page || "/public/image/default_cover.png"}
             alt={document.title}
             className="w-[90%] bg-white object-fill h-32 shadow-sm rounded-lg"
             onError={handleImageError}
