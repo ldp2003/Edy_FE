@@ -3,6 +3,10 @@ import { Form, Input, Button, message } from "antd";
 import type { Store } from "antd/es/form/interface";
 import type { ValidateErrorEntity } from "rc-field-form/lib/interface";
 import { register, login } from "../../../utils/AuthService";
+import {
+  validateEmail,
+  validatePassword,
+} from "../../../utils/ValidationUtils";
 
 interface RegisterFormProps {
   onSuccess: () => void;
@@ -88,7 +92,14 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
             name="email"
             rules={[
               { required: true, message: "Vui lòng nhập email!" },
-              { type: "email", message: "Email không hợp lệ!" },
+              {
+                validator: (_, value) => {
+                  const result = validateEmail(value);
+                  return result.isValid
+                    ? Promise.resolve()
+                    : Promise.reject(new Error(result.message));
+                },
+              },
             ]}
           >
             <Input
@@ -104,7 +115,16 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
           <Form.Item
             label="Mật khẩu"
             name="password"
-            rules={[{ required: true, message: "Vui lòng nhập mật khẩu!" }]}
+            rules={[
+              {
+                validator: (_, value) => {
+                  const result = validatePassword(value);
+                  return result.isValid
+                    ? Promise.resolve()
+                    : Promise.reject(new Error(result.message));
+                },
+              },
+            ]}
           >
             <Input.Password
               placeholder="Mật khẩu"
