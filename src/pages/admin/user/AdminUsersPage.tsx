@@ -9,9 +9,13 @@ const AdminUsersPage: React.FC = () => {
   ];
 
   return (
-    <div className="p-6 h-full">
-      <AdminBreadcrumb items={breadcrumbItems} />
-      <AdminUserTable />
+    <div className="min-h-screen bg-gray-50">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <AdminBreadcrumb items={breadcrumbItems} />
+        <div className="mt-6">
+          <AdminUserTable />
+        </div>
+      </div>
     </div>
   );
 };

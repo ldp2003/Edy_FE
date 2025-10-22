@@ -1,22 +1,14 @@
-import { RoleAPI } from "../api/API";
+import { RoleAPI, UserAPI } from "../api/API";
 
 export const RoleService = {
   getAllRoles: async () => {
-    try {
-      const response = await RoleAPI.getAllRoles();
-      return response.data;
-    } catch (error) {
-      throw error;
-    }
+    const response = await RoleAPI.getAllRoles();
+    return response.data;
   },
 
   updateRoleStatus: async (roleId: string, isActive: boolean) => {
-    try {
-      const response = await RoleAPI.updateRoleStatus(roleId, isActive);
-      return response.data;
-    } catch (error) {
-      throw error;
-    }
+    const response = await RoleAPI.updateRoleStatus(roleId, isActive);
+    return response.data;
   },
 
   createRole: async (roleData: {
@@ -24,27 +16,26 @@ export const RoleService = {
     description: string;
     permissions: string[];
   }) => {
-    try {
-      const response = await RoleAPI.createRole({
-        ...roleData,
-        code: "CUSTOM_ROLE"
-      });
-      return response.data;
-    } catch (error) {
-      throw error;
-    }
+    const response = await RoleAPI.createRole({
+      ...roleData,
+      code: "CUSTOM_ROLE",
+    });
+    return response.data;
   },
 
-  updateRole: async (roleId: string, roleData: {
-    name: string;
-    description: string;
-    permissions: string[];
-  }) => {
-    try {
-      const response = await RoleAPI.updateRole(roleId, roleData);
-      return response.data;
-    } catch (error) {
-      throw error;
+  updateRole: async (
+    roleId: string,
+    roleData: {
+      name: string;
+      description: string;
+      permissions: string[];
     }
+  ) => {
+    const response = await RoleAPI.updateRole(roleId, roleData);
+    return response.data;
+  },
+  getUserRoles: async (userId: string) => {
+    const response = await UserAPI.getPermissionByUserId(userId);
+    return response.data;
   },
 };

@@ -92,7 +92,6 @@ const UserEditPage: React.FC = () => {
       <div className="mt-8 flex flex-row bg-white rounded-lg border border-[var(--border-color)]">
         {/* Left Column - Role Management */}
         <div className="w-1/2 p-6 border-r border-[var(--border-color)]">
-          <div className="font-bold text-sm mb-4">Quyền</div>
           <UserRoleManager userId={id!} currentRole={user?.role || "USER"} />
         </div>
 

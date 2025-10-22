@@ -1,10 +1,10 @@
-import React from "react";
-import SubjectItem from "./SubjectItem";
+// import { useNavigate } from "react-router-dom";
 import type { Subject } from "../../../models/subject";
+import SubjectItem from "./SubjectItem";
 
 interface SubjectGridProps {
   title: string;
-  subjects? : Subject[];
+  subjects?: Subject[];
   onSubjectClick?: (subject: Subject) => void;
 }
 
@@ -13,17 +13,21 @@ const SubjectGrid: React.FC<SubjectGridProps> = ({
   subjects,
   onSubjectClick,
 }) => {
-  if (!subjects || subjects.length === 0) {
-    return null;
-  }
-
   return (
-    <div className="mb-8 text-left bg-white p-4 rounded-lg border border-[var(--border-color)]">
-      <h2 className="text-base font-bold text-[var(--primary-text-color)] mb-4">
-        {title}
-      </h2>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-        {subjects.map((subject) => (
+    <section className="mb-4 bg-white p-4 rounded-lg border border-[var(--border-color)]">
+      <div className="flex justify-between items-center mb-4">
+        <h2 className="text-sm md:text-base font-bold text-[var(--primary-text-color)] text-center md:text-left">
+          {title}
+        </h2>
+        <a
+          href="#"
+          className="text-xs md:text-sm text-[var(--link-color)] hover:underline"
+        >
+          Xem tất cả {">>"}
+        </a>
+      </div>
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-2 md:gap-4">
+        {(subjects || []).slice(0, 5).map((subject) => (
           <SubjectItem
             key={subject._id}
             subject={subject}
@@ -31,7 +35,7 @@ const SubjectGrid: React.FC<SubjectGridProps> = ({
           />
         ))}
       </div>
-    </div>
+    </section>
   );
 };
 

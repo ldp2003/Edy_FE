@@ -28,8 +28,8 @@ const AuthorInfo: React.FC<AuthorInfoProps> = ({ document }) => {
   };
   return (
     <>
-      <div className="flex text-left items-center justify-between p-4 bg-white border-b border-gray-200 rounded-xl mb-6 shadow">
-        <div className="flex items-center flex-row gap-4">
+      <div className="flex text-center md:text-left items-center justify-center md:justify-between p-4 bg-white border-b border-gray-200 rounded-xl mb-6 shadow">
+        <div className="flex flex-col md:flex-row gap-4 items-center justify-center md:justify-start">
           <Avatar size={80} className="bg-gray-200">
             {document.user.avatar ? (
               <img
@@ -74,7 +74,7 @@ const AuthorInfo: React.FC<AuthorInfoProps> = ({ document }) => {
           className="flex flex-col items-center space-y-2"
           style={{ color: "var(--primary-text-color)" }}
         >
-          <div className="flex flex-row space-x-6">
+          <div className="flex flex-row justify-center md:justify-start space-x-6">
             <div className="text-center">
               <div className="font-semibold text-xs">{followerCount}</div>
               <div className="text-xs">Người theo dõi</div>
@@ -92,11 +92,13 @@ const AuthorInfo: React.FC<AuthorInfoProps> = ({ document }) => {
               <div className="text-xs">Bài đăng</div>
             </div>
           </div>
-          <FollowButton
-            user={document.user}
-            size="default"
-            onFollowerCountChange={handleFollowerCountChange}
-          />
+          <div className="flex justify-center">
+            <FollowButton
+              user={document.user}
+              size="default"
+              onFollowerCountChange={handleFollowerCountChange}
+            />
+          </div>
         </div>
       </div>
     </>

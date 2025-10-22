@@ -10,11 +10,7 @@ interface WordViewerProps {
   isUser?: boolean; // True if document belongs to current user
 }
 
-const WordViewer: React.FC<WordViewerProps> = ({
-  url,
-  onPageChange,
-  isUser = false, // eslint-disable-line @typescript-eslint/no-unused-vars
-}) => {
+const WordViewer: React.FC<WordViewerProps> = ({ url, onPageChange }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -53,13 +49,28 @@ const WordViewer: React.FC<WordViewerProps> = ({
   }, [url, onPageChange]);
 
   return (
-    <div className="lg:max-w-[1400px] z-0" style={{ minHeight: 200 }}>
-      {loading && <div>Đang tải file Word...</div>}
-      {error && <div style={{ color: "red" }}>{error}</div>}
+    <div className="w-full max-w-full md:max-w-4xl lg:max-w-5xl xl:max-w-6xl z-0 min-h-[200px]">
+      {loading && (
+        <div className="flex items-center justify-center py-8 px-4">
+          <div className="text-gray-600 text-sm sm:text-base text-center">
+            Đang tải file Word...
+          </div>
+        </div>
+      )}
+      {error && (
+        <div className="text-red-600 text-sm sm:text-base px-3 sm:px-4 py-3 bg-red-50 rounded-lg mx-2 sm:mx-4">
+          {error}
+        </div>
+      )}
       <div
         ref={containerRef}
-        className="docx-wrapper"
-        style={{ width: "100%", overflowX: "auto" }}
+        className="docx-wrapper px-1 sm:px-2 md:px-4"
+        style={{
+          width: "100%",
+          overflowX: "auto",
+          fontSize: "14px",
+          lineHeight: "1.4",
+        }}
       />
     </div>
   );

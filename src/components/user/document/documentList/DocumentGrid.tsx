@@ -8,32 +8,40 @@ interface DocumentGridProps {
 
 const DocumentGrid: React.FC<DocumentGridProps> = ({ title, documents }) => {
   return (
-    <section className="mb-8 bg-white p-4 rounded-lg  border border-[var(--border-color)]">
-      <div className="flex justify-between items-center mb-4">
-        <h2 className="text-base font-bold text-[var(--primary-text-color)]">
+    <section className="mb-4 bg-white p-2 md:p-4 rounded-lg border border-[var(--border-color)] w-full sm:w-fit">
+      <div className="flex justify-between items-center mb-4 sm:mb-2">
+        <h2 className="text-sm md:text-base font-bold text-[var(--primary-text-color)] text-center md:text-left">
           {title}
         </h2>
         <a
           href="#"
-          className="text-sm text-[var(--link-color)] hover:underline"
+          className="text-xs md:text-sm text-[var(--link-color)] hover:underline"
         >
           Xem tất cả {">>"}
         </a>
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
+      <div className="flex flex-nowrap md:grid md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-2 md:gap-4 overflow-x-auto pb-2 snap-x snap-mandatory scrollbar-none">
         {documents
-          .filter((doc): doc is Document => doc !== null && doc !== undefined) // Filter out null and undefined documents
-          .slice(0, 5) // Limit to 5 documents
+          .filter((doc): doc is Document => doc !== null && doc !== undefined)
+          .slice(0, 5)
           .map((doc) => (
-            <DocumentCard
+            <div
               key={doc._id}
-              title={doc.title}
-              description={doc.subject?.name || "Chưa có môn học"}
-              imageUrl={doc.cover_page}
-              document={doc}
-            />
+              className="min-w-[160px] md:w-auto flex-shrink-0 snap-start"
+            >
+              <DocumentCard document={doc} />
+            </div>
           ))}
       </div>
+      <style>{`
+        .scrollbar-none::-webkit-scrollbar {
+          display: none;
+        }
+        .scrollbar-none {
+          -ms-overflow-style: none;
+          scrollbar-width: none;
+        }
+      `}</style>
     </section>
   );
 };

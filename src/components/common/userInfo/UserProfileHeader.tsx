@@ -4,7 +4,7 @@ import type { RcFile } from "antd/es/upload/interface";
 import type { MessageInstance } from "antd/es/message/interface";
 import { updateProfile } from "../../../utils/UserService";
 import { uploadImageToCloudinary } from "../../../utils/CloudinaryService";
-import type { Organization } from "../../../models/organization";
+import type { OrganizationDetailed } from "../../../models/organization";
 
 const { Option } = Select;
 
@@ -13,7 +13,7 @@ interface UserProfileHeaderProps {
   lastName: string;
   organization: string | { _id: string; name: string };
   email: string;
-  organizationOptions: Organization[];
+  organizationOptions: OrganizationDetailed[];
   messageApi: MessageInstance;
   avatar?: string;
 }
@@ -126,7 +126,7 @@ const UserProfileHeader: React.FC<UserProfileHeaderProps> = ({
   };
   return (
     <div
-      className="rounded-lg text-left p-4 shadow-lg"
+      className="rounded-lg text-center md:text-left p-4 shadow-lg"
       style={{ backgroundColor: "var(--card-background-color)" }}
     >
       <style>
@@ -143,7 +143,7 @@ const UserProfileHeader: React.FC<UserProfileHeaderProps> = ({
           }
         `}
       </style>
-      <div className="flex items-start gap-4">
+      <div className="flex flex-col md:flex-row items-start gap-4">
         <Upload
           name="avatar"
           listType="picture-circle"
@@ -153,81 +153,98 @@ const UserProfileHeader: React.FC<UserProfileHeaderProps> = ({
           customRequest={customUpload}
           beforeUpload={beforeUpload}
         >
-          {avatarUrl ? (
+          <div className="relative">
             <img
-              src={avatarUrl}
+              src={avatarUrl || avatar || "/default-avatar.png"}
               alt="avatar"
               style={{ width: "100%", height: "100%", borderRadius: "50%" }}
             />
-          ) : (
-            <img
-              src={avatar || "/default-avatar.png"}
-              alt="avatar"
-              style={{ width: "100%", height: "100%", borderRadius: "50%" }}
-            />
-          )}
+            <div className="absolute inset-0 bg-black bg-opacity-50 rounded-full flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
+              <span className="text-white text-xs">Thay đổi</span>
+            </div>
+          </div>
         </Upload>
 
-        <div className="flex-1 grid grid-cols-4 gap-3">
-          {/* Column 1: Labels for Họ and Tên */}
-          <div className="flex flex-col gap-3">
-            <label htmlFor="first-name" className="text-xs font-medium">
+        <div className="flex-1 flex flex-col gap-4">
+          {/* Họ */}
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
+            <label
+              htmlFor="first-name"
+              className="text-xs font-medium md:col-span-1"
+            >
               Họ:
             </label>
-            <label htmlFor="last-name" className="text-xs font-medium">
+            <div className="md:col-span-3">
+              <Input
+                id="first-name"
+                value={firstNameValue}
+                onChange={(e) => setFirstNameValue(e.target.value)}
+                className="text-sm"
+                size="small"
+              />
+            </div>
+          </div>
+
+          {/* Tên */}
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
+            <label
+              htmlFor="last-name"
+              className="text-xs font-medium md:col-span-1"
+            >
               Tên:
             </label>
+            <div className="md:col-span-3">
+              <Input
+                id="last-name"
+                value={lastNameValue}
+                onChange={(e) => setLastNameValue(e.target.value)}
+                className="text-sm"
+                size="small"
+              />
+            </div>
           </div>
 
-          {/* Column 2: Inputs for Họ and Tên */}
-          <div className="flex flex-col gap-3">
-            <Input
-              id="first-name"
-              value={firstNameValue}
-              onChange={(e) => setFirstNameValue(e.target.value)}
-              className="mt-1 text-sm"
-              size="small"
-            />
-            <Input
-              id="last-name"
-              value={lastNameValue}
-              onChange={(e) => setLastNameValue(e.target.value)}
-              className="mt-1 text-sm"
-              size="small"
-            />
-          </div>
-
-          {/* Column 3: Labels for Học tập/làm việc tại and Email */}
-          <div className="flex flex-col gap-3">
-            <label htmlFor="hoc-tap" className="text-xs font-medium">
+          {/* Học tập/làm việc tại */}
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
+            <label
+              htmlFor="hoc-tap"
+              className="text-xs font-medium md:col-span-1"
+            >
               Học tập/làm việc tại:
             </label>
-            <label htmlFor="email" className="text-xs font-medium">
-              Email:
-            </label>
+            <div className="md:col-span-3">
+              <Select
+                value={organizationValue}
+                onChange={(value) => setOrganizationValue(value)}
+                className="text-sm"
+                size="small"
+              >
+                {organizationOptions.map((org) => (
+                  <Option key={org._id} value={org._id}>
+                    {org.name}
+                  </Option>
+                ))}
+              </Select>
+            </div>
           </div>
 
-          {/* Column 4: Inputs for Học tập/làm việc tại and Email */}
-          <div className="flex flex-col gap-3">
-            <Select
-              value={organizationValue}
-              onChange={(value) => setOrganizationValue(value)}
-              className="mt-1 text-sm"
-              size="small"
+          {/* Email */}
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
+            <label
+              htmlFor="email"
+              className="text-xs font-medium md:col-span-1"
             >
-              {organizationOptions.map((org) => (
-                <Option key={org._id} value={org._id}>
-                  {org.name}
-                </Option>
-              ))}
-            </Select>
-            <Input
-              id="email"
-              defaultValue={email}
-              disabled
-              className="mt-1 text-sm"
-              size="small"
-            />
+              Email:
+            </label>
+            <div className="md:col-span-3">
+              <Input
+                id="email"
+                defaultValue={email}
+                disabled
+                className="text-sm"
+                size="small"
+              />
+            </div>
           </div>
         </div>
       </div>

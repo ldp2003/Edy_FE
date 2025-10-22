@@ -239,6 +239,9 @@ export const UserAPI = {
   unfollowUser: async (userId: string) => {
     return await apiClient.post(`/users/${userId}/unfollow`);
   },
+  getPermissionByUserId: async (userId: string) => {
+    return await apiClient.get(`/users/${userId}/roles`);
+  },
 };
 
 export const SubjectAPI = {
@@ -1258,5 +1261,19 @@ export const AssignmentAPI = {
       console.error("Error updating assignment:", error);
       throw error;
     }
+  },
+};
+
+export const PointTransactionAPI = {
+  getTransactionHistory: async (
+    userId: string,
+    params?: {
+      page?: number;
+      limit?: number;
+    }
+  ) => {
+    return await apiClient.get(`/point-transactions/${userId}/history`, {
+      params,
+    });
   },
 };

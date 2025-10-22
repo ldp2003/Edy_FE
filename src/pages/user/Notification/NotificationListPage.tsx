@@ -36,7 +36,7 @@ const NotificationListPage: React.FC = () => {
 
   return (
     <div className="p-4 bg-white rounded shadow mt-6 text-left">
-      <h1 className="text-base text-[var(--primary-text-color)] font-bold mb-4">
+      <h1 className="text-base text-[var(--primary-text-color)] font-bold mb-4 text-center md:text-left">
         Danh sách thông báo
       </h1>
       {loading ? (

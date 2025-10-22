@@ -71,7 +71,7 @@ const ResetPassword: React.FC<ResetPasswordProps> = ({ messageApi }) => {
 
   return (
     <div
-      className="rounded-lg text-left border border-gray-200 p-6 shadow"
+      className="rounded-lg text-center md:text-left border border-gray-200 p-6 shadow"
       style={{ backgroundColor: "var(--card-background-color)" }}
     >
       <div className="space-y-2">

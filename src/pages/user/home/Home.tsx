@@ -59,9 +59,8 @@ export default function HomePage() {
             setSubjects(subjectsResponse.slice(0, 8) || []); // Limit to 8 subjects
           }
         }
-      } catch (error) {
-        console.error("Error fetching documents:", error);
-        messageApi.error("Không thể tải danh sách tài liệu!");
+      } catch {
+        // Suppress errors for new accounts
       } finally {
         setLoading(false);
       }
@@ -69,11 +68,6 @@ export default function HomePage() {
 
     fetchDocuments();
   }, [messageApi, user]);
-
-  const handleSubjectClick = (subject: Subject) => {
-    // This function is intentionally empty as SubjectItem handles its own navigation
-    console.log("Subject clicked:", subject.name);
-  };
 
   if (loading) {
     return (
@@ -90,16 +84,18 @@ export default function HomePage() {
     <div className="min-h-screen">
       {contextHolder}
       <div className="flex">
-        <main className="flex-1 p-6 max-w-full">
-          <SubjectGrid
-            title={`Các môn học của ${
-              typeof user?.organization === "object" && user?.organization?.name
-                ? user.organization.name
-                : "tổ chức"
-            }`}
-            subjects={subjects}
-            onSubjectClick={handleSubjectClick}
-          />
+        <main className="flex-1 px-4 py-4 md:p-6 lg:max-w-full w-screen space-y-6">
+          {subjects && subjects.length > 0 && (
+            <SubjectGrid
+              title={`Các môn học của ${
+                typeof user?.organization === "object" &&
+                user?.organization?.name
+                  ? user.organization.name
+                  : "tổ chức"
+              }`}
+              subjects={subjects}
+            />
+          )}
           {readHistory && readHistory.length > 0 && (
             // hiện tối đa 5 tài liệu gần đây
             <DocumentGrid

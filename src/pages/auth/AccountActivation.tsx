@@ -14,7 +14,7 @@ const AccountActivation: React.FC = () => {
       await verifyUser(organizationId, fieldOfStudy);
       messageApi.success("Thông tin đã được lưu thành công!");
       setTimeout(() => {
-        window.location.href = "/";
+        window.location.reload();
       }, 2000);
     } catch {
       messageApi.error("Lưu thông tin thất bại. Vui lòng thử lại.");
