@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useMemo, useCallback } from "react";
 import { Button, Modal, message, Input } from "antd";
 import { useNavigate } from "react-router-dom";
 import { NotificationService } from "../../../../utils/NotificationService";
@@ -53,16 +53,23 @@ const DocumentActionButtons: React.FC<DocumentActionButtonsProps> = ({
   const [messageApi, contextHolder] = message.useMessage();
   const [rejectModalVisible, setRejectModalVisible] = useState(false);
   const [deleteModalVisible, setDeleteModalVisible] = useState(false);
+  const [editRequestModalVisible, setEditRequestModalVisible] = useState(false);
   const [rejectReason, setRejectReason] = useState("");
   const [deleteReason, setDeleteReason] = useState("");
+  const [editRequestReason, setEditRequestReason] = useState("");
 
-  // Check document status - sử dụng documentStatus từ props thay vì documentRequest
-  const isPending = documentStatus === "PENDING";
-  const isApproved = documentStatus === "APPROVED";
-  const isRejected = documentStatus === "REJECTED";
-  const isRequestedEdit = documentStatus === "REQUESTED_EDIT";
+  // Document status constants
+  const DOCUMENT_STATUS = {
+    PENDING: "PENDING",
+    APPROVED: "APPROVED",
+    REJECTED: "REJECTED",
+    REQUESTED_EDIT: "REQUESTED_EDIT",
+  } as const;
 
-  const handleApprove = async () => {
+  type DocumentStatusType =
+    (typeof DOCUMENT_STATUS)[keyof typeof DOCUMENT_STATUS];
+
+  const handleApprove = useCallback(async () => {
     if (!documentRequest) {
       messageApi.error("Không tìm thấy request tài liệu!");
       return;
@@ -102,7 +109,15 @@ const DocumentActionButtons: React.FC<DocumentActionButtonsProps> = ({
       console.error("Approve error:", error);
       messageApi.error("Có lỗi xảy ra khi duyệt tài liệu!");
     }
-  };
+  }, [
+    documentRequest,
+    summaryRequest,
+    summaryAction,
+    summaryRejectReason,
+    isIntensive,
+    onApprove,
+    messageApi,
+  ]);
 
   const handleReject = async () => {
     if (!documentRequest) {
@@ -159,9 +174,164 @@ const DocumentActionButtons: React.FC<DocumentActionButtonsProps> = ({
     }
   };
 
+  const handleEditRequest = async () => {
+    if (!editRequestReason.trim()) {
+      messageApi.error("Vui lòng nhập lý do yêu cầu chỉnh sửa!");
+      return;
+    }
+
+    try {
+      await onDelete(editRequestReason);
+      messageApi.success("Đã gửi yêu cầu chỉnh sửa!");
+      setEditRequestModalVisible(false);
+      setEditRequestReason("");
+
+      // Send notification to the document owner
+      await NotificationService.createNotification({
+        userId: documentRequest?.requester || "",
+        type: "SYSTEM",
+        message: `Quản trị viên yêu cầu chỉnh sửa tài liệu của bạn. Lý do: ${editRequestReason}`,
+        docId: documentRequest?.doc,
+      });
+    } catch (error) {
+      console.error("Edit request error:", error);
+      messageApi.error("Có lỗi xảy ra khi gửi yêu cầu chỉnh sửa!");
+    }
+  };
+
   const handleCompare = () => {
     navigate(`/admin/documents/compare/${documentId}`);
   };
+
+  // Button configurations based on document status
+  const statusConfig = useMemo(() => {
+    const configs: Record<
+      DocumentStatusType,
+      {
+        statusBadge: {
+          text: string;
+          color: string;
+          bgColor: string;
+          borderColor: string;
+        } | null;
+        actionButtons: Array<{
+          key: string;
+          text: string;
+          color: string;
+          onClick: () => void;
+          disabled?: boolean;
+        }>;
+      }
+    > = {
+      [DOCUMENT_STATUS.PENDING]: {
+        statusBadge: {
+          text: "⏳ Đang chờ duyệt",
+          color: "text-blue-700",
+          bgColor: "bg-blue-100",
+          borderColor: "border-blue-300",
+        },
+        actionButtons: [
+          {
+            key: "approve",
+            text: "Duyệt bài",
+            color: "#22c55e",
+            onClick: handleApprove,
+          },
+          {
+            key: "reject",
+            text: "Từ chối",
+            color: "#ef4444",
+            onClick: () => setRejectModalVisible(true),
+          },
+          {
+            key: "request-edit",
+            text: "Yêu cầu chỉnh sửa",
+            color: "#f59e0b",
+            onClick: () => setDeleteModalVisible(true),
+          },
+        ],
+      },
+      [DOCUMENT_STATUS.APPROVED]: {
+        statusBadge: {
+          text: "✓ Đã duyệt",
+          color: "text-green-700",
+          bgColor: "bg-green-100",
+          borderColor: "border-green-300",
+        },
+        actionButtons: [
+          {
+            key: "request-edit",
+            text: "Yêu cầu chỉnh sửa",
+            color: "#f59e0b",
+            onClick: () => setEditRequestModalVisible(true),
+          },
+          {
+            key: "delete",
+            text: "Xóa bài",
+            color: "#ef4444",
+            onClick: () => setDeleteModalVisible(true),
+          },
+        ],
+      },
+      [DOCUMENT_STATUS.REJECTED]: {
+        statusBadge: {
+          text: "✗ Đã từ chối",
+          color: "text-red-700",
+          bgColor: "bg-red-100",
+          borderColor: "border-red-300",
+        },
+        actionButtons: [
+          {
+            key: "approve",
+            text: "Duyệt lại",
+            color: "#22c55e",
+            onClick: handleApprove,
+          },
+          {
+            key: "delete",
+            text: "Xóa bài",
+            color: "#f59e0b",
+            onClick: () => setDeleteModalVisible(true),
+          },
+        ],
+      },
+      [DOCUMENT_STATUS.REQUESTED_EDIT]: {
+        statusBadge: {
+          text: "⚠ Yêu cầu chỉnh sửa",
+          color: "text-yellow-700",
+          bgColor: "bg-yellow-100",
+          borderColor: "border-yellow-300",
+        },
+        actionButtons: [
+          {
+            key: "approve",
+            text: "Duyệt bài",
+            color: "#22c55e",
+            onClick: handleApprove,
+          },
+          {
+            key: "reject",
+            text: "Từ chối",
+            color: "#ef4444",
+            onClick: () => setRejectModalVisible(true),
+          },
+          {
+            key: "delete",
+            text: "Xóa bài",
+            color: "#f59e0b",
+            onClick: () => setDeleteModalVisible(true),
+          },
+        ],
+      },
+    };
+
+    return (
+      configs[documentStatus as DocumentStatusType] || {
+        statusBadge: null,
+        actionButtons: [],
+      }
+    );
+  }, [documentStatus, handleApprove]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <>
@@ -170,154 +340,35 @@ const DocumentActionButtons: React.FC<DocumentActionButtonsProps> = ({
       <div className="mt-8 pt-6 border-t border-gray-200">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div className="flex flex-wrap gap-3">
-            {/* Status indicators */}
-            {isApproved && (
-              <div className="flex items-center text-xs gap-2 px-2 bg-green-100 border border-green-300 rounded-md">
-                <span className="text-green-700 font-medium">✓ Đã duyệt</span>
-              </div>
-            )}
-            {isRejected && (
-              <div className="flex items-center text-xs gap-2 px-2 bg-red-100 border border-red-300 rounded-md">
-                <span className="text-red-700 font-medium">✗ Đã từ chối</span>
-              </div>
-            )}
-            {isRequestedEdit && (
-              <div className="flex items-center text-xs gap-2 px-2 bg-yellow-100 border border-yellow-300 rounded-md">
-                <span className="text-yellow-700 font-medium">
-                  ⚠ Yêu cầu chỉnh sửa
-                </span>
-              </div>
-            )}
-            {isPending && (
-              <div className="flex items-center text-xs gap-2 px-2 bg-blue-100 border border-blue-300 rounded-md">
-                <span className="text-blue-700 font-medium">
-                  ⏳ Đang chờ duyệt
+            {/* Status indicator */}
+            {statusConfig.statusBadge && (
+              <div
+                className={`flex items-center text-xs gap-2 px-2 border rounded-md ${statusConfig.statusBadge.bgColor} ${statusConfig.statusBadge.borderColor}`}
+              >
+                <span
+                  className={`font-medium ${statusConfig.statusBadge.color}`}
+                >
+                  {statusConfig.statusBadge.text}
                 </span>
               </div>
             )}
 
             {/* Action buttons based on status */}
-            {isPending && (
-              <>
-                <Button
-                  style={{
-                    backgroundColor: "#22c55e",
-                    borderColor: "#22c55e",
-                    color: "white",
-                  }}
-                  onClick={handleApprove}
-                  loading={processing}
-                  disabled={processing}
-                >
-                  Duyệt bài
-                </Button>
-                <Button
-                  style={{
-                    backgroundColor: "#ef4444",
-                    borderColor: "#ef4444",
-                    color: "white",
-                  }}
-                  onClick={() => setRejectModalVisible(true)}
-                  disabled={processing}
-                >
-                  Từ chối
-                </Button>
-                <Button
-                  style={{
-                    backgroundColor: "#f59e0b",
-                    borderColor: "#f59e0b",
-                    color: "white",
-                  }}
-                  onClick={() => setDeleteModalVisible(true)}
-                  disabled={processing}
-                >
-                  Yêu cầu chỉnh sửa
-                </Button>
-              </>
-            )}
-
-            {isApproved && (
-              <>
-                <Button
-                  style={{
-                    backgroundColor: "#f59e0b",
-                    borderColor: "#f59e0b",
-                    color: "white",
-                  }}
-                  onClick={() => setDeleteModalVisible(true)}
-                  disabled={processing}
-                >
-                  Xóa bài
-                </Button>
-              </>
-            )}
-
-            {isRejected && (
-              <>
-                <Button
-                  style={{
-                    backgroundColor: "#22c55e",
-                    borderColor: "#22c55e",
-                    color: "white",
-                  }}
-                  onClick={handleApprove}
-                  loading={processing}
-                  disabled={processing}
-                >
-                  Duyệt lại
-                </Button>
-                <Button
-                  style={{
-                    backgroundColor: "#f59e0b",
-                    borderColor: "#f59e0b",
-                    color: "white",
-                  }}
-                  onClick={() => setDeleteModalVisible(true)}
-                  disabled={processing}
-                >
-                  Xóa bài
-                </Button>
-              </>
-            )}
-
-            {isRequestedEdit && (
-              <>
-                <Button
-                  style={{
-                    backgroundColor: "#22c55e",
-                    borderColor: "#22c55e",
-                    color: "white",
-                  }}
-                  onClick={handleApprove}
-                  loading={processing}
-                  disabled={processing}
-                >
-                  Duyệt bài
-                </Button>
-                <Button
-                  style={{
-                    backgroundColor: "#ef4444",
-                    borderColor: "#ef4444",
-                    color: "white",
-                  }}
-                  onClick={() => setRejectModalVisible(true)}
-                  disabled={processing}
-                >
-                  Từ chối
-                </Button>
-                <Button
-                  style={{
-                    backgroundColor: "#f59e0b",
-                    borderColor: "#f59e0b",
-                    color: "white",
-                  }}
-                  onClick={() => setDeleteModalVisible(true)}
-                  disabled={processing}
-                >
-                  Xóa bài
-                </Button>
-              </>
-            )}
+            {statusConfig.actionButtons.map((button) => (
+              <Button
+                key={button.key}
+                style={{
+                  backgroundColor: button.color,
+                  borderColor: button.color,
+                  color: "white",
+                }}
+                onClick={button.onClick}
+                loading={button.key === "approve" ? processing : false}
+                disabled={processing || button.disabled}
+              >
+                {button.text}
+              </Button>
+            ))}
 
             {/* Button "Xem trùng" luôn hiển thị */}
             <Button
@@ -384,8 +435,8 @@ const DocumentActionButtons: React.FC<DocumentActionButtonsProps> = ({
         confirmLoading={processing}
         okButtonProps={{
           style: {
-            backgroundColor: "#f59e0b",
-            borderColor: "#f59e0b",
+            backgroundColor: "#ef4444",
+            borderColor: "#ef4444",
           },
         }}
       >
@@ -400,6 +451,41 @@ const DocumentActionButtons: React.FC<DocumentActionButtonsProps> = ({
               setDeleteReason(e.target.value)
             }
             placeholder="Nhập lý do xóa bài viết này..."
+            style={{ resize: "none" }}
+          />
+        </div>
+      </Modal>
+
+      {/* Edit Request Modal */}
+      <Modal
+        title="Yêu cầu chỉnh sửa"
+        open={editRequestModalVisible}
+        onOk={handleEditRequest}
+        onCancel={() => {
+          setEditRequestModalVisible(false);
+          setEditRequestReason("");
+        }}
+        okText="Gửi yêu cầu"
+        cancelText="Hủy"
+        confirmLoading={processing}
+        okButtonProps={{
+          style: {
+            backgroundColor: "#f59e0b",
+            borderColor: "#f59e0b",
+          },
+        }}
+      >
+        <div className="mb-4">
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Lý do yêu cầu chỉnh sửa:
+          </label>
+          <TextArea
+            rows={4}
+            value={editRequestReason}
+            onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
+              setEditRequestReason(e.target.value)
+            }
+            placeholder="Nhập lý do yêu cầu chỉnh sửa tài liệu này..."
             style={{ resize: "none" }}
           />
         </div>
