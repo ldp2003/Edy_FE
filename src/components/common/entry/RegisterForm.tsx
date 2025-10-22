@@ -1,12 +1,11 @@
-import React from "react";
+import React, { useState } from "react";
 import { Form, Input, Button, message } from "antd";
-import type { Store } from "antd/es/form/interface";
-import type { ValidateErrorEntity } from "rc-field-form/lib/interface";
-import { register, login } from "../../../utils/AuthService";
+import { login, createOTP, registerWithOTP } from "../../../utils/AuthService";
 import {
   validateEmail,
   validatePassword,
-} from "../../../utils/ValidationUtils";
+} from "../../../utils/ValidationUtils.ts";
+import OTPModal from "../OTPModal";
 
 interface RegisterFormProps {
   onSuccess: () => void;
@@ -17,27 +16,93 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
   onSuccess,
   onSwitchToLogin,
 }) => {
+  const [otpModalVisible, setOtpModalVisible] = useState(false);
+  const [form] = Form.useForm();
   const [messageApi, contextHolder] = message.useMessage();
-  const onFinish = async (values: Store) => {
-    try {
-      const { firstname, lastname, email, password } = values;
-      const response = await register(firstname, lastname, email, password);
-      console.log("Registration successful:", response);
+  const [registrationData, setRegistrationData] = useState<{
+    first_name: string;
+    last_name: string;
+    email: string;
+    password: string;
+  } | null>(null);
+  const onFinish = async (values: {
+    firstname: string;
+    lastname: string;
+    email: string;
+    password: string;
+  }) => {
+    const { firstname, lastname, email, password } = values;
 
-      const loginResponse = await login(email, password);
-      if (loginResponse) {
-        messageApi.success("Đăng ký thành công!");
-        onSuccess();
-        window.location.reload();
+    // Lưu dữ liệu đăng ký để sử dụng sau khi xác thực OTP
+    setRegistrationData({
+      first_name: firstname,
+      last_name: lastname,
+      email,
+      password,
+    });
+
+    // Gửi OTP trước
+    try {
+      const otpResult = await createOTP(email, "REGISTER");
+      if (otpResult.message === "OTP đã được gửi đến email của bạn") {
+        messageApi.success("Đã gửi mã OTP đến email của bạn!");
+        setOtpModalVisible(true);
+      } else {
+        messageApi.error(otpResult.error || "Gửi OTP thất bại!");
       }
-    } catch (error) {
-      messageApi.error("Đăng ký thất bại. Vui lòng thử lại.");
-      console.error("Registration failed:", error);
+    } catch (error: unknown) {
+      const axiosError = error as {
+        response?: { data?: { message?: string } };
+      };
+      const errorMessage =
+        axiosError?.response?.data?.message || "Gửi OTP thất bại!";
+      messageApi.error(errorMessage);
     }
   };
 
-  const onFinishFailed = (errorInfo: ValidateErrorEntity) => {
-    console.log("Failed:", errorInfo);
+  const handleOTPVerified = async () => {
+    if (!registrationData) return;
+
+    try {
+      const result = await registerWithOTP({
+        ...registrationData,
+        otp: "", // OTP đã được xác thực trong modal
+      });
+
+      if (result.message === "Đăng ký thành công với OTP") {
+        messageApi.success("Đăng ký thành công!");
+        setOtpModalVisible(false);
+        form.resetFields();
+        setRegistrationData(null);
+
+        // Auto login sau khi đăng ký thành công
+        try {
+          const loginResponse = await login(
+            registrationData.email,
+            registrationData.password
+          );
+          if (loginResponse) {
+            setTimeout(() => {
+              window.location.reload();
+            }, 500);
+            onSuccess();
+          }
+        } catch (loginError) {
+          console.error("Auto login failed:", loginError);
+          // Vẫn coi là thành công, user có thể login thủ công
+          onSuccess();
+        }
+      } else {
+        messageApi.error(result.error || "Đăng ký thất bại!");
+      }
+    } catch (error: unknown) {
+      const axiosError = error as {
+        response?: { data?: { message?: string } };
+      };
+      const errorMessage =
+        axiosError?.response?.data?.message || "Đăng ký thất bại!";
+      messageApi.error(errorMessage);
+    }
   };
 
   return (
@@ -54,7 +119,6 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
           name="register"
           layout="vertical"
           onFinish={onFinish}
-          onFinishFailed={onFinishFailed}
           className="w-full"
         >
           <Form.Item
@@ -198,6 +262,14 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
           </button>
         </p>
       </div>
+
+      <OTPModal
+        visible={otpModalVisible}
+        onCancel={() => setOtpModalVisible(false)}
+        onSuccess={handleOTPVerified}
+        email={registrationData?.email || ""}
+        type="REGISTER"
+      />
     </div>
   );
 };
