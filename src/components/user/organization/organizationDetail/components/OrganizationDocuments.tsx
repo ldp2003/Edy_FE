@@ -48,14 +48,7 @@ const OrganizationDocuments: React.FC<OrganizationDocumentsProps> = ({
           <>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2">
               {displayedDocuments.map((doc) => (
-                <DocumentCard
-                  key={doc._id}
-                  title={doc.title}
-                  imageUrl={doc.cover_page}
-                  // description={doc.subject?.name || "Chưa có môn học"}
-                  description={doc.subject?.name || "Chưa có môn học"}
-                  document={doc}
-                />
+                <DocumentCard key={doc._id} document={doc} />
               ))}
             </div>
 

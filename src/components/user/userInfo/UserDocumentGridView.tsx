@@ -35,11 +35,6 @@ const UserDocumentGridView: React.FC<UserDocumentGridViewProps> = ({
             style={{ maxWidth: "20%", flex: "0 0 20%" }}
           >
             <DocumentCard
-              title={doc.title}
-              description={`${doc.view || 0} lượt xem • ${
-                doc.comment_count || 0
-              } bình luận`}
-              imageUrl={doc.cover_page}
               document={doc}
               navigationPath={`/document-detail/${doc._id}`}
             />

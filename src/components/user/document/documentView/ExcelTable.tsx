@@ -11,10 +11,7 @@ interface SheetData {
   data: (string | number | null)[][];
 }
 
-const ExcelTable: React.FC<ExcelTableProps> = ({
-  url,
-  isUser = false, // eslint-disable-line @typescript-eslint/no-unused-vars
-}) => {
+const ExcelTable: React.FC<ExcelTableProps> = ({ url }) => {
   const [sheets, setSheets] = useState<SheetData[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [activeSheet, setActiveSheet] = useState(0);
@@ -39,8 +36,18 @@ const ExcelTable: React.FC<ExcelTableProps> = ({
     fetchExcel();
   }, [url]);
 
-  if (error) return <div className="text-red-600 text-sm sm:text-base px-4 py-3 bg-red-50 rounded-lg mx-2 sm:mx-4">{error}</div>;
-  if (!sheets.length) return <div className="text-gray-600 text-sm sm:text-base flex justify-center py-10">Đang tải dữ liệu Excel...</div>;
+  if (error)
+    return (
+      <div className="text-red-600 text-sm sm:text-base px-4 py-3 bg-red-50 rounded-lg mx-2 sm:mx-4">
+        {error}
+      </div>
+    );
+  if (!sheets.length)
+    return (
+      <div className="text-gray-600 text-sm sm:text-base flex justify-center py-10">
+        Đang tải dữ liệu Excel...
+      </div>
+    );
 
   return (
     <div
@@ -80,7 +87,10 @@ const ExcelTable: React.FC<ExcelTableProps> = ({
                       {cell}
                     </th>
                   ) : (
-                    <td key={j} className="border border-gray-300 px-2 py-1.5 sm:px-3 sm:py-2 whitespace-nowrap">
+                    <td
+                      key={j}
+                      className="border border-gray-300 px-2 py-1.5 sm:px-3 sm:py-2 whitespace-nowrap"
+                    >
                       {cell}
                     </td>
                   )
