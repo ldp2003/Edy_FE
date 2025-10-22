@@ -1,17 +1,31 @@
 import React from "react";
-import { Modal, Tag, Avatar, Divider, Button, Form, Checkbox, Input, Radio } from "antd";
 import {
-  UserOutlined,
-  FileTextOutlined,
-} from "@ant-design/icons";
+  Modal,
+  Tag,
+  Avatar,
+  Divider,
+  Button,
+  Form,
+  Checkbox,
+  Input,
+  Radio,
+} from "antd";
+import { UserOutlined, FileTextOutlined } from "@ant-design/icons";
 import type { Report } from "../../../models/report";
-import { REPORT_TYPE_OPTIONS, getReportStatusLabel, getReportTypeLabel } from "../../../utils/reportTypeUtils";
+import {
+  REPORT_TYPE_OPTIONS,
+  getReportStatusLabel,
+} from "../../../utils/reportTypeUtils";
 
 interface AdminReportDetailModalProps {
   report: Report | null;
   visible: boolean;
   onClose: () => void;
-  onResolve?: (params: { validTypes: string[]; action: string; resolveReason: string }) => void;
+  onResolve?: (params: {
+    validTypes: string[];
+    action: string;
+    resolveReason: string;
+  }) => void;
 }
 
 const AdminReportDetailModal: React.FC<AdminReportDetailModalProps> = ({
@@ -20,9 +34,9 @@ const AdminReportDetailModal: React.FC<AdminReportDetailModalProps> = ({
   onClose,
   onResolve,
 }) => {
-  if (!report) return null;
-
   const [form] = Form.useForm();
+
+  if (!report) return null;
 
   const initialTypes =
     Array.isArray(report.type) && report.type.length > 0 ? report.type : [];
@@ -37,7 +51,10 @@ const AdminReportDetailModal: React.FC<AdminReportDetailModalProps> = ({
         <div className="flex items-center gap-2">
           <FileTextOutlined className="text-blue-500" />
           <span className="text-lg font-semibold">Xử lý báo cáo</span>
-          <Tag color={report.status === "PROCESSING" ? "blue" : "green"} className="ml-2">
+          <Tag
+            color={report.status === "PROCESSING" ? "blue" : "green"}
+            className="ml-2"
+          >
             {getReportStatusLabel(report.status)}
           </Tag>
         </div>
@@ -45,7 +62,9 @@ const AdminReportDetailModal: React.FC<AdminReportDetailModalProps> = ({
       onOk={() => form.submit()}
       okText="Xác nhận xử lý"
       footer={[
-        <Button key="cancel" onClick={onClose}>Đóng</Button>,
+        <Button key="cancel" onClick={onClose}>
+          Đóng
+        </Button>,
         <Button key="ok" type="primary" onClick={() => form.submit()}>
           Xác nhận xử lý
         </Button>,
@@ -56,7 +75,11 @@ const AdminReportDetailModal: React.FC<AdminReportDetailModalProps> = ({
         <div className="bg-gray-50 p-4 rounded-lg">
           <div className="flex items-start gap-4">
             <Avatar
-              src={typeof report.reporter === "object" ? report.reporter.avatar : undefined}
+              src={
+                typeof report.reporter === "object"
+                  ? report.reporter.avatar
+                  : undefined
+              }
               size={40}
               icon={<UserOutlined />}
               className="border-2 border-white shadow-sm"
@@ -100,7 +123,12 @@ const AdminReportDetailModal: React.FC<AdminReportDetailModalProps> = ({
           <Form.Item
             name="validTypes"
             label="Chọn các loại vi phạm thực sự"
-            rules={[{ required: true, message: "Vui lòng chọn ít nhất một loại vi phạm" }]}
+            rules={[
+              {
+                required: true,
+                message: "Vui lòng chọn ít nhất một loại vi phạm",
+              },
+            ]}
           >
             <Checkbox.Group>
               <div className="grid grid-cols-2 gap-2">
