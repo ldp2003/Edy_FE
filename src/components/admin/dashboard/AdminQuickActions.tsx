@@ -26,7 +26,7 @@ const AdminQuickActions: React.FC = () => {
         borderRadius: "12px",
         background: "var(--primary-background-color)",
       }}
-      bodyStyle={{ padding: "24px" }}
+      styles={{ body: { padding: "24px" } }}
     >
       <Space direction="vertical" style={{ width: "100%" }}>
         <Button

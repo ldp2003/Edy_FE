@@ -68,6 +68,53 @@ export const AuthAPI = {
       throw error;
     }
   },
+  createOTP: async (
+    email: string,
+    type: "REGISTER" | "RESET_PASSWORD" | "VERIFY_EMAIL" = "REGISTER"
+  ) => {
+    try {
+      const response = await apiClient.post("/auth/create-otp", {
+        email,
+        type,
+      });
+      return response.data;
+    } catch (error) {
+      console.error("Error creating OTP:", error);
+      throw error;
+    }
+  },
+  verifyOTP: async (
+    email: string,
+    otp: string,
+    type: "REGISTER" | "RESET_PASSWORD" | "VERIFY_EMAIL" = "REGISTER"
+  ) => {
+    try {
+      const response = await apiClient.post("/auth/verify-otp", {
+        email,
+        otp,
+        type,
+      });
+      return response.data;
+    } catch (error) {
+      console.error("Error verifying OTP:", error);
+      throw error;
+    }
+  },
+  registerWithOTP: async (data: {
+    first_name: string;
+    last_name: string;
+    email: string;
+    password: string;
+    otp: string;
+  }) => {
+    try {
+      const response = await apiClient.post("/auth/register-with-otp", data);
+      return response.data;
+    } catch (error) {
+      console.error("Error registering with OTP:", error);
+      throw error;
+    }
+  },
 };
 
 export const OrganizationAPI = {
