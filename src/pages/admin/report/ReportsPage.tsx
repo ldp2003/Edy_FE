@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback } from "react";
-import { message, Pagination, Modal, Button } from "antd";
+import { message, Pagination } from "antd";
 import { useSearchParams } from "react-router-dom";
 import { ReportService } from "../../../utils/ReportService";
 import type { Report } from "../../../models/report";
@@ -17,13 +17,6 @@ const ReportsPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [selectedReport, setSelectedReport] = useState<Report | null>(null);
   const [resolveModalVisible, setResolveModalVisible] = useState(false);
-
-  // Modal preview tài liệu (placeholder)
-  const [docPreviewVisible, setDocPreviewVisible] = useState(false);
-  const [previewDoc, setPreviewDoc] = useState<{
-    _id: string;
-    title: string;
-  } | null>(null);
 
   // Lấy params từ URL
   const getCurrentPage = useCallback(
@@ -136,16 +129,6 @@ const ReportsPage: React.FC = () => {
     fetchReports(page, newPageSize, filters);
   };
 
-  const handleViewDetail = (report: Report) => {
-    const docObj = typeof report.doc === "object" ? report.doc : null;
-    if (docObj?._id) {
-      setPreviewDoc({ _id: docObj._id, title: docObj.title || "Tài liệu" });
-      setDocPreviewVisible(true);
-    } else {
-      message.info("Không có thông tin tài liệu để xem trước");
-    }
-  };
-
   const openResolveModal = (report: Report) => {
     setSelectedReport(report);
     setResolveModalVisible(true);
@@ -171,20 +154,6 @@ const ReportsPage: React.FC = () => {
       console.error("Error resolving report:", error);
       message.error("Không thể giải quyết báo cáo");
     }
-  };
-
-  const handleDelete = () => {
-    Modal.confirm({
-      title: "Xác nhận xóa",
-      content: "Bạn có chắc chắn muốn xóa báo cáo này không?",
-      okText: "Xóa",
-      cancelText: "Hủy",
-      okType: "danger",
-      onOk: () => {
-        // Tạm thời chỉ hiển thị thông báo vì API delete chưa có
-        message.info("Tính năng xóa báo cáo sẽ được cập nhật sau");
-      },
-    });
   };
 
   const breadcrumbItems = [
@@ -213,9 +182,7 @@ const ReportsPage: React.FC = () => {
         <AdminReportTable
           reports={reports}
           loading={loading}
-          onViewDetail={handleViewDetail} // mở modal preview
           onResolve={openResolveModal} // mở modal duyệt
-          onDelete={handleDelete}
         />
 
         {total > 0 && (
@@ -239,33 +206,6 @@ const ReportsPage: React.FC = () => {
             />
           </div>
         )}
-
-        {/* Modal preview tài liệu (placeholder) */}
-        <Modal
-          open={docPreviewVisible}
-          onCancel={() => setDocPreviewVisible(false)}
-          footer={null}
-          title="Xem chi tiết tài liệu"
-        >
-          {previewDoc ? (
-            <div className="space-y-3">
-              <div className="font-medium">{previewDoc.title}</div>
-              <div className="text-sm text-gray-500">
-                URL: /document-detail/{previewDoc._id}
-              </div>
-              <Button
-                type="primary"
-                onClick={() =>
-                  window.open(`/document-detail/${previewDoc._id}`, "_blank")
-                }
-              >
-                Mở trang chi tiết
-              </Button>
-            </div>
-          ) : (
-            <div>Không có dữ liệu tài liệu</div>
-          )}
-        </Modal>
 
         <AdminReportDetailModal
           report={selectedReport}

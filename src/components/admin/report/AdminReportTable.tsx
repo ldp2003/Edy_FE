@@ -6,17 +6,13 @@ import ReportCard from "./ReportCard";
 interface AdminReportTableProps {
   reports: Report[];
   loading: boolean;
-  onViewDetail?: (report: Report) => void;
   onResolve?: (report: Report) => void;
-  onDelete?: (report: Report) => void;
 }
 
 const AdminReportTable: React.FC<AdminReportTableProps> = ({
   reports,
   loading,
-  onViewDetail,
   onResolve,
-  onDelete,
 }) => {
   return (
     <div className="w-[90%] mx-auto space-y-4">
@@ -25,11 +21,7 @@ const AdminReportTable: React.FC<AdminReportTableProps> = ({
         dataSource={reports}
         renderItem={(report) => (
           <List.Item key={report._id} className="w-full">
-            <ReportCard
-              report={report}
-              onViewDetail={onViewDetail}
-              onResolve={onResolve}
-            />
+            <ReportCard report={report} onResolve={onResolve} />
           </List.Item>
         )}
       />
