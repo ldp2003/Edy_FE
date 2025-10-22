@@ -158,7 +158,7 @@ const DocumentReviewPage: React.FC = () => {
   ];
 
   return (
-    <div className="max-w-7xl text-left mx-auto p-6">
+    <div className="w-full text-left mx-auto px-4 sm:px-6 lg:px-8">
       <AdminBreadcrumb items={breadcrumbItems} />
 
       {/* Show duplicate document alert if came from compare page */}

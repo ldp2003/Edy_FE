@@ -133,7 +133,7 @@ const ReportModal: React.FC<ReportModalProps> = ({
         footer={null}
         width={600}
         destroyOnClose={true}
-        bodyStyle={{ padding: 16 }}
+        styles={{ body: { padding: 16 } }}
       >
         {/* Document Info */}
         <div className="mb-3 px-3 py-2 bg-white rounded border border-gray-100">

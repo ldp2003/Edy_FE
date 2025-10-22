@@ -98,7 +98,7 @@ const AdminRecentActivities: React.FC<AdminRecentActivitiesProps> = ({
         borderRadius: "12px",
         background: "var(--primary-background-color)",
       }}
-      bodyStyle={{ padding: "0" }}
+      styles={{ body: { padding: "0" } }}
     >
       <Table
         columns={columns}

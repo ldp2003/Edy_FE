@@ -16,6 +16,19 @@ import DocumentViewModal from "./review/DocumentViewModal";
 
 // Helper function to convert User to UserInfo
 const convertUserToUserInfo = (user: User): UserInfo => {
+  if (!user) {
+    return {
+      _id: "",
+      first_name: "",
+      last_name: "",
+      organization: undefined,
+      avatar: undefined,
+      follower: [],
+      following: [],
+      doc_count: 0,
+    };
+  }
+
   let organizationInfo: { _id: string; name: string } | undefined;
 
   if (user.organization) {
@@ -32,14 +45,14 @@ const convertUserToUserInfo = (user: User): UserInfo => {
   }
 
   return {
-    _id: user._id,
-    first_name: user.first_name,
-    last_name: user.last_name,
+    _id: user._id || "",
+    first_name: user.first_name || "",
+    last_name: user.last_name || "",
     organization: organizationInfo,
     avatar: user.avatar,
-    follower: user.follower,
-    following: user.following,
-    doc_count: user.doc_count,
+    follower: user.follower || [],
+    following: user.following || [],
+    doc_count: user.doc_count || 0,
   };
 };
 
@@ -161,20 +174,22 @@ const DocumentReview: React.FC<DocumentReviewProps> = ({
   }
 
   return (
-    <div className="pb-6 min-h-screen text-left">
+    <div className="pb-4 sm:pb-6 min-h-screen text-left">
       {contextHolder}
 
       {/* User Info Header */}
-      <UserInfoHeader user={convertUserToUserInfo(document.user)} />
+      {document.user && (
+        <UserInfoHeader user={convertUserToUserInfo(document.user)} />
+      )}
 
-      <div className="font-bold text-base mb-6 text-[var(--primary-text-color)]">
+      <div className="font-bold text-base mb-4 sm:mb-6 text-[var(--primary-text-color)]">
         Thông tin tài liệu
         <span className="ml-3 text-xs text-black font-medium">
           Id: {document._id}
         </span>
       </div>
 
-      <div className="mx-auto bg-white rounded-lg shadow-sm p-6">
+      <div className="mx-auto bg-white rounded-lg shadow-sm p-3 sm:p-6">
         <Form
           form={form}
           layout="vertical"
@@ -184,51 +199,59 @@ const DocumentReview: React.FC<DocumentReviewProps> = ({
             authors: authors,
           }}
         >
-          <div
-            className="grid gap-6"
-            style={{ gridTemplateColumns: "290px 1fr 1fr" }}
-          >
+          {/* Responsive Grid Layout */}
+          <div className="grid gap-4 sm:gap-6 grid-cols-1 lg:grid-cols-3 xl:grid-cols-3">
             {/* Column 1 - Document Preview */}
-            <DocumentPreview
-              document={document}
-              isIntensive={isIntensive}
-              onIntensiveChange={setIsIntensive}
-              onViewDocument={() => setDocumentViewModalVisible(true)}
-            />
+            <div className="lg:col-span-1 xl:col-span-1">
+              <DocumentPreview
+                document={document}
+                isIntensive={isIntensive}
+                onIntensiveChange={setIsIntensive}
+                onViewDocument={() => setDocumentViewModalVisible(true)}
+              />
+            </div>
 
             {/* Column 2 - Basic Information */}
-            <DocumentBasicInfo />
+            <div className="lg:col-span-1 xl:col-span-1">
+              <DocumentBasicInfo />
+            </div>
 
             {/* Column 3 - Summary */}
-            <DocumentSummary
-              summaryRequest={summaryRequest}
-              summaryAction={summaryAction}
-              summaryRejectReason={summaryRejectReason}
-              onSummaryActionChange={setSummaryAction}
-              onSummaryRejectReasonChange={setSummaryRejectReason}
+            <div className="lg:col-span-1 xl:col-span-1">
+              <DocumentSummary
+                summaryRequest={summaryRequest}
+                summaryAction={summaryAction}
+                summaryRejectReason={summaryRejectReason}
+                onSummaryActionChange={setSummaryAction}
+                onSummaryRejectReasonChange={setSummaryRejectReason}
+              />
+            </div>
+          </div>
+
+          {/* Additional Information - Full Width */}
+          <div className="mt-6">
+            <DocumentAdditionalInfo
+              authors={authors}
+              onAuthorsChange={setAuthors}
             />
           </div>
 
-          {/* Additional Information */}
-          <DocumentAdditionalInfo
-            authors={authors}
-            onAuthorsChange={setAuthors}
-          />
-
-          {/* Action Buttons */}
-          <DocumentActionButtons
-            documentRequest={documentRequest}
-            summaryRequest={summaryRequest}
-            isIntensive={isIntensive}
-            summaryAction={summaryAction}
-            summaryRejectReason={summaryRejectReason}
-            processing={processing}
-            documentId={document._id}
-            documentStatus={document.status}
-            onApprove={onApprove}
-            onReject={onReject}
-            onDelete={onDelete}
-          />
+          {/* Action Buttons - Full Width */}
+          <div className="mt-6">
+            <DocumentActionButtons
+              documentRequest={documentRequest}
+              summaryRequest={summaryRequest}
+              isIntensive={isIntensive}
+              summaryAction={summaryAction}
+              summaryRejectReason={summaryRejectReason}
+              processing={processing}
+              documentId={document._id}
+              documentStatus={document.status}
+              onApprove={onApprove}
+              onReject={onReject}
+              onDelete={onDelete}
+            />
+          </div>
         </Form>
       </div>
 
