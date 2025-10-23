@@ -1186,9 +1186,11 @@ export const NotificationAPI = {
 
 export const RoleAPI = {
   // Get all roles
-  getAllRoles: async () => {
+  getAllRoles: async (active: boolean) => {
     try {
-      const response = await apiClient.get("/admin/roles");
+      const response = await apiClient.get("/admin/roles", {
+      params: { active }
+      });
       return response.data;
     } catch (error) {
       console.error("Error fetching roles:", error);
