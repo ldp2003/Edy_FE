@@ -14,7 +14,11 @@ const apiClient = axios.create({
 export const AuthAPI = {
   login: async (email: string, password: string) => {
     try {
-      const response = await apiClient.post("/auth/login", { email, password });
+      const response = await apiClient.post(
+        "/auth/login",
+        { email, password },
+        { withCredentials: true }
+      );
       return response.data;
     } catch (error) {
       console.error("Error logging in:", error);
@@ -52,7 +56,11 @@ export const AuthAPI = {
   },
   refreshToken: async () => {
     try {
-      const response = await apiClient.post("/auth/refresh-token");
+      const response = await apiClient.post(
+        "/auth/refresh-token",
+        {},
+        { withCredentials: true }
+      );
       return response.data;
     } catch (error) {
       console.error("Error refreshing token:", error);
@@ -60,13 +68,7 @@ export const AuthAPI = {
     }
   },
   getCurrentUser: async () => {
-    try {
-      const response = await apiClient.get("/auth/me");
-      return response.data;
-    } catch (error) {
-      console.error("Error fetching current user:", error);
-      throw error;
-    }
+    return apiClient.get("/auth/me").then((response) => response.data);
   },
   createOTP: async (
     email: string,
@@ -1189,7 +1191,7 @@ export const RoleAPI = {
   getAllRoles: async (active: boolean) => {
     try {
       const response = await apiClient.get("/admin/roles", {
-      params: { active }
+        params: { active },
       });
       return response.data;
     } catch (error) {
