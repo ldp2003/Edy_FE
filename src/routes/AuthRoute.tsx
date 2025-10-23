@@ -259,7 +259,7 @@ const AuthRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
             message: axiosError.message,
             status: axiosError.response?.status,
             statusText: axiosError.response?.statusText,
-            data: axiosError.response?.data,
+            data: axiosError.response,
           });
 
           // Handle specific error cases
