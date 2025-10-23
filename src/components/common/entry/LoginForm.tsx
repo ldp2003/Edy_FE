@@ -27,9 +27,9 @@ const LoginForm: React.FC<LoginFormProps> = ({
 
         // Trigger AuthRoute recheck sau khi login thành công
         // Có thể dùng window.location.reload() hoặc navigate
-        // setTimeout(() => {
-        //   window.location.reload();
-        // }, 500); // Delay nhỏ để user thấy success message
+        setTimeout(() => {
+          window.location.reload();
+        }, 500); // Delay nhỏ để user thấy success message
 
         onSuccess();
       }
