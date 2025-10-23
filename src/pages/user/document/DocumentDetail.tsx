@@ -47,7 +47,7 @@ const DocumentDetail: React.FC = () => {
     };
 
     fetchDocument();
-  }, [id, isLoggedIn, addToReadHistory]);
+  }, [id, isLoggedIn]);
 
   // Handle page change from document viewer
   const handlePageChange = useCallback((current: number, total: number) => {

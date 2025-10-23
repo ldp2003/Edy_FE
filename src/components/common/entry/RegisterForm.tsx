@@ -25,6 +25,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
     email: string;
     password: string;
   } | null>(null);
+  
   const onFinish = async (values: {
     firstname: string;
     lastname: string;

@@ -1,8 +1,11 @@
 import { RoleAPI, UserAPI } from "../api/API";
 
 export const RoleService = {
-  getAllRoles: async () => {
-    const response = await RoleAPI.getAllRoles();
+  getAllRoles: async (active: boolean) => {
+    if (active === undefined) {
+      active = true;
+    }
+    const response = await RoleAPI.getAllRoles(active);
     return response.data;
   },
 
