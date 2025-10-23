@@ -68,7 +68,9 @@ export const AuthAPI = {
     }
   },
   getCurrentUser: async () => {
-    return apiClient.get("/auth/me").then((response) => response.data);
+    return apiClient
+      .get("/auth/me", { withCredentials: true })
+      .then((response) => response.data);
   },
   createOTP: async (
     email: string,
