@@ -94,7 +94,7 @@ const AuthRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
       try {
         await refreshToken();
         const data = await getCurrentUser();
-
+        console.log("🔍 Current user data:", data);
         if (data) {
           setIsLoggedIn(true);
           setUser(data.user);
