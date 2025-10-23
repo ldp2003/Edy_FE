@@ -42,6 +42,17 @@ export const refreshToken = async () => {
   return AuthAPI.refreshToken();
 };
 
+// Check if user has valid token
+export const hasValidToken = async (): Promise<boolean> => {
+  try {
+    await AuthAPI.getCurrentUser();
+    return true;
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  } catch (error) {
+    return false;
+  }
+};
+
 // Get current user info
 export const getCurrentUser = async () => {
   return AuthAPI.getCurrentUser();

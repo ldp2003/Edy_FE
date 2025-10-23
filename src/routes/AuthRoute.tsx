@@ -1,7 +1,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useEffect, useState, useRef } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { getCurrentUser, refreshToken } from "../utils/AuthService";
+import {
+  getCurrentUser,
+  refreshToken,
+  hasValidToken,
+} from "../utils/AuthService";
 import { UserProvider } from "../contexts/UserProvider";
 import type { User } from "../models/user";
 import { defaultUser } from "../models/user";
@@ -92,7 +96,19 @@ const AuthRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const checkAuth = async () => {
       setIsLoading(true);
       try {
-        await refreshToken();
+        // Kiểm tra có token hợp lệ không trước khi refresh
+        const hasToken = await hasValidToken();
+        if (hasToken) {
+          try {
+            await refreshToken(); // Chỉ refresh nếu có token
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
+          } catch (refreshError) {
+            console.log("🔄 Token refresh failed, proceeding without refresh");
+            // Không throw error, tiếp tục với getCurrentUser()
+          }
+        }
+
+        // Luôn gọi getCurrentUser() để kiểm tra trạng thái auth
         const data = await getCurrentUser();
         console.log("🔍 Current user data:", data);
         if (data) {
