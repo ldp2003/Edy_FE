@@ -52,7 +52,7 @@ const EditRoleModal: React.FC<EditRoleModalProps> = ({
   const fetchData = async () => {
     try {
       // Fetch roles
-      const rolesResponse = await RoleService.getAllRoles();
+      const rolesResponse = await RoleService.getAllRoles(true);
       setRoles(rolesResponse);
 
       // Fetch subjects

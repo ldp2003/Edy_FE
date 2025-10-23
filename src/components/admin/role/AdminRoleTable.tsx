@@ -45,7 +45,7 @@ const AdminRoleTable: React.FC = () => {
   const fetchRoles = async () => {
     setLoading(true);
     try {
-      const response = await RoleService.getAllRoles();
+      const response = await RoleService.getAllRoles(true);
       console.log("response:", response);
       setRoles(response || []);
       setTotalRoles(response?.length || 0);
