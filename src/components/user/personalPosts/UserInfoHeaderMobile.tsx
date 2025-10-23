@@ -18,7 +18,7 @@ const UserInfoHeaderMobile: React.FC = () => {
         <div className="flex flex-row justify-start w-full text-left items-center gap-2">
           <div className="w-16 h-16 mt-4 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden">
             <img
-              src={user?.avatar || "/default-avatar.png"}
+              src={user?.avatar || "/avatar-default.svg"}
               alt="Avatar"
               className="w-full h-full object-cover"
             />

@@ -155,7 +155,7 @@ const UserProfileHeader: React.FC<UserProfileHeaderProps> = ({
         >
           <div className="relative">
             <img
-              src={avatarUrl || avatar || "/default-avatar.png"}
+              src={avatarUrl || avatar || "/avatar-default.svg"}
               alt="avatar"
               style={{ width: "100%", height: "100%", borderRadius: "50%" }}
             />

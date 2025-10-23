@@ -27,7 +27,7 @@ const UserInfoHeader: React.FC<UserInfoHeaderProps> = ({ user }) => {
           <div className="flex flex-row justify-start w-full text-left items-start gap-2">
             <div className="w-15 h-15 rounded-full bg-gray-200 flex items-start justify-baseline overflow-hidden">
               <img
-                src={user?.avatar || "/default-avatar.png"}
+                src={user?.avatar || "/avatar-default.svg"}
                 alt="Avatar"
                 className="w-full h-full object-cover"
               />
