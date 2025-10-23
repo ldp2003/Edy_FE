@@ -1,6 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import logo from "/public/image/Logo.png";
+import logo from "/image/Logo.png";
 
 const UserFooter: React.FC = () => {
   const currentYear = new Date().getFullYear();

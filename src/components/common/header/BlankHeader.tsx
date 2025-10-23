@@ -1,5 +1,5 @@
 import { Dropdown } from "antd";
-import logo from "/public/image/Logo.png";
+import logo from "/image/Logo.png";
 import AccountDropdown from "../dropdown/AccountDropdown";
 import { useContext } from "react";
 import { UserContext } from "../../../contexts/UserContext";

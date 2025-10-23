@@ -1,7 +1,7 @@
 import { Badge } from "antd";
 import { Search, Shield, User } from "lucide-react";
 import { Dropdown } from "antd";
-import logo from "/public/image/Logo.png";
+import logo from "/image/Logo.png";
 import AvatarDropdown from "../dropdown/AvatarDropdown";
 import UploadHeaderButton from "../buttons/UploadHeaderButton";
 import { useContext } from "react";

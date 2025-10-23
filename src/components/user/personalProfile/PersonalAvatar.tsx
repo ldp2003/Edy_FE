@@ -7,7 +7,7 @@ const PersonalAvatar: React.FC = () => {
   return (
     <div className="flex flex-col items-center">
       <img
-        src={user?.avatar || "/avatar-default.svg"}
+        src={user?.avatar || "/image/avatar-default.svg"}
         alt="User Avatar"
         className="rounded-full w-32 md:w-40 h-32 md:h-40 border border-gray-300"
       />
