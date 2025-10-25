@@ -57,7 +57,7 @@ export function UserProfile({ isCompact }: UserProfileProps) {
             >
               {typeof user?.organization === "object"
                 ? user.organization?.name
-                : user?.organization || "No Organization"}
+                : user?.organization || "Chưa có trường/tổ chức"}
             </p>
           </div>
         )}

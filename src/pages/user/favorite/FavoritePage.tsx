@@ -3,8 +3,10 @@ import FavoriteDocuments from "../../../components/user/favorite/FavoriteDocumen
 
 const FavoritePage: React.FC = () => {
   return (
-    <div className="p-6">
-      <FavoriteDocuments />
+    <div className="min-h-screen p-3 sm:p-4 md:p-6 lg:p-8">
+      <div className="max-w-7xl mx-auto">
+        <FavoriteDocuments />
+      </div>
     </div>
   );
 };

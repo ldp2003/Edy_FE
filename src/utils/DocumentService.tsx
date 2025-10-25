@@ -28,7 +28,14 @@ export const DocumentService = {
       throw error;
     }
   },
-
+  async addViewCount(documentId: string) {
+    try {
+      return await DocumentAPI.addViewCount(documentId);
+    } catch (error) {
+      console.error("Error in DocumentService.addViewCount:", error);
+      throw error;
+    }
+  },
   async fetchNewestDocuments(params: {
     search?: string;
     ordering?: string;

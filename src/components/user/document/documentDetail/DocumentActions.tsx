@@ -100,17 +100,17 @@ const DocumentActions: React.FC<DocumentActionsProps> = ({
     }
   }, [document._id]);
 
-  // Thêm listener để trigger refetch khi có reaction
+  // Listen for reaction changes from Like/Dislike buttons
   useEffect(() => {
-    const handleReactionChange = (event: any) => {
+    const handleReactionChanged = (event: any) => {
       if (event.detail.documentId === document._id) {
         refetchReactions();
       }
     };
 
-    window.addEventListener("reactionChanged", handleReactionChange);
+    window.addEventListener("reactionChanged", handleReactionChanged);
     return () =>
-      window.removeEventListener("reactionChanged", handleReactionChange);
+      window.removeEventListener("reactionChanged", handleReactionChanged);
   }, [document._id, refetchReactions]);
 
   useEffect(() => {
@@ -174,7 +174,7 @@ const DocumentActions: React.FC<DocumentActionsProps> = ({
       data-document-actions={document._id}
       className={`flex items-center justify-between p-2 transition-all duration-300 ${
         isFixed
-          ? "sticky top-0 bg-[var(--secondary-background-color)] shadow-md z-10 mx-[-16px] px-4"
+          ? `absolute top-0 bg-[var(--secondary-background-color)] shadow-md z-10 mx-[-16px] px-4 w-[calc(100%-335px)]`
           : ""
       }`}
     >

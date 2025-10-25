@@ -3,6 +3,7 @@ import * as XLSX from "xlsx";
 
 interface ExcelTableProps {
   url: string;
+  zoom?: number;
   isUser?: boolean; // True if document belongs to current user
 }
 
@@ -11,7 +12,7 @@ interface SheetData {
   data: (string | number | null)[][];
 }
 
-const ExcelTable: React.FC<ExcelTableProps> = ({ url }) => {
+const ExcelTable: React.FC<ExcelTableProps> = ({ url, zoom = 1 }) => {
   const [sheets, setSheets] = useState<SheetData[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [activeSheet, setActiveSheet] = useState(0);
@@ -74,7 +75,14 @@ const ExcelTable: React.FC<ExcelTableProps> = ({ url }) => {
       </div>
       {/* Active Sheet Table */}
       <div className="overflow-x-auto">
-        <table className="border-collapse w-full bg-white text-xs sm:text-sm font-sans">
+        <table
+          className="border-collapse w-full bg-white text-xs sm:text-sm font-sans"
+          style={{
+            fontSize: `${zoom * 100}%`,
+            transform: `scale(${zoom})`,
+            transformOrigin: "top left",
+          }}
+        >
           <tbody>
             {sheets[activeSheet].data.map((row, i) => (
               <tr key={i}>
