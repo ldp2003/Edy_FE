@@ -23,7 +23,7 @@ const PDFViewer: React.FC<PDFViewerProps> = ({
   onPageChange,
   currentPage = 1,
   onPageUpdate,
-  zoom = 1.5,
+  zoom = 1,
   isUser = false,
 }) => {
   const [pdfDocument, setPdfDocument] =
@@ -54,7 +54,7 @@ const PDFViewer: React.FC<PDFViewerProps> = ({
           const renderTask = page.render({
             canvasContext: context,
             viewport: viewport,
-            canvas: canvas // Thêm thuộc tính canvas theo yêu cầu của RenderParameters
+            canvas: canvas, // Thêm thuộc tính canvas theo yêu cầu của RenderParameters
           });
 
           try {
@@ -103,7 +103,7 @@ const PDFViewer: React.FC<PDFViewerProps> = ({
 
         const pdf = await pdfjsLib.getDocument(url).promise;
         if (!isMounted) return;
-        
+
         currentPdf = pdf;
         setPdfDocument(pdf);
         await renderPages(pdf);
@@ -201,7 +201,9 @@ const PDFViewer: React.FC<PDFViewerProps> = ({
       {loading && (
         <div className="flex flex-col items-center justify-center py-10 sm:py-20">
           <div className="animate-spin rounded-full h-8 w-8 sm:h-12 sm:w-12 border-b-2 border-blue-500 mb-3 sm:mb-4"></div>
-          <p className="text-gray-600 text-sm sm:text-base">Đang tải tài liệu...</p>
+          <p className="text-gray-600 text-sm sm:text-base">
+            Đang tải tài liệu...
+          </p>
         </div>
       )}
 

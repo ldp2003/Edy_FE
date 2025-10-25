@@ -46,7 +46,7 @@ export interface User {
 
 export const defaultUser: User = {
   _id: "",
-  first_name: "",
+  first_name: "Chưa đăng nhập",
   last_name: "",
   contact_email: "",
   follower: [],
@@ -67,6 +67,6 @@ export const defaultUser: User = {
   updatedAt: "",
   organization: {
     _id: "",
-    name: "No Organization",
+    name: "Chưa có trường/tổ chức",
   } as Organization,
 };

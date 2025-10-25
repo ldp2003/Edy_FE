@@ -451,6 +451,10 @@ export const DocumentAPI = {
       throw error;
     }
   },
+
+  addViewCount: async (documentId: string) => {
+    return await apiClient.post(`/documents/${documentId}/view`);
+  },
   // Get documents of current user
   getMyDocuments: async (params?: {
     search?: string;

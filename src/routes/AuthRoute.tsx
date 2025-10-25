@@ -21,6 +21,7 @@ import type {
 import { DocumentService } from "../utils/DocumentService";
 import { NotificationService } from "../utils/NotificationService";
 import type { Notification } from "../models/notification";
+import LoginRequiredModal from "../components/common/LoginRequiredModal";
 
 const AuthRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const navigate = useNavigate();
@@ -39,9 +40,15 @@ const AuthRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
 
+  // State cho modal yêu cầu đăng nhập
+  const [showLoginModal, setShowLoginModal] = useState(false);
+
   // Ref để đảm bảo chỉ chạy authentication một lần
   const hasInitialized = useRef(false);
   const [dataFetched, setDataFetched] = useState(false);
+
+  // Ref để track initial auth check completion
+  const initialAuthCheckCompleted = useRef(false);
 
   // Function to fetch notifications - wrapped in useCallback to prevent infinite loops
   const fetchNotifications = React.useCallback(async () => {
@@ -84,6 +91,22 @@ const AuthRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
       console.error("Error fetching user documents:", error);
       return [];
     }
+  };
+
+  // Hàm kiểm tra trang công khai
+  const isPublicPage = (pathname: string): boolean => {
+    const publicPages = [
+      "/", // trang chủ
+      "/search", // tìm kiếm
+      "/organizations", // danh sách tổ chức
+    ];
+
+    // Kiểm tra các trang động
+    if (pathname.startsWith("/document-detail/")) return true; // chi tiết bài đăng
+    if (pathname.startsWith("/organization/")) return true; // chi tiết tổ chức
+    if (pathname.startsWith("/subject/")) return true; // môn học
+
+    return publicPages.includes(pathname);
   };
 
   useEffect(() => {
@@ -244,19 +267,10 @@ const AuthRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
           setNotifications([]);
           setUnreadCount(0);
 
-          // Allow access to public pages without redirecting
-          const publicPages = ["/", "/document-detail", "/search"];
-          const isPublicPage = publicPages.some(
-            (page) =>
-              location.pathname === page ||
-              (page === "/document-detail" &&
-                location.pathname.startsWith("/document-detail/")) ||
-              (page === "/search" && location.pathname.startsWith("/search"))
+          // Không hiển thị modal ở đây, để navigation check xử lý
+          console.log(
+            "🔐 User not authenticated, navigation check will handle modal display"
           );
-
-          if (!isPublicPage) {
-            navigate("/");
-          }
         }
       } catch (error) {
         console.error("❌ Error during auth check:", error);
@@ -321,30 +335,55 @@ const AuthRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
         setReadHistory([]);
         setSharedDocuments([]);
 
-        // Allow access to public pages even when auth fails
-        const publicPages = ["/", "/document-detail", "/search"];
-        const isPublicPage = publicPages.some(
-          (page) =>
-            location.pathname === page ||
-            (page === "/document-detail" &&
-              location.pathname.startsWith("/document-detail/")) ||
-            (page === "/search" && location.pathname.startsWith("/search"))
+        // Không hiển thị modal ở đây, để navigation check xử lý
+        console.log(
+          "🔐 Auth failed, navigation check will handle modal display"
         );
-
-        if (!isPublicPage) {
-          console.log("🔄 Redirecting to home page due to auth failure");
-          navigate("/");
-        } else {
-          console.log("📄 Staying on public page despite auth failure");
-        }
       } finally {
         setIsLoading(false);
+        initialAuthCheckCompleted.current = true; // Đánh dấu đã hoàn thành initial check
       }
     };
 
     checkAuth();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []); // Chỉ chạy một lần khi component mount
+
+  // Theo dõi thay đổi location để kiểm tra authentication khi navigate
+  useEffect(() => {
+    const checkAuthOnNavigation = async () => {
+      // Chỉ kiểm tra nếu đã hoàn thành authentication check ban đầu
+      if (!initialAuthCheckCompleted.current) return;
+
+      try {
+        // Kiểm tra có token hợp lệ không
+        const hasToken = await hasValidToken();
+
+        if (!hasToken) {
+          // User chưa đăng nhập, kiểm tra trang hiện tại
+          const currentPath = location.pathname;
+          const isCurrentPagePublic = isPublicPage(currentPath);
+
+          if (!isCurrentPagePublic) {
+            console.log(
+              "🔐 Navigation to protected page without login, showing modal"
+            );
+            setShowLoginModal(true);
+          } else {
+            console.log("📄 Navigation to public page, allowing access");
+            setShowLoginModal(false);
+          }
+        } else {
+          // User đã đăng nhập, ẩn modal nếu đang hiển thị
+          setShowLoginModal(false);
+        }
+      } catch (error) {
+        console.error("❌ Error checking auth on navigation:", error);
+      }
+    };
+
+    checkAuthOnNavigation();
+  }, [location.pathname]); // Chạy lại khi location thay đổi
 
   // Show loading only during initial authentication check
   if (isLoading) {
@@ -376,6 +415,10 @@ const AuthRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
       refreshNotifications={fetchNotifications}
     >
       {children}
+      <LoginRequiredModal
+        visible={showLoginModal}
+        onCancel={() => setShowLoginModal(false)}
+      />
     </UserProvider>
   );
 };
