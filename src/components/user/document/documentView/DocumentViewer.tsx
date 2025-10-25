@@ -83,6 +83,7 @@ const DocumentViewer: React.FC<DocumentViewerProps> = ({
         onPageChange={onPageChange}
         currentPage={currentPage}
         onPageUpdate={onPageUpdate}
+        zoom={zoom}
         isUser={isUser}
       />
     );
@@ -96,7 +97,7 @@ const DocumentViewer: React.FC<DocumentViewerProps> = ({
     );
   }
   if (type === "excel") {
-    return <ExcelTable url={url} isUser={isUser} />;
+    return <ExcelTable url={url} zoom={zoom} isUser={isUser} />;
   }
   if (type === "video") {
     return <VideoViewer url={url} isUser={isUser} />;

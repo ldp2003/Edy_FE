@@ -1,4 +1,10 @@
-import React, { useState, useCallback, useEffect, useContext } from "react";
+import React, {
+  useState,
+  useCallback,
+  useEffect,
+  useContext,
+  useRef,
+} from "react";
 import { useParams } from "react-router-dom";
 import DocumentSide from "../../../components/user/document/documentDetail/DocumentSide";
 import MobileDocumentHeader from "../../../components/user/document/documentDetail/MobileDocumentHeader";
@@ -13,41 +19,70 @@ import DocumentActions from "../../../components/user/document/documentDetail/Do
 const DocumentDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const { isLoggedIn, addToReadHistory } = useContext(UserContext);
+  const addToReadHistoryRef = useRef(addToReadHistory);
+
+  // Update ref when addToReadHistory changes
+  useEffect(() => {
+    addToReadHistoryRef.current = addToReadHistory;
+  }, [addToReadHistory]);
+
+  // Reset view flag when id changes
+  useEffect(() => {
+    hasAddedViewRef.current = false;
+  }, [id]);
   const [document, setDocument] = useState<Document | null>(null);
   const [loading, setLoading] = useState(true);
+  const hasAddedViewRef = useRef(false);
 
   // State for pagination
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(0);
-  const [zoom, setZoom] = useState(1.5);
+  const [zoom, setZoom] = useState(1);
 
   // Fetch document data
-  useEffect(() => {
-    const fetchDocument = async () => {
-      if (!id) {
-        setLoading(false);
-        return;
+  const fetchDocument = useCallback(async () => {
+    if (!id) {
+      setLoading(false);
+      return;
+    }
+
+    try {
+      setLoading(true);
+      const documentData = await DocumentService.getDocumentById(id);
+      setDocument(documentData);
+
+      // Add to read history if user is logged in
+      if (isLoggedIn && documentData) {
+        void addToReadHistoryRef.current(documentData);
       }
 
-      try {
-        setLoading(true);
-        const documentData = await DocumentService.getDocumentById(id);
-        setDocument(documentData);
+      // Check if this is a reload or back navigation to avoid adding view count
+      const nav = performance.getEntriesByType(
+        "navigation"
+      )[0] as PerformanceNavigationTiming;
+      const isReloadOrBack =
+        nav && (nav.type === "reload" || nav.type === "back_forward");
 
-        // Add to read history if user is logged in
-        if (isLoggedIn && documentData) {
-          void addToReadHistory(documentData);
+      // Add view count only if not reload or back and not already added
+      if (!isReloadOrBack && !hasAddedViewRef.current) {
+        try {
+          await DocumentService.addViewCount(id);
+          hasAddedViewRef.current = true;
+        } catch (error) {
+          console.error("Error adding view count:", error);
         }
-      } catch (error) {
-        console.error("Error fetching document:", error);
-        setDocument(null);
-      } finally {
-        setLoading(false);
       }
-    };
-
-    fetchDocument();
+    } catch (error) {
+      console.error("Error fetching document:", error);
+      setDocument(null);
+    } finally {
+      setLoading(false);
+    }
   }, [id, isLoggedIn]);
+
+  useEffect(() => {
+    fetchDocument();
+  }, [fetchDocument]);
 
   // Handle page change from document viewer
   const handlePageChange = useCallback((current: number, total: number) => {

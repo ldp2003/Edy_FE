@@ -7,10 +7,15 @@ interface WordViewerProps {
   onPageChange?: (currentPage: number, totalPages: number) => void;
   currentPage?: number;
   onPageUpdate?: (page: number) => void;
+  zoom?: number;
   isUser?: boolean; // True if document belongs to current user
 }
 
-const WordViewer: React.FC<WordViewerProps> = ({ url, onPageChange }) => {
+const WordViewer: React.FC<WordViewerProps> = ({
+  url,
+  onPageChange,
+  zoom = 1,
+}) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -32,10 +37,14 @@ const WordViewer: React.FC<WordViewerProps> = ({ url, onPageChange }) => {
             inWrapper: false,
           });
 
-          // For Word documents, we simulate pagination by treating the document as 1 page
-          // In a real implementation, you might want to calculate pages based on content height
+          // Calculate pages based on content height
+          // Assuming a standard page height of 800px for pagination
+          const contentHeight = containerRef.current.scrollHeight;
+          const pageHeight = 800; // Approximate height of one page in pixels
+          const totalPages = Math.max(1, Math.ceil(contentHeight / pageHeight));
+
           if (onPageChange) {
-            onPageChange(1, 1);
+            onPageChange(1, totalPages);
           }
         }
       } catch (e) {
@@ -68,8 +77,10 @@ const WordViewer: React.FC<WordViewerProps> = ({ url, onPageChange }) => {
         style={{
           width: "100%",
           overflowX: "auto",
-          fontSize: "14px",
+          fontSize: `${14 * zoom}px`,
           lineHeight: "1.4",
+          transform: `scale(${zoom})`,
+          transformOrigin: "top left",
         }}
       />
     </div>

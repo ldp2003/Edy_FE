@@ -20,7 +20,7 @@ const PersonalPostDetail: React.FC = () => {
   // State for pagination
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(0);
-  const [zoom, setZoom] = useState(1.5);
+  const [zoom, setZoom] = useState(1);
 
   // Fetch document data - ownership verification is handled at route level
   useEffect(() => {
