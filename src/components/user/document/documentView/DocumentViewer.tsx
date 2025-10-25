@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import WordViewer from "./WordViewer";
 import PDFViewer from "./PDFViewer";
 import ExcelTable from "./ExcelTable";
+import DocumentPagination from "./DocumentPagination";
 
 interface DocumentViewerProps {
   url: string;
@@ -12,6 +13,13 @@ interface DocumentViewerProps {
   onPageUpdate?: (page: number) => void;
   zoom?: number;
   isUser?: boolean; // True if document belongs to current user (no limitations)
+  // Pagination props
+  totalPages?: number;
+  onPrevPage?: () => void;
+  onNextPage?: () => void;
+  onGoToPage?: (page: number) => void;
+  onZoomIn?: () => void;
+  onZoomOut?: () => void;
 }
 
 const VideoViewer: React.FC<{ url: string; isUser?: boolean }> = ({
@@ -63,48 +71,79 @@ const DocumentViewer: React.FC<DocumentViewerProps> = ({
   onPageUpdate,
   zoom,
   isUser = false,
+  totalPages,
+  onPrevPage,
+  onNextPage,
+  onGoToPage,
+  onZoomIn,
+  onZoomOut,
 }) => {
-  if (type === "pdf") {
-    return (
-      <PDFViewer
-        url={url}
-        onPageChange={onPageChange}
-        currentPage={currentPage}
-        onPageUpdate={onPageUpdate}
-        zoom={zoom}
-        isUser={isUser}
-      />
-    );
-  }
-  if (type === "word") {
-    return (
-      <WordViewer
-        url={url}
-        onPageChange={onPageChange}
-        currentPage={currentPage}
-        onPageUpdate={onPageUpdate}
-        zoom={zoom}
-        isUser={isUser}
-      />
-    );
-  }
-  if (type === "ppt") {
+  const renderViewer = () => {
+    if (type === "pdf") {
+      return (
+        <PDFViewer
+          url={url}
+          onPageChange={onPageChange}
+          currentPage={currentPage}
+          onPageUpdate={onPageUpdate}
+          zoom={zoom}
+          isUser={isUser}
+        />
+      );
+    }
+    if (type === "word") {
+      return (
+        <WordViewer
+          url={url}
+          onPageChange={onPageChange}
+          currentPage={currentPage}
+          onPageUpdate={onPageUpdate}
+          zoom={zoom}
+          isUser={isUser}
+        />
+      );
+    }
+    if (type === "ppt") {
+      return (
+        <div className="text-center py-10 px-4 text-sm sm:text-base text-gray-600">
+          Chưa hỗ trợ xem trực tiếp PowerPoint. Vui lòng chuyển sang PDF hoặc
+          Excel.
+        </div>
+      );
+    }
+    if (type === "excel") {
+      return <ExcelTable url={url} zoom={zoom} isUser={isUser} />;
+    }
+    if (type === "video") {
+      return <VideoViewer url={url} isUser={isUser} />;
+    }
     return (
       <div className="text-center py-10 px-4 text-sm sm:text-base text-gray-600">
-        Chưa hỗ trợ xem trực tiếp PowerPoint. Vui lòng chuyển sang PDF hoặc
-        Excel.
+        Unsupported document type
       </div>
     );
-  }
-  if (type === "excel") {
-    return <ExcelTable url={url} zoom={zoom} isUser={isUser} />;
-  }
-  if (type === "video") {
-    return <VideoViewer url={url} isUser={isUser} />;
-  }
+  };
+
+  const shouldShowPagination =
+    type === "pdf" || type === "word" || type === "ppt" || type === "excel";
+
   return (
-    <div className="text-center py-10 px-4 text-sm sm:text-base text-gray-600">
-      Unsupported document type
+    <div className="w-full relative overflow-hidden">
+      {renderViewer()}
+      {shouldShowPagination && totalPages && totalPages > 0 && (
+        <div className="fixed bottom-0 left-140 right-0 flex justify-center pb-4  z-10">
+          <DocumentPagination
+            currentPage={currentPage || 1}
+            totalPages={totalPages}
+            onPrevPage={onPrevPage}
+            onNextPage={onNextPage}
+            onGoToPage={onGoToPage}
+            onZoomIn={onZoomIn}
+            onZoomOut={onZoomOut}
+            zoom={zoom}
+          />
+        </div>
+      )}
     </div>
   );
 };

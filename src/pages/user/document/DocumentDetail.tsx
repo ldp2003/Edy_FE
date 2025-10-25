@@ -9,7 +9,6 @@ import { useParams } from "react-router-dom";
 import DocumentSide from "../../../components/user/document/documentDetail/DocumentSide";
 import MobileDocumentHeader from "../../../components/user/document/documentDetail/MobileDocumentHeader";
 import DocumentViewer from "../../../components/user/document/documentView/DocumentViewer";
-import DocumentPagination from "../../../components/user/document/documentView/DocumentPagination";
 import { DocumentService } from "../../../utils/DocumentService";
 import type { Document } from "../../../models/document";
 import { UserContext } from "../../../contexts/UserContext";
@@ -181,7 +180,7 @@ const DocumentDetail: React.FC = () => {
       </div>
 
       {/* Main content - có thể scroll */}
-      <div className="flex-1 overflow-y-auto pb-[72px] md:pb-0">
+      <div className="flex-1 overflow-y-auto relative pb-8">
         <div className="p-4">
           <div className="hidden sm:flex flex-col">
             <AuthorInfo document={document!} />
@@ -195,23 +194,15 @@ const DocumentDetail: React.FC = () => {
             currentPage={currentPage}
             onPageUpdate={handlePageUpdate}
             zoom={zoom}
+            totalPages={totalPages}
+            onPrevPage={handlePrevPage}
+            onNextPage={handleNextPage}
+            onGoToPage={handleGoToPage}
+            onZoomIn={handleZoomIn}
+            onZoomOut={handleZoomOut}
           />
         </div>
       </div>
-
-      {/* Fixed Pagination Bar */}
-      {totalPages > 0 && (
-        <DocumentPagination
-          currentPage={currentPage}
-          totalPages={totalPages}
-          onPrevPage={handlePrevPage}
-          onNextPage={handleNextPage}
-          onGoToPage={handleGoToPage}
-          onZoomIn={handleZoomIn}
-          onZoomOut={handleZoomOut}
-          zoom={zoom}
-        />
-      )}
     </div>
   );
 };
