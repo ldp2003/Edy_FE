@@ -22,7 +22,7 @@ const DocumentListItem: React.FC<DocumentListItemProps> = ({
   const navigate = useNavigate();
   const [messageApi, contextHolder] = message.useMessage();
   const { favoriteDocuments, setFavoriteDocuments } = useContext(UserContext);
-  const [isFavorite, setIsFavorite] = useState(true);
+  const [isFavorite, setIsFavorite] = useState(false);
 
   useEffect(() => {
     if (document._id) {
@@ -57,40 +57,40 @@ const DocumentListItem: React.FC<DocumentListItemProps> = ({
 
   return (
     <div
-      className="flex flex-col sm:flex-row text-left w-full gap-3 sm:gap-4 justify-between p-4 border rounded-lg shadow-sm bg-white hover:shadow-md transition-shadow duration-200 cursor-pointer"
+      className="flex flex-col sm:flex-row text-left w-full gap-3 sm:gap-4 justify-between p-3 sm:p-4 border rounded-lg shadow-sm bg-white hover:shadow-md transition-shadow duration-200 cursor-pointer"
       onClick={handleItemClick}
     >
       {contextHolder}
       <div className="flex items-start sm:items-center w-full sm:w-auto flex-1 min-w-0">
         <div className="icon bg-[var(--primary-color)] text-white p-2 rounded-full mr-3 sm:mr-4 flex-shrink-0">
-          <FileText size={20} className="w-5 h-5 sm:w-6 sm:h-6" />
+          <FileText size={20} className="w-4 h-4 sm:w-5 sm:h-5" />
         </div>
         <div className="flex-1 min-w-0">
-          <div className="item-title font-bold text-sm sm:text-base text-gray-800 break-words mb-2">
+          <div className="item-title font-bold text-sm sm:text-base text-gray-800 break-words mb-1 sm:mb-2">
             {document.title}
           </div>
-          <div className="flex flex-wrap gap-2 sm:gap-4 text-xs sm:text-sm text-gray-600 mb-2">
+          <div className="flex flex-wrap gap-2 sm:gap-4 text-xs sm:text-sm text-gray-600 mb-1 sm:mb-2">
             {document.view && (
               <span>
-                <ViewCount count={document.view}></ViewCount>
+                <ViewCount count={document.view} />
               </span>
             )}
             {document.page && (
               <span>
-                <PageCount pages={document.page}></PageCount>
+                <PageCount pages={document.page} />
               </span>
             )}
           </div>
-          <div className="flex flex-wrap gap-3 text-xs text-gray-500">
+          <div className="flex flex-wrap gap-2 sm:gap-3 text-xs text-gray-500">
             {document.subject && (
               <div className="flex items-center gap-1">
-                <GraduationCap className="w-3 h-3" />
+                <GraduationCap className="w-3 h-3 flex-shrink-0" />
                 <span className="truncate">{document.subject.name}</span>
               </div>
             )}
             {document.user && (
               <div className="flex items-center gap-1">
-                <User className="w-3 h-3" />
+                <User className="w-3 h-3 flex-shrink-0" />
                 <span className="truncate">
                   {document.user.first_name} {document.user.last_name}
                 </span>
@@ -99,23 +99,23 @@ const DocumentListItem: React.FC<DocumentListItemProps> = ({
           </div>
         </div>
       </div>
-      <div className="flex flex-row sm:flex-col justify-between sm:justify-end items-center sm:items-end sm:text-right flex-shrink-0 gap-2 sm:gap-0">
+      <div className="flex flex-row sm:flex-col justify-between sm:justify-end items-center sm:items-end sm:text-right flex-shrink-0 gap-2 sm:gap-1">
         <button
           onClick={handleFavoriteClick}
-          className={`p-2 rounded-full transition-colors ${
+          className={`p-1.5 sm:p-2 rounded-full transition-colors ${
             isFavorite
               ? "bg-red-500 text-white hover:bg-red-600"
               : "bg-gray-100 text-gray-400 hover:bg-gray-200"
           }`}
         >
           <Heart
-            className="w-4 h-4"
+            className="w-3.5 h-3.5 sm:w-4 sm:h-4"
             fill={isFavorite ? "currentColor" : "none"}
           />
         </button>
         {document.intensive && (
           <div className="sm:mt-1">
-            <IntensiveMark label="Chuyên sâu"></IntensiveMark>
+            <IntensiveMark label="Chuyên sâu" />
           </div>
         )}
       </div>
