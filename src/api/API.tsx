@@ -47,7 +47,7 @@ export const AuthAPI = {
   },
   logout: async () => {
     try {
-      const response = await apiClient.post("/auth/logout");
+      const response = await apiClient.post("/auth/logout", {}, { withCredentials: true });
       return response.data;
     } catch (error) {
       console.error("Error logging out:", error);
@@ -671,6 +671,24 @@ export const DocumentAPI = {
       return response.data;
     } catch (error) {
       console.error("Error reacting to document:", error);
+      throw error;
+    }
+  },
+
+  editDocument: async (
+    documentId: string,
+    updateData: {
+      title?: string;
+    }
+  ) => {
+    try {
+      const response = await apiClient.put(
+        `/documents/${documentId}/edit`,
+        updateData
+      );
+      return response.data;
+    } catch (error) {
+      console.error("Error editing document:", error);
       throw error;
     }
   },
