@@ -6,7 +6,6 @@ import PersonalPostHeader from "../../../components/user/personalPosts/PersonalP
 import DocumentSide from "../../../components/user/document/documentDetail/DocumentSide";
 import DocumentActions from "../../../components/user/document/documentDetail/DocumentActions";
 import DocumentViewer from "../../../components/user/document/documentView/DocumentViewer";
-import DocumentPagination from "../../../components/user/document/documentView/DocumentPagination";
 import { DocumentService } from "../../../utils/DocumentService";
 import type { Document } from "../../../models/document";
 
@@ -20,7 +19,7 @@ const PersonalPostDetail: React.FC = () => {
   // State for pagination
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(0);
-  const [zoom, setZoom] = useState(1.5);
+  const [zoom, setZoom] = useState(1);
 
   // Fetch document data - ownership verification is handled at route level
   useEffect(() => {
@@ -253,7 +252,7 @@ const PersonalPostDetail: React.FC = () => {
       </div>
 
       {/* Main content - có thể scroll */}
-      <div className="flex-1 overflow-y-auto pb-[72px] md:pb-0">
+      <div className="flex-1 overflow-y-auto pb-8">
         <div className="p-2 md:p-4">
           <div className="hidden md:flex flex-col">
             <PersonalPostHeader
@@ -275,24 +274,16 @@ const PersonalPostDetail: React.FC = () => {
             currentPage={currentPage}
             onPageUpdate={handlePageUpdate}
             zoom={zoom}
+            totalPages={totalPages}
+            onPrevPage={handlePrevPage}
+            onNextPage={handleNextPage}
+            onGoToPage={handleGoToPage}
+            onZoomIn={handleZoomIn}
+            onZoomOut={handleZoomOut}
             isUser={true}
           />
         </div>
       </div>
-
-      {/* Fixed Pagination Bar */}
-      {totalPages > 0 && (
-        <DocumentPagination
-          currentPage={currentPage}
-          totalPages={totalPages}
-          onPrevPage={handlePrevPage}
-          onNextPage={handleNextPage}
-          onGoToPage={handleGoToPage}
-          onZoomIn={handleZoomIn}
-          onZoomOut={handleZoomOut}
-          zoom={zoom}
-        />
-      )}
     </div>
   );
 };

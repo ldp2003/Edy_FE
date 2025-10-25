@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { Table, Dropdown, Modal, message } from "antd";
+import React, { useState, useEffect } from "react";
+import { Table, Dropdown, Modal, message, Checkbox } from "antd";
 import type { ColumnsType } from "antd/es/table";
 import {
   Trash,
@@ -9,6 +9,7 @@ import {
   Lock,
   Users,
   Share2,
+  Eye,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import {
@@ -29,9 +30,14 @@ import { calculateDocumentRating } from "../../../utils/CalcRate";
 interface PostTableProps {
   data: Document[];
   loading?: boolean;
+  onDataChange?: (updatedData: Document[]) => void;
 }
 
-const PostTable: React.FC<PostTableProps> = ({ data, loading }) => {
+const PostTable: React.FC<PostTableProps> = ({
+  data,
+  loading,
+  onDataChange,
+}) => {
   const navigate = useNavigate();
   const [messageApi, contextHolder] = message.useMessage();
 
@@ -44,6 +50,61 @@ const PostTable: React.FC<PostTableProps> = ({ data, loading }) => {
   const [pendingMode, setPendingMode] = useState<PublicModeType | null>(null);
   const [selectedPost, setSelectedPost] = useState<Document | null>(null);
   const [updatedData, setUpdatedData] = useState<Document[]>(data);
+
+  // State for column visibility
+  const [visibleColumns, setVisibleColumns] = useState<Set<string>>(
+    new Set([
+      "index",
+      "title",
+      "createdAt",
+      "status",
+      "public_mode",
+      "view",
+      "comment_count",
+      "download_count",
+      "file_type",
+      "rating",
+      "action",
+    ])
+  );
+
+  // Load column visibility from localStorage on mount
+  useEffect(() => {
+    const saved = localStorage.getItem("postTableVisibleColumns");
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        setVisibleColumns(new Set(parsed));
+      } catch (error) {
+        console.error("Error loading column visibility:", error);
+      }
+    }
+  }, []);
+
+  // Save column visibility to localStorage
+  const saveColumnVisibility = (columns: Set<string>) => {
+    localStorage.setItem(
+      "postTableVisibleColumns",
+      JSON.stringify([...columns])
+    );
+  };
+
+  // Toggle column visibility
+  const toggleColumnVisibility = (columnKey: string, checked: boolean) => {
+    const newVisibleColumns = new Set(visibleColumns);
+    if (checked) {
+      newVisibleColumns.add(columnKey);
+    } else {
+      // Don't allow hiding essential columns
+      if (columnKey === "title" || columnKey === "action") {
+        messageApi.warning("Không thể ẩn cột Tên tài liệu và Thao tác!");
+        return;
+      }
+      newVisibleColumns.delete(columnKey);
+    }
+    setVisibleColumns(newVisibleColumns);
+    saveColumnVisibility(newVisibleColumns);
+  };
 
   console.log("PostTable data:", data);
   // Get icon for public mode
@@ -129,6 +190,11 @@ const PostTable: React.FC<PostTableProps> = ({ data, loading }) => {
       );
       setUpdatedData(newData);
 
+      // Notify parent component about data change
+      if (onDataChange) {
+        onDataChange(newData);
+      }
+
       messageApi.success(
         `Đã thay đổi chế độ hiển thị thành "${publicModeLabels[pendingMode]}"!`
       );
@@ -158,6 +224,7 @@ const PostTable: React.FC<PostTableProps> = ({ data, loading }) => {
       width: 60,
       fixed: true,
       responsive: ["md"],
+      render: (_: unknown, __: Document, index: number) => index + 1,
     },
     {
       title: "Tên tài liệu",
@@ -436,6 +503,42 @@ const PostTable: React.FC<PostTableProps> = ({ data, loading }) => {
     },
   ];
 
+  // Filter columns based on visibility
+  const filteredColumns = columns.filter((column) =>
+    visibleColumns.has(column.key as string)
+  );
+
+  // Column options for visibility toggle
+  const columnOptions = [
+    { key: "index", label: "STT" },
+    { key: "title", label: "Tên tài liệu", disabled: true },
+    { key: "createdAt", label: "Ngày tạo" },
+    { key: "status", label: "Trạng thái" },
+    { key: "public_mode", label: "Chế độ" },
+    { key: "view", label: "Lượt xem" },
+    { key: "comment_count", label: "Bình luận" },
+    { key: "download_count", label: "Lượt tải" },
+    { key: "file_type", label: "Loại file" },
+    { key: "rating", label: "Đánh giá" },
+    { key: "action", label: "Thao tác", disabled: true },
+  ];
+
+  // Dropdown menu for column visibility
+  const columnVisibilityMenu = {
+    items: columnOptions.map((option) => ({
+      key: option.key,
+      label: (
+        <Checkbox
+          checked={visibleColumns.has(option.key)}
+          disabled={option.disabled}
+          onChange={(e) => toggleColumnVisibility(option.key, e.target.checked)}
+        >
+          {option.label}
+        </Checkbox>
+      ),
+    })),
+  };
+
   // Nếu loading, hiển thị skeleton hoặc rỗng
   const displayData = loading
     ? []
@@ -447,10 +550,27 @@ const PostTable: React.FC<PostTableProps> = ({ data, loading }) => {
     <>
       {contextHolder}
       <div className="w-full">
+        {/* Table Header with Column Visibility Controls */}
+        <div className="flex justify-between items-center mb-4">
+          <h3 className="text-lg font-medium text-[var(--primary-text-color)]">
+            Danh sách tài liệu cá nhân
+          </h3>
+          <Dropdown
+            menu={columnVisibilityMenu}
+            placement="bottomRight"
+            trigger={["click"]}
+          >
+            <button className="flex items-center gap-2 px-3 py-2 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors">
+              <Eye size={16} />
+              <span className="text-sm">Ẩn/Hiện cột</span>
+            </button>
+          </Dropdown>
+        </div>
+
         {/* Desktop Table View - Hidden on mobile */}
         <div className="hidden md:block rounded-md overflow-hidden border border-[rgba(0,0,0,0.2)]">
           <Table
-            columns={columns}
+            columns={filteredColumns}
             dataSource={displayData}
             loading={loading}
             pagination={false}
