@@ -362,8 +362,8 @@ const InformationForm = ({
   const isSubmitDisabled = !fileInfo || isUploading || submitting;
 
   return (
-    <div className="py-6 min-h-screen text-left bg-white p-4 rounded-lg border border-[var(--border-color)] my-6">
-      <div className="font-bold text-base mb-6 text-[var(--primary-text-color)]">
+    <div className="bg-white p-4 sm:p-6 rounded-lg border border-gray-200 shadow-sm">
+      <div className="font-bold text-lg sm:text-xl mb-6 text-gray-900 text-center md:text-left">
         Nhập thông tin
         {isUploading && (
           <span className="ml-2 text-sm text-orange-500 font-normal">
@@ -371,7 +371,7 @@ const InformationForm = ({
           </span>
         )}
       </div>
-      <div className="mx-auto bg-white rounded-lg shadow-sm p-6">
+      <div className="bg-white rounded-lg">
         <Form
           form={form}
           layout="vertical"
@@ -383,21 +383,18 @@ const InformationForm = ({
             authors: authors,
           }}
         >
-          {/* Rest of the form JSX remains the same... */}
-          <div
-            className="grid gap-6"
-            style={{ gridTemplateColumns: "290px 1fr 1fr" }}
-          >
+          {/* Main form grid - responsive */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {/* Column 1 - Image and privacy */}
-            <div className="space-y-4">
+            <div className="space-y-4 md:col-span-1">
               <div className="mb-0">
                 <img
                   src={getPreviewImage()}
                   alt="Document preview"
-                  className={`border border-gray-200 rounded object-cover ${
+                  className={`border border-gray-200 rounded object-cover w-full ${
                     isUploading ? "opacity-50" : ""
                   }`}
-                  style={{ maxHeight: "300px" }}
+                  style={{ maxHeight: "250px" }}
                 />
                 <div className="text-xs text-gray-500 mt-1">
                   {fileInfo ? formatFileSize(fileInfo.size) : "Chưa có file"}
@@ -425,7 +422,7 @@ const InformationForm = ({
             </div>
 
             {/* Column 2 - Main form fields */}
-            <div className="space-y-4">
+            <div className="space-y-4 md:col-span-1">
               <Form.Item
                 style={{ marginBottom: 13.5 }}
                 name="documentName"
@@ -522,7 +519,7 @@ const InformationForm = ({
                 </Select>
               </Form.Item>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <Form.Item
                   style={{ marginBottom: 13.5 }}
                   name="pageCount"
@@ -557,7 +554,7 @@ const InformationForm = ({
             </div>
 
             {/* Column 3 - Summary */}
-            <div>
+            <div className="md:col-span-1">
               <Form.Item
                 style={{ marginBottom: 5 }}
                 name="summary"
@@ -566,7 +563,7 @@ const InformationForm = ({
               >
                 <TextArea
                   placeholder="Nhập mô tả hoặc tóm tắt tài liệu vào đây"
-                  rows={15}
+                  rows={12}
                   style={{ resize: "none", borderColor: "#60a5fa" }}
                   disabled={isUploading}
                 />
@@ -576,14 +573,11 @@ const InformationForm = ({
 
           {/* Thông tin khác */}
           <div className="mt-8 pt-6 border-t border-gray-200">
-            <div className="font-semibold text-base mb-4 text-gray-800">
+            <div className="font-semibold text-lg mb-4 text-gray-800 text-center md:text-left">
               Thông tin khác
             </div>
-            <div
-              className="grid gap-6"
-              style={{ gridTemplateColumns: "290px 1fr 1fr" }}
-            >
-              <div className="col-span-2 grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="md:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-4">
                   <Form.Item
                     style={{ marginBottom: 5 }}
@@ -603,7 +597,7 @@ const InformationForm = ({
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm text-left  text-black mb-2">
                     Tác giả tài liệu
                   </label>
                   {authors.map((author, idx) => (
@@ -657,28 +651,21 @@ const InformationForm = ({
           </div>
 
           {/* Action buttons */}
-          <div className="flex items-center justify-between mt-8 pt-6 border-t border-gray-200">
-            <div className="flex gap-3">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mt-8 pt-6 border-t border-gray-200 gap-4">
+            <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
               <Button
                 onClick={() => form.resetFields()}
                 disabled={isUploading || submitting}
+                className="w-full sm:w-auto"
               >
                 Hủy
               </Button>
-              {/* <Button
-                onClick={() => {
-                  console.log("Current form values:", form.getFieldsValue());
-                  console.log("Subjects list:", subjects);
-                }}
-                disabled={isUploading || submitting}
-              >
-                Debug
-              </Button> */}
               <Button
                 type="primary"
                 htmlType="submit"
                 loading={submitting}
                 disabled={isSubmitDisabled}
+                className="w-full sm:w-auto"
               >
                 {submitting
                   ? "Đang đăng tải..."
@@ -688,7 +675,7 @@ const InformationForm = ({
               </Button>
             </div>
             {isSubmitDisabled && !submitting && (
-              <div className="text-xs text-gray-500">
+              <div className="text-xs text-gray-500 w-full sm:w-auto text-center sm:text-left">
                 {!fileInfo
                   ? "Vui lòng tải lên file trước"
                   : isUploading
@@ -706,6 +693,7 @@ const InformationForm = ({
           onCancel={handleModalCancel}
           footer={null}
           width={600}
+          className="max-w-[95vw] sm:max-w-[600px]"
         >
           <Form
             form={newSubjectForm}
@@ -746,9 +734,15 @@ const InformationForm = ({
               />
             </Form.Item>
 
-            <div className="flex justify-end gap-2 mt-6">
-              <Button onClick={handleModalCancel}>Hủy</Button>
-              <Button type="primary" htmlType="submit">
+            <div className="flex flex-col sm:flex-row justify-end gap-2 mt-6">
+              <Button onClick={handleModalCancel} className="w-full sm:w-auto">
+                Hủy
+              </Button>
+              <Button
+                type="primary"
+                htmlType="submit"
+                className="w-full sm:w-auto"
+              >
                 Tạo môn học
               </Button>
             </div>

@@ -1,10 +1,9 @@
 import React, { useEffect, useState, useCallback } from "react";
-import { message, Pagination, Modal } from "antd";
+import { message, Pagination } from "antd";
 import { useSearchParams } from "react-router-dom";
 import { ReportService } from "../../../utils/ReportService";
 import type { Report } from "../../../models/report";
 import { AdminBreadcrumb } from "../../../components/admin/common/AdminBreadcrumb";
-
 import AdminReportTable from "../../../components/admin/report/AdminReportTable";
 import AdminReportDetailModal from "../../../components/admin/report/AdminReportDetailModal";
 import type { AdminReportFilterParams } from "../../../components/admin/report/AdminReportFilterSearch";
@@ -17,7 +16,7 @@ const ReportsPage: React.FC = () => {
   const [reports, setReports] = useState<Report[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedReport, setSelectedReport] = useState<Report | null>(null);
-  const [modalVisible, setModalVisible] = useState(false);
+  const [resolveModalVisible, setResolveModalVisible] = useState(false);
 
   // Lấy params từ URL
   const getCurrentPage = useCallback(
@@ -31,7 +30,7 @@ const ReportsPage: React.FC = () => {
   const getCurrentFilters = useCallback(
     (): AdminReportFilterParams => ({
       search: searchParams.get("search") || "",
-      status: searchParams.get("status") || "",
+      status: searchParams.get("status") || "PROCESSING", // Mặc định lấy báo cáo đang xử lý
       type: searchParams.get("type") || "",
     }),
     [searchParams]
@@ -40,7 +39,9 @@ const ReportsPage: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(5);
   const [total, setTotal] = useState(0);
-  const [filters, setFilters] = useState<AdminReportFilterParams>({});
+  const [filters, setFilters] = useState<AdminReportFilterParams>({
+    status: "PROCESSING", // Khởi tạo với trạng thái mặc định
+  });
 
   // Cập nhật URL params
   const updateUrlParams = useCallback(
@@ -128,39 +129,31 @@ const ReportsPage: React.FC = () => {
     fetchReports(page, newPageSize, filters);
   };
 
-  const handleViewDetail = (report: Report) => {
+  const openResolveModal = (report: Report) => {
     setSelectedReport(report);
-    setModalVisible(true);
+    setResolveModalVisible(true);
   };
 
-  const handleResolve = async (report: Report) => {
+  const handleSubmitResolution = async (params: {
+    validTypes: string[];
+    action: string;
+    resolveReason: string;
+  }) => {
+    if (!selectedReport?._id) return;
     try {
-      // Gọi API để resolve report
-      await ReportService.resolveReport(report._id, {
-        validTypes: report.type || [],
-        action: "APPROVED",
-        resolveReason: "Đã xử lý báo cáo",
+      await ReportService.resolveReport(selectedReport._id, {
+        validTypes: params.validTypes,
+        action: params.action,
+        resolveReason: params.resolveReason,
       });
       message.success("Đã giải quyết báo cáo thành công");
+      setResolveModalVisible(false);
+      setSelectedReport(null);
       fetchReports();
     } catch (error) {
       console.error("Error resolving report:", error);
       message.error("Không thể giải quyết báo cáo");
     }
-  };
-
-  const handleDelete = () => {
-    Modal.confirm({
-      title: "Xác nhận xóa",
-      content: "Bạn có chắc chắn muốn xóa báo cáo này không?",
-      okText: "Xóa",
-      cancelText: "Hủy",
-      okType: "danger",
-      onOk: () => {
-        // Tạm thời chỉ hiển thị thông báo vì API delete chưa có
-        message.info("Tính năng xóa báo cáo sẽ được cập nhật sau");
-      },
-    });
   };
 
   const breadcrumbItems = [
@@ -189,10 +182,7 @@ const ReportsPage: React.FC = () => {
         <AdminReportTable
           reports={reports}
           loading={loading}
-          onRowClick={handleViewDetail}
-          onViewDetail={handleViewDetail}
-          onResolve={handleResolve}
-          onDelete={handleDelete}
+          onResolve={openResolveModal} // mở modal duyệt
         />
 
         {total > 0 && (
@@ -219,12 +209,12 @@ const ReportsPage: React.FC = () => {
 
         <AdminReportDetailModal
           report={selectedReport}
-          visible={modalVisible}
+          visible={resolveModalVisible}
           onClose={() => {
-            setModalVisible(false);
+            setResolveModalVisible(false);
             setSelectedReport(null);
           }}
-          onResolve={handleResolve}
+          onResolve={handleSubmitResolution} // nhận validTypes, action, resolveReason từ form
         />
       </div>
     </div>

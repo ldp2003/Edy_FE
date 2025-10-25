@@ -2,8 +2,8 @@ import React, { useEffect, useContext, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { UserContext } from "../../contexts/UserContext";
 import { DocumentService } from "../../utils/DocumentService";
-import DocumentAccessGuard from "./DocumentAccessGuard";
-import DocumentAccessDeniedPage from "./DocumentAccessDeniedPage";
+import DocumentAccessGuard from "../user/document/AccessCheck/DocumentAccessGuard";
+import DocumentAccessDeniedPage from "../../pages/Error/DocumentAccessDeniedPage";
 
 interface DocumentRouteWrapperProps {
   children: React.ReactNode;

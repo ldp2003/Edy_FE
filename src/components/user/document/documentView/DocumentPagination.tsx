@@ -51,20 +51,20 @@ const DocumentPagination: React.FC<DocumentPaginationProps> = ({
   };
 
   return (
-    <div className="fixed z-10 bottom-6 left-1/2 transform -translate-x-1/2 ">
-      <div className="bg-white border border-gray-300 rounded-full shadow-lg px-4 py-2 flex items-center gap-3">
+    <div className="hidden md:block fixed z-10 bottom-4 sm:bottom-6 left-1/2 transform -translate-x-1/2 w-full max-w-sm sm:max-w-md px-4">
+      <div className="bg-white border border-gray-300 rounded-full shadow-lg px-3 sm:px-4 py-2 flex items-center justify-center gap-2 sm:gap-3">
         {/* Previous Page Button */}
         <button
           onClick={onPrevPage}
           disabled={disabled || currentPage <= 1}
-          className="p-2 rounded-full hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          className="p-2 sm:p-2 rounded-full hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors touch-manipulation"
           title="Trang trước"
         >
           <ChevronLeft size={20} className="text-gray-700" />
         </button>
 
         {/* Page Input */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1 sm:gap-2">
           <input
             type="number"
             min="1"
@@ -73,16 +73,18 @@ const DocumentPagination: React.FC<DocumentPaginationProps> = ({
             onChange={handlePageInputChange}
             onKeyPress={handlePageInputKeyPress}
             disabled={disabled}
-            className="w-16 px-2 py-1 text-center border border-gray-300 rounded focus:outline-none focus:border-blue-500 disabled:bg-gray-100"
+            className="w-12 sm:w-16 px-1 sm:px-2 py-1 text-center border border-gray-300 rounded focus:outline-none focus:border-blue-500 disabled:bg-gray-100 text-sm"
           />
-          <span className="text-gray-600 text-sm">/ {totalPages}</span>
+          <span className="text-gray-600 text-xs sm:text-sm">
+            / {totalPages}
+          </span>
         </div>
 
         {/* Next Page Button */}
         <button
           onClick={onNextPage}
           disabled={disabled || currentPage >= totalPages}
-          className="p-2 rounded-full hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          className="p-2 sm:p-2 rounded-full hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors touch-manipulation"
           title="Trang tiếp theo"
         >
           <ChevronRight size={20} className="text-gray-700" />
@@ -90,7 +92,7 @@ const DocumentPagination: React.FC<DocumentPaginationProps> = ({
 
         {/* Divider */}
         {(onZoomIn || onZoomOut || onRotate) && (
-          <div className="w-px h-6 bg-gray-300 mx-1"></div>
+          <div className="w-px h-5 sm:h-6 bg-gray-300 mx-1"></div>
         )}
 
         {/* Zoom Out Button */}
@@ -98,16 +100,16 @@ const DocumentPagination: React.FC<DocumentPaginationProps> = ({
           <button
             onClick={onZoomOut}
             disabled={disabled}
-            className="p-2 rounded-full hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            className="p-1.5 sm:p-2 rounded-full hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors touch-manipulation"
             title="Thu nhỏ"
           >
-            <ZoomOut size={18} className="text-gray-700" />
+            <ZoomOut size={16} className="text-gray-700" />
           </button>
         )}
 
         {/* Zoom Level Display */}
         {zoom && (
-          <span className="text-sm text-gray-600 min-w-[3rem] text-center">
+          <span className="text-xs sm:text-sm text-gray-600 min-w-[2.5rem] sm:min-w-[3rem] text-center">
             {Math.round(zoom * 100)}%
           </span>
         )}
@@ -117,10 +119,10 @@ const DocumentPagination: React.FC<DocumentPaginationProps> = ({
           <button
             onClick={onZoomIn}
             disabled={disabled}
-            className="p-2 rounded-full hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            className="p-1.5 sm:p-2 rounded-full hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors touch-manipulation"
             title="Phóng to"
           >
-            <ZoomIn size={18} className="text-gray-700" />
+            <ZoomIn size={16} className="text-gray-700" />
           </button>
         )}
 
@@ -129,10 +131,10 @@ const DocumentPagination: React.FC<DocumentPaginationProps> = ({
           <button
             onClick={onRotate}
             disabled={disabled}
-            className="p-2 rounded-full hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            className="p-1.5 sm:p-2 rounded-full hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors touch-manipulation"
             title="Xoay"
           >
-            <RotateCcw size={18} className="text-gray-700" />
+            <RotateCcw size={16} className="text-gray-700" />
           </button>
         )}
       </div>

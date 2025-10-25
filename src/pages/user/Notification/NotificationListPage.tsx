@@ -7,28 +7,28 @@ const NotificationListPage: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const { notifications, setNotifications, refreshNotifications } =
-    useContext(UserContext);
+  const { notifications, setNotifications } = useContext(UserContext);
 
+  // Fetch notifications with pagination
   useEffect(() => {
-    setLoading(true);
-    NotificationService.getNotifications({ page, limit: 10 })
-      .then((response) => {
+    const fetchNotifications = async () => {
+      setLoading(true);
+      try {
+        const response = await NotificationService.getNotifications({
+          page,
+          limit: 10,
+        });
         setNotifications(response.notifications);
         setTotalPages(response.totalPages);
-      })
-      .catch((error) => {
+      } catch (error) {
         console.error("Error fetching notifications:", error);
-      })
-      .finally(() => {
+      } finally {
         setLoading(false);
-      });
-  }, [page, setNotifications]);
+      }
+    };
 
-  // Refresh notifications when component mounts
-  useEffect(() => {
-    refreshNotifications();
-  }, [refreshNotifications]);
+    fetchNotifications();
+  }, [page, setNotifications]);
 
   const handlePageChange = (newPage: number) => {
     setPage(newPage);
@@ -36,7 +36,7 @@ const NotificationListPage: React.FC = () => {
 
   return (
     <div className="p-4 bg-white rounded shadow mt-6 text-left">
-      <h1 className="text-base text-[var(--primary-text-color)] font-bold mb-4">
+      <h1 className="text-base text-[var(--primary-text-color)] font-bold mb-4 text-center md:text-left">
         Danh sách thông báo
       </h1>
       {loading ? (

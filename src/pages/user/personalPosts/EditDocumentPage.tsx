@@ -69,7 +69,7 @@ const EditDocumentPage: React.FC = () => {
     <div className="min-h-screen mt-8">
       {contextHolder}
       {/* Form Container */}
-      <div className="container mx-auto px-6 pb-8">
+      <div className="container mx-auto px-4 sm:px-6 md:px-8 pb-8">
         <EditInformationForm
           document={document}
           onEditSuccess={handleEditSuccess}

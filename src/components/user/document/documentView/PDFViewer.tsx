@@ -35,36 +35,55 @@ const PDFViewer: React.FC<PDFViewerProps> = ({
 
   const renderPages = useCallback(
     async (pdf: pdfjsLib.PDFDocumentProxy) => {
-      // If user owns the document, show all pages. Otherwise, limit to 10 pages
-      const pageCount = isUser ? pdf.numPages : Math.min(pdf.numPages, 10);
-      const canvasImages: string[] = [];
+      try {
+        const numPages = pdf.numPages;
+        const pagesToRender = isUser ? numPages : Math.min(numPages, 10);
+        const newCanvases: string[] = [];
 
-      for (let i = 1; i <= pageCount; i++) {
-        const page = await pdf.getPage(i);
-        const viewport = page.getViewport({ scale: zoom });
-        const canvas = document.createElement("canvas");
-        const context = canvas.getContext("2d");
-        canvas.height = viewport.height;
-        canvas.width = viewport.width;
+        for (let i = 1; i <= pagesToRender; i++) {
+          const page = await pdf.getPage(i);
+          const viewport = page.getViewport({ scale: zoom });
+          const canvas = document.createElement("canvas");
+          const context = canvas.getContext("2d");
 
-        await page.render({ canvasContext: context!, viewport, canvas })
-          .promise;
-        canvasImages.push(canvas.toDataURL());
+          if (!context) continue;
+
+          canvas.height = viewport.height;
+          canvas.width = viewport.width;
+
+          const renderTask = page.render({
+            canvasContext: context,
+            viewport: viewport,
+            canvas: canvas // Thêm thuộc tính canvas theo yêu cầu của RenderParameters
+          });
+
+          try {
+            await renderTask.promise;
+            newCanvases.push(canvas.toDataURL());
+          } catch (renderError) {
+            console.error(`Error rendering page ${i}:`, renderError);
+            continue;
+          } finally {
+            // Cleanup page object
+            page.cleanup();
+          }
+        }
+
+        setCanvases(newCanvases);
+        if (onPageChange) {
+          onPageChange(currentPage, pagesToRender);
+        }
+      } catch (error) {
+        console.error("Error rendering pages:", error);
       }
-
-      setCanvases(canvasImages);
-
-      // Notify parent about page count (full pages if user's doc, limited if not)
-      if (onPageChange) {
-        onPageChange(1, pageCount);
-      }
-
-      console.log("Rendered canvases:", canvasImages.length);
     },
-    [zoom, onPageChange, isUser]
+    [zoom, onPageChange, isUser, currentPage]
   );
 
   useEffect(() => {
+    let isMounted = true;
+    let currentPdf: pdfjsLib.PDFDocumentProxy | null = null;
+
     const loadPDF = async () => {
       try {
         setLoading(true);
@@ -83,11 +102,13 @@ const PDFViewer: React.FC<PDFViewerProps> = ({
         }
 
         const pdf = await pdfjsLib.getDocument(url).promise;
-        console.log("Loaded PDF:", pdf);
+        if (!isMounted) return;
+        
+        currentPdf = pdf;
         setPdfDocument(pdf);
-
         await renderPages(pdf);
       } catch (error) {
+        if (!isMounted) return;
         console.error("Error loading PDF:", error);
         if (error instanceof Error) {
           if (error.message.includes("401")) {
@@ -105,27 +126,34 @@ const PDFViewer: React.FC<PDFViewerProps> = ({
           setError("Đã xảy ra lỗi không xác định khi tải tài liệu.");
         }
       } finally {
-        setLoading(false);
+        if (isMounted) {
+          setLoading(false);
+        }
       }
     };
 
     loadPDF();
-  }, [url, renderPages]);
+
+    return () => {
+      isMounted = false;
+      if (currentPdf) {
+        currentPdf.destroy();
+      }
+    };
+  }, [url]);
 
   useEffect(() => {
-    // Update visible page when currentPage prop changes
     if (currentPage !== visiblePage) {
       setVisiblePage(currentPage);
       scrollToPage(currentPage);
     }
   }, [currentPage, visiblePage]);
 
-  // Re-render pages when zoom changes
   useEffect(() => {
     if (pdfDocument) {
       renderPages(pdfDocument);
     }
-  }, [zoom, pdfDocument, renderPages]);
+  }, [zoom, pdfDocument]);
 
   const scrollToPage = (pageNumber: number) => {
     const pageElement = document.getElementById(`pdf-page-${pageNumber}`);
@@ -169,20 +197,20 @@ const PDFViewer: React.FC<PDFViewerProps> = ({
   }, [visiblePage, onPageUpdate]);
 
   return (
-    <div className="max-w-full mx-auto z-0">
+    <div className="w-full mx-auto z-0">
       {loading && (
-        <div className="flex flex-col items-center justify-center py-20">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mb-4"></div>
-          <p className="text-gray-600">Đang tải tài liệu...</p>
+        <div className="flex flex-col items-center justify-center py-10 sm:py-20">
+          <div className="animate-spin rounded-full h-8 w-8 sm:h-12 sm:w-12 border-b-2 border-blue-500 mb-3 sm:mb-4"></div>
+          <p className="text-gray-600 text-sm sm:text-base">Đang tải tài liệu...</p>
         </div>
       )}
 
       {error && (
-        <div className="flex flex-col items-center justify-center py-20">
-          <div className="bg-red-50 border border-red-200 rounded-lg p-6 max-w-md text-center">
-            <div className="text-red-600 mb-4">
+        <div className="flex flex-col items-center justify-center py-10 sm:py-20 px-4">
+          <div className="bg-red-50 border border-red-200 rounded-lg p-4 sm:p-6 w-full max-w-md text-center">
+            <div className="text-red-600 mb-3 sm:mb-4">
               <svg
-                className="w-12 h-12 mx-auto"
+                className="w-8 h-8 sm:w-12 sm:h-12 mx-auto"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -195,13 +223,13 @@ const PDFViewer: React.FC<PDFViewerProps> = ({
                 />
               </svg>
             </div>
-            <h3 className="text-lg font-semibold text-red-800 mb-2">
+            <h3 className="text-base sm:text-lg font-semibold text-red-800 mb-2">
               Không thể tải tài liệu
             </h3>
-            <p className="text-red-600 text-sm">{error}</p>
+            <p className="text-red-600 text-xs sm:text-sm">{error}</p>
             <button
               onClick={() => window.location.reload()}
-              className="mt-4 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition-colors"
+              className="mt-3 sm:mt-4 px-3 py-1.5 sm:px-4 sm:py-2 bg-red-600 text-white text-sm rounded hover:bg-red-700 transition-colors"
             >
               Thử lại
             </button>
@@ -211,29 +239,28 @@ const PDFViewer: React.FC<PDFViewerProps> = ({
 
       {!loading && !error && (
         <>
-          <div className="mb-5"></div>
-          <div className="space-y-6 w-full">
+          <div className="mb-3 sm:mb-5"></div>
+          <div className="space-y-4 sm:space-y-6 w-full">
             {canvases.map((imgSrc, index) => (
               <div
                 key={index}
                 id={`pdf-page-${index + 1}`}
-                className="mb-7 border border-gray-300 h-[80%] mx-[10%] rounded-lg"
+                className="mb-4 sm:mb-7 border border-gray-300 mx-2 sm:mx-[10%] rounded-lg overflow-hidden"
               >
                 <img
                   src={imgSrc}
                   alt={`Page ${index + 1}`}
-                  className="w-full h-auto rounded-2xl hover:shadow-lg transition-shadow duration-300"
+                  className="w-full h-auto rounded-lg sm:rounded-2xl hover:shadow-lg transition-shadow duration-300"
                 />
               </div>
             ))}
 
-            {/* Thông báo giới hạn xem - chỉ hiển thị khi không phải tài liệu của user */}
             {!isUser && canvases.length >= 10 && (
-              <Card className="border-orange-200 bg-orange-50 text-center">
-                <div className="flex flex-col items-center space-y-3">
+              <Card className="mx-2 sm:mx-auto border-orange-200 bg-orange-50 text-center max-w-lg">
+                <div className="flex flex-col items-center space-y-2 sm:space-y-3">
                   <div className="flex items-center space-x-2">
                     <svg
-                      className="w-5 h-5 text-orange-600"
+                      className="w-4 h-4 sm:w-5 sm:h-5 text-orange-600"
                       fill="currentColor"
                       viewBox="0 0 20 20"
                     >
@@ -243,17 +270,17 @@ const PDFViewer: React.FC<PDFViewerProps> = ({
                         clipRule="evenodd"
                       />
                     </svg>
-                    <Text className="text-orange-700 font-medium">
+                    <Text className="text-orange-700 font-medium text-sm sm:text-base">
                       Bạn đã xem hết 10 trang đầu tiên
                     </Text>
                   </div>
-                  <Text className="text-orange-600 text-sm">
+                  <Text className="text-orange-600 text-xs sm:text-sm">
                     Để xem toàn bộ tài liệu, vui lòng tải xuống
                   </Text>
                   <Button
                     type="primary"
                     icon={<DownloadOutlined />}
-                    className="bg-orange-500 border-orange-500 hover:bg-orange-600"
+                    className="bg-orange-500 border-orange-500 hover:bg-orange-600 text-sm sm:text-base"
                   >
                     Tải xuống
                   </Button>

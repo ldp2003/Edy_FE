@@ -15,7 +15,6 @@ import {
 import type { ColumnsType } from "antd/es/table";
 import { Edit, Lock, Unlock, Plus } from "lucide-react";
 import { AssignmentService } from "../../../utils/AssignmentService";
-import { RoleService } from "../../../utils/RoleService";
 import { ROLE_DISPLAY_NAMES } from "../../../constants/RoleConstants";
 import AssignRoleModal from "./AssignRoleModal";
 import EditAssignmentModel from "./EditAssigmentModel";
@@ -50,7 +49,6 @@ interface Assignment {
 const AssignmentTable: React.FC = () => {
   const [assignments, setAssignments] = useState<Assignment[]>([]);
   const [loading, setLoading] = useState(false);
-  const [roles, setRoles] = useState<any[]>([]);
   // const [isModalVisible, setIsModalVisible] = useState(false);
   // const [form] = Form.useForm();
   const [isAssignModalVisible, setIsAssignModalVisible] = useState(false);
@@ -77,7 +75,7 @@ const AssignmentTable: React.FC = () => {
       const assignmentData = response || [];
       console.log("Assignment data:", assignmentData);
       setAssignments(assignmentData);
-    } catch (error) {
+    } catch {
       message.error("Không thể tải danh sách phân quyền");
       setAssignments([]);
     } finally {
@@ -85,21 +83,8 @@ const AssignmentTable: React.FC = () => {
     }
   };
 
-  const fetchRoles = async () => {
-    try {
-      const response = await RoleService.getAllRoles();
-      console.log("Roles response:", response);
-      // Đảm bảo response.data tồn tại và là mảng
-      setRoles(Array.isArray(response) ? response : []);
-    } catch (error) {
-      message.error("Không thể tải danh sách vai trò");
-      setRoles([]); // Set mảng rỗng khi có lỗi
-    }
-  };
-
   useEffect(() => {
     fetchAssignments();
-    fetchRoles();
   }, []);
 
   const handleToggleStatus = async (

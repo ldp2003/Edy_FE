@@ -11,10 +11,7 @@ interface SheetData {
   data: (string | number | null)[][];
 }
 
-const ExcelTable: React.FC<ExcelTableProps> = ({
-  url,
-  isUser = false, // eslint-disable-line @typescript-eslint/no-unused-vars
-}) => {
+const ExcelTable: React.FC<ExcelTableProps> = ({ url }) => {
   const [sheets, setSheets] = useState<SheetData[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [activeSheet, setActiveSheet] = useState(0);
@@ -39,23 +36,33 @@ const ExcelTable: React.FC<ExcelTableProps> = ({
     fetchExcel();
   }, [url]);
 
-  if (error) return <div>{error}</div>;
-  if (!sheets.length) return <div>Đang tải dữ liệu Excel...</div>;
+  if (error)
+    return (
+      <div className="text-red-600 text-sm sm:text-base px-4 py-3 bg-red-50 rounded-lg mx-2 sm:mx-4">
+        {error}
+      </div>
+    );
+  if (!sheets.length)
+    return (
+      <div className="text-gray-600 text-sm sm:text-base flex justify-center py-10">
+        Đang tải dữ liệu Excel...
+      </div>
+    );
 
   return (
     <div
-      className="select-none pointer-events-auto"
+      className="select-none pointer-events-auto px-2 sm:px-4"
       onContextMenu={(e) => e.preventDefault()}
       onCopy={(e) => e.preventDefault()}
       onDragStart={(e) => e.preventDefault()}
     >
       {/* Sheet Tabs */}
-      <div className="flex mb-3">
+      <div className="flex mb-3 overflow-x-auto whitespace-nowrap pb-2">
         {sheets.map((sheet, idx) => (
           <div
             key={sheet.name}
             onClick={() => setActiveSheet(idx)}
-            className={`px-5 py-2 cursor-pointer rounded-t-lg mr-1 ${
+            className={`px-3 sm:px-5 py-1.5 sm:py-2 cursor-pointer rounded-t-lg mr-1 text-sm sm:text-base ${
               idx === activeSheet
                 ? "bg-blue-100 border-2 border-blue-600 border-b-0 font-semibold"
                 : "bg-gray-100 border border-gray-300 font-normal"
@@ -66,8 +73,8 @@ const ExcelTable: React.FC<ExcelTableProps> = ({
         ))}
       </div>
       {/* Active Sheet Table */}
-      <div>
-        <table className="border-collapse w-full bg-white text-sm font-sans">
+      <div className="overflow-x-auto">
+        <table className="border-collapse w-full bg-white text-xs sm:text-sm font-sans">
           <tbody>
             {sheets[activeSheet].data.map((row, i) => (
               <tr key={i}>
@@ -75,12 +82,15 @@ const ExcelTable: React.FC<ExcelTableProps> = ({
                   i === 0 ? (
                     <th
                       key={j}
-                      className="bg-gray-100 font-semibold border border-gray-300"
+                      className="bg-gray-100 font-semibold border border-gray-300 px-2 py-1.5 sm:px-3 sm:py-2 whitespace-nowrap"
                     >
                       {cell}
                     </th>
                   ) : (
-                    <td key={j} className="border border-gray-300">
+                    <td
+                      key={j}
+                      className="border border-gray-300 px-2 py-1.5 sm:px-3 sm:py-2 whitespace-nowrap"
+                    >
                       {cell}
                     </td>
                   )

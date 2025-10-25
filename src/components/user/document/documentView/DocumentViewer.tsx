@@ -21,7 +21,7 @@ const VideoViewer: React.FC<{ url: string; isUser?: boolean }> = ({
   const [paused, setPaused] = useState(false);
 
   return (
-    <div className="relative">
+    <div className="relative w-full">
       <video
         src={url}
         controls
@@ -30,7 +30,6 @@ const VideoViewer: React.FC<{ url: string; isUser?: boolean }> = ({
         onContextMenu={(e) => e.preventDefault()}
         onTimeUpdate={(e) => {
           const video = e.currentTarget;
-          // Only limit video time if not user's own document
           if (!isUser && video.currentTime >= 60) {
             video.pause();
             video.currentTime = 60;
@@ -41,11 +40,14 @@ const VideoViewer: React.FC<{ url: string; isUser?: boolean }> = ({
         Trình duyệt của bạn không hỗ trợ video.
       </video>
       {paused && !isUser && (
-        <div className="absolute top-0 left-0 w-full h-full bg-black bg-opacity-70 flex flex-col items-center justify-center text-white z-10">
-          <div className="mb-4 text-lg font-semibold">
-            Bạn chỉ được xem trước 1 phút đầu.
-            <br />
-            Vui lòng tải xuống để xem toàn bộ video.
+        <div className="absolute top-0 left-0 w-full h-full bg-black/70 flex flex-col items-center justify-center text-white z-10 px-4">
+          <div className="text-center">
+            <p className="text-base sm:text-lg font-semibold mb-2">
+              Bạn chỉ được xem trước 1 phút đầu.
+            </p>
+            <p className="text-sm sm:text-base">
+              Vui lòng tải xuống để xem toàn bộ video.
+            </p>
           </div>
         </div>
       )}
@@ -87,7 +89,7 @@ const DocumentViewer: React.FC<DocumentViewerProps> = ({
   }
   if (type === "ppt") {
     return (
-      <div>
+      <div className="text-center py-10 px-4 text-sm sm:text-base text-gray-600">
         Chưa hỗ trợ xem trực tiếp PowerPoint. Vui lòng chuyển sang PDF hoặc
         Excel.
       </div>
@@ -99,7 +101,11 @@ const DocumentViewer: React.FC<DocumentViewerProps> = ({
   if (type === "video") {
     return <VideoViewer url={url} isUser={isUser} />;
   }
-  return <div>Unsupported document type</div>;
+  return (
+    <div className="text-center py-10 px-4 text-sm sm:text-base text-gray-600">
+      Unsupported document type
+    </div>
+  );
 };
 
 export default DocumentViewer;

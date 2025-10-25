@@ -6,7 +6,6 @@ import PageCount from "../documentElement/PageCount";
 import IntensiveMark from "../documentElement/IntensiveMark";
 import type { ReactNode } from "react";
 
-
 type RecentItemProps = {
   title: string | ReactNode;
   views: number;
@@ -25,20 +24,20 @@ const RecentItem: React.FC<RecentItemProps> = ({
   intensive,
 }) => {
   return (
-    <div className="flex text-left w-full gap-4 justify-between px-2 py-1 border rounded-lg shadow-md bg-white mb-2">
-      <div className="flex items-center">
-        <div className="icon bg-blue-500 text-white p-2 rounded-full mr-4">
-          <FileText size={24} />
+    <div className="flex flex-col md:flex-row text-left w-full gap-2 md:gap-4 justify-between px-2 py-1 border rounded-lg shadow-md bg-white mb-2">
+      <div className="flex items-start md:items-center w-full md:w-auto">
+        <div className="icon bg-[var(--primary-color)] text-white p-2 rounded-full mr-2 md:mr-4 flex-shrink-0">
+          <FileText size={20} className="md:w-6 md:h-6" />
         </div>
-        <div>
-          <div className="item-title font-bold text-sm text-gray-800">
+        <div className="flex-1 min-w-0">
+          <div className="item-title font-bold text-sm text-gray-800 break-words">
             {title}
           </div>
-          <div className="flex flex-row text-sm text-gray-600">
-            <span className="mr-4">
+          <div className="flex flex-wrap gap-2 md:gap-4 text-xs md:text-sm text-gray-600 mt-1">
+            <span>
               <ViewCount count={views}></ViewCount>
             </span>
-            <span className="mr-4">
+            <span>
               <RatingRatio rating={rating}></RatingRatio>
             </span>
             <span>
@@ -47,11 +46,15 @@ const RecentItem: React.FC<RecentItemProps> = ({
           </div>
         </div>
       </div>
-      <div className="flex flex-col text-right">
-        <span className="text-xs text-[var(--secondary-text-color)] mr-4">
+      <div className="flex flex-row md:flex-col justify-between md:justify-end items-center md:items-end md:text-right flex-shrink-0">
+        <span className="text-xs text-[var(--secondary-text-color)]">
           {date instanceof Date ? date.toLocaleDateString() : date}
         </span>
-        {intensive && <IntensiveMark label="Chuyên sâu"></IntensiveMark>}
+        {intensive && (
+          <div className="md:mt-1">
+            <IntensiveMark label="Chuyên sâu"></IntensiveMark>
+          </div>
+        )}
       </div>
     </div>
   );

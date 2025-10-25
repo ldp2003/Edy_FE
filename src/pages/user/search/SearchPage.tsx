@@ -106,9 +106,22 @@ const SearchPage: React.FC = () => {
 
     // Skip fetching documents for subjects tab, only show subjects
     if (currentTab === "subjects") {
-      setDocuments([]);
-      setSubjects([]);
-      setTotalDocuments(6); // Mock count for subjects
+      setLoading(true);
+      try {
+        const subRes = await SubjectService.searchSubjects(
+          filters.search || ""
+        );
+        console.log("Fetched subjects:", subRes);
+        setSubjects(subRes || []);
+        setTotalDocuments(6); // Mock count for subjects
+      } catch (error) {
+        console.error("Error fetching subjects:", error);
+        message.error("Có lỗi xảy ra khi tìm kiếm môn học");
+        setSubjects([]);
+        setTotalDocuments(0);
+      } finally {
+        setLoading(false);
+      }
       return;
     }
 
@@ -232,6 +245,9 @@ const SearchPage: React.FC = () => {
   const handleTabChange = (tab: TabMode) => {
     setCurrentTab(tab);
     setCurrentPage(1);
+    // Reset data when switching tabs to avoid showing old data
+    setDocuments([]);
+    setSubjects([]);
 
     // Update URL with new tab
     const newSearchParams = new URLSearchParams(searchParams);
@@ -246,8 +262,10 @@ const SearchPage: React.FC = () => {
 
   // Fetch documents when filters, page, or tab change
   useEffect(() => {
-    fetchDocuments();
-  }, [fetchDocuments]);
+    if (filters && currentTab) {
+      fetchDocuments();
+    }
+  }, [filters, currentTab, fetchDocuments]);
 
   // Update filters when URL changes (only on initial load or external URL changes)
   useEffect(() => {
@@ -280,7 +298,7 @@ const SearchPage: React.FC = () => {
 
   return (
     <div className="min-h-screen">
-      <div className="max-w-7xl mx-auto px-4 py-6 bg-white rounded-lg shadow">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8 py-4 sm:py-6 bg-white rounded-lg shadow">
         {/* Search Header with integrated filter drawer */}
         <SearchHeader
           initialQuery={filters.search || ""}
@@ -296,7 +314,7 @@ const SearchPage: React.FC = () => {
           <div className="mb-6">
             <div className="flex border-b border-gray-200 text-sm">
               <button
-                className={`cursor-pointer px-6 py-3 font-medium border-b-2 transition-colors ${
+                className={`cursor-pointer px-4 sm:px-6 py-3 font-medium border-b-2 transition-colors ${
                   currentTab === "all"
                     ? "text-[var(--primary-color)] border-[var(--primary-color)]"
                     : "text-[var(--third-text-color)] hover:text-black border-transparent"
@@ -306,7 +324,7 @@ const SearchPage: React.FC = () => {
                 Tất cả
               </button>
               <button
-                className={`cursor-pointer px-6 py-3 font-medium border-b-2 transition-colors ${
+                className={`cursor-pointer px-4 sm:px-6 py-3 font-medium border-b-2 transition-colors ${
                   currentTab === "subjects"
                     ? "text-[var(--primary-color)] border-[var(--primary-color)]"
                     : "text-[var(--third-text-color)] hover:text-black border-transparent"

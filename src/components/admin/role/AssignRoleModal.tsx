@@ -42,7 +42,7 @@ const AssignRoleModal: React.FC<AssignRoleModalProps> = ({
   const fetchData = async () => {
     try {
       // Fetch roles
-      const rolesResponse = await RoleService.getAllRoles();
+      const rolesResponse = await RoleService.getAllRoles(true);
       setRoles(rolesResponse);
 
       if (!selectedAccount) {

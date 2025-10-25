@@ -9,7 +9,7 @@ import AdminDocumentFilterSearch, {
   type AdminFilterSearchParams,
 } from "./AdminDocumentFilterSearch";
 import { DocumentService } from "../../../utils/DocumentService";
-import { fetchMultipleDocumentRatings } from "../../../utils/CalcRate";
+import { calculateDocumentRating } from "../../../utils/CalcRate";
 
 const { Option } = Select;
 
@@ -45,9 +45,7 @@ const AdminDocumentTable: React.FC = () => {
   const [appliedFilters, setAppliedFilters] = useState<AdminFilterSearchParams>(
     {}
   );
-  const [documentRatings, setDocumentRatings] = useState<
-    Map<string, { ratingPercentage: number; formattedRating: string }>
-  >(new Map());
+
   const isInitialized = useRef(false);
 
   // Initialize filter from URL params on mount - only once
@@ -112,21 +110,11 @@ const AdminDocumentTable: React.FC = () => {
 
         setDocuments(fetchedDocuments);
         setTotalDocuments(response.total || 0);
-
-        // Fetch ratings cho các documents vừa lấy
-        if (fetchedDocuments.length > 0) {
-          const documentIds = fetchedDocuments.map((doc: Document) => doc._id);
-          const ratingsMap = await fetchMultipleDocumentRatings(documentIds);
-          setDocumentRatings(ratingsMap);
-        } else {
-          setDocumentRatings(new Map());
-        }
       } catch (error) {
         console.error("Error fetching documents:", error);
         message.error("Không thể tải danh sách tài liệu!");
         setDocuments([]);
         setTotalDocuments(0);
-        setDocumentRatings(new Map());
       } finally {
         setLoading(false);
       }
@@ -371,11 +359,10 @@ const AdminDocumentTable: React.FC = () => {
       key: "rating",
       align: "center",
       render: (_, record: DocumentDisplay) => {
-        const rating = documentRatings.get(record._id);
-        if (!rating) {
-          return <span className="text-gray-400">-</span>;
-        }
-
+        const rating = calculateDocumentRating(
+          record.like || 0,
+          record.dislike || 0
+        );
         const percentage = rating.ratingPercentage;
         let colorClass = "text-gray-600";
 

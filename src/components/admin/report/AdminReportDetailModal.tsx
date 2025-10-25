@@ -1,14 +1,19 @@
 import React from "react";
-import { Modal, Tag, Avatar, Divider, Button } from "antd";
 import {
-  UserOutlined,
-  FileTextOutlined,
-  CalendarOutlined,
-  EditOutlined,
-} from "@ant-design/icons";
+  Modal,
+  Tag,
+  Avatar,
+  Divider,
+  Button,
+  Form,
+  Checkbox,
+  Input,
+  Radio,
+} from "antd";
+import { UserOutlined, FileTextOutlined } from "@ant-design/icons";
 import type { Report } from "../../../models/report";
 import {
-  getReportTypeLabel,
+  REPORT_TYPE_OPTIONS,
   getReportStatusLabel,
 } from "../../../utils/reportTypeUtils";
 
@@ -16,7 +21,11 @@ interface AdminReportDetailModalProps {
   report: Report | null;
   visible: boolean;
   onClose: () => void;
-  onResolve?: (report: Report) => void;
+  onResolve?: (params: {
+    validTypes: string[];
+    action: string;
+    resolveReason: string;
+  }) => void;
 }
 
 const AdminReportDetailModal: React.FC<AdminReportDetailModalProps> = ({
@@ -25,36 +34,23 @@ const AdminReportDetailModal: React.FC<AdminReportDetailModalProps> = ({
   onClose,
   onResolve,
 }) => {
+  const [form] = Form.useForm();
+
   if (!report) return null;
 
-  const handleResolve = () => {
-    onResolve?.(report);
-    onClose();
-  };
+  const initialTypes =
+    Array.isArray(report.type) && report.type.length > 0 ? report.type : [];
+  const docObj = typeof report.doc === "object" ? report.doc : null;
 
   return (
     <Modal
       open={visible}
       onCancel={onClose}
-      width={600}
-      footer={
-        <div className="flex justify-end gap-2">
-          <Button onClick={onClose}>Đóng</Button>
-          {report.status === "PROCESSING" && onResolve && (
-            <Button
-              type="primary"
-              icon={<EditOutlined />}
-              onClick={handleResolve}
-            >
-              Giải quyết báo cáo
-            </Button>
-          )}
-        </div>
-      }
+      width={640}
       title={
         <div className="flex items-center gap-2">
           <FileTextOutlined className="text-blue-500" />
-          <span className="text-lg font-semibold">Chi tiết báo cáo</span>
+          <span className="text-lg font-semibold">Xử lý báo cáo</span>
           <Tag
             color={report.status === "PROCESSING" ? "blue" : "green"}
             className="ml-2"
@@ -63,123 +59,108 @@ const AdminReportDetailModal: React.FC<AdminReportDetailModalProps> = ({
           </Tag>
         </div>
       }
+      onOk={() => form.submit()}
+      okText="Xác nhận xử lý"
+      footer={[
+        <Button key="cancel" onClick={onClose}>
+          Đóng
+        </Button>,
+        <Button key="ok" type="primary" onClick={() => form.submit()}>
+          Xác nhận xử lý
+        </Button>,
+      ]}
     >
+      {/* Thông tin tóm tắt */}
       <div className="space-y-4">
-        {/* Thông tin tài liệu */}
         <div className="bg-gray-50 p-4 rounded-lg">
-          <h4 className="font-semibold text-gray-700 mb-2 flex items-center gap-2">
-            <FileTextOutlined />
-            Thông tin tài liệu
-          </h4>
-          <div className="space-y-2 text-sm">
-            <div>
-              <span className="font-medium text-gray-600">Tiêu đề:</span>{" "}
-              <span className="text-gray-800">
-                {typeof report.doc === "object" && report.doc !== null
-                  ? report.doc.title
-                  : "Không có dữ liệu"}
-              </span>
-            </div>
-            {typeof report.doc === "object" &&
-              report.doc !== null &&
-              report.doc.author && (
-                <div>
-                  <span className="font-medium text-gray-600">Tác giả:</span>{" "}
-                  <span className="text-gray-800">
-                    {report.doc.author.join(", ") || "Không có thông tin"}
-                  </span>
-                </div>
-              )}
-          </div>
-        </div>
-
-        <Divider className="my-3" />
-
-        {/* Thông tin người báo cáo */}
-        <div className="bg-gray-50 p-4 rounded-lg">
-          <h4 className="font-semibold text-gray-700 mb-2 flex items-center gap-2">
-            <UserOutlined />
-            Người báo cáo
-          </h4>
-          {typeof report.reporter === "object" && report.reporter !== null ? (
-            <div className="flex items-center gap-3">
-              <Avatar
-                src={report.reporter.avatar}
-                size={40}
-                icon={<UserOutlined />}
-              />
-              <div>
-                <div className="font-medium text-gray-800">
-                  {report.reporter.last_name} {report.reporter.first_name}
-                </div>
-                <div className="text-xs text-gray-500">
-                  ID: {report.reporter._id}
-                </div>
+          <div className="flex items-start gap-4">
+            <Avatar
+              src={
+                typeof report.reporter === "object"
+                  ? report.reporter.avatar
+                  : undefined
+              }
+              size={40}
+              icon={<UserOutlined />}
+              className="border-2 border-white shadow-sm"
+            />
+            <div className="flex-1">
+              <div className="font-medium text-base">
+                {typeof report.reporter === "object"
+                  ? `${report.reporter.last_name} ${report.reporter.first_name}`
+                  : "Người dùng"}
               </div>
-            </div>
-          ) : (
-            <span className="text-sm text-gray-400">Không có dữ liệu</span>
-          )}
-        </div>
-
-        <Divider className="my-3" />
-
-        {/* Chi tiết báo cáo */}
-        <div className="space-y-3">
-          <div>
-            <span className="font-semibold text-gray-700">Loại báo cáo:</span>
-            <div className="flex flex-wrap gap-1 mt-1">
-              {report.type?.map((t) => (
-                <Tag key={t} color="red" className="text-xs">
-                  {getReportTypeLabel(t)}
-                </Tag>
-              ))}
-            </div>
-          </div>
-
-          <div>
-            <span className="font-semibold text-gray-700">Lý do báo cáo:</span>
-            <div className="mt-1 p-3 bg-gray-50 rounded border-l-4 border-orange-400">
-              <p className="text-sm text-gray-800 leading-relaxed">
+              <div className="text-sm text-gray-600 mt-1">
+                {docObj ? `Tài liệu: ${docObj.title}` : "Tài liệu: Không rõ"}
+              </div>
+              <div className="text-sm text-gray-600 mt-1">
+                <span className="font-medium">Lý do báo cáo: </span>
                 {report.reason}
-              </p>
-            </div>
-          </div>
-
-          {report.resolveReason && (
-            <div>
-              <span className="font-semibold text-gray-700">
-                Lý do giải quyết:
-              </span>
-              <div className="mt-1 p-3 bg-green-50 rounded border-l-4 border-green-400">
-                <p className="text-sm text-gray-800 leading-relaxed">
-                  {report.resolveReason}
-                </p>
               </div>
             </div>
-          )}
-        </div>
-
-        <Divider className="my-3" />
-
-        {/* Thông tin thời gian */}
-        <div className="flex justify-between text-sm text-gray-500">
-          <div className="flex items-center gap-1">
-            <CalendarOutlined />
-            <span>
-              Ngày tạo: {new Date(report.createdAt).toLocaleString("vi-VN")}
-            </span>
           </div>
-          {report.resolvedAt && (
-            <div className="flex items-center gap-1">
-              <CalendarOutlined />
-              <span>
-                Ngày giải quyết:{" "}
-                {new Date(report.resolvedAt).toLocaleString("vi-VN")}
-              </span>
-            </div>
-          )}
         </div>
+
+        <Divider className="my-4" />
+
+        {/* Form duyệt báo cáo */}
+        <Form
+          form={form}
+          layout="vertical"
+          initialValues={{
+            validTypes: initialTypes,
+            action: "DELETE",
+            resolveReason: "",
+          }}
+          onFinish={(values) =>
+            onResolve?.({
+              validTypes: values.validTypes || [],
+              action: values.action,
+              resolveReason: values.resolveReason || "",
+            })
+          }
+        >
+          <Form.Item
+            name="validTypes"
+            label="Chọn các loại vi phạm thực sự"
+            rules={[
+              {
+                required: true,
+                message: "Vui lòng chọn ít nhất một loại vi phạm",
+              },
+            ]}
+          >
+            <Checkbox.Group>
+              <div className="grid grid-cols-2 gap-2">
+                {REPORT_TYPE_OPTIONS.map((opt) => (
+                  <Checkbox key={opt.value} value={opt.value}>
+                    {opt.label}
+                  </Checkbox>
+                ))}
+              </div>
+            </Checkbox.Group>
+          </Form.Item>
+
+          <Form.Item
+            name="action"
+            label="Hành động"
+            rules={[{ required: true, message: "Vui lòng chọn hành động" }]}
+          >
+            <Radio.Group>
+              <Radio value="DELETE">Gỡ nội dung</Radio>
+              <Radio value="EDIT_REQUESTED">Yêu cầu chỉnh sửa</Radio>
+              <Radio value="FALSE_REPORT">Giữ lại (Báo cáo sai)</Radio>
+            </Radio.Group>
+          </Form.Item>
+
+          <Form.Item
+            name="resolveReason"
+            label="Lý do xử lý"
+            rules={[{ required: true, message: "Vui lòng nhập lý do xử lý" }]}
+          >
+            <Input.TextArea rows={3} placeholder="Mô tả ngắn gọn lý do xử lý" />
+          </Form.Item>
+        </Form>
       </div>
     </Modal>
   );

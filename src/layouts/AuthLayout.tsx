@@ -21,8 +21,9 @@ const AuthLayout: React.FC = () => {
       <main className="flex-1 overflow-auto">
         <div
           className={`
-          ${isAccountActivationPage ? "p-6" : ""} 
+          ${isAccountActivationPage ? "p-4 md:p-6" : ""} 
           ${isRoleSelectionPage ? "p-0" : ""}
+          max-w-screen-xl mx-auto
         `}
         >
           <Outlet />

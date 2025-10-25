@@ -7,7 +7,7 @@ import SubjectGrid from "../subject/SubjectGrid";
 import type { Document } from "../../../models/document";
 import type { Subject } from "../../../models/subject";
 import type { ViewMode, TabMode } from "../../../pages/user/search/SearchPage";
-import { fetchMultipleDocumentRatings } from "../../../utils/CalcRate";
+import { calculateDocumentRating } from "../../../utils/CalcRate";
 
 const { Option } = Select;
 
@@ -40,65 +40,57 @@ const SearchResults: React.FC<SearchResultsProps> = ({
   onViewModeChange,
   onSortChange,
 }) => {
-  const [documentRatings, setDocumentRatings] = React.useState<
-    Map<string, { ratingPercentage: number; formattedRating: string }>
-  >(new Map());
-
-  // Fetch ratings when documents change
-  React.useEffect(() => {
-    const fetchRatings = async () => {
-      if (documents && documents.length > 0) {
-        try {
-          const documentIds = documents.map((doc) => doc._id);
-          const ratingsMap = await fetchMultipleDocumentRatings(documentIds);
-          setDocumentRatings(ratingsMap);
-        } catch (error) {
-          console.error("Error fetching document ratings:", error);
-          setDocumentRatings(new Map());
-        }
-      } else {
-        setDocumentRatings(new Map());
-      }
-    };
-
-    fetchRatings();
-  }, [documents]);
-
   const handleSortChange = (value: string) => {
     const [ordering, orderStr] = value.split(":");
     const order = orderStr === "desc" ? -1 : 1;
     onSortChange(ordering, order);
   };
-  
 
   return (
     <div className="space-y-4">
       {/* Header Title - Top Left */}
-      <div className="text-left">
-        <h2 className="text-lg font-semibold text-gray-800 mb-1">
+      <div className="text-center md:text-left">
+        <h2 className="text-lg font-semibold text-gray-800 mb-1 text-center md:text-left">
           {currentTab === "subjects" ? "Danh sách môn học" : "Kết quả tìm kiếm"}
           {searchQuery && currentTab === "all" && (
             <span className="text-blue-600 ml-2">"{searchQuery}"</span>
           )}
         </h2>
-        <p className="text-sm text-gray-600">
-          {currentTab === "subjects"
-            ? `Hiển thị ${total.toLocaleString()} môn học`
-            : `Tìm thấy ${total.toLocaleString()} tài liệu`}
-        </p>
       </div>
 
       {/* Results Content */}
       {currentTab === "subjects" ? (
         /* Subject Grid Only */
-        <SubjectGrid
-          title=""
-          subjects={subjects}
-          onSubjectClick={(subject) => {
-            // Navigate to subject documents page
-            window.location.href = `/subject/${subject._id}/documents`;
-          }}
-        />
+        loading ? (
+          <div className="flex justify-center items-center py-12">
+            <Spin size="large" />
+          </div>
+        ) : subjects && subjects.length > 0 ? (
+          <SubjectGrid
+            title=""
+            subjects={subjects}
+            onSubjectClick={(subject: Subject) => {
+              // Navigate to subject documents page
+              window.location.href = `/subject/${subject._id}/documents`;
+            }}
+          />
+        ) : (
+          <Card>
+            <Empty
+              description={
+                <div className="text-center">
+                  <p className="text-gray-500 mb-2">
+                    Không tìm thấy môn học nào phù hợp
+                  </p>
+                  <p className="text-sm text-gray-400">
+                    Thử thay đổi từ khóa tìm kiếm
+                  </p>
+                </div>
+              }
+              className="py-12"
+            />
+          </Card>
+        )
       ) : (
         <>
           {/* Subject Grid for All tab */}
@@ -113,14 +105,14 @@ const SearchResults: React.FC<SearchResultsProps> = ({
           {/* Controls */}
           <div className="bg-white">
             <div className="flex flex-col sm:flex-row justify-start items-start sm:items-center gap-4">
-              <div className="flex items-center gap-3">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
                 {/* Sort Dropdown */}
                 <div className="flex items-center gap-2">
                   <span className="text-sm text-gray-600">Sắp xếp:</span>
                   <Select
                     placeholder="Chọn cách sắp xếp"
                     onChange={handleSortChange}
-                    className="w-40"
+                    className="w-full sm:w-40"
                     size="small"
                     defaultValue="createdAt:desc"
                   >
@@ -185,18 +177,9 @@ const SearchResults: React.FC<SearchResultsProps> = ({
             <>
               {/* Grid View */}
               {viewMode === "grid" && (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4 justify-items-center">
                   {documents.map((document) => (
-                    <DocumentCard
-                      key={document._id}
-                      title={document.title}
-                      description={`${document.page || 0} trang • ${
-                        document.view || 0
-                      } lượt xem • ${document.download_count || 0} lượt tải`}
-                      imageUrl={document.cover_page}
-                      document={document}
-                      // navigationPath={`/document-detail/${document._id}`}
-                    />
+                    <DocumentCard key={document._id} document={document} />
                   ))}
                 </div>
               )}
@@ -217,8 +200,10 @@ const SearchResults: React.FC<SearchResultsProps> = ({
                           title={document.title}
                           views={document.view}
                           rating={
-                            documentRatings.get(document._id)
-                              ?.ratingPercentage || 0
+                            calculateDocumentRating(
+                              document.like || 0,
+                              document.dislike || 0
+                            ).ratingPercentage
                           }
                           pages={document.page || 0}
                           date={new Date(document.createdAt).toLocaleDateString(

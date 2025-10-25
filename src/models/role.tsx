@@ -4,8 +4,9 @@ export interface Role {
   name: string;
   description?: string;
   permissions: Permission[];
-  createdAt: Date;
-  updatedAt: Date;
+  is_active: boolean;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export type RoleCode =
@@ -19,9 +20,9 @@ export type RoleCode =
 export type Permission =
   | "MANAGE_DOCUMENT"
   | "HANDLE_DOCUMENT_REPORT"
+  | "HANDLE_COMMENT_REPORT"
   | "MANAGE_USER"
   | "MANAGE_COMMENT"
-  | "HANDLE_COMMENT_REPORT"
   | "MANAGE_SERVER"
   | "MANAGE_ENTITY"
   | "MANAGE_ROLE"

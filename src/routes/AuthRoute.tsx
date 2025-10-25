@@ -1,6 +1,11 @@
-import React, { useEffect, useState } from "react";
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import React, { useEffect, useState, useRef } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { getCurrentUser, refreshToken } from "../utils/AuthService";
+import {
+  getCurrentUser,
+  refreshToken,
+  hasValidToken,
+} from "../utils/AuthService";
 import { UserProvider } from "../contexts/UserProvider";
 import type { User } from "../models/user";
 import { defaultUser } from "../models/user";
@@ -9,7 +14,13 @@ import type { RoleCode } from "../models/role";
 import { getIsAdminMode } from "../utils/CookieUtils";
 import { UserService } from "../utils/UserService";
 import type { Document } from "../models/document";
-import type { ReadHistoryItem } from "../contexts/UserContext";
+import type {
+  ReadHistoryItem,
+  SharedDocumentItem,
+} from "../contexts/UserContext";
+import { DocumentService } from "../utils/DocumentService";
+import { NotificationService } from "../utils/NotificationService";
+import type { Notification } from "../models/notification";
 
 const AuthRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const navigate = useNavigate();
@@ -19,57 +30,150 @@ const AuthRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [role, setRole] = useState<RoleCode | null>(null);
   const [account, setAccount] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [isInitialLoad, setIsInitialLoad] = useState(true);
   const [favoriteDocuments, setFavoriteDocuments] = useState<Document[]>([]);
   const [readHistory, setReadHistory] = useState<ReadHistoryItem[]>([]);
+  const [personalDocuments, setPersonalDocuments] = useState<Document[]>([]);
+  const [sharedDocuments, setSharedDocuments] = useState<SharedDocumentItem[]>(
+    []
+  );
+  const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [unreadCount, setUnreadCount] = useState(0);
+
+  // Ref để đảm bảo chỉ chạy authentication một lần
+  const hasInitialized = useRef(false);
+  const [dataFetched, setDataFetched] = useState(false);
+
+  // Function to fetch notifications - wrapped in useCallback to prevent infinite loops
+  const fetchNotifications = React.useCallback(async () => {
+    try {
+      console.log("🔄 Fetching notifications...");
+      const notificationRes = await NotificationService.getNotifications({
+        page: 1,
+        limit: 50,
+      });
+      setNotifications(notificationRes.notifications);
+
+      const unread = notificationRes.notifications.filter(
+        (notification) => !notification.isRead
+      ).length;
+      setUnreadCount(unread);
+      console.log(
+        "✅ Fetched notifications:",
+        notificationRes.notifications.length,
+        "items"
+      );
+    } catch (notifError) {
+      console.warn(
+        "⚠️ Failed to get notifications (non-critical):",
+        notifError
+      );
+    }
+  }, []);
+
+  const fetchUserDocuments = async () => {
+    try {
+      const response = await DocumentService.getMyDocuments({
+        page: 1,
+        limit: 100,
+      });
+      if (response && response.documents) {
+        return response.documents;
+      }
+      return [];
+    } catch (error) {
+      console.error("Error fetching user documents:", error);
+      return [];
+    }
+  };
 
   useEffect(() => {
+    // Ngăn chặn việc chạy nhiều lần do React StrictMode
+    if (hasInitialized.current) {
+      return;
+    }
+    hasInitialized.current = true;
+
     const checkAuth = async () => {
-      // Only show loading on initial load, not on route changes
-      if (isInitialLoad) {
-        setIsLoading(true);
-      }
+      setIsLoading(true);
       try {
-        console.log("🔄 Starting auth check...");
-
-        console.log("🔄 Step 1: Refreshing token...");
-        await refreshToken();
-        console.log("✅ Token refreshed successfully");
-
-        console.log("🔄 Step 2: Getting current user...");
-        const data = await getCurrentUser();
-        console.log("✅ Got current user data:", data);
-
-        // Try to get favorites, but don't fail if it errors
-        let favoriteDocuments: Document[] = [];
-        try {
-          console.log("🔄 Step 3: Getting favorite documents...");
-          const favoriteRes = await UserService.getListFavorites();
-          favoriteDocuments = favoriteRes?.documents || [];
-          console.log(
-            "✅ Got favorite documents:",
-            favoriteDocuments.length,
-            "items"
-          );
-        } catch (favError) {
-          console.warn(
-            "⚠️ Failed to get favorite documents (non-critical):",
-            favError
-          );
-          // Continue with empty favorites - this shouldn't block authentication
+        // Kiểm tra có token hợp lệ không trước khi refresh
+        const hasToken = await hasValidToken();
+        if (hasToken) {
+          try {
+            await refreshToken(); // Chỉ refresh nếu có token
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
+          } catch (refreshError) {
+            console.log("🔄 Token refresh failed, proceeding without refresh");
+            // Không throw error, tiếp tục với getCurrentUser()
+          }
         }
 
+        // Luôn gọi getCurrentUser() để kiểm tra trạng thái auth
+        const data = await getCurrentUser();
+        console.log("🔍 Current user data:", data);
         if (data) {
           setIsLoggedIn(true);
-          setUser(data.user); // Full user data
-          setRole(data.roles); // User role
-          setAccount(data.account); // Account data
-          setFavoriteDocuments(favoriteDocuments);
+          setUser(data.user);
+          setRole(data.roles);
+          setAccount(data.account);
 
-          // Extract read history from user data
-          const userReadHistory: ReadHistoryItem[] =
-            data.user?.read_history || [];
+          // Extract read history from user data and ensure type safety
+          const rawReadHistory = data.user?.read_history || [];
+          const userReadHistory: ReadHistoryItem[] = rawReadHistory.map(
+            (item: any) => ({
+              document:
+                item.document && typeof item.document === "object"
+                  ? (item.document as Document)
+                  : null,
+              read_at: item.read_at,
+              _id: item._id,
+            })
+          );
           setReadHistory(userReadHistory);
+          console.log("📚 User Read History:", userReadHistory.length, "items");
+
+          // Get shared documents from user data (populated with full document objects)
+          const rawSharedDocs = data.user?.shared_documents || [];
+          const userSharedDocs: SharedDocumentItem[] = rawSharedDocs.map(
+            (item: any) => ({
+              document:
+                typeof item.document === "string"
+                  ? null
+                  : (item.document as Document | null),
+              shared_at: item.shared_at,
+              _id: item._id || `shared_${item.shared_at}`,
+            })
+          );
+          setSharedDocuments(userSharedDocs);
+
+          // Fetch additional data only once
+          if (!dataFetched) {
+            const personalDocs = await fetchUserDocuments();
+            setPersonalDocuments(personalDocs);
+
+            // Try to get favorites, but don't fail if it errors
+            try {
+              console.log("🔄 Getting favorite documents...");
+              const favoriteRes = await UserService.getListFavorites();
+              const favoriteDocuments = favoriteRes?.documents || [];
+              console.log(
+                "✅ Got favorite documents:",
+                favoriteDocuments.length,
+                "items"
+              );
+              setFavoriteDocuments(favoriteDocuments);
+            } catch (favError) {
+              console.warn(
+                "⚠️ Failed to get favorite documents (non-critical):",
+                favError
+              );
+            }
+
+            // Fetch notifications
+            await fetchNotifications();
+
+            setDataFetched(true);
+          }
 
           // Debug user verification status
           console.log("🔍 Checking verification status:");
@@ -135,6 +239,10 @@ const AuthRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
           setRole(null);
           setFavoriteDocuments([]);
           setReadHistory([]);
+          setPersonalDocuments([]);
+          setSharedDocuments([]);
+          setNotifications([]);
+          setUnreadCount(0);
 
           // Allow access to public pages without redirecting
           const publicPages = ["/", "/document-detail", "/search"];
@@ -210,6 +318,8 @@ const AuthRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
         setAccount(null);
         setRole(null);
         setFavoriteDocuments([]);
+        setReadHistory([]);
+        setSharedDocuments([]);
 
         // Allow access to public pages even when auth fails
         const publicPages = ["/", "/document-detail", "/search"];
@@ -228,18 +338,16 @@ const AuthRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
           console.log("📄 Staying on public page despite auth failure");
         }
       } finally {
-        if (isInitialLoad) {
-          setIsLoading(false);
-          setIsInitialLoad(false);
-        }
+        setIsLoading(false);
       }
     };
 
     checkAuth();
-  }, [navigate, location.pathname, isInitialLoad]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Chỉ chạy một lần khi component mount
 
   // Show loading only during initial authentication check
-  if (isLoading && isInitialLoad) {
+  if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-lg">Đang tải...</div>
@@ -257,6 +365,15 @@ const AuthRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
       setFavoriteDocuments={setFavoriteDocuments}
       readHistory={readHistory}
       setReadHistory={setReadHistory}
+      personalDocuments={personalDocuments}
+      setPersonalDocuments={setPersonalDocuments}
+      sharedDocuments={sharedDocuments}
+      setSharedDocuments={setSharedDocuments}
+      notifications={notifications}
+      setNotifications={setNotifications}
+      unreadCount={unreadCount}
+      setUnreadCount={setUnreadCount}
+      refreshNotifications={fetchNotifications}
     >
       {children}
     </UserProvider>

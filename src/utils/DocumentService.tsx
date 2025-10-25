@@ -367,4 +367,32 @@ export const DocumentService = {
       throw error;
     }
   },
+  async getDocumentByUser(
+    userId: string,
+    params?: {
+      search?: string;
+      ordering?: string;
+      order?: 1 | -1;
+      page?: number;
+      limit?: number;
+      organization?: string;
+      publisher?: string;
+      published_year?: number;
+      intensive?: boolean;
+      author?: string;
+      keyword?: string;
+      doc_type?: string;
+      level?: string;
+      subject?: string;
+      status?: string;
+      public_mode?: string;
+    }
+  ) {
+    try {
+      return await DocumentAPI.getDocumentByUser(userId, params);
+    } catch (error) {
+      console.error("Error in DocumentService.getDocumentByUser:", error);
+      throw error;
+    }
+  },
 };

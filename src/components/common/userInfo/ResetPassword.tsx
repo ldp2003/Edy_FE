@@ -1,14 +1,17 @@
-import { useState } from "react";
+import { useState, useContext } from "react";
 import { Button, Input } from "antd";
 import type { MessageInstance } from "antd/es/message/interface";
 import { changePassword } from "../../../utils/UserService";
+import { UserContext } from "../../../contexts/UserContext";
+import OTPModal from "../OTPModal";
 
 interface ResetPasswordProps {
   messageApi: MessageInstance;
 }
 
 const ResetPassword: React.FC<ResetPasswordProps> = ({ messageApi }) => {
-  const [showOTP, setShowOTP] = useState(false);
+  const { user } = useContext(UserContext);
+  const [otpModalVisible, setOtpModalVisible] = useState(false);
   const [oldPassword, setOldPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -21,7 +24,7 @@ const ResetPassword: React.FC<ResetPasswordProps> = ({ messageApi }) => {
   // Check if passwords match
   const passwordsMatch = newPassword === confirmPassword;
 
-  const handleConfirm = async () => {
+  const handleOTPVerified = async () => {
     if (!passwordsMatch) {
       messageApi.error("Mật khẩu xác nhận không khớp!");
       return;
@@ -39,7 +42,7 @@ const ResetPassword: React.FC<ResetPasswordProps> = ({ messageApi }) => {
       setOldPassword("");
       setNewPassword("");
       setConfirmPassword("");
-      setShowOTP(false);
+      setOtpModalVisible(false);
 
       setTimeout(() => {
         window.location.reload();
@@ -62,16 +65,9 @@ const ResetPassword: React.FC<ResetPasswordProps> = ({ messageApi }) => {
     }
   };
 
-  const handleCancel = () => {
-    setOldPassword("");
-    setNewPassword("");
-    setConfirmPassword("");
-    setShowOTP(false);
-  };
-
   return (
     <div
-      className="rounded-lg text-left border border-gray-200 p-6 shadow"
+      className="rounded-lg text-center md:text-left border border-gray-200 p-6 shadow"
       style={{ backgroundColor: "var(--card-background-color)" }}
     >
       <div className="space-y-2">
@@ -110,67 +106,39 @@ const ResetPassword: React.FC<ResetPasswordProps> = ({ messageApi }) => {
             onChange={(e) => setConfirmPassword(e.target.value)}
           />
         </div>
-
-        {showOTP && (
-          <div>
-            <label htmlFor="otp" className="text-xs font-medium">
-              Xác thực OTP:
-            </label>
-            <Input id="otp" placeholder="Nhập mã OTP" />
-          </div>
-        )}
-
-        {showOTP && (
-          <div className="text-center text-xs text-red-500 mb-4">
-            OTP đã được gửi về Email, hết hạn sau 60s
-          </div>
-        )}
-
-        <div className="flex justify-end gap-3">
-          {showOTP && (
-            <Button
-              type="default"
-              size="small"
-              disabled={!isRequiredFieldsFilled}
-            >
-              <span className="text-xs">Gửi lại OTP</span>
-            </Button>
-          )}
-          {!showOTP && (
-            <Button
-              size="small"
-              disabled={!isRequiredFieldsFilled}
-              onClick={() => setShowOTP(true)}
-              style={{
-                backgroundColor: isRequiredFieldsFilled
-                  ? "var(--primary-color)"
-                  : undefined,
-                borderColor: isRequiredFieldsFilled
-                  ? "var(--primary-color)"
-                  : undefined,
-                color: isRequiredFieldsFilled ? "white" : undefined,
-              }}
-            >
-              <span className="text-xs">Lấy OTP</span>
-            </Button>
-          )}
-        </div>
       </div>
 
-      <div className="flex justify-end gap-3 mt-6">
-        <Button danger size="small" onClick={handleCancel} disabled={loading}>
-          <span className="text-xs">Hủy</span>
-        </Button>
+      <div className="flex justify-end mt-6">
         <Button
           type="primary"
           size="small"
           disabled={!isRequiredFieldsFilled || !passwordsMatch}
-          onClick={handleConfirm}
+          onClick={() => setOtpModalVisible(true)}
           loading={loading}
+          style={{
+            backgroundColor:
+              isRequiredFieldsFilled && passwordsMatch
+                ? "var(--primary-color)"
+                : undefined,
+            borderColor:
+              isRequiredFieldsFilled && passwordsMatch
+                ? "var(--primary-color)"
+                : undefined,
+            color:
+              isRequiredFieldsFilled && passwordsMatch ? "white" : undefined,
+          }}
         >
-          <span className="text-xs">Xác nhận</span>
+          <span className="text-xs">Lấy OTP</span>
         </Button>
       </div>
+
+      <OTPModal
+        visible={otpModalVisible}
+        onCancel={() => setOtpModalVisible(false)}
+        onSuccess={handleOTPVerified}
+        email={user?.contact_email || ""}
+        type="RESET_PASSWORD"
+      />
     </div>
   );
 };

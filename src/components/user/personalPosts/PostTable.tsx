@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { Table, Dropdown, Modal, message } from "antd";
 import type { ColumnsType } from "antd/es/table";
 import {
@@ -20,32 +20,14 @@ import {
   PublicMode,
   publicModeLabels,
   type PublicModeType,
+  type Document,
 } from "../../../models/document";
 import ShareModal from "../share/ShareModal";
 import { DocumentService } from "../../../utils/DocumentService";
-import { fetchMultipleDocumentRatings } from "../../../utils/CalcRate";
-
-interface Post {
-  key: string;
-  _id?: string; // Add _id for API calls
-  index: number;
-  title: string;
-  views: number;
-  comments: number;
-  download_count: number;
-  rating: string;
-  status: string;
-  mode: string;
-  public_mode: string;
-  url: string;
-  createdAt: string;
-  content_rejection?: {
-    message: string;
-  };
-}
+import { calculateDocumentRating } from "../../../utils/CalcRate";
 
 interface PostTableProps {
-  data: Post[];
+  data: Document[];
   loading?: boolean;
 }
 
@@ -60,33 +42,12 @@ const PostTable: React.FC<PostTableProps> = ({ data, loading }) => {
   const [shareModalVisible, setShareModalVisible] = useState(false);
   const [confirmModalVisible, setConfirmModalVisible] = useState(false);
   const [pendingMode, setPendingMode] = useState<PublicModeType | null>(null);
-  const [selectedPost, setSelectedPost] = useState<Post | null>(null);
-  const [updatedData, setUpdatedData] = useState<Post[]>(data);
-  const [postRatings, setPostRatings] = useState<
-    Map<string, { ratingPercentage: number; formattedRating: string }>
-  >(new Map());
+  const [selectedPost, setSelectedPost] = useState<Document | null>(null);
+  const [updatedData, setUpdatedData] = useState<Document[]>(data);
 
-  // Fetch ratings khi data thay đổi
-  useEffect(() => {
-    const fetchRatings = async () => {
-      if (data && data.length > 0) {
-        const documentIds = data.map((post) => post._id || post.key);
-        try {
-          const ratingsMap = await fetchMultipleDocumentRatings(documentIds);
-          setPostRatings(ratingsMap);
-        } catch (error) {
-          console.error("Error fetching post ratings:", error);
-          setPostRatings(new Map());
-        }
-      } else {
-        setPostRatings(new Map());
-      }
-    };
-
-    fetchRatings();
-  }, [data]);
-
+  console.log("PostTable data:", data);
   // Get icon for public mode
+
   const getPublicModeIcon = (mode: string) => {
     switch (mode) {
       case PublicMode.PUBLIC:
@@ -132,7 +93,7 @@ const PostTable: React.FC<PostTableProps> = ({ data, loading }) => {
 
   // Handle visibility change with confirmation
   const handleVisibilityChange = async (
-    post: Post,
+    post: Document,
     newMode: PublicModeType
   ) => {
     setSelectedPost(post);
@@ -153,16 +114,16 @@ const PostTable: React.FC<PostTableProps> = ({ data, loading }) => {
     if (!pendingMode || !selectedPost) return;
 
     setConfirmModalVisible(false);
-    setVisibilityLoading(selectedPost.key);
+    setVisibilityLoading(selectedPost._id);
 
     try {
-      // Use _id or key for API call
-      const documentId = selectedPost._id || selectedPost.key;
+      // Use _id for API call
+      const documentId = selectedPost._id;
       await DocumentService.updateDocumentPublicMode(documentId, pendingMode);
 
       // Update local data
       const newData = updatedData.map((item) =>
-        item.key === selectedPost.key
+        item._id === selectedPost._id
           ? { ...item, public_mode: pendingMode }
           : item
       );
@@ -188,7 +149,7 @@ const PostTable: React.FC<PostTableProps> = ({ data, loading }) => {
     setSelectedPost(null);
   };
 
-  const columns: ColumnsType<Post> = [
+  const columns: ColumnsType<Document> = [
     {
       title: "STT",
       dataIndex: "index",
@@ -196,6 +157,7 @@ const PostTable: React.FC<PostTableProps> = ({ data, loading }) => {
       align: "center",
       width: 60,
       fixed: true,
+      responsive: ["md"],
     },
     {
       title: "Tên tài liệu",
@@ -203,7 +165,9 @@ const PostTable: React.FC<PostTableProps> = ({ data, loading }) => {
       key: "title",
       width: 300,
       fixed: "left",
-      render: (text: string, record: Post) => {
+      sorter: (a, b) => a.title.localeCompare(b.title),
+      sortDirections: ["ascend", "descend"],
+      render: (text: string, record: Document) => {
         const isRejected = record.status === "REJECTED";
         const isRequestedEdit =
           record.status === "REQUESTED_EDIT" ||
@@ -218,7 +182,7 @@ const PostTable: React.FC<PostTableProps> = ({ data, loading }) => {
               isRejected
                 ? undefined
                 : () =>
-                    navigate(`/personal-posts/document-detail/${record.key}`)
+                    navigate(`/personal-posts/document-detail/${record._id}`)
             }
             className={isRejected ? "cursor-not-allowed" : "cursor-pointer"}
           >
@@ -253,6 +217,10 @@ const PostTable: React.FC<PostTableProps> = ({ data, loading }) => {
       key: "createdAt",
       align: "center",
       width: 120,
+      sorter: (a, b) =>
+        new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
+      sortDirections: ["ascend", "descend"],
+      responsive: ["sm"],
       render: (dateString: string) => {
         const date = new Date(dateString);
         return date.toLocaleDateString("vi-VN", {
@@ -268,6 +236,7 @@ const PostTable: React.FC<PostTableProps> = ({ data, loading }) => {
       key: "status",
       align: "center",
       width: 120,
+      responsive: ["md"],
       render: (status: string) => createStatusTag(status),
     },
     {
@@ -276,22 +245,29 @@ const PostTable: React.FC<PostTableProps> = ({ data, loading }) => {
       key: "public_mode",
       align: "center",
       width: 120,
+      responsive: ["md"],
       render: (mode: string) => createPublicModeTag(mode),
     },
 
     {
       title: "Lượt xem",
-      dataIndex: "views",
-      key: "views",
+      dataIndex: "view",
+      key: "view",
       align: "center",
       width: 100,
+      sorter: (a, b) => (a.view || 0) - (b.view || 0),
+      sortDirections: ["ascend", "descend"],
+      responsive: ["sm"],
     },
     {
       title: "Bình luận",
-      dataIndex: "comments",
-      key: "comments",
+      dataIndex: "comment_count",
+      key: "comment_count",
       align: "center",
       width: 100,
+      sorter: (a, b) => (a.comment_count || 0) - (b.comment_count || 0),
+      sortDirections: ["ascend", "descend"],
+      responsive: ["sm"],
     },
     {
       title: "Lượt tải",
@@ -299,13 +275,17 @@ const PostTable: React.FC<PostTableProps> = ({ data, loading }) => {
       key: "download_count",
       align: "center",
       width: 100,
+      sorter: (a, b) => (a.download_count || 0) - (b.download_count || 0),
+      sortDirections: ["ascend", "descend"],
+      responsive: ["sm"],
     },
     {
       title: "Loại file",
-      dataIndex: "mode",
-      key: "mode",
+      dataIndex: "file_type",
+      key: "file_type",
       align: "center",
       width: 100,
+      responsive: ["lg"],
       render: (fileType: string) => createFileTypeTag(fileType),
     },
     {
@@ -314,14 +294,24 @@ const PostTable: React.FC<PostTableProps> = ({ data, loading }) => {
       key: "rating",
       align: "center",
       width: 100,
-      render: (_, record: Post) => {
-        const documentId = record._id || record.key;
-        const rating = postRatings.get(documentId);
-
-        if (!rating) {
-          return <span className="text-gray-400">-</span>;
-        }
-
+      sorter: (a, b) => {
+        const ratingA = calculateDocumentRating(
+          a.like || 0,
+          a.dislike || 0
+        ).ratingPercentage;
+        const ratingB = calculateDocumentRating(
+          b.like || 0,
+          b.dislike || 0
+        ).ratingPercentage;
+        return ratingA - ratingB;
+      },
+      sortDirections: ["ascend", "descend"],
+      responsive: ["md"],
+      render: (_, record: Document) => {
+        const rating = calculateDocumentRating(
+          record.like || 0,
+          record.dislike || 0
+        );
         const percentage = rating.ratingPercentage;
         let colorClass = "text-gray-600";
 
@@ -350,21 +340,21 @@ const PostTable: React.FC<PostTableProps> = ({ data, loading }) => {
       fixed: "right",
       render: (_, record) => {
         const isRejected = record.status === "REJECTED";
-        const isLoading = visibilityLoading === record.key;
+        const isLoading = visibilityLoading === record._id;
 
         // Create dropdown items for visibility change
-        const dropdownItems = getAvailableOptions(record.public_mode).map(
-          (option) => ({
-            key: option.mode,
-            label: (
-              <div className="flex items-center gap-2">
-                {getPublicModeIcon(option.mode)}
-                <span>{option.label}</span>
-              </div>
-            ),
-            onClick: () => handleVisibilityChange(record, option.mode),
-          })
-        );
+        const dropdownItems = getAvailableOptions(
+          record.public_mode || "PRIVATE"
+        ).map((option) => ({
+          key: option.mode,
+          label: (
+            <div className="flex items-center gap-2">
+              {getPublicModeIcon(option.mode)}
+              <span>{option.label}</span>
+            </div>
+          ),
+          onClick: () => handleVisibilityChange(record, option.mode),
+        }));
 
         return (
           <div className="flex gap-1 justify-center">
@@ -378,7 +368,7 @@ const PostTable: React.FC<PostTableProps> = ({ data, loading }) => {
               onClick={
                 isRejected
                   ? undefined
-                  : () => navigate(`/personal-posts/edit/${record.key}`)
+                  : () => navigate(`/personal-posts/edit/${record._id}`)
               }
               title={
                 isRejected
@@ -414,7 +404,7 @@ const PostTable: React.FC<PostTableProps> = ({ data, loading }) => {
                 {isLoading ? (
                   <Settings size={13} className="animate-spin" />
                 ) : (
-                  getPublicModeIcon(record.public_mode)
+                  getPublicModeIcon(record.public_mode || "PRIVATE")
                 )}
               </button>
             </Dropdown>
@@ -456,17 +446,20 @@ const PostTable: React.FC<PostTableProps> = ({ data, loading }) => {
   return (
     <>
       {contextHolder}
-      <div className="rounded-md overflow-hidden w-full border border-[rgba(0,0,0,0.2)]">
-        <Table
-          columns={columns}
-          dataSource={displayData}
-          loading={loading}
-          pagination={false}
-          size="small"
-          scroll={{ x: 1200, y: 600 }}
-          bordered
-          sticky={{ offsetHeader: 0 }}
-        />
+      <div className="w-full">
+        {/* Desktop Table View - Hidden on mobile */}
+        <div className="hidden md:block rounded-md overflow-hidden border border-[rgba(0,0,0,0.2)]">
+          <Table
+            columns={columns}
+            dataSource={displayData}
+            loading={loading}
+            pagination={false}
+            size="small"
+            scroll={{ x: 1200, y: 600 }}
+            bordered
+            sticky={{ offsetHeader: 0 }}
+          />
+        </div>
       </div>
 
       {/* Confirmation Modal */}
@@ -506,7 +499,7 @@ const PostTable: React.FC<PostTableProps> = ({ data, loading }) => {
             setShareModalVisible(false);
             setSelectedPost(null);
           }}
-          documentId={selectedPost._id || selectedPost.key}
+          documentId={selectedPost._id}
           documentTitle={selectedPost.title}
           isPublic={selectedPost.public_mode === PublicMode.PUBLIC}
           isSharedWithOrganization={

@@ -1,25 +1,22 @@
 import { Badge } from "antd";
 import { Search, Shield, User } from "lucide-react";
 import { Dropdown } from "antd";
-import logo from "/public/image/Logo.png";
+import logo from "/image/Logo.png";
 import AvatarDropdown from "../dropdown/AvatarDropdown";
 import UploadHeaderButton from "../buttons/UploadHeaderButton";
-import { useContext, useEffect, useState } from "react";
+import { useContext } from "react";
 import UserDropdown from "../dropdown/UserDropdown";
 import AdminDropdown from "../dropdown/AdminDropdown";
 import { UserContext } from "../../../contexts/UserContext";
 import NotificationDropdown from "../Notification/NotificationDropdown";
 
-export function Header() {
-  const {
-    isLoggedIn,
-    user,
-    account,
-    notifications,
-    unreadCount,
-    refreshNotifications,
-  } = useContext(UserContext);
-  const [loading, setLoading] = useState(false);
+interface HeaderProps {
+  onMenuToggle?: () => void;
+}
+
+export function Header({ onMenuToggle }: HeaderProps) {
+  const { isLoggedIn, user, account, notifications, unreadCount } =
+    useContext(UserContext);
 
   // Detect if we're on admin page
   const isOnAdminPage = window.location.pathname.startsWith("/admin");
@@ -63,33 +60,48 @@ export function Header() {
     }
   };
 
-  useEffect(() => {
-    if (isLoggedIn) {
-      setLoading(true);
-      refreshNotifications();
-      setLoading(false);
-    }
-  }, [isLoggedIn, refreshNotifications]);
+  // Remove unnecessary notification fetching - handled by AuthRoute
 
   return (
-    <header className="bg-white border-b border-gray-200 px-6 py-2 w-full flex-shrink-0 shadow-sm text-sm">
+    <header className="bg-white border-b border-gray-200 px-4 lg:w-screen md:px-6 py-2 w-full flex-shrink-0 shadow-lg text-sm">
       <div className="flex items-center justify-between">
+        {/* Menu Toggle Button - Only visible on mobile */}
+        <button
+          className="md:hidden p-2 hover:bg-gray-100 rounded-lg"
+          onClick={onMenuToggle}
+        >
+          <svg
+            className="w-6 h-6"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M4 6h16M4 12h16M4 18h16"
+            />
+          </svg>
+        </button>
+
         {/* Logo */}
         <div
-          className="flex items-center gap-2 cursor-pointer"
+          className="flex items-center gap-2 cursor-pointer mx-auto md:mx-0"
           onClick={() => (window.location.href = "/")}
         >
-          <div className="w-10 h-10 rounded flex items-center justify-center">
+          <div className="w-8 md:w-10 h-8 md:h-10 rounded flex items-center justify-center">
             <img src={logo} alt="Logo" />
           </div>
-          <span className="text-[29px] font-bold bg-gradient-to-b from-[#50C4FE] to-[#3586DB] bg-clip-text text-transparent">
+          <span className="text-[24px] md:text-[29px] font-bold bg-gradient-to-b from-[#50C4FE] to-[#3586DB] bg-clip-text text-transparent">
             EDY
           </span>
         </div>
 
-        {/* Search Bar */}
-        <div className="flex-1 max-w-2xl mx-8">
-          <div className="relative">
+        {/* Search Bar - Hidden on mobile */}
+        <div className="hidden md:flex flex-1 max-w-2xl mx-8">
+          <div className="relative w-full">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
             <input
               id="search-input"
@@ -111,16 +123,18 @@ export function Header() {
         </div>
 
         {/* User Info */}
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-2 md:gap-4">
           {isLoggedIn ? (
             <>
-              <UploadHeaderButton></UploadHeaderButton>
+              <div className="hidden md:block">
+                <UploadHeaderButton></UploadHeaderButton>
+              </div>
 
               {/* Admin/User Mode Toggle Button - Only show for admins */}
               {account?.is_admin && (
                 <button
                   onClick={handleModeToggle}
-                  className={`flex items-center gap-2 px-3 py-2 rounded-full text-xs font-medium cursor-pointer transition-colors ${
+                  className={`hidden md:flex items-center gap-2 px-3 py-2 rounded-full text-xs font-medium cursor-pointer transition-colors ${
                     isOnAdminPage
                       ? "bg-[var(--secondary-background-color)] text-[var(--primary-color)] hover:bg-blue-200"
                       : "bg-red-100 text-red-700 hover:bg-red-200"
@@ -152,16 +166,22 @@ export function Header() {
                 offset={[-4, 8]}
                 size="small"
               >
-                <NotificationDropdown
-                  notifications={notifications}
-                  loading={loading}
-                />
+                <NotificationDropdown notifications={notifications} />
               </Badge>
 
               <Dropdown
-                overlay={
-                  account?.is_admin ? <AdminDropdown /> : <UserDropdown />
-                }
+                menu={{
+                  items: [
+                    {
+                      key: "user-menu",
+                      label: account?.is_admin ? (
+                        <AdminDropdown />
+                      ) : (
+                        <UserDropdown />
+                      ),
+                    },
+                  ],
+                }}
               >
                 <div className="flex items-center gap-2 cursor-pointer">
                   <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden">
@@ -184,7 +204,7 @@ export function Header() {
                       NA
                     </span>
                   </div>
-                  <div className="flex flex-col items-start">
+                  <div className="hidden md:flex flex-col items-start">
                     <span
                       className="text-sm font-medium"
                       style={{ color: "var(--primary-color)" }}
@@ -208,7 +228,16 @@ export function Header() {
               </Dropdown>
             </>
           ) : (
-            <Dropdown overlay={<AvatarDropdown />}>
+            <Dropdown
+              menu={{
+                items: [
+                  {
+                    key: "avatar-menu",
+                    label: <AvatarDropdown />,
+                  },
+                ],
+              }}
+            >
               <button
                 className="text-sm bg-[var(--primary-color)] hover:bg-white cursor-pointer hover:border-[var(--primary-color)] hover:border-1 hover:text-[var(--primary-color)] text-white px-4 py-2 rounded-md"
                 onClick={() => {

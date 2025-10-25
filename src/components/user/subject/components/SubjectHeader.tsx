@@ -19,7 +19,7 @@ const SubjectHeader: React.FC<SubjectHeaderProps> = ({
         </div>
 
         <div className="flex-1">
-          <h1 className="text-xl font-bold text-[var(--primary-text-color)] mb-2">
+          <h1 className="text-xl font-bold text-[var(--primary-text-color)] mb-2 text-center md:text-left">
             {subject.name}
           </h1>
 

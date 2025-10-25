@@ -14,7 +14,11 @@ const apiClient = axios.create({
 export const AuthAPI = {
   login: async (email: string, password: string) => {
     try {
-      const response = await apiClient.post("/auth/login", { email, password });
+      const response = await apiClient.post(
+        "/auth/login",
+        { email, password },
+        { withCredentials: true }
+      );
       return response.data;
     } catch (error) {
       console.error("Error logging in:", error);
@@ -52,7 +56,11 @@ export const AuthAPI = {
   },
   refreshToken: async () => {
     try {
-      const response = await apiClient.post("/auth/refresh-token");
+      const response = await apiClient.post(
+        "/auth/refresh-token",
+        {},
+        { withCredentials: true }
+      );
       return response.data;
     } catch (error) {
       console.error("Error refreshing token:", error);
@@ -60,11 +68,54 @@ export const AuthAPI = {
     }
   },
   getCurrentUser: async () => {
+    return apiClient
+      .get("/auth/me", { withCredentials: true })
+      .then((response) => response.data);
+  },
+  createOTP: async (
+    email: string,
+    type: "REGISTER" | "RESET_PASSWORD" | "VERIFY_EMAIL" = "REGISTER"
+  ) => {
     try {
-      const response = await apiClient.get("/auth/me");
+      const response = await apiClient.post("/auth/create-otp", {
+        email,
+        type,
+      });
       return response.data;
     } catch (error) {
-      console.error("Error fetching current user:", error);
+      console.error("Error creating OTP:", error);
+      throw error;
+    }
+  },
+  verifyOTP: async (
+    email: string,
+    otp: string,
+    type: "REGISTER" | "RESET_PASSWORD" | "VERIFY_EMAIL" = "REGISTER"
+  ) => {
+    try {
+      const response = await apiClient.post("/auth/verify-otp", {
+        email,
+        otp,
+        type,
+      });
+      return response.data;
+    } catch (error) {
+      console.error("Error verifying OTP:", error);
+      throw error;
+    }
+  },
+  registerWithOTP: async (data: {
+    first_name: string;
+    last_name: string;
+    email: string;
+    password: string;
+    otp: string;
+  }) => {
+    try {
+      const response = await apiClient.post("/auth/register-with-otp", data);
+      return response.data;
+    } catch (error) {
+      console.error("Error registering with OTP:", error);
       throw error;
     }
   },
@@ -232,6 +283,15 @@ export const UserAPI = {
       console.error("Error removing document from favorites:", error);
       throw error;
     }
+  },
+  followUser: async (userId: string) => {
+    return await apiClient.post(`/users/${userId}/follow`);
+  },
+  unfollowUser: async (userId: string) => {
+    return await apiClient.post(`/users/${userId}/unfollow`);
+  },
+  getPermissionByUserId: async (userId: string) => {
+    return await apiClient.get(`/users/${userId}/roles`);
   },
 };
 
@@ -744,6 +804,29 @@ export const DocumentAPI = {
       throw error;
     }
   },
+  getDocumentByUser: async (
+    userId: string,
+    params?: {
+      search?: string;
+      ordering?: string;
+      order?: 1 | -1;
+      page?: number;
+      limit?: number;
+      organization?: string;
+      publisher?: string;
+      published_year?: number;
+      intensive?: boolean;
+      author?: string;
+      keyword?: string;
+      doc_type?: string;
+      level?: string;
+      subject?: string;
+      status?: string;
+      public_mode?: string;
+    }
+  ) => {
+    return await apiClient.get(`/documents/user/${userId}`, { params });
+  },
 };
 export const AccessRequestAPI = {
   // Create access request for private share
@@ -1107,9 +1190,11 @@ export const NotificationAPI = {
 
 export const RoleAPI = {
   // Get all roles
-  getAllRoles: async () => {
+  getAllRoles: async (active: boolean) => {
     try {
-      const response = await apiClient.get("/admin/roles");
+      const response = await apiClient.get("/admin/roles", {
+        params: { active },
+      });
       return response.data;
     } catch (error) {
       console.error("Error fetching roles:", error);
@@ -1229,5 +1314,19 @@ export const AssignmentAPI = {
       console.error("Error updating assignment:", error);
       throw error;
     }
+  },
+};
+
+export const PointTransactionAPI = {
+  getTransactionHistory: async (
+    userId: string,
+    params?: {
+      page?: number;
+      limit?: number;
+    }
+  ) => {
+    return await apiClient.get(`/point-transactions/${userId}/history`, {
+      params,
+    });
   },
 };

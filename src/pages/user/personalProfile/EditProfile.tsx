@@ -28,10 +28,12 @@ const EditProfile: React.FC = () => {
   }, []);
 
   return (
-    <div className="p-4 text-left">
+    <div className="p-4 text-center md:text-left">
       {contextHolder}
       <div className="bg-white p-6 rounded-lg border border-[var(--border-color)]">
-        <h2 className="font-bold text-sm mb-6">Cập nhật thông tin cá nhân</h2>
+        <h2 className="font-bold text-xs md:text-sm mb-6">
+          Cập nhật thông tin cá nhân
+        </h2>
         <UserProfileHeader
           firstName={user?.first_name || "Chưa đặt tên"}
           lastName={user?.last_name || "Chưa đặt tên"}
@@ -42,13 +44,13 @@ const EditProfile: React.FC = () => {
           avatar={user?.avatar || ""}
         />
       </div>
-      <div className="mt-8 flex flex-row bg-white p-6 rounded-lg border border-[var(--border-color)]">
-        <div className="w-1/2 pr-2 flex flex-col gap-4">
-          <div className="font-bold text-sm">Cập nhật mật khẩu</div>
+      <div className="mt-8 flex flex-col md:flex-row bg-white p-6 rounded-lg border border-[var(--border-color)]">
+        <div className="w-full md:w-1/2 md:pr-2 flex flex-col gap-4">
+          <div className="font-bold text-xs md:text-sm">Cập nhật mật khẩu</div>
           <ResetPassword messageApi={messageApi} />
         </div>
-        <div className="w-1/2 pl-2 flex flex-col gap-4">
-          <div className="font-bold text-sm">Phạm vi tìm kiếm</div>
+        <div className="w-full md:w-1/2 md:pl-2 flex flex-col gap-4">
+          <div className="font-bold text-xs md:text-sm">Phạm vi tìm kiếm</div>
 
           <StudyList fieldOfStudy={user?.field_of_study || []} />
         </div>

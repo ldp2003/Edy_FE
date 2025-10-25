@@ -129,7 +129,7 @@ const CommentReportModal: React.FC<CommentReportModalProps> = ({
         footer={null}
         width={600}
         destroyOnClose={true}
-        bodyStyle={{ padding: 16 }}
+        styles={{ body: { padding: 16 } }}
       >
         {/* Comment Info */}
         <div className="mb-3 px-3 py-2 bg-gray-50 rounded border">

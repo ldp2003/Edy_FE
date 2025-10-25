@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useState, useEffect } from "react";
 import {
   Table,
@@ -7,6 +8,7 @@ import {
   message,
   Popconfirm,
   Tooltip,
+  Tag,
 } from "antd";
 import { useNavigate } from "react-router-dom";
 import type { ColumnsType } from "antd/es/table";
@@ -15,14 +17,18 @@ import {
   Printer,
   Search,
   Filter,
-  Eye,
   Lock,
   Unlock,
   Edit,
+  List,
+  Grid3X3,
 } from "lucide-react";
 import type { User } from "../../../models/user";
 import { UserService } from "../../../utils/UserService";
 import { getRoleDisplayName } from "../../../constants/RoleConstants";
+import { OrganizationService } from "../../../utils/OrganizationService";
+import UserFilterModal from "./UserFilterModal";
+import UserItem from "./UserItem";
 
 const { Option } = Select;
 
@@ -40,28 +46,98 @@ const AdminUserTable: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [totalUsers, setTotalUsers] = useState(0);
   const [searchText, setSearchText] = useState("");
+  const [filters, setFilters] = useState<any>({});
+  const [isFilterPanelVisible, setIsFilterPanelVisible] = useState(false);
+  const [viewMode, setViewMode] = useState<"table" | "list">("table");
+  const [organizations, setOrganizations] = useState<
+    Array<{ _id: string; name: string }>
+  >([]);
 
-  // Fetch users from API
+  // Auto-switch view mode based on screen size
   useEffect(() => {
-    const fetchUsers = async () => {
-      setLoading(true);
-      try {
-        const response = await UserService.getAllUsers();
-
-        setUsers(response || []);
-        setTotalUsers(response.total || 0);
-      } catch (error) {
-        console.error("Error fetching users:", error);
-        message.error("Không thể tải danh sách người dùng!");
-        setUsers([]);
-        setTotalUsers(0);
-      } finally {
-        setLoading(false);
-      }
+    const updateViewMode = () => {
+      const isMobile = window.innerWidth < 768; // md breakpoint
+      setViewMode(isMobile ? "list" : "table");
     };
 
+    // Set initial view mode
+    updateViewMode();
+
+    // Add resize listener
+    window.addEventListener("resize", updateViewMode);
+
+    // Cleanup
+    return () => window.removeEventListener("resize", updateViewMode);
+  }, []);
+
+  // Fetch users from API
+  const fetchUsers = async (
+    search?: string,
+    appliedFilters?: { status?: string; organization?: string }
+  ) => {
+    setLoading(true);
+    try {
+      // For now, just fetch all users. In real implementation, pass search and filters to API
+      const response = await UserService.getAllUsers();
+      let filteredUsers: User[] = response || [];
+
+      // Apply client-side filtering if needed
+      if (search) {
+        filteredUsers = filteredUsers.filter(
+          (user: User) =>
+            user.first_name.toLowerCase().includes(search.toLowerCase()) ||
+            user.last_name.toLowerCase().includes(search.toLowerCase()) ||
+            user.contact_email.toLowerCase().includes(search.toLowerCase())
+        );
+      }
+
+      if (appliedFilters?.status) {
+        filteredUsers = filteredUsers.filter(
+          (user: User) => user.status === appliedFilters.status
+        );
+      }
+
+      if (appliedFilters?.organization) {
+        filteredUsers = filteredUsers.filter(
+          (user: User) =>
+            typeof user.organization === "object" &&
+            user.organization?._id === appliedFilters.organization
+        );
+      }
+
+      setUsers(filteredUsers);
+      setTotalUsers(filteredUsers.length);
+    } catch (error) {
+      console.error("Error fetching users:", error);
+      message.error("Không thể tải danh sách người dùng!");
+      setUsers([]);
+      setTotalUsers(0);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
     fetchUsers();
-  }, [currentPage, pageSize, searchText]);
+  }, []);
+
+  // Fetch organizations for filter display
+  useEffect(() => {
+    const fetchOrganizations = async () => {
+      try {
+        const orgResponse = await OrganizationService.getOrganizations();
+        setOrganizations(
+          (orgResponse || []).map((org) => ({
+            _id: org._id || "",
+            name: org.name,
+          }))
+        );
+      } catch (error) {
+        console.error("Error fetching organizations:", error);
+      }
+    };
+    fetchOrganizations();
+  }, []);
 
   const handleViewUser = (userId: string) => {
     navigate(`/admin/users/detail/${userId}`);
@@ -111,6 +187,10 @@ const AdminUserTable: React.FC = () => {
       key: "fullName",
       width: 200,
       fixed: "left",
+      sorter: (a: UserDisplay, b: UserDisplay) =>
+        `${a.first_name} ${a.last_name}`.localeCompare(
+          `${b.first_name} ${b.last_name}`
+        ),
       render: (_, record: UserDisplay) => (
         <div className="flex items-center space-x-2">
           <div className="w-6 h-6 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden flex-shrink-0">
@@ -157,34 +237,35 @@ const AdminUserTable: React.FC = () => {
     {
       title: "Vai trò",
       key: "role_names",
-      width: 100,
-      ellipsis: true,
+      width: 150,
       render: (_, record: UserDisplay) => {
-        const getRoleDisplay = (roleNames: string[]) => {
-          if (!roleNames || roleNames.length === 0) {
-            return "Người dùng";
-          }
+        const roles = record.role_names || [];
+        if (roles.length === 0) {
+          return <Tag>Người dùng</Tag>;
+        }
 
-          const translatedRoles = roleNames.map((role) =>
-            getRoleDisplayName(role)
-          );
-
-          return translatedRoles.join(", ");
-        };
-
-        const roleText = getRoleDisplay(record.role_names || []);
-        const isAdmin = record.role_names && record.role_names.length > 0;
+        // Chia roles thành các nhóm của 2
+        const roleGroups = [];
+        for (let i = 0; i < roles.length; i += 2) {
+          roleGroups.push(roles.slice(i, i + 2));
+        }
 
         return (
-          <Tooltip title={roleText}>
-            <span
-              className={`text-xs ${
-                isAdmin ? "text-blue-600" : "text-gray-600"
-              }`}
-            >
-              {roleText}
-            </span>
-          </Tooltip>
+          <div className="flex flex-col gap-1">
+            {roleGroups.map((group, groupIndex) => (
+              <div key={groupIndex} className="flex gap-1">
+                {group.map((role, index) => (
+                  <Tag
+                    key={`${groupIndex}-${index}`}
+                    color="blue"
+                    className="text-xs"
+                  >
+                    {getRoleDisplayName(role)}
+                  </Tag>
+                ))}
+              </div>
+            ))}
+          </div>
         );
       },
     },
@@ -213,11 +294,13 @@ const AdminUserTable: React.FC = () => {
       },
     },
     {
-      title: "Follower",
+      title: "Người theo dõi",
       dataIndex: "follower",
       key: "follower",
       align: "center",
       width: 70,
+      sorter: (a: UserDisplay, b: UserDisplay) =>
+        (a.follower?.length || 0) - (b.follower?.length || 0),
       render: (follower: string[]) => (
         <span className="text-xs text-black">
           {follower ? follower.length : 0}
@@ -225,11 +308,13 @@ const AdminUserTable: React.FC = () => {
       ),
     },
     {
-      title: "Following",
+      title: "Đang theo dõi",
       dataIndex: "following",
       key: "following",
       align: "center",
       width: 70,
+      sorter: (a: UserDisplay, b: UserDisplay) =>
+        (a.following?.length || 0) - (b.following?.length || 0),
       render: (following: string[]) => (
         <span className="text-xs text-black">
           {following ? following.length : 0}
@@ -242,6 +327,8 @@ const AdminUserTable: React.FC = () => {
       key: "doc_count",
       align: "center",
       width: 70,
+      sorter: (a: UserDisplay, b: UserDisplay) =>
+        (a.doc_count || 0) - (b.doc_count || 0),
       render: (count: number) => (
         <span className="text-xs text-black">{count || 0}</span>
       ),
@@ -252,26 +339,32 @@ const AdminUserTable: React.FC = () => {
       key: "point",
       align: "center",
       width: 60,
+      sorter: (a: UserDisplay, b: UserDisplay) =>
+        (a.point || 0) - (b.point || 0),
       render: (point: number) => (
         <span className="text-xs text-black">{point || 0}</span>
       ),
     },
     {
-      title: "Rank",
+      title: "Xếp hạng",
       dataIndex: "rank_point",
       key: "rank_point",
       align: "center",
       width: 60,
+      sorter: (a: UserDisplay, b: UserDisplay) =>
+        (a.rank_point || 0) - (b.rank_point || 0),
       render: (rankPoint: number) => (
         <span className="text-xs text-black">{rankPoint || 0}</span>
       ),
     },
     {
-      title: "Strike",
+      title: "Cảnh cáo",
       dataIndex: "strike",
       key: "strike",
       align: "center",
       width: 60,
+      sorter: (a: UserDisplay, b: UserDisplay) =>
+        (a.strike || 0) - (b.strike || 0),
       render: (strike: number) => (
         <span
           className={`text-xs ${strike > 0 ? "text-red-600" : "text-black"}`}
@@ -285,6 +378,9 @@ const AdminUserTable: React.FC = () => {
       dataIndex: "createdAt",
       key: "createdAt",
       width: 80,
+      sorter: (a: UserDisplay, b: UserDisplay) =>
+        new Date(a.createdAt || 0).getTime() -
+        new Date(b.createdAt || 0).getTime(),
       render: (date: string) => {
         if (!date) return <span className="text-xs text-gray-400">N/A</span>;
         const formattedDate = new Date(date).toLocaleDateString("vi-VN", {
@@ -347,18 +443,6 @@ const AdminUserTable: React.FC = () => {
       fixed: "right",
       render: (_, record: UserDisplay) => (
         <div className="flex justify-center space-x-0.5">
-          <Tooltip title="Xem chi tiết">
-            <Button
-              type="text"
-              icon={<Eye size={12} />}
-              size="small"
-              onClick={(e) => {
-                e.stopPropagation();
-                handleViewUser(record._id);
-              }}
-            />
-          </Tooltip>
-
           <Tooltip title="Chỉnh sửa">
             <Button
               type="text"
@@ -443,9 +527,24 @@ const AdminUserTable: React.FC = () => {
     }
   };
 
-  const handleSearch = (value: string) => {
-    setSearchText(value);
-    setCurrentPage(1);
+  const handleSearch = () => {
+    fetchUsers(searchText, filters);
+  };
+
+  const handleApplyFilters = (newFilters: {
+    status?: string;
+    organization?: string;
+  }) => {
+    setFilters(newFilters);
+    fetchUsers(searchText, newFilters);
+  };
+
+  const handleToggleFilterPanel = () => {
+    setIsFilterPanelVisible(!isFilterPanelVisible);
+  };
+
+  const handleCloseFilterPanel = () => {
+    setIsFilterPanelVisible(false);
   };
 
   const rowSelection = {
@@ -456,17 +555,13 @@ const AdminUserTable: React.FC = () => {
   };
 
   return (
-    <div className="w-full max-w-full overflow-hidden">
-      <div className="space-y-6">
+    <div className="w-full max-w-full overflow-hidden relative">
+      <div className="space-y-4 md:space-y-6">
         {/* Filter and Search Section */}
-        <div className="border border-gray-200 rounded-lg p-4 bg-white shadow-sm">
+        <div className="border border-gray-200 rounded-lg p-3 md:p-4 bg-white shadow-sm">
           {/* Header Controls */}
-          <div className="flex justify-between items-center mb-4">
-            <div className="flex items-center space-x-2">
-              <Select defaultValue="2025" size="small" style={{ width: 80 }}>
-                <Option value="2025">2025</Option>
-                <Option value="2024">2024</Option>
-              </Select>
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
+            <div className="hidden md:flex items-center space-x-2">
               <Button icon={<Download size={14} />} size="small">
                 Download
               </Button>
@@ -475,12 +570,34 @@ const AdminUserTable: React.FC = () => {
               </Button>
             </div>
 
-            <div className="flex items-center space-x-2">
+            <div className="flex items-center space-x-2 w-full sm:w-auto">
+              {/* View Mode Toggle - Hidden on mobile, auto-switches */}
+              <div className="hidden md:flex items-center border border-gray-300 rounded-md">
+                <button
+                  className={`flex items-center px-2 py-1 text-xs ${
+                    viewMode === "table"
+                      ? "bg-blue-500 text-white"
+                      : "text-gray-600 hover:bg-gray-100"
+                  }`}
+                  onClick={() => setViewMode("table")}
+                >
+                  <Grid3X3 size={14} />
+                </button>
+                <button
+                  className={`flex items-center px-2 py-1 text-xs ${
+                    viewMode === "list"
+                      ? "bg-blue-500 text-white"
+                      : "text-gray-600 hover:bg-gray-100"
+                  }`}
+                  onClick={() => setViewMode("list")}
+                >
+                  <List size={14} />
+                </button>
+              </div>
+
               <button
                 className="flex items-center text-xs gap-1 border border-gray-300 rounded-md px-2 py-1 hover:bg-gray-100 cursor-pointer"
-                onClick={() =>
-                  message.info("Tính năng bộ lọc đang được phát triển")
-                }
+                onClick={handleToggleFilterPanel}
               >
                 <Filter size={14} />
                 Bộ lọc
@@ -497,65 +614,192 @@ const AdminUserTable: React.FC = () => {
                 className="pl-10"
                 size="small"
                 value={searchText}
-                onChange={(e) => handleSearch(e.target.value)}
+                onChange={(e) => setSearchText(e.target.value)}
               />
             </div>
+            <Button type="primary" size="small" onClick={handleSearch}>
+              Tìm kiếm
+            </Button>
           </div>
         </div>
 
-        {/* Table */}
-        <div className="w-full overflow-hidden">
-          <div className="rounded-md border border-gray-200 bg-white shadow-sm">
-            <style>
-              {`
-              .compact-table .ant-table-tbody > tr > td {
-                font-size: 11px !important;
-                padding: 4px 8px !important;
-                white-space: nowrap;
-              }
-              .compact-table .ant-table-thead > tr > th {
-                font-size: 11px !important;
-                padding: 8px 8px !important;
-                white-space: nowrap;
-              }
-              .compact-table .ant-table-container {
-                overflow-x: auto !important;
-              }
-              .compact-table .ant-table {
-                font-size: 11px;
-              }
-              .compact-table .ant-table-fixed-left {
-                z-index: 2;
-              }
-              .compact-table .ant-table-fixed-right {
-                z-index: 2;
-              }
-              
-              /* Hide less important columns on smaller screens */
-              @media (max-width: 1200px) {
-                .compact-table th:nth-child(n+6):nth-child(-n+10),
-                .compact-table td:nth-child(n+6):nth-child(-n+10) {
-                  display: none !important;
-                }
-              }
-            `}
-            </style>
-            <Table
-              rowSelection={rowSelection}
-              columns={columns}
-              dataSource={currentData}
-              pagination={false}
-              size="middle"
-              loading={loading}
-              rowKey="_id"
-              scroll={{ x: "max-content", y: 600 }}
-              className="compact-table"
-            />
+        {/* Filter and Search Summary */}
+        <div className="flex flex-wrap items-center gap-2 text-xs text-gray-600">
+          {searchText && (
+            <span className="bg-blue-50 text-blue-700 px-2 py-1 rounded">
+              Tìm kiếm: "{searchText}"
+            </span>
+          )}
+          {filters?.status && (
+            <span className="bg-green-50 text-green-700 px-2 py-1 rounded">
+              Trạng thái:{" "}
+              {filters.status === "ACTIVE"
+                ? "Hoạt động"
+                : filters.status === "INACTIVE"
+                ? "Không hoạt động"
+                : "Bị khóa"}
+            </span>
+          )}
+          {filters?.organization && (
+            <span className="bg-purple-50 text-purple-700 px-2 py-1 rounded">
+              Tổ chức:{" "}
+              {filters.organizationName ||
+                organizations.find((org) => org._id === filters.organization)
+                  ?.name ||
+                filters.organization}
+            </span>
+          )}
+          {filters?.point_range &&
+            (filters.point_range[0] || filters.point_range[1]) && (
+              <span className="bg-yellow-50 text-yellow-700 px-2 py-1 rounded">
+                Điểm: {filters.point_range[0] || 0} -{" "}
+                {filters.point_range[1] || "∞"}
+              </span>
+            )}
+          {filters?.strike_range &&
+            (filters.strike_range[0] || filters.strike_range[1]) && (
+              <span className="bg-red-50 text-red-700 px-2 py-1 rounded">
+                Cảnh cáo: {filters.strike_range[0] || 0} -{" "}
+                {filters.strike_range[1] || "∞"}
+              </span>
+            )}
+          {(searchText ||
+            filters?.status ||
+            filters?.organization ||
+            filters?.point_range ||
+            filters?.strike_range) && (
+            <button
+              className="text-blue-500 hover:text-blue-700 underline text-xs"
+              onClick={() => {
+                setSearchText("");
+                setFilters({});
+                fetchUsers("", {});
+              }}
+            >
+              Xóa tất cả
+            </button>
+          )}
+        </div>
 
-            {/* Footer with pagination */}
-            <div className="flex justify-between items-center px-4 py-3 bg-gray-50 border-t">
+        {/* Data Display */}
+        {viewMode === "table" ? (
+          <div className="w-full overflow-hidden">
+            <div className="rounded-md border border-gray-200 bg-white shadow-sm">
+              <style>
+                {`
+                .compact-table .ant-table-tbody > tr > td {
+                  font-size: 11px !important;
+                  padding: 4px 8px !important;
+                  white-space: nowrap;
+                }
+                .compact-table .ant-table-thead > tr > th {
+                  font-size: 11px !important;
+                  padding: 8px 8px !important;
+                  white-space: nowrap;
+                }
+                .compact-table .ant-table-container {
+                  overflow-x: auto !important;
+                }
+                .compact-table .ant-table {
+                  font-size: 11px;
+                }
+                .compact-table .ant-table-fixed-left {
+                  z-index: 2;
+                }
+                .compact-table .ant-table-fixed-right {
+                  z-index: 2;
+                }
+                
+                /* Make rows clickable with hover effect */
+                .compact-table .ant-table-tbody > tr:hover > td {
+                  background-color: #f5f5f5 !important;
+                }
+                
+                /* Hide less important columns on smaller screens */
+                @media (max-width: 1200px) {
+                  .compact-table th:nth-child(n+6):nth-child(-n+10),
+                  .compact-table td:nth-child(n+6):nth-child(-n+10) {
+                    display: none !important;
+                  }
+                }
+              `}
+              </style>
+              <Table
+                rowSelection={rowSelection}
+                columns={columns}
+                dataSource={currentData}
+                pagination={false}
+                size="middle"
+                loading={loading}
+                rowKey="_id"
+                scroll={{ x: "max-content", y: 600 }}
+                className="compact-table"
+                onRow={(record) => ({
+                  onClick: () => handleViewUser(record._id),
+                  style: { cursor: "pointer" },
+                })}
+              />
+
+              {/* Footer with pagination */}
+              <div className="flex justify-between items-center px-4 py-3 bg-gray-50 border-t">
+                <div className="flex items-center gap-2">
+                  <span className="text-sm text-gray-600">Số hàng:</span>
+                  <Select
+                    value={pageSize}
+                    onChange={handlePageSizeChange}
+                    size="small"
+                    style={{ width: 70 }}
+                  >
+                    <Option value={5}>5</Option>
+                    <Option value={10}>10</Option>
+                    <Option value={20}>20</Option>
+                    <Option value={50}>50</Option>
+                  </Select>
+                </div>
+
+                <div className="flex items-center gap-3">
+                  <span className="text-sm text-gray-700">
+                    {startIndex + 1}-{endIndex} trên {totalUsers}
+                  </span>
+                  <div className="flex items-center gap-1">
+                    <button
+                      className="px-3 py-1.5 text-sm border border-gray-300 rounded-md hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
+                      onClick={handlePreviousPage}
+                      disabled={currentPage === 1}
+                    >
+                      ‹
+                    </button>
+                    <button
+                      className="px-3 py-1.5 text-sm border border-gray-300 rounded-md hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
+                      onClick={handleNextPage}
+                      disabled={currentPage === totalPages}
+                    >
+                      ›
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        ) : (
+          <div className="w-full">
+            {/* List View */}
+            <div className="space-y-3">
+              {currentData.map((user) => (
+                <UserItem
+                  key={user._id}
+                  user={user}
+                  onViewUser={handleViewUser}
+                  onEditUser={handleEditUser}
+                  onToggleUserStatus={handleToggleUserStatus}
+                />
+              ))}
+            </div>
+
+            {/* Footer with pagination for list view */}
+            <div className="flex flex-col sm:flex-row justify-between items-center gap-4 px-4 py-3 bg-white border border-gray-200 rounded-lg mt-4">
               <div className="flex items-center gap-2">
-                <span className="text-sm text-gray-600">Số dòng:</span>
+                <span className="text-sm text-gray-600">Số hàng:</span>
                 <Select
                   value={pageSize}
                   onChange={handlePageSizeChange}
@@ -569,9 +813,9 @@ const AdminUserTable: React.FC = () => {
                 </Select>
               </div>
 
-              <div className="flex items-center gap-3">
+              <div className="flex flex-col sm:flex-row items-center gap-3">
                 <span className="text-sm text-gray-700">
-                  {startIndex + 1}-{endIndex} of {totalUsers}
+                  {startIndex + 1}-{endIndex} trên {totalUsers}
                 </span>
                 <div className="flex items-center gap-1">
                   <button
@@ -592,8 +836,48 @@ const AdminUserTable: React.FC = () => {
               </div>
             </div>
           </div>
+        )}
+      </div>
+
+      {/* Slide-out Filter Panel */}
+      <div
+        className={`fixed top-0 right-0 h-full w-full sm:w-80 bg-white shadow-lg transform transition-transform duration-300 ease-in-out z-50 ${
+          isFilterPanelVisible ? "translate-x-0" : "translate-x-full"
+        }`}
+      >
+        <div className="p-4 sm:p-6">
+          <div className="flex justify-between items-center mb-6">
+            <h3 className="text-lg font-semibold">Bộ lọc nâng cao</h3>
+            <button
+              onClick={handleCloseFilterPanel}
+              className="text-gray-400 hover:text-gray-600"
+            >
+              ✕
+            </button>
+          </div>
+
+          <div className="max-h-[calc(100vh-120px)] overflow-y-auto">
+            <UserFilterModal
+              visible={true}
+              onClose={() => {}}
+              onApply={(filters) => {
+                handleApplyFilters(filters);
+                handleCloseFilterPanel();
+              }}
+              initialFilters={filters}
+              isInDrawer={true}
+            />
+          </div>
         </div>
       </div>
+
+      {/* Overlay for filter panel */}
+      {isFilterPanelVisible && (
+        <div
+          className="fixed inset-0 bg-black/60 bg-opacity-50 z-40"
+          onClick={handleCloseFilterPanel}
+        />
+      )}
     </div>
   );
 };

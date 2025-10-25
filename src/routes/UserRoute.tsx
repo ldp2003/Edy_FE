@@ -17,13 +17,17 @@ import FavoritePage from "../pages/user/favorite/FavoritePage";
 import OrganizationDetailPage from "../pages/user/organization/OrganizationDetailPage";
 import OrganizationListPage from "../pages/user/organization/OrganizationListPage";
 import SubjectDocumentPage from "../pages/user/subject/SubjectDocumentPage";
-import NotFoundPage from "../pages/NotFoundPage";
+import NotFoundPage from "../pages/Error/NotFoundPage";
 import DirectDownload from "../pages/user/download/DirectDownload";
 import ShareAccess from "../pages/user/share/ShareAccess";
 import SearchPage from "../pages/user/search/SearchPage";
 import NotificationListPage from "../pages/user/Notification/NotificationListPage";
-import DocumentRouteWrapper from "../components/common/DocumentRouteGuard";
+import DocumentRouteWrapper from "../components/user/document/AccessCheck/DocumentRouteGuard";
 import ReadHistoryPage from "../pages/user/history/ReadHistoryPage";
+import UserProfilePage from "../pages/user/userInfo/UserProfilePage";
+import FollowPage from "../pages/user/follow/FollowPage";
+import StatsPage from "../pages/user/personalProfile/StatsPage";
+import PointManagementPage from "../pages/user/point/PointManagementPage";
 
 const UserRoute: React.FC = () => {
   return (
@@ -69,12 +73,26 @@ const UserRoute: React.FC = () => {
             path="personal-posts/edit/:id"
             element={<EditDocumentPage />}
           />
-          <Route path="personal-profile" element={<PersonalProfile />} />
+          <Route path="personal-profile/*" element={<PersonalProfile />} />
+          <Route path="personal-profile/recent" element={<PersonalProfile />} />
+          <Route
+            path="personal-profile/field-of-study"
+            element={<PersonalProfile />}
+          />
+          <Route
+            path="personal-profile/shared-documents"
+            element={<PersonalProfile />}
+          />
           <Route path="upload-document" element={<UploadPage />} />
           <Route path="edit-profile" element={<EditProfile />} />
           <Route path="favorites" element={<FavoritePage />} />
           <Route path="history" element={<ReadHistoryPage />} />
           <Route path="notifications" element={<NotificationListPage />} />
+          <Route path="stats" element={<StatsPage />} />
+          <Route path="user/:userId" element={<UserProfilePage />} />
+          <Route path="following" element={<FollowPage />} />
+          <Route path="follower" element={<FollowPage />} />
+          <Route path="point-management" element={<PointManagementPage />} />
 
           {/* 404 Page */}
           <Route path="*" element={<NotFoundPage />} />

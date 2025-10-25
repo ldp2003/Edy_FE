@@ -1,15 +1,9 @@
-import React, { useState } from "react";
-import { Table, Button, Tag, message, Modal } from "antd";
+import React, { useState, useEffect, useCallback } from "react";
+import { Table, Button, Tag, message } from "antd";
 import { Edit, Trash2, Plus } from "lucide-react";
-
-interface UserRole {
-  id: string;
-  name: string;
-  status: "active" | "restricted" | "suspended";
-  expiryDate?: string;
-  restrictedBy?: string;
-  permissions: string[];
-}
+import { RoleService } from "../../../utils/RoleService";
+import type { Role } from "../../../models/role";
+import EditRoleModal from "../role/EditAssigmentModel";
 
 interface UserRoleManagerProps {
   userId: string;
@@ -17,41 +11,39 @@ interface UserRoleManagerProps {
   onRoleChange?: (newRole: string) => void;
 }
 
-const UserRoleManager: React.FC<UserRoleManagerProps> = () => {
+const UserRoleManager: React.FC<UserRoleManagerProps> = ({ userId }) => {
   const [loading, setLoading] = useState(false);
+  const [rolesLoading, setRolesLoading] = useState(true);
+  const [userRoles, setUserRoles] = useState<Role[]>([]);
   const [editModalVisible, setEditModalVisible] = useState(false);
-  const [selectedRoleForEdit, setSelectedRoleForEdit] =
-    useState<UserRole | null>(null);
+  const [selectedRoleForEdit, setSelectedRoleForEdit] = useState<Role | null>(
+    null
+  );
 
-  // Mock data for user roles - replace with actual API call
-  const userRoles: UserRole[] = [
-    {
-      id: "1",
-      name: "Người dùng",
-      status: "active",
-      expiryDate: "2025-12-31",
-      restrictedBy: undefined,
-      permissions: ["Xem tài liệu", "Tải tài liệu", "Bình luận"],
-    },
-    {
-      id: "2",
-      name: "Điều hành viên",
-      status: "restricted",
-      expiryDate: "2025-06-30",
-      restrictedBy: "Admin System",
-      permissions: ["Duyệt tài liệu", "Quản lý bình luận", "Xóa nội dung"],
-    },
-    {
-      id: "3",
-      name: "Quản trị viên",
-      status: "suspended",
-      expiryDate: undefined,
-      restrictedBy: "Super Admin",
-      permissions: ["Toàn quyền hệ thống"],
-    },
-  ];
+  // Fetch roles data
+  const fetchRoles = useCallback(async () => {
+    try {
+      setRolesLoading(true);
+      const response = await RoleService.getUserRoles(userId);
+      // API trả về { success, permissions, roles }
+      const roles = response.roles || [];
+      setUserRoles(roles);
+    } catch (error) {
+      console.error("Error fetching roles:", error);
+      message.error("Không thể tải danh sách quyền!");
+      setUserRoles([]);
+    } finally {
+      setRolesLoading(false);
+    }
+  }, [userId]);
 
-  const handleEditRole = (record: UserRole) => {
+  useEffect(() => {
+    if (userId) {
+      fetchRoles();
+    }
+  }, [userId, fetchRoles]);
+
+  const handleEditRole = (record: Role) => {
     setSelectedRoleForEdit(record);
     setEditModalVisible(true);
   };
@@ -60,7 +52,7 @@ const UserRoleManager: React.FC<UserRoleManagerProps> = () => {
     console.log("Deleting role:", roleId);
     try {
       setLoading(true);
-      // API call to delete role
+      // API call to delete role - you can implement this later
       message.success("Xóa quyền thành công!");
     } catch (error) {
       console.error("Delete role error:", error);
@@ -80,59 +72,65 @@ const UserRoleManager: React.FC<UserRoleManagerProps> = () => {
       title: "Tên quyền",
       dataIndex: "name",
       key: "name",
-      width: "20%",
-      render: (text: string) => <span className="font-medium">{text}</span>,
+      render: (_: string, record: Role) => (
+        <span className="font-medium text-xs whitespace-nowrap">
+          {record.name}
+        </span>
+      ),
+    },
+    {
+      title: "Mã quyền",
+      dataIndex: "code",
+      key: "code",
+      render: (code: string) => (
+        <Tag color="blue" className="text-xs whitespace-nowrap">
+          {code}
+        </Tag>
+      ),
     },
     {
       title: "Tình trạng",
-      dataIndex: "status",
-      key: "status",
-      width: "15%",
-      render: (status: string) => {
-        const statusConfig = {
-          active: { color: "green", text: "Hoạt động" },
-          restricted: { color: "orange", text: "Hạn chế" },
-          suspended: { color: "red", text: "Tạm ngưng" },
-        };
-        const config = statusConfig[status as keyof typeof statusConfig];
-        return <Tag color={config.color}>{config.text}</Tag>;
-      },
+      dataIndex: "is_active",
+      key: "is_active",
+      render: (is_active: boolean) => (
+        <Tag
+          color={is_active ? "green" : "red"}
+          className="text-xs whitespace-nowrap"
+        >
+          {is_active ? "Hoạt động" : "Không hoạt động"}
+        </Tag>
+      ),
     },
     {
-      title: "Thời hạn",
-      dataIndex: "expiryDate",
-      key: "expiryDate",
-      width: "15%",
-      render: (date: string) => date || "Vô thời hạn",
-    },
-    {
-      title: "Người hạn chế",
-      dataIndex: "restrictedBy",
-      key: "restrictedBy",
-      width: "20%",
-      render: (restrictedBy: string) => restrictedBy || "-",
+      title: "Mô tả",
+      dataIndex: "description",
+      key: "description",
+      render: (description: string) => (
+        <span className="text-gray-500 text-xs whitespace-nowrap">
+          {description || "Không có mô tả"}
+        </span>
+      ),
     },
     {
       title: "Hành động",
       key: "action",
-      width: "15%",
-      render: (_: unknown, record: UserRole) => (
-        <div className="flex space-x-2">
+      render: (_: unknown, record: Role) => (
+        <div className="flex space-x-1">
           <Button
             type="link"
-            icon={<Edit size={14} />}
+            icon={<Edit size={12} />}
             size="small"
             onClick={() => handleEditRole(record)}
-            className="text-blue-500 p-0"
+            className="text-blue-500 p-0 text-xs"
           >
             Sửa
           </Button>
           <Button
             type="link"
-            icon={<Trash2 size={14} />}
+            icon={<Trash2 size={12} />}
             size="small"
-            onClick={() => handleDeleteRole(record.id)}
-            className="text-red-500 p-0"
+            onClick={() => handleDeleteRole(record._id)}
+            className="text-red-500 p-0 text-xs"
             loading={loading}
           >
             Xóa
@@ -142,51 +140,52 @@ const UserRoleManager: React.FC<UserRoleManagerProps> = () => {
     },
   ];
 
+  const assignment = selectedRoleForEdit
+    ? {
+        _id: selectedRoleForEdit._id,
+        role: { _id: selectedRoleForEdit._id, name: selectedRoleForEdit.name },
+      }
+    : null;
+
   return (
     <div className="bg-white">
-      <div className="flex justify-between items-center mb-4">
-        <h3 className="text-lg font-semibold text-gray-900">Quản lý quyền</h3>
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-4 gap-2">
+        <h3 className="text-base sm:text-sm font-bold text-[var(--primary-text-color)]">
+          Quản lý quyền
+        </h3>
         <Button
           type="primary"
-          icon={<Plus size={16} />}
+          icon={<Plus size={14} />}
           onClick={handleAddRole}
-          className="flex items-center"
+          className="flex items-center text-xs sm:text-sm"
+          size="small"
         >
           Thêm quyền
         </Button>
       </div>
 
-      <Table
-        columns={columns}
-        dataSource={userRoles}
-        rowKey="id"
-        pagination={false}
-        size="middle"
-        className="border border-gray-200 rounded-lg"
-      />
+      <div className="overflow-x-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
+        <Table
+          columns={columns}
+          dataSource={userRoles}
+          rowKey="_id"
+          pagination={false}
+          size="small"
+          loading={rolesLoading}
+        />
+      </div>
 
-      <Modal
-        title={selectedRoleForEdit ? "Chỉnh sửa quyền" : "Thêm quyền mới"}
-        open={editModalVisible}
-        onCancel={() => setEditModalVisible(false)}
-        footer={[
-          <Button key="cancel" onClick={() => setEditModalVisible(false)}>
-            Hủy
-          </Button>,
-          <Button key="save" type="primary" loading={loading}>
-            Lưu
-          </Button>,
-        ]}
-      >
-        <div className="py-4">
-          <p className="text-gray-600">
-            {selectedRoleForEdit
-              ? "Chỉnh sửa thông tin quyền"
-              : "Thêm quyền mới cho người dùng"}
-          </p>
-          {/* Form fields will be added here */}
-        </div>
-      </Modal>
+      {assignment && (
+        <EditRoleModal
+          visible={editModalVisible}
+          onCancel={() => setEditModalVisible(false)}
+          onSuccess={() => {
+            setEditModalVisible(false);
+            fetchRoles();
+          }}
+          assignment={assignment}
+        />
+      )}
     </div>
   );
 };
