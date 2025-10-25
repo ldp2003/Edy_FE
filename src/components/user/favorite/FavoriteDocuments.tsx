@@ -1,9 +1,9 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect, useContext, useCallback } from "react";
 import { UserContext } from "../../../contexts/UserContext";
 import { Row, Col, message } from "antd";
 import { UserService } from "../../../utils/UserService";
-import FavoriteCard from "./FavoriteCard";
-import FavoriteListItem from "./FavoriteListItem";
+import DocumentCard from "../document/documentCard/DocumentCard";
+import DocumentListItem from "../document/documentCard/DocumentListItem";
 import FavoriteHeader from "./FavoriteHeader";
 import { FavoriteLoading, FavoriteEmpty } from "./FavoriteStates";
 
@@ -12,7 +12,7 @@ const FavoriteDocuments: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
 
-  const fetchFavoriteDocuments = async () => {
+  const fetchFavoriteDocuments = useCallback(async () => {
     try {
       setLoading(true);
       const response = await UserService.getListFavorites();
@@ -23,11 +23,10 @@ const FavoriteDocuments: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [setFavoriteDocuments]);
 
   const handleRemoveFromFavorites = async (documentId: string) => {
     try {
-      
       await UserService.removeFromFavorites(documentId);
       console.log("Removed document ID:", documentId);
 
@@ -46,7 +45,7 @@ const FavoriteDocuments: React.FC = () => {
     return () => {
       controller.abort();
     };
-  }, []);
+  }, [fetchFavoriteDocuments]);
 
   // Show loading state
   if (loading) {
@@ -59,7 +58,7 @@ const FavoriteDocuments: React.FC = () => {
   }
 
   return (
-    <div className="bg-white border border-[var(--border-color)] rounded-md max-h-screen h-fit p-6">
+    <div className="bg-white border border-[var(--border-color)] rounded-md max-h-screen h-fit p-4 sm:p-6 md:p-8">
       <FavoriteHeader
         documentsCount={favoriteDocuments.length}
         viewMode={viewMode}
@@ -69,20 +68,17 @@ const FavoriteDocuments: React.FC = () => {
 
       {/* Documents Display */}
       {viewMode === "grid" ? (
-        <Row gutter={[16, 16]}>
+        <Row gutter={[12, 12]} className="mt-4 sm:mt-6">
           {favoriteDocuments.map((document) => (
-            <Col key={document._id} xs={12} sm={10} md={6} lg={4} xxl={3}>
-              <FavoriteCard
-                document={document}
-                onRemove={handleRemoveFromFavorites}
-              />
+            <Col key={document._id} xs={12} sm={8} md={6} lg={6} xl={4} xxl={3}>
+              <DocumentCard document={document} />
             </Col>
           ))}
         </Row>
       ) : (
-        <div className="space-y-4">
+        <div className="space-y-3 sm:space-y-4 mt-4 sm:mt-6">
           {favoriteDocuments.map((document) => (
-            <FavoriteListItem
+            <DocumentListItem
               key={document._id}
               document={document}
               onRemove={handleRemoveFromFavorites}

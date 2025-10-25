@@ -16,9 +16,9 @@ const FavoriteHeader: React.FC<FavoriteHeaderProps> = ({
   onRefresh,
 }) => {
   return (
-    <div className="mb-6 flex items-center text-left justify-between">
-      <div>
-        <h2 className="text-base text-left font-bold text-[var(--primary-text-color)] mb-2">
+    <div className="mb-4 sm:mb-6 flex flex-col sm:flex-row sm:items-center text-left justify-start gap-4 sm:gap-0">
+      <div className="flex-1">
+        <h2 className="text-base sm:text-lg text-left font-bold text-[var(--primary-text-color)] mb-2">
           Tài liệu yêu thích của bạn
         </h2>
         <p className="text-sm text-gray-600">
@@ -26,9 +26,9 @@ const FavoriteHeader: React.FC<FavoriteHeaderProps> = ({
         </p>
       </div>
 
-      <div className="flex items-center space-x-3">
+      <div className="flex items-center justify-start space-x-3">
         {/* View Mode Toggle */}
-        <div className="flex  rounded-md overflow-hidden">
+        <div className="flex rounded-md overflow-hidden">
           <Button
             type={viewMode === "grid" ? "primary" : "default"}
             icon={<Grid3X3 size={16} />}
@@ -45,7 +45,7 @@ const FavoriteHeader: React.FC<FavoriteHeaderProps> = ({
           />
         </div>
 
-        <Button icon={<RefreshCw size={16} />} onClick={onRefresh}>
+        <Button icon={<RefreshCw size={16} />} onClick={onRefresh} size="small">
           Làm mới
         </Button>
       </div>
