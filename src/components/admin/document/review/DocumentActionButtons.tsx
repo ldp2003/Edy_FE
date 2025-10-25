@@ -470,6 +470,41 @@ const DocumentActionButtons: React.FC<DocumentActionButtonsProps> = ({
         confirmLoading={processing}
         okButtonProps={{
           style: {
+            backgroundColor: "#ef4444",
+            borderColor: "#ef4444",
+          },
+        }}
+      >
+        <div className="mb-4">
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Lý do yêu cầu chỉnh sửa:
+          </label>
+          <TextArea
+            rows={4}
+            value={editRequestReason}
+            onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
+              setEditRequestReason(e.target.value)
+            }
+            placeholder="Nhập lý do yêu cầu chỉnh sửa tài liệu này..."
+            style={{ resize: "none" }}
+          />
+        </div>
+      </Modal>
+
+      {/* Edit Request Modal */}
+      <Modal
+        title="Yêu cầu chỉnh sửa"
+        open={editRequestModalVisible}
+        onOk={handleEditRequest}
+        onCancel={() => {
+          setEditRequestModalVisible(false);
+          setEditRequestReason("");
+        }}
+        okText="Gửi yêu cầu"
+        cancelText="Hủy"
+        confirmLoading={processing}
+        okButtonProps={{
+          style: {
             backgroundColor: "#f59e0b",
             borderColor: "#f59e0b",
           },
