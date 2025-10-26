@@ -402,4 +402,78 @@ export const DocumentService = {
       throw error;
     }
   },
+
+  // Create or update edit document
+  async createEditDocument(
+    documentId: string,
+    editData: {
+      title?: string;
+      doc_type?: string;
+      subject?: string;
+      author?: string[];
+      published_year?: number;
+      publisher?: string;
+      level?: string;
+      keyword?: string[];
+      summary_by_user?: string;
+      page?: number;
+      organization?: string;
+      url?: string;
+      file_type?: string;
+    }
+  ) {
+    try {
+      return await DocumentAPI.createEditDocument(documentId, editData);
+    } catch (error) {
+      console.error("Error in DocumentService.createEditDocument:", error);
+      throw error;
+    }
+  },
+
+  // Update edit document
+  async updateEditDocument(
+    editId: string,
+    editData: {
+      title?: string;
+      doc_type?: string;
+      subject?: string;
+      author?: string[];
+      published_year?: number;
+      publisher?: string;
+      level?: string;
+      keyword?: string[];
+      summary_by_user?: string;
+      page?: number;
+      organization?: string;
+      url?: string;
+      file_type?: string;
+    }
+  ) {
+    try {
+      return await DocumentAPI.updateEditDocument(editId, editData);
+    } catch (error) {
+      console.error("Error in DocumentService.updateEditDocument:", error);
+      throw error;
+    }
+  },
+
+  // Delete edit document
+  async deleteEditDocument(editId: string) {
+    try {
+      return await DocumentAPI.deleteEditDocument(editId);
+    } catch (error) {
+      console.error("Error in DocumentService.deleteEditDocument:", error);
+      throw error;
+    }
+  },
+
+  // Get edit document by original document
+  async getEditDocument(documentId: string) {
+    try {
+      return await DocumentAPI.getEditDocument(documentId);
+    } catch (error) {
+      console.error("Error in DocumentService.getEditDocument:", error);
+      throw error;
+    }
+  },
 };
