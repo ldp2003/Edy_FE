@@ -850,6 +850,112 @@ export const DocumentAPI = {
   ) => {
     return await apiClient.get(`/documents/user/${userId}`, { params });
   },
+
+  // Create or update edit document
+  createEditDocument: async (
+    documentId: string,
+    editData: {
+      title?: string;
+      doc_type?: string;
+      subject?: string;
+      author?: string[];
+      published_year?: number;
+      publisher?: string;
+      level?: string;
+      keyword?: string[];
+      summary_by_user?: string;
+      page?: number;
+      organization?: string;
+      url?: string;
+      file_type?: string;
+    }
+  ) => {
+    try {
+      const response = await apiClient.post(
+        `/documents/${documentId}/edit`,
+        editData
+      );
+      return response.data;
+    } catch (error) {
+      console.error("Error creating edit document:", error);
+      throw error;
+    }
+  },
+
+  // Update edit document
+  updateEditDocument: async (
+    editId: string,
+    editData: {
+      title?: string;
+      doc_type?: string;
+      subject?: string;
+      author?: string[];
+      published_year?: number;
+      publisher?: string;
+      level?: string;
+      keyword?: string[];
+      summary_by_user?: string;
+      page?: number;
+      organization?: string;
+      url?: string;
+      file_type?: string;
+    }
+  ) => {
+    try {
+      const response = await apiClient.put(`/documents/edit/${editId}`, editData);
+      return response.data;
+    } catch (error) {
+      console.error("Error updating edit document:", error);
+      throw error;
+    }
+  },
+
+  // Delete edit document
+  deleteEditDocument: async (editId: string) => {
+    try {
+      const response = await apiClient.delete(`/documents/edit/${editId}`);
+      return response.data;
+    } catch (error) {
+      console.error("Error deleting edit document:", error);
+      throw error;
+    }
+  },
+
+  // Get edit document by original document
+  getEditDocument: async (documentId: string) => {
+    try {
+      const response = await apiClient.get(`/documents/${documentId}/edit`);
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching edit document:", error);
+      throw error;
+    }
+  },
+
+  // Get edit approval by document ID
+  getEditApprovalByDocumentId: async (documentId: string) => {
+    try {
+      const response = await apiClient.get(`/documents/pending-edit-request/${documentId}`);
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching edit approval:", error);
+      throw error;
+    }
+  },
+
+  // Handle edit approval (approve/reject)
+  handleEditApproval: async (editApprovalId: string, actionData: {
+    action: 'APPROVE' | 'REJECT';
+    message?: string;
+  }) => {
+    try {
+      const response = await apiClient.put(`/documents/approve-edit/${editApprovalId}`, actionData);
+      return response.data;
+    } catch (error) {
+      console.error("Error handling edit approval:", error);
+      throw error;
+    }
+  },
 };
 export const AccessRequestAPI = {
   // Create access request for private share

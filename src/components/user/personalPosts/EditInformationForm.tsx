@@ -8,6 +8,7 @@ import {
   message,
   Modal,
   Upload,
+  Alert,
 } from "antd";
 import type { MessageInstance } from "antd/es/message/interface";
 import { Plus, Minus, Upload as UploadIcon } from "lucide-react";
@@ -61,6 +62,9 @@ const EditInformationForm = ({
     document.cover_page || ""
   );
   const [uploading, setUploading] = useState(false);
+  const [existingEditDocument, setExistingEditDocument] = useState<any>(null);
+  const [loadingEditData, setLoadingEditData] = useState(false);
+  const [formInitialized, setFormInitialized] = useState(false);
   const navigate = useNavigate();
 
   const { user } = useContext(UserContext);
@@ -91,9 +95,75 @@ const EditInformationForm = ({
     loadSubjects();
   }, [loadSubjects]);
 
-  // Ensure form is updated when both document and subjects are available
+  // Load existing edit document if any
   useEffect(() => {
-    if (document && subjects.length > 0 && !subjectsLoading) {
+    let isMounted = true;
+    
+    const loadEditDocument = async () => {
+      try {
+        setLoadingEditData(true);
+        const editDoc = await DocumentService.getEditDocument(document._id);
+        
+        // Only update if component is still mounted
+        if (!isMounted) return;
+        
+        setExistingEditDocument(editDoc);
+        
+        // If there's existing edit data, load it into the form
+        if (editDoc && editDoc.title) {
+          // Set form values with existing edit data
+          const formValues: Partial<FormData> = {
+            documentName: editDoc.title,
+            subject: typeof editDoc.subject === "object" ? editDoc.subject._id : editDoc.subject,
+            organization: typeof editDoc.organization === "object" ? editDoc.organization._id : editDoc.organization,
+            documentType: editDoc.doc_type,
+            pageCount: editDoc.page,
+            level: editDoc.level,
+            keywords: editDoc.keyword ? editDoc.keyword.join(", ") : "",
+            publisher: editDoc.publisher,
+            publishYear: editDoc.published_year?.toString(),
+            summary: editDoc.summary_by_user || "",
+            public_mode: document.public_mode || "PUBLIC",
+          };
+          
+          // Set authors
+          if (editDoc.author && editDoc.author.length > 0) {
+            setAuthors(editDoc.author);
+            formValues.authors = editDoc.author;
+          }
+          
+          form.setFieldsValue(formValues);
+          setFormInitialized(true);
+          message.info("Đang chỉnh sửa bản nháp trước đó. Bạn có thể tiếp tục chỉnh sửa và gửi lại.");
+        }
+      } catch (error: any) {
+        // If error is 404 or "not found", it means no edit document exists yet
+        if (!isMounted) return;
+        
+        if (error.response?.status === 404 || error.message?.includes("không tồn tại")) {
+          console.log("No existing edit document found");
+        } else {
+          console.error("Error loading edit document:", error);
+        }
+      } finally {
+        if (isMounted) {
+          setLoadingEditData(false);
+        }
+      }
+    };
+
+    loadEditDocument();
+    
+    // Cleanup function
+    return () => {
+      isMounted = false;
+    };
+  }, [document._id]);
+
+  // Ensure form is updated when both document and subjects are available
+  // Only apply this if we don't have edit data to avoid conflicts
+  useEffect(() => {
+    if (document && subjects.length > 0 && !subjectsLoading && !existingEditDocument) {
       const subjectId =
         typeof document.subject === "object"
           ? document.subject._id
@@ -109,11 +179,12 @@ const EditInformationForm = ({
         console.log("Force set subject field to:", subjectId);
       }
     }
-  }, [document, subjects, subjectsLoading, form]);
+  }, [document, subjects, subjectsLoading, form, existingEditDocument]);
 
-  // Pre-fill form with existing document data
+  // Pre-fill form with existing document data (only if no edit document exists and form not initialized)
   useEffect(() => {
-    if (document && subjects.length > 0) {
+    // Only set original document data if we don't have an existing edit document and form hasn't been initialized
+    if (document && subjects.length > 0 && !existingEditDocument && !formInitialized) {
       console.log("Setting form values with document:", document);
       console.log("Available subjects:", subjects);
 
@@ -150,8 +221,9 @@ const EditInformationForm = ({
       console.log("Setting form values:", formValues);
       form.setFieldsValue(formValues);
       setCoverImage(document.cover_page || "");
+      setFormInitialized(true);
     }
-  }, [document, form, subjects]); // Add subjects to dependencies
+  }, [document, form, subjects, existingEditDocument, formInitialized]); // Add existingEditDocument to dependencies
 
   const addAuthor = () => {
     setAuthors([...authors, ""]);
@@ -236,8 +308,8 @@ const EditInformationForm = ({
     setSubmitting(true);
 
     try {
-      // Prepare data for update
-      const updateData = {
+      // Prepare data for edit document
+      const editData = {
         title: values.documentName,
         doc_type: values.documentType,
         subject: values.subject,
@@ -248,33 +320,29 @@ const EditInformationForm = ({
         publisher: values.publisher,
         organization: values.organization,
         level: values.level,
-        public_mode: values.public_mode,
         keyword: values.keywords
           ? values.keywords.split(",").map((k) => k.trim())
           : [],
-        description: values.summary,
+        summary_by_user: values.summary,
         page: values.pageCount,
-        cover_page: coverImage,
+        // Required fields from original document
+        url: document.url,
+        file_type: document.file_type,
       };
 
-      console.log("Document update data:", updateData);
+      console.log("Edit document data:", editData);
 
-      // Call the actual update document API
-      const response = await DocumentService.updateDocument(
-        document._id,
-        updateData
-      );
+      // Call the create/edit document API (this will create or update existing edit)
+      await DocumentService.createEditDocument(document._id, editData);
 
-      if (response) {
-        const showMessage = messageApi || message;
-        showMessage.success("🎉 Cập nhật tài liệu thành công!");
+      const showMessage = messageApi || message;
+      showMessage.success("Gửi yêu cầu chỉnh sửa tài liệu thành công! Vui lòng chờ admin phê duyệt.");
 
-        if (onEditSuccess) {
-          onEditSuccess();
-        }
+      if (onEditSuccess) {
+        onEditSuccess();
       }
     } catch (error: unknown) {
-      console.error("Document update error:", error);
+      console.error("Document edit error:", error);
 
       const showMessage = messageApi || message;
 
@@ -288,7 +356,7 @@ const EditInformationForm = ({
       } else if (error instanceof Error) {
         showMessage.error(`Lỗi: ${error.message}`);
       } else {
-        showMessage.error("Có lỗi xảy ra khi cập nhật tài liệu!");
+        showMessage.error("Có lỗi xảy ra khi gửi yêu cầu chỉnh sửa tài liệu!");
       }
     } finally {
       setSubmitting(false);
@@ -333,6 +401,18 @@ const EditInformationForm = ({
       <div className="font-bold text-base mb-6 text-[var(--primary-text-color)]">
         Chỉnh sửa thông tin tài liệu
       </div>
+      
+      {existingEditDocument && existingEditDocument.status === "PENDING" && (
+        <Alert
+          message="Bạn đã có một yêu cầu chỉnh sửa đang chờ phê duyệt"
+          description="Đang tải dữ liệu yêu cầu trước đó. Bạn có thể chỉnh sửa và cập nhật lại."
+          type="info"
+          showIcon
+          closable
+          className="mb-4"
+        />
+      )}
+
       <div className="mx-auto bg-white rounded-lg shadow-sm p-4 sm:p-6">
         <Form
           form={form}
@@ -635,11 +715,11 @@ const EditInformationForm = ({
               <Button
                 type="primary"
                 htmlType="submit"
-                loading={submitting}
-                disabled={submitting}
+                loading={submitting || loadingEditData}
+                disabled={submitting || loadingEditData}
                 className="w-full sm:w-auto"
               >
-                {submitting ? "Đang cập nhật..." : "Cập nhật tài liệu"}
+                {submitting ? "Đang gửi..." : existingEditDocument ? "Cập nhật yêu cầu chỉnh sửa" : "Gửi yêu cầu chỉnh sửa"}
               </Button>
             </div>
           </div>

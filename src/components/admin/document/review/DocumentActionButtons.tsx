@@ -2,19 +2,9 @@ import React, { useState, useMemo, useCallback } from "react";
 import { Button, Modal, message, Input } from "antd";
 import { useNavigate } from "react-router-dom";
 import { NotificationService } from "../../../../utils/NotificationService";
+import type { PendingRequest } from "../../../../models/document";
 
 const { TextArea } = Input;
-
-interface PendingRequest {
-  _id: string;
-  doc: string;
-  requester: string;
-  is_summary: boolean;
-  status: string;
-  message: string;
-  createdAt: string;
-  updatedAt: string;
-}
 
 interface DocumentActionButtonsProps {
   documentRequest: PendingRequest | null;
@@ -61,6 +51,7 @@ const DocumentActionButtons: React.FC<DocumentActionButtonsProps> = ({
   // Document status constants
   const DOCUMENT_STATUS = {
     PENDING: "PENDING",
+    PENDING_EDIT: "PENDING_EDIT",
     APPROVED: "APPROVED",
     REJECTED: "REJECTED",
     REQUESTED_EDIT: "REQUESTED_EDIT",
@@ -99,12 +90,14 @@ const DocumentActionButtons: React.FC<DocumentActionButtonsProps> = ({
       messageApi.success("Tài liệu đã được duyệt thành công!");
 
       // Send notification to the document owner
-      await NotificationService.createNotification({
-        userId: documentRequest.requester,
-        type: "SYSTEM",
-        message: `Quản trị viên đã duyệt tài liệu của bạn.`,
-        docId: documentRequest.doc,
-      });
+      if (documentRequest.requester) {
+        await NotificationService.createNotification({
+          userId: documentRequest.requester,
+          type: "SYSTEM",
+          message: `Quản trị viên đã duyệt tài liệu của bạn.`,
+          docId: documentRequest.doc,
+        });
+      }
     } catch (error) {
       console.error("Approve error:", error);
       messageApi.error("Có lỗi xảy ra khi duyệt tài liệu!");
@@ -137,12 +130,14 @@ const DocumentActionButtons: React.FC<DocumentActionButtonsProps> = ({
       setRejectReason("");
 
       // Send notification to the document owner
-      await NotificationService.createNotification({
-        userId: documentRequest.requester,
-        type: "SYSTEM",
-        message: `Quản trị viên đã từ chối tài liệu của bạn. Lý do: ${rejectReason}`,
-        docId: documentRequest.doc,
-      });
+      if (documentRequest.requester) {
+        await NotificationService.createNotification({
+          userId: documentRequest.requester,
+          type: "SYSTEM",
+          message: `Quản trị viên đã từ chối tài liệu của bạn. Lý do: ${rejectReason}`,
+          docId: documentRequest.doc,
+        });
+      }
     } catch (error) {
       console.error("Reject error:", error);
       messageApi.error("Có lỗi xảy ra khi từ chối tài liệu!");
@@ -247,10 +242,46 @@ const DocumentActionButtons: React.FC<DocumentActionButtonsProps> = ({
             key: "request-edit",
             text: "Yêu cầu chỉnh sửa",
             color: "#f59e0b",
+            onClick: () => setEditRequestModalVisible(true),
+          },
+          {
+            key: "delete",
+            text: "Xóa bài",
+            color: "#ef4444",
             onClick: () => setDeleteModalVisible(true),
           },
         ],
       },
+      
+      [DOCUMENT_STATUS.PENDING_EDIT]: {
+        statusBadge: {
+          text: "✏️ Yêu cầu chỉnh sửa đang chờ duyệt",
+          color: "text-purple-700",
+          bgColor: "bg-purple-100",
+          borderColor: "border-purple-300",
+        },
+        actionButtons: [
+          {
+            key: "approve",
+            text: "Duyệt chỉnh sửa",
+            color: "#22c55e",
+            onClick: handleApprove,
+          },
+          {
+            key: "reject",
+            text: "Từ chối chỉnh sửa",
+            color: "#ef4444",
+            onClick: () => setRejectModalVisible(true),
+          },
+          {
+            key: "delete",
+            text: "Xóa bài",
+            color: "#ef4444",
+            onClick: () => setDeleteModalVisible(true),
+          },
+        ],
+      },
+      
       [DOCUMENT_STATUS.APPROVED]: {
         statusBadge: {
           text: "✓ Đã duyệt",

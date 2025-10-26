@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { Form, message } from "antd";
-import type { Document } from "../../../models/document";
+import { Form, message, Alert } from "antd";
+import type { Document, PendingRequest } from "../../../models/document";
 import type { User } from "../../../models/user";
 import UserInfoHeader from "./UserInfoHeader";
 import type { UserInfo } from "./UserInfoHeader";
@@ -56,16 +56,7 @@ const convertUserToUserInfo = (user: User): UserInfo => {
   };
 };
 
-interface PendingRequest {
-  _id: string;
-  doc: string;
-  requester: string;
-  is_summary: boolean;
-  status: string;
-  message: string;
-  createdAt: string;
-  updatedAt: string;
-}
+// Using PendingRequest from document model
 
 interface DocumentReviewProps {
   document: Document;
@@ -76,8 +67,11 @@ interface DocumentReviewProps {
     summaryAction?: "approve" | "reject";
     summaryRejectReason?: string;
   }) => void;
-  onReject: (reason: string, requestId: string) => void;
+  onReject: (reason: string, requestId?: string) => void;
   onDelete: (reason: string) => void;
+  isEdit?: boolean;
+  editData?: any;
+  editApprovalData?: any;
 }
 
 const DocumentReview: React.FC<DocumentReviewProps> = ({
@@ -85,6 +79,9 @@ const DocumentReview: React.FC<DocumentReviewProps> = ({
   onApprove,
   onReject,
   onDelete,
+  isEdit = false,
+  editData, // TODO: Use this to show edit changes in UI
+  editApprovalData,
 }) => {
   const [form] = Form.useForm();
   const [messageApi, contextHolder] = message.useMessage();
@@ -107,24 +104,42 @@ const DocumentReview: React.FC<DocumentReviewProps> = ({
   const [summaryRejectReason, setSummaryRejectReason] = useState("");
   const [loading, setLoading] = useState(true);
 
-  // Load pending requests for the document
+  // Load pending requests for the document (only for new uploads, not edit requests)
   useEffect(() => {
     const loadPendingRequests = async () => {
       try {
         setLoading(true);
-        const response = await DocumentService.getPendingRequestsByDocument(
-          document._id
-        );
-        const requests = response.requests || [];
+        
+        // For edit requests, use the provided edit approval data
+        if (isEdit && editApprovalData) {
+          setDocumentRequest({
+            _id: editApprovalData._id,
+            doc: document._id,
+            is_summary: false,
+            status: editApprovalData.status,
+            message: editApprovalData.message || '',
+            reviewed_by: editApprovalData.reviewed_by,
+            reviewed_at: editApprovalData.reviewed_at,
+            createdAt: editApprovalData.createdAt,
+            updatedAt: editApprovalData.updatedAt,
+          });
+          setSummaryRequest(null); // Edit requests don't have separate summary
+        } else {
+          // For new upload requests, fetch from API
+          const response = await DocumentService.getPendingRequestsByDocument(
+            document._id
+          );
+          const requests = response.requests || [];
 
-        // Separate document and summary requests
-        const docReq = requests.find((req: PendingRequest) => !req.is_summary);
-        const sumReq = requests.find((req: PendingRequest) => req.is_summary);
+          // Separate document and summary requests
+          const docReq = requests.find((req: PendingRequest) => !req.is_summary);
+          const sumReq = requests.find((req: PendingRequest) => req.is_summary);
 
-        setDocumentRequest(docReq || null);
-        setSummaryRequest(sumReq || null);
+          setDocumentRequest(docReq || null);
+          setSummaryRequest(sumReq || null);
+        }
 
-        console.log("Loaded requests:", { docReq, sumReq });
+        console.log("Loaded requests:", { documentRequest, summaryRequest });
       } catch (error) {
         console.error("Error loading pending requests:", error);
         messageApi.error("Không thể tải thông tin requests!");
@@ -136,29 +151,32 @@ const DocumentReview: React.FC<DocumentReviewProps> = ({
     if (document._id) {
       loadPendingRequests();
     }
-  }, [document._id, messageApi]);
+  }, [document._id, messageApi, isEdit, editApprovalData]);
 
   useEffect(() => {
     if (document) {
-      const documentAuthors = document.author || [""];
+      // If this is an edit request, use edit data, otherwise use original document
+      const dataToUse = isEdit && editData ? editData : document;
+      
+      const documentAuthors = dataToUse.author || [""];
       setAuthors(documentAuthors.length > 0 ? documentAuthors : [""]);
 
       form.setFieldsValue({
-        documentName: document.title,
-        subject: document.subject?.name || "",
-        organization: document.organization?.name || "",
-        documentType: document.doc_type,
-        pageCount: document.page,
-        level: document.level,
-        keywords: document.keyword?.join(", ") || "",
-        publisher: document.publisher || "",
-        publishYear: document.published_year?.toString() || "",
+        documentName: dataToUse.title,
+        subject: typeof dataToUse.subject === 'object' ? dataToUse.subject?.name : '',
+        organization: typeof dataToUse.organization === 'object' ? dataToUse.organization?.name : '',
+        documentType: dataToUse.doc_type,
+        pageCount: dataToUse.page,
+        level: dataToUse.level,
+        keywords: dataToUse.keyword?.join(", ") || "",
+        publisher: dataToUse.publisher || "",
+        publishYear: dataToUse.published_year?.toString() || "",
         authors: documentAuthors,
-        summary: document.description?.summary_by_user || "",
-        public_mode: document.public_mode || "PUBLIC",
+        summary: dataToUse.summary_by_user || dataToUse.description?.summary_by_user || "",
+        public_mode: dataToUse.public_mode || document.public_mode || "PUBLIC",
       });
     }
-  }, [document, form]);
+  }, [document, form, isEdit, editData]);
 
   // Functions moved to child components
 
@@ -188,6 +206,26 @@ const DocumentReview: React.FC<DocumentReviewProps> = ({
           Id: {document._id}
         </span>
       </div>
+
+      {/* Show edit information alert */}
+      {isEdit && editData && (
+        <Alert
+          message="Chỉnh sửa tài liệu"
+          description={
+            <div>
+              <p className="mb-2">Tài liệu này có yêu cầu chỉnh sửa đang chờ duyệt.</p>
+              <p className="text-sm text-gray-600">
+                Thông tin bên dưới đang hiển thị dữ liệu đã chỉnh sửa. 
+                Khi duyệt, dữ liệu này sẽ thay thế dữ liệu cũ.
+              </p>
+            </div>
+          }
+          type="info"
+          showIcon
+          className="mb-4"
+          closable
+        />
+      )}
 
       <div className="mx-auto bg-white rounded-lg shadow-sm p-3 sm:p-6">
         <Form
