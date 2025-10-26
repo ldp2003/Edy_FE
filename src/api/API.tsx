@@ -48,6 +48,7 @@ export const AuthAPI = {
   logout: async () => {
     try {
       const response = await apiClient.post("/auth/logout", {}, { withCredentials: true });
+      
       return response.data;
     } catch (error) {
       console.error("Error logging out:", error);
