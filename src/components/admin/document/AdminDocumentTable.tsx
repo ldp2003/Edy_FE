@@ -389,34 +389,6 @@ const AdminDocumentTable: React.FC = () => {
       align: "center",
     },
     {
-      title: "Trạng thái",
-      dataIndex: "status",
-      key: "status",
-      align: "center",
-      fixed: "right",
-      render: (status: string) => {
-        const getStatusDisplay = (status: string) => {
-          switch (status) {
-            case "PENDING":
-              return { text: "Chờ duyệt", color: "text-yellow-600" };
-            case "APPROVED":
-              return { text: "Đã duyệt", color: "text-green-600" };
-            case "PENDING_SUMMARY":
-              return { text: "Chờ tóm tắt", color: "text-blue-600" };
-            case "REJECTED":
-              return { text: "Đã từ chối", color: "text-red-600" };
-            case "REQUESTED_EDIT":
-              return { text: "Chờ chỉnh sửa", color: "text-orange-600" };
-            default:
-              return { text: status, color: "text-gray-600" };
-          }
-        };
-
-        const { text, color } = getStatusDisplay(status);
-        return <span className={`font-medium ${color}`}>{text}</span>;
-      },
-    },
-    {
       title: "Ngày tạo",
       dataIndex: "createdAt",
       key: "createdAt",
@@ -505,6 +477,10 @@ const AdminDocumentTable: React.FC = () => {
             REJECTED: { text: "Đã từ chối", color: "bg-red-100 text-red-800" },
             REQUESTED_EDIT: {
               text: "Chờ chỉnh sửa",
+              color: "bg-orange-100 text-orange-800",
+            },
+            PENDING_EDIT: {
+              text: "Chờ duyệt chỉnh sửa",
               color: "bg-orange-100 text-orange-800",
             },
           };

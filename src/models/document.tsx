@@ -130,6 +130,19 @@ export interface DocumentsResponse {
   have_next: boolean;
 }
 
+export interface PendingRequest {
+  _id: string;
+  doc: string;
+  requester?: string;
+  is_summary: boolean;
+  status: string;
+  message: string;
+  reviewed_by?: any;
+  reviewed_at?: any;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface FetchDocumentsParams {
   search?: string;
   ordering?: string;
