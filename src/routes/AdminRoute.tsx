@@ -13,6 +13,8 @@ import NotFoundPage from "../pages/Error/NotFoundPage";
 import ReportsPage from "../pages/admin/report/ReportsPage";
 import ManageRolesPage from "../pages/admin/user/ManageRolesPage";
 import AssignRolesPage from "../pages/admin/user/AssignRolesPage";
+import ManageSubjectsPage from "../pages/admin/subject/ManageSubjectsPage";
+import ManageOrganizationsPage from "../pages/admin/organization/ManageOrganizationsPage";
 
 const AdminRoute: React.FC = () => {
   return (
@@ -41,6 +43,12 @@ const AdminRoute: React.FC = () => {
 
           <Route path="users/assign-roles" element={<AssignRolesPage />} />
           <Route path="users/manage-roles" element={<ManageRolesPage />} />
+
+          {/* Subject management routes */}
+          <Route path="subjects" element={<ManageSubjectsPage />} />
+
+          {/* Organization management routes */}
+          <Route path="organizations" element={<ManageOrganizationsPage />} />
 
           {/* Reports routes */}
           <Route path="reports" element={<ReportsPage />} />

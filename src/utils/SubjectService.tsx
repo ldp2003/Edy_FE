@@ -123,6 +123,51 @@ const SubjectService = {
       throw error;
     }
   },
+
+  /**
+   * Sync subject document count
+   * @param subjectId - ID của môn học
+   * @returns Promise<{message: string, old_count?: number, new_count?: number, count?: number}>
+   */
+  async syncSubjectDocCount(
+    subjectId: string
+  ): Promise<{
+    message: string;
+    old_count?: number;
+    new_count?: number;
+    count?: number;
+  }> {
+    try {
+      const response = await SubjectAPI.syncSubjectDocCount(subjectId);
+      return response;
+    } catch (error) {
+      console.error("Error in SubjectService.syncSubjectDocCount:", error);
+      throw error;
+    }
+  },
+
+  /**
+   * Sync all subjects document count
+   * @returns Promise<{message: string, total_subjects: number, updated_subjects: number, updated_list: {subject_id: string, old_count: number, new_count: number}[]}>
+   */
+  async syncAllSubjectsDocCount(): Promise<{
+    message: string;
+    total_subjects: number;
+    updated_subjects: number;
+    updated_list: {
+      subject_id: string;
+      old_count: number;
+      new_count: number;
+    }[];
+  }> {
+    try {
+      const response = await SubjectAPI.syncAllSubjectsDocCount();
+      return response;
+    } catch (error) {
+      console.error("Error in SubjectService.syncAllSubjectsDocCount:", error);
+      throw error;
+    }
+  },
 };
 
 export default SubjectService;

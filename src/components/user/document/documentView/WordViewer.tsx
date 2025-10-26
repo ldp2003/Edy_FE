@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { renderAsync } from "docx-preview";
 import "../../../../docx-preview.css";
+import DescriptionModal from "../description/DescriptionModal";
 
 interface WordViewerProps {
   url: string;
@@ -15,6 +16,7 @@ const WordViewer: React.FC<WordViewerProps> = ({
   url,
   onPageChange,
   zoom = 1,
+  isUser = false,
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [loading, setLoading] = useState(true);
@@ -73,7 +75,7 @@ const WordViewer: React.FC<WordViewerProps> = ({
       )}
       <div
         ref={containerRef}
-        className="docx-wrapper px-1 sm:px-2 md:px-4"
+        className="docx-wrapper px-1 sm:px-2 md:px-4 relative"
         style={{
           width: "100%",
           overflowX: "auto",
@@ -82,7 +84,14 @@ const WordViewer: React.FC<WordViewerProps> = ({
           transform: `scale(${zoom})`,
           transformOrigin: "top left",
         }}
-      />
+      >
+        {/* Add DescriptionModal overlay for non-owner users */}
+        {!isUser && (
+          <div className="absolute inset-0 flex items-center justify-center bg-white/90 z-10">
+            <DescriptionModal />
+          </div>
+        )}
+      </div>
     </div>
   );
 };
