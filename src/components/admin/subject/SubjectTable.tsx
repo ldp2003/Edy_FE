@@ -1,6 +1,6 @@
 import React from "react";
 import { Table, Button } from "antd";
-import { EditOutlined } from "@ant-design/icons";
+import { EditOutlined, DeleteOutlined, SyncOutlined } from "@ant-design/icons";
 import type { ColumnsType } from "antd/es/table";
 import type { Subject } from "../../../models/subject";
 
@@ -10,13 +10,18 @@ interface SubjectTableProps {
   onEdit: (subject: Subject) => void;
   onDelete: (subjectId: string) => void;
   onView: (subject: Subject) => void;
+  onSync?: (subjectId: string) => void;
+  syncingSubjects?: Set<string>;
 }
 
 const SubjectTable: React.FC<SubjectTableProps> = ({
   subjects,
   loading,
   onEdit,
+  onDelete,
   onView,
+  onSync,
+  syncingSubjects = new Set(),
 }) => {
   const columns: ColumnsType<Subject> = [
     {
@@ -103,6 +108,31 @@ const SubjectTable: React.FC<SubjectTableProps> = ({
           >
             Sửa
           </Button>
+          <Button
+            type="link"
+            size="small"
+            danger
+            icon={<DeleteOutlined />}
+            onClick={() => onDelete(record._id)}
+            className="text-base sm:text-sm xs:text-xs p-0"
+          >
+            Xóa
+          </Button>
+          {onSync && (
+            <Button
+              type="link"
+              size="small"
+              icon={
+                syncingSubjects.has(record._id) ? undefined : <SyncOutlined />
+              }
+              onClick={() => onSync(record._id)}
+              className="text-base sm:text-sm xs:text-xs p-0 text-blue-600"
+              loading={syncingSubjects.has(record._id)}
+              disabled={syncingSubjects.has(record._id)}
+            >
+              {syncingSubjects.has(record._id) ? "Đang đồng bộ..." : "Đồng bộ"}
+            </Button>
+          )}
         </div>
       ),
     },

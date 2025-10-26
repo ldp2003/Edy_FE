@@ -27,7 +27,7 @@ const AuthRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [user, setUser] = useState<User>(defaultUser);
+  const [user, setUser] = useState<User | null>(defaultUser);
   const [role, setRole] = useState<RoleCode | null>(null);
   const [account, setAccount] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -413,6 +413,7 @@ const AuthRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
       unreadCount={unreadCount}
       setUnreadCount={setUnreadCount}
       refreshNotifications={fetchNotifications}
+      setUser={setUser}
     >
       {children}
       <LoginRequiredModal

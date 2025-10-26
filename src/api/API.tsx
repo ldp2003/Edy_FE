@@ -441,6 +441,30 @@ export const SubjectAPI = {
       throw error;
     }
   },
+
+  // Sync subject document count
+  syncSubjectDocCount: async (subjectId: string) => {
+    try {
+      const response = await apiClient.post(
+        `/subjects/${subjectId}/sync-doc-count`
+      );
+      return response.data;
+    } catch (error) {
+      console.error("Error syncing subject document count:", error);
+      throw error;
+    }
+  },
+
+  // Sync all subjects document count
+  syncAllSubjectsDocCount: async () => {
+    try {
+      const response = await apiClient.post(`/subjects/sync-all-doc-counts`);
+      return response.data;
+    } catch (error) {
+      console.error("Error syncing all subjects document count:", error);
+      throw error;
+    }
+  },
 };
 
 export const DocumentAPI = {
@@ -1403,4 +1427,124 @@ export const PointTransactionAPI = {
       params,
     });
   },
+
+  // Spend points
+  spendPoints: async (data: { amount: number; reason: string }) => {
+    try {
+      const response = await apiClient.post("/point-transactions/spend", data);
+      return response.data;
+    } catch (error) {
+      console.error("Error spending points:", error);
+      throw error;
+    }
+  },
+};
+
+export const CloudinaryAPI = {
+  // Delete file from Cloudinary
+  deleteFile: async (data: {
+    fileUrl?: string;
+    publicId?: string;
+    resourceType?: "raw" | "image" | "video";
+  }) => {
+    try {
+      // Extract publicId and resourceType from URL if provided
+      let publicId = data.publicId;
+      let resourceType: "raw" | "image" | "video" = data.resourceType || "raw";
+
+      if (data.fileUrl && !publicId) {
+        const extractedPublicId = extractPublicIdFromUrl(data.fileUrl);
+        if (extractedPublicId) {
+          publicId = extractedPublicId;
+          // Only auto-detect resourceType if not explicitly provided
+          if (!data.resourceType) {
+            resourceType = extractResourceTypeFromUrl(data.fileUrl);
+          }
+        }
+      }
+
+      if (!publicId) {
+        throw new Error("Không thể trích xuất public ID từ URL");
+      }
+
+      const response = await apiClient.delete("/cloudinary/delete-file", {
+        data: { publicId, resourceType: resourceType },
+      });
+      return response.data;
+    } catch (error) {
+      console.error("Error deleting file:", error);
+      throw error;
+    }
+  },
+
+  // Get file info from Cloudinary
+  getFileInfo: async (data: {
+    fileUrl: string;
+    resourceType?: "raw" | "image" | "video";
+  }) => {
+    try {
+      const publicId = extractPublicIdFromUrl(data.fileUrl);
+      const resourceType =
+        data.resourceType || extractResourceTypeFromUrl(data.fileUrl);
+
+      if (!publicId) {
+        throw new Error("Không thể trích xuất public ID từ URL");
+      }
+
+      const response = await apiClient.post("/cloudinary/file-info", {
+        publicId,
+        resourceType,
+      });
+      return response.data;
+    } catch (error) {
+      console.error("Error getting file info:", error);
+      throw error;
+    }
+  },
+};
+
+// Helper functions to extract public ID and resource type from Cloudinary URL
+const extractPublicIdFromUrl = (url: string): string | null => {
+  try {
+    if (!url) return null;
+
+    // Tìm pattern: /(raw|image|video)/upload/[v123456789/]publicId.extension
+    const match = url.match(/\/(raw|image|video)\/upload\/(?:v\d+\/)?(.+)$/);
+
+    if (match && match[2]) {
+      // Decode URL để chuyển từ %C4%90 về tiếng Việt
+      const decodedPath = decodeURIComponent(match[2]);
+
+      // Kiểm tra xem có phải file Word không (.doc, .docx)
+      const isWordFile = /\.(doc|docx)$/i.test(decodedPath);
+
+      if (isWordFile) {
+        // Giữ nguyên extension cho file Word
+        return decodedPath;
+      } else {
+        // Loại bỏ extension cho các file khác
+        const lastDotIndex = decodedPath.lastIndexOf(".");
+        if (lastDotIndex !== -1) {
+          return decodedPath.substring(0, lastDotIndex);
+        }
+        return decodedPath;
+      }
+    }
+
+    return null;
+  } catch (error) {
+    console.error("Error extracting publicId:", error);
+    return null;
+  }
+};
+
+const extractResourceTypeFromUrl = (url: string): "raw" | "image" | "video" => {
+  try {
+    // Tìm resource type từ URL pattern: /resource_type/
+    const match = url.match(/\/(raw|image|video)\//);
+    return match ? (match[1] as "raw" | "image" | "video") : "image"; // Mặc định là image nếu không tìm thấy
+  } catch (error) {
+    console.error("Error extracting resource type:", error);
+    return "image";
+  }
 };

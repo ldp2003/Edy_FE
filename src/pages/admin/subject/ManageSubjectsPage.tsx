@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { Select, message, Modal, Form } from "antd";
-import { PlusOutlined } from "@ant-design/icons";
+import { PlusOutlined, SyncOutlined } from "@ant-design/icons";
 import SubjectService from "../../../utils/SubjectService";
 import { OrganizationService } from "../../../utils/OrganizationService";
 import type { Subject } from "../../../models/subject";
@@ -22,6 +22,10 @@ const ManageSubjectsPage: React.FC = () => {
   const [editingSubject, setEditingSubject] = useState<Subject | null>(null);
   const [viewingSubject, setViewingSubject] = useState<Subject | null>(null);
   const [isViewModalVisible, setIsViewModalVisible] = useState(false);
+  const [syncAllLoading, setSyncAllLoading] = useState(false);
+  const [syncingSubjects, setSyncingSubjects] = useState<Set<string>>(
+    new Set()
+  );
   const [form] = Form.useForm();
 
   const loadSubjects = useCallback(async () => {
@@ -139,6 +143,49 @@ const ManageSubjectsPage: React.FC = () => {
     setViewingSubject(null);
   };
 
+  const handleSync = async (subjectId: string) => {
+    // Add to syncing set
+    setSyncingSubjects((prev) => new Set(prev).add(subjectId));
+
+    try {
+      const result = await SubjectService.syncSubjectDocCount(subjectId);
+      if (result.old_count !== undefined && result.new_count !== undefined) {
+        message.success(
+          `Đã đồng bộ: ${result.old_count} → ${result.new_count} tài liệu`
+        );
+      } else {
+        message.success("Số lượng tài liệu đã chính xác");
+      }
+      loadSubjects(); // Reload để cập nhật số lượng
+    } catch (error) {
+      console.error("Error syncing subject document count:", error);
+      message.error("Không thể đồng bộ số lượng tài liệu");
+    } finally {
+      // Remove from syncing set
+      setSyncingSubjects((prev) => {
+        const newSet = new Set(prev);
+        newSet.delete(subjectId);
+        return newSet;
+      });
+    }
+  };
+
+  const handleSyncAll = async () => {
+    setSyncAllLoading(true);
+    try {
+      const result = await SubjectService.syncAllSubjectsDocCount();
+      message.success(
+        `Đã đồng bộ ${result.updated_subjects}/${result.total_subjects} môn học`
+      );
+      loadSubjects(); // Reload để cập nhật số lượng
+    } catch (error) {
+      console.error("Error syncing all subjects document count:", error);
+      message.error("Không thể đồng bộ số lượng tài liệu");
+    } finally {
+      setSyncAllLoading(false);
+    }
+  };
+
   return (
     <div>
       <div className="mb-6">
@@ -149,7 +196,7 @@ const ManageSubjectsPage: React.FC = () => {
         <div className="flex flex-col sm:flex-row gap-4 mb-4">
           <div className="sm:w-1/3">
             <div>
-              <label className="block font-medium text-gray-700 mb-2 text-base sm:text-sm xs:text-xs">
+              <label className="block text-left font-medium text-gray-700 mb-2 text-base sm:text-sm xs:text-xs">
                 Chọn tổ chức
               </label>
               <Select
@@ -167,7 +214,7 @@ const ManageSubjectsPage: React.FC = () => {
               </Select>
             </div>
           </div>
-          <div className="sm:w-2/3 flex items-end justify-start">
+          <div className="sm:w-2/3 flex items-end justify-start gap-2">
             <button
               onClick={handleAdd}
               disabled={!selectedOrganization}
@@ -180,6 +227,22 @@ const ManageSubjectsPage: React.FC = () => {
               <PlusOutlined className="mr-2" />
               Thêm môn học
             </button>
+            <button
+              onClick={handleSyncAll}
+              disabled={!selectedOrganization || syncAllLoading}
+              className={`inline-flex items-center px-4 py-2 text-base sm:text-sm xs:text-xs font-medium rounded-md text-white ${
+                selectedOrganization && !syncAllLoading
+                  ? "bg-green-600 hover:bg-green-700 focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
+                  : "bg-gray-400 cursor-not-allowed"
+              } transition-colors duration-200`}
+            >
+              {syncAllLoading ? (
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+              ) : (
+                <SyncOutlined className="mr-2" />
+              )}
+              {syncAllLoading ? "Đang đồng bộ..." : "Đồng bộ tất cả"}
+            </button>
           </div>
         </div>
       </div>
@@ -190,6 +253,8 @@ const ManageSubjectsPage: React.FC = () => {
         onEdit={handleEdit}
         onDelete={handleDelete}
         onView={handleView}
+        onSync={handleSync}
+        syncingSubjects={syncingSubjects}
       />
 
       <SubjectForm
