@@ -56,7 +56,7 @@ const AdminUserTable: React.FC = () => {
   // Auto-switch view mode based on screen size
   useEffect(() => {
     const updateViewMode = () => {
-      const isMobile = window.innerWidth < 768; // md breakpoint
+      const isMobile = window.innerWidth < 1024; // lg breakpoint - switch to list on tablets
       setViewMode(isMobile ? "list" : "table");
     };
 
@@ -555,7 +555,7 @@ const AdminUserTable: React.FC = () => {
   };
 
   return (
-    <div className="w-full max-w-full overflow-hidden relative">
+    <div className="w-full overflow-hidden relative">
       <div className="space-y-4 md:space-y-6">
         {/* Filter and Search Section */}
         <div className="border border-gray-200 rounded-lg p-3 md:p-4 bg-white shadow-sm">
@@ -574,6 +574,7 @@ const AdminUserTable: React.FC = () => {
               {/* View Mode Toggle - Hidden on mobile, auto-switches */}
               <div className="hidden md:flex items-center border border-gray-300 rounded-md">
                 <button
+                  title="Xem dạng bảng"
                   className={`flex items-center px-2 py-1 text-xs ${
                     viewMode === "table"
                       ? "bg-blue-500 text-white"
@@ -584,6 +585,7 @@ const AdminUserTable: React.FC = () => {
                   <Grid3X3 size={14} />
                 </button>
                 <button
+                  title="Xem dạng danh sách"
                   className={`flex items-center px-2 py-1 text-xs ${
                     viewMode === "list"
                       ? "bg-blue-500 text-white"
@@ -688,20 +690,21 @@ const AdminUserTable: React.FC = () => {
               <style>
                 {`
                 .compact-table .ant-table-tbody > tr > td {
-                  font-size: 11px !important;
-                  padding: 4px 8px !important;
+                  font-size: 13px !important;
+                  padding: 10px 12px !important;
                   white-space: nowrap;
                 }
                 .compact-table .ant-table-thead > tr > th {
-                  font-size: 11px !important;
-                  padding: 8px 8px !important;
+                  font-size: 13px !important;
+                  padding: 12px 12px !important;
                   white-space: nowrap;
+                  font-weight: 600;
                 }
                 .compact-table .ant-table-container {
                   overflow-x: auto !important;
                 }
                 .compact-table .ant-table {
-                  font-size: 11px;
+                  font-size: 13px;
                 }
                 .compact-table .ant-table-fixed-left {
                   z-index: 2;
@@ -713,6 +716,29 @@ const AdminUserTable: React.FC = () => {
                 /* Make rows clickable with hover effect */
                 .compact-table .ant-table-tbody > tr:hover > td {
                   background-color: #f5f5f5 !important;
+                }
+                
+                /* Responsive adjustments */
+                @media (max-width: 1400px) {
+                  .compact-table .ant-table-tbody > tr > td {
+                    font-size: 12px !important;
+                    padding: 8px 10px !important;
+                  }
+                  .compact-table .ant-table-thead > tr > th {
+                    font-size: 12px !important;
+                    padding: 10px 10px !important;
+                  }
+                }
+                
+                @media (max-width: 1600px) {
+                  .compact-table .ant-table-tbody > tr > td {
+                    font-size: 12.5px !important;
+                    padding: 9px 11px !important;
+                  }
+                  .compact-table .ant-table-thead > tr > th {
+                    font-size: 12.5px !important;
+                    padding: 11px 11px !important;
+                  }
                 }
                 
                 /* Hide less important columns on smaller screens */
@@ -732,7 +758,7 @@ const AdminUserTable: React.FC = () => {
                 size="middle"
                 loading={loading}
                 rowKey="_id"
-                scroll={{ x: "max-content", y: 600 }}
+                scroll={{ x: "max-content", y: 700 }}
                 className="compact-table"
                 onRow={(record) => ({
                   onClick: () => handleViewUser(record._id),

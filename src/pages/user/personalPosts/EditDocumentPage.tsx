@@ -38,7 +38,6 @@ const EditDocumentPage: React.FC = () => {
   }, [id, messageApi, navigate]);
 
   const handleEditSuccess = () => {
-    messageApi.success("Cập nhật tài liệu thành công!");
     setTimeout(() => {
       navigate("/personal-posts");
     }, 1500);

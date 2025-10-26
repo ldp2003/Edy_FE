@@ -476,4 +476,27 @@ export const DocumentService = {
       throw error;
     }
   },
+
+  // Get edit approval by document ID
+  async getEditApprovalByDocumentId(documentId: string) {
+    try {
+      return await DocumentAPI.getEditApprovalByDocumentId(documentId);
+    } catch (error) {
+      console.error("Error in DocumentService.getEditApprovalByDocumentId:", error);
+      throw error;
+    }
+  },
+
+  // Handle edit approval (approve/reject)
+  async handleEditApproval(editApprovalId: string, actionData: {
+    action: 'APPROVE' | 'REJECT';
+    message?: string;
+  }) {
+    try {
+      return await DocumentAPI.handleEditApproval(editApprovalId, actionData);
+    } catch (error) {
+      console.error("Error in DocumentService.handleEditApproval:", error);
+      throw error;
+    }
+  },
 };

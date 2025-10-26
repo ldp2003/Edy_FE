@@ -19,6 +19,9 @@ const DocumentReviewPage: React.FC = () => {
   const requestId = searchParams.get("requestId");
   const [document, setDocument] = useState<Document | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isEdit, setIsEdit] = useState(false);
+  const [editData, setEditData] = useState<any>(null);
+  const [editApprovalData, setEditApprovalData] = useState<any>(null);
 
   // Get duplicate document info from navigation state
   const duplicateDocument = location.state?.duplicateDocument as
@@ -40,6 +43,31 @@ const DocumentReviewPage: React.FC = () => {
         setLoading(true);
         const documentData = await DocumentService.getDocumentById(id);
         setDocument(documentData);
+        const isEditRequest = documentData.status === "PENDING_EDIT";
+        setIsEdit(isEditRequest);
+
+        // If this is an edit request, fetch edit data and approval info
+        if (isEditRequest) {
+          try {
+            // Fetch edit document data
+            const editDocData = await DocumentService.getEditDocument(id);
+            setEditData(editDocData);
+
+            // Fetch edit approval data
+            const editApproval = await DocumentService.getEditApprovalByDocumentId(id);
+            setEditApprovalData(editApproval);
+          } catch (editError: any) {
+            console.error("Error fetching edit data:", editError);
+            // Don't show error if it's just that there's no edit data yet
+            if (editError.response?.status !== 404) {
+              message.warning("Không thể tải thông tin chỉnh sửa. Tiếp tục với tài liệu gốc.");
+            }
+          }
+        } else {
+          // For new upload requests, the approval data is fetched by the DocumentReview component
+          setEditData(null);
+          setEditApprovalData(null);
+        }
       } catch (error) {
         console.error("Error fetching document:", error);
         message.error("Không thể tải thông tin tài liệu!");
@@ -60,25 +88,35 @@ const DocumentReviewPage: React.FC = () => {
     summaryRejectReason?: string;
   }) => {
     try {
-      // Approve document request - Fixed method name
-      await DocumentService.approveDocumentByRequestId(
-        approvalData.documentRequestId,
-        {
-          isIntensive: approvalData.isIntensive,
-        }
-      );
+      // If this is an edit request, use edit approval API
+      if (isEdit && editApprovalData) {
+        await DocumentService.handleEditApproval(
+          editApprovalData._id || approvalData.documentRequestId,
+          {
+            action: 'APPROVE',
+          }
+        );
+      } else {
+        // This is a new upload request, use regular approval API
+        await DocumentService.approveDocumentByRequestId(
+          approvalData.documentRequestId,
+          {
+            isIntensive: approvalData.isIntensive,
+          }
+        );
 
-      // Handle summary request if exists
-      if (approvalData.summaryRequestId) {
-        if (approvalData.summaryAction === "approve") {
-          await DocumentService.approveDocumentByRequestId(
-            approvalData.summaryRequestId
-          );
-        } else if (approvalData.summaryAction === "reject") {
-          await DocumentService.rejectDocumentByRequestId(
-            approvalData.summaryRequestId,
-            approvalData.summaryRejectReason || "Tóm tắt không phù hợp"
-          );
+        // Handle summary request if exists
+        if (approvalData.summaryRequestId) {
+          if (approvalData.summaryAction === "approve") {
+            await DocumentService.approveDocumentByRequestId(
+              approvalData.summaryRequestId
+            );
+          } else if (approvalData.summaryAction === "reject") {
+            await DocumentService.rejectDocumentByRequestId(
+              approvalData.summaryRequestId,
+              approvalData.summaryRejectReason || "Tóm tắt không phù hợp"
+            );
+          }
         }
       }
 
@@ -96,14 +134,25 @@ const DocumentReviewPage: React.FC = () => {
 
   const handleReject = async (reason: string, reqId?: string) => {
     const targetRequestId = reqId || requestId;
-    if (!targetRequestId) {
+    if (!targetRequestId && !editApprovalData) {
       message.error("Không có thông tin yêu cầu duyệt!");
       return;
     }
 
     try {
-      // Using DocumentService instead of DocumentService for consistency
-      await DocumentService.rejectDocumentByRequestId(targetRequestId, reason);
+      // If this is an edit request, use edit approval API
+      if (isEdit && editApprovalData) {
+        await DocumentService.handleEditApproval(
+          editApprovalData._id || targetRequestId!,
+          {
+            action: 'REJECT',
+            message: reason,
+          }
+        );
+      } else {
+        // This is a new upload request, use regular rejection API
+        await DocumentService.rejectDocumentByRequestId(targetRequestId!, reason);
+      }
       message.success("Đã từ chối tài liệu!");
       setTimeout(() => {
         navigate("/admin/documents/all");
@@ -160,7 +209,7 @@ const DocumentReviewPage: React.FC = () => {
   return (
     <div className="w-full text-left mx-auto px-4 sm:px-6 lg:px-8">
       <AdminBreadcrumb items={breadcrumbItems} />
-
+      
       {/* Show duplicate document alert if came from compare page */}
       {duplicateDocument && (
         <Alert
@@ -191,6 +240,9 @@ const DocumentReviewPage: React.FC = () => {
         onApprove={handleApprove}
         onReject={handleReject}
         onDelete={handleDelete}
+        isEdit={isEdit}
+        editData={editData}
+        editApprovalData={editApprovalData}
       />
     </div>
   );

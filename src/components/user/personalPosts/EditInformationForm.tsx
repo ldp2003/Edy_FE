@@ -64,6 +64,7 @@ const EditInformationForm = ({
   const [uploading, setUploading] = useState(false);
   const [existingEditDocument, setExistingEditDocument] = useState<any>(null);
   const [loadingEditData, setLoadingEditData] = useState(false);
+  const [formInitialized, setFormInitialized] = useState(false);
   const navigate = useNavigate();
 
   const { user } = useContext(UserContext);
@@ -96,10 +97,16 @@ const EditInformationForm = ({
 
   // Load existing edit document if any
   useEffect(() => {
+    let isMounted = true;
+    
     const loadEditDocument = async () => {
       try {
         setLoadingEditData(true);
         const editDoc = await DocumentService.getEditDocument(document._id);
+        
+        // Only update if component is still mounted
+        if (!isMounted) return;
+        
         setExistingEditDocument(editDoc);
         
         // If there's existing edit data, load it into the form
@@ -126,26 +133,37 @@ const EditInformationForm = ({
           }
           
           form.setFieldsValue(formValues);
+          setFormInitialized(true);
           message.info("Đang chỉnh sửa bản nháp trước đó. Bạn có thể tiếp tục chỉnh sửa và gửi lại.");
         }
       } catch (error: any) {
         // If error is 404 or "not found", it means no edit document exists yet
+        if (!isMounted) return;
+        
         if (error.response?.status === 404 || error.message?.includes("không tồn tại")) {
           console.log("No existing edit document found");
         } else {
           console.error("Error loading edit document:", error);
         }
       } finally {
-        setLoadingEditData(false);
+        if (isMounted) {
+          setLoadingEditData(false);
+        }
       }
     };
 
     loadEditDocument();
-  }, [document._id, form]);
+    
+    // Cleanup function
+    return () => {
+      isMounted = false;
+    };
+  }, [document._id]);
 
   // Ensure form is updated when both document and subjects are available
+  // Only apply this if we don't have edit data to avoid conflicts
   useEffect(() => {
-    if (document && subjects.length > 0 && !subjectsLoading) {
+    if (document && subjects.length > 0 && !subjectsLoading && !existingEditDocument) {
       const subjectId =
         typeof document.subject === "object"
           ? document.subject._id
@@ -161,11 +179,12 @@ const EditInformationForm = ({
         console.log("Force set subject field to:", subjectId);
       }
     }
-  }, [document, subjects, subjectsLoading, form]);
+  }, [document, subjects, subjectsLoading, form, existingEditDocument]);
 
-  // Pre-fill form with existing document data
+  // Pre-fill form with existing document data (only if no edit document exists and form not initialized)
   useEffect(() => {
-    if (document && subjects.length > 0) {
+    // Only set original document data if we don't have an existing edit document and form hasn't been initialized
+    if (document && subjects.length > 0 && !existingEditDocument && !formInitialized) {
       console.log("Setting form values with document:", document);
       console.log("Available subjects:", subjects);
 
@@ -202,8 +221,9 @@ const EditInformationForm = ({
       console.log("Setting form values:", formValues);
       form.setFieldsValue(formValues);
       setCoverImage(document.cover_page || "");
+      setFormInitialized(true);
     }
-  }, [document, form, subjects]); // Add subjects to dependencies
+  }, [document, form, subjects, existingEditDocument, formInitialized]); // Add existingEditDocument to dependencies
 
   const addAuthor = () => {
     setAuthors([...authors, ""]);

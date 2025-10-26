@@ -1,18 +1,8 @@
 import React from "react";
 import { Form, Radio, Input } from "antd";
+import type { PendingRequest } from "../../../../models/document";
 
 const { TextArea } = Input;
-
-interface PendingRequest {
-  _id: string;
-  doc: string;
-  requester: string;
-  is_summary: boolean;
-  status: string;
-  message: string;
-  createdAt: string;
-  updatedAt: string;
-}
 
 interface DocumentSummaryProps {
   summaryRequest: PendingRequest | null;

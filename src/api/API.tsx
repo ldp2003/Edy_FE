@@ -930,6 +930,31 @@ export const DocumentAPI = {
       throw error;
     }
   },
+
+  // Get edit approval by document ID
+  getEditApprovalByDocumentId: async (documentId: string) => {
+    try {
+      const response = await apiClient.get(`/documents/pending-edit-request/${documentId}`);
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching edit approval:", error);
+      throw error;
+    }
+  },
+
+  // Handle edit approval (approve/reject)
+  handleEditApproval: async (editApprovalId: string, actionData: {
+    action: 'APPROVE' | 'REJECT';
+    message?: string;
+  }) => {
+    try {
+      const response = await apiClient.put(`/documents/approve-edit/${editApprovalId}`, actionData);
+      return response.data;
+    } catch (error) {
+      console.error("Error handling edit approval:", error);
+      throw error;
+    }
+  },
 };
 export const AccessRequestAPI = {
   // Create access request for private share
