@@ -47,8 +47,12 @@ export const AuthAPI = {
   },
   logout: async () => {
     try {
-      const response = await apiClient.post("/auth/logout", {}, { withCredentials: true });
-      
+      const response = await apiClient.post(
+        "/auth/logout",
+        {},
+        { withCredentials: true }
+      );
+
       return response.data;
     } catch (error) {
       console.error("Error logging out:", error);
@@ -130,6 +134,7 @@ export const OrganizationAPI = {
     country: string;
     address: string;
     website: string;
+    logo?: string;
   }) => {
     try {
       const response = await apiClient.post("/organizations", organization);
@@ -146,6 +151,52 @@ export const OrganizationAPI = {
       return response.data;
     } catch (error) {
       console.error("Error fetching organizations:", error);
+      throw error;
+    }
+  },
+
+  getOrganizationById: async (organizationId: string) => {
+    try {
+      const response = await apiClient.get(`/organizations/${organizationId}`);
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching organization by ID:", error);
+      throw error;
+    }
+  },
+
+  updateOrganization: async (
+    organizationId: string,
+    organizationData: {
+      name?: string;
+      code?: string;
+      description?: string;
+      country?: string;
+      address?: string;
+      website?: string;
+      logo?: string;
+    }
+  ) => {
+    try {
+      const response = await apiClient.put(
+        `/organizations/${organizationId}`,
+        organizationData
+      );
+      return response.data;
+    } catch (error) {
+      console.error("Error updating organization:", error);
+      throw error;
+    }
+  },
+
+  deleteOrganization: async (organizationId: string) => {
+    try {
+      const response = await apiClient.delete(
+        `/organizations/${organizationId}`
+      );
+      return response.data;
+    } catch (error) {
+      console.error("Error deleting organization:", error);
       throw error;
     }
   },

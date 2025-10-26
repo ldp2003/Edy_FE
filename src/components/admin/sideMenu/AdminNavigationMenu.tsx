@@ -6,6 +6,8 @@ import {
   Flag,
   ChevronDown,
   ChevronRight,
+  BookOpen,
+  Building,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
@@ -55,6 +57,8 @@ export function AdminNavigationMenu({ isCompact }: AdminNavigationMenuProps) {
         { label: "Quản lý quyền", path: "/admin/users/manage-roles" },
       ],
     },
+    { icon: BookOpen, label: "Môn học", path: "/admin/subjects" },
+    { icon: Building, label: "Tổ chức", path: "/admin/organizations" },
     { icon: Flag, label: "Báo cáo", path: "/admin/reports" },
   ];
 
