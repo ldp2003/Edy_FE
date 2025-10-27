@@ -46,7 +46,6 @@ export const publicModeTranslations = {
 export const statusColors = {
   PENDING: "#faad14", // Orange
   APPROVED: "#52c41a", // Green
-  PENDING_SUMMARY: "#1890ff", // Blue
   REJECTED: "#ff4d4f", // Red
   REQUESTED_EDIT: "#722ed1", // Purple
 };

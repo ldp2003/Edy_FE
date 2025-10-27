@@ -31,7 +31,6 @@ export const DocumentStatus = {
   REJECTED: "REJECTED",
   REQUESTED_EDIT: "REQUESTED_EDIT",
   PENDING_EDIT: "PENDING_EDIT",
-  PENDING_SUMMARY: "PENDING_SUMMARY",
 } as const;
 
 export type DocumentStatusType =
@@ -91,7 +90,6 @@ export interface Document {
   level: DocumentLevelType;
   subject: Subject;
   status?: DocumentStatusType;
-  summary_status?: DocumentStatusType | "NONE";
   public_mode?: PublicModeType;
   page?: number;
   file_type: FileTypeType;
@@ -117,7 +115,6 @@ export interface Document {
       last_name: string;
     };
     reviewed_at: string;
-    is_summary: boolean;
     message: string;
   };
 }
@@ -134,7 +131,6 @@ export interface PendingRequest {
   _id: string;
   doc: string;
   requester?: string;
-  is_summary: boolean;
   status: string;
   message: string;
   reviewed_by?: any;

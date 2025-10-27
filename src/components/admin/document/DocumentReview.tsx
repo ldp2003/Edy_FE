@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Form, message, Alert } from "antd";
+import { Form, message, Alert, Input } from "antd";
 import type { Document, PendingRequest } from "../../../models/document";
 import type { User } from "../../../models/user";
 import UserInfoHeader from "./UserInfoHeader";
@@ -7,7 +7,6 @@ import type { UserInfo } from "./UserInfoHeader";
 import { DocumentService } from "../../../utils/DocumentService";
 import DocumentPreview from "./review/DocumentPreview";
 import DocumentBasicInfo from "./review/DocumentBasicInfo";
-import DocumentSummary from "./review/DocumentSummary";
 import DocumentAdditionalInfo from "./review/DocumentAdditionalInfo";
 import DocumentActionButtons from "./review/DocumentActionButtons";
 import DocumentViewModal from "./review/DocumentViewModal";
@@ -62,10 +61,7 @@ interface DocumentReviewProps {
   document: Document;
   onApprove: (approvalData: {
     documentRequestId: string;
-    summaryRequestId?: string;
     isIntensive: boolean;
-    summaryAction?: "approve" | "reject";
-    summaryRejectReason?: string;
   }) => void;
   onReject: (reason: string, requestId?: string) => void;
   onDelete: (reason: string) => void;
@@ -95,13 +91,6 @@ const DocumentReview: React.FC<DocumentReviewProps> = ({
   const [documentRequest, setDocumentRequest] = useState<PendingRequest | null>(
     null
   );
-  const [summaryRequest, setSummaryRequest] = useState<PendingRequest | null>(
-    null
-  );
-  const [summaryAction, setSummaryAction] = useState<"approve" | "reject">(
-    "approve"
-  );
-  const [summaryRejectReason, setSummaryRejectReason] = useState("");
   const [loading, setLoading] = useState(true);
 
   // Load pending requests for the document (only for new uploads, not edit requests)
@@ -115,7 +104,6 @@ const DocumentReview: React.FC<DocumentReviewProps> = ({
           setDocumentRequest({
             _id: editApprovalData._id,
             doc: document._id,
-            is_summary: false,
             status: editApprovalData.status,
             message: editApprovalData.message || '',
             reviewed_by: editApprovalData.reviewed_by,
@@ -123,7 +111,6 @@ const DocumentReview: React.FC<DocumentReviewProps> = ({
             createdAt: editApprovalData.createdAt,
             updatedAt: editApprovalData.updatedAt,
           });
-          setSummaryRequest(null); // Edit requests don't have separate summary
         } else {
           // For new upload requests, fetch from API
           const response = await DocumentService.getPendingRequestsByDocument(
@@ -131,15 +118,13 @@ const DocumentReview: React.FC<DocumentReviewProps> = ({
           );
           const requests = response.requests || [];
 
-          // Separate document and summary requests
-          const docReq = requests.find((req: PendingRequest) => !req.is_summary);
-          const sumReq = requests.find((req: PendingRequest) => req.is_summary);
+          // Get the first request (should only be one)
+          const docReq = requests[0] || null;
 
           setDocumentRequest(docReq || null);
-          setSummaryRequest(sumReq || null);
         }
 
-        console.log("Loaded requests:", { documentRequest, summaryRequest });
+        console.log("Loaded requests:", { documentRequest });
       } catch (error) {
         console.error("Error loading pending requests:", error);
         messageApi.error("Không thể tải thông tin requests!");
@@ -256,13 +241,19 @@ const DocumentReview: React.FC<DocumentReviewProps> = ({
 
             {/* Column 3 - Summary */}
             <div className="lg:col-span-1 xl:col-span-1">
-              <DocumentSummary
-                summaryRequest={summaryRequest}
-                summaryAction={summaryAction}
-                summaryRejectReason={summaryRejectReason}
-                onSummaryActionChange={setSummaryAction}
-                onSummaryRejectReasonChange={setSummaryRejectReason}
-              />
+              <Form.Item
+                style={{ marginBottom: 5 }}
+                name="summary"
+                label={<span className="text-xs">Tóm tắt</span>}
+              >
+                <Input.TextArea
+                  placeholder="Tài liệu này không có tóm tắt"
+                  rows={15}
+                  style={{ resize: "none", borderColor: "#60a5fa" }}
+                  disabled
+                  readOnly
+                />
+              </Form.Item>
             </div>
           </div>
 
@@ -278,10 +269,7 @@ const DocumentReview: React.FC<DocumentReviewProps> = ({
           <div className="mt-6">
             <DocumentActionButtons
               documentRequest={documentRequest}
-              summaryRequest={summaryRequest}
               isIntensive={isIntensive}
-              summaryAction={summaryAction}
-              summaryRejectReason={summaryRejectReason}
               processing={processing}
               documentId={document._id}
               documentStatus={document.status}
