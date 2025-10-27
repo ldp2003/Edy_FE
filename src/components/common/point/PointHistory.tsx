@@ -121,8 +121,8 @@ const PointHistory: React.FC<PointHistoryProps> = ({
         )}
       </div>
 
-      <div className="flex gap-4 mb-4">
-        <div>
+      <div className="flex flex-col sm:flex-row gap-4 mb-4">
+        <div className="w-full sm:w-auto">
           <label className="text-xs font-medium text-gray-600 block mb-1">
             Loại giao dịch:
           </label>
@@ -131,14 +131,14 @@ const PointHistory: React.FC<PointHistoryProps> = ({
             allowClear
             value={transactionTypeFilter}
             onChange={setTransactionTypeFilter}
-            className="w-32"
+            className="w-full sm:w-32"
             size="small"
           >
             <Select.Option value="EARN">Tích điểm</Select.Option>
             <Select.Option value="SPEND">Tiêu điểm</Select.Option>
           </Select>
         </div>
-        <div>
+        <div className="w-full sm:w-auto">
           <label className="text-xs font-medium text-gray-600 block mb-1">
             Loại điểm:
           </label>
@@ -147,7 +147,7 @@ const PointHistory: React.FC<PointHistoryProps> = ({
             allowClear
             value={pointTypeFilter}
             onChange={setPointTypeFilter}
-            className="w-32"
+            className="w-full sm:w-32"
             size="small"
           >
             <Select.Option value="RANKPOINT">Điểm hạng</Select.Option>

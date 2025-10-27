@@ -345,6 +345,9 @@ export const UserAPI = {
   getPermissionByUserId: async (userId: string) => {
     return await apiClient.get(`/users/${userId}/roles`);
   },
+  updateFieldStudy: async (field_of_study: string[]) => {
+    return await apiClient.put(`/users/field-of-study`, { field_of_study });
+  },
 };
 
 export const SubjectAPI = {
@@ -977,7 +980,10 @@ export const DocumentAPI = {
     }
   ) => {
     try {
-      const response = await apiClient.put(`/documents/edit/${editId}`, editData);
+      const response = await apiClient.put(
+        `/documents/edit/${editId}`,
+        editData
+      );
       return response.data;
     } catch (error) {
       console.error("Error updating edit document:", error);
@@ -1010,7 +1016,9 @@ export const DocumentAPI = {
   // Get edit approval by document ID
   getEditApprovalByDocumentId: async (documentId: string) => {
     try {
-      const response = await apiClient.get(`/documents/pending-edit-request/${documentId}`);
+      const response = await apiClient.get(
+        `/documents/pending-edit-request/${documentId}`
+      );
       return response.data;
     } catch (error) {
       console.error("Error fetching edit approval:", error);
@@ -1019,12 +1027,18 @@ export const DocumentAPI = {
   },
 
   // Handle edit approval (approve/reject)
-  handleEditApproval: async (editApprovalId: string, actionData: {
-    action: 'APPROVE' | 'REJECT';
-    message?: string;
-  }) => {
+  handleEditApproval: async (
+    editApprovalId: string,
+    actionData: {
+      action: "APPROVE" | "REJECT";
+      message?: string;
+    }
+  ) => {
     try {
-      const response = await apiClient.put(`/documents/approve-edit/${editApprovalId}`, actionData);
+      const response = await apiClient.put(
+        `/documents/approve-edit/${editApprovalId}`,
+        actionData
+      );
       return response.data;
     } catch (error) {
       console.error("Error handling edit approval:", error);

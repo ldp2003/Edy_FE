@@ -50,7 +50,7 @@ const AdminDropdown: React.FC = () => {
       // Clear selected role when logout
       localStorage.removeItem("selectedRole");
       messageApi.success("Đăng xuất thành công");
-      navigate("/");
+      window.location.href = "/";
     } catch (error) {
       messageApi.error("Đăng xuất thất bại");
       console.error("Logout failed:", error);

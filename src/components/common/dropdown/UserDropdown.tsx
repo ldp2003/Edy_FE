@@ -51,7 +51,7 @@ const UserDropdown: React.FC = () => {
     try {
       await logout();
       messageApi.success("Đăng xuất thành công");
-      navigate("/");
+      window.location.href = "/";
     } catch (error) {
       messageApi.error("Đăng xuất thất bại");
       console.error("Logout failed:", error);
