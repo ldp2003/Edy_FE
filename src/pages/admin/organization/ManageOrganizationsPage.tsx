@@ -1,0 +1,160 @@
+import React, { useState, useEffect, useCallback } from "react";
+import { message, Form, Modal } from "antd";
+import { PlusOutlined } from "@ant-design/icons";
+import { OrganizationService } from "../../../utils/OrganizationService";
+import type { OrganizationDetailed } from "../../../models/organization";
+import OrganizationTable from "../../../components/admin/organization/OrganizationTable";
+import OrganizationForm from "../../../components/admin/organization/OrganizationForm";
+import OrganizationViewModal from "../../../components/admin/organization/OrganizationViewModal";
+
+const ManageOrganizationsPage: React.FC = () => {
+  const [organizations, setOrganizations] = useState<OrganizationDetailed[]>(
+    []
+  );
+  const [loading, setLoading] = useState(false);
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [editingOrganization, setEditingOrganization] =
+    useState<OrganizationDetailed | null>(null);
+  const [viewingOrganization, setViewingOrganization] =
+    useState<OrganizationDetailed | null>(null);
+  const [isViewModalVisible, setIsViewModalVisible] = useState(false);
+  const [form] = Form.useForm();
+
+  const loadOrganizations = useCallback(async () => {
+    setLoading(true);
+    try {
+      const orgs = await OrganizationService.getOrganizations();
+      setOrganizations(orgs);
+    } catch (error) {
+      console.error("Error loading organizations:", error);
+      message.error("Không thể tải danh sách tổ chức");
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    loadOrganizations();
+  }, [loadOrganizations]);
+
+  const handleAdd = () => {
+    setEditingOrganization(null);
+    form.resetFields();
+    setIsModalVisible(true);
+  };
+
+  const handleEdit = (organization: OrganizationDetailed) => {
+    setEditingOrganization(organization);
+    form.setFieldsValue({
+      name: organization.name,
+      code: organization.code,
+      description: organization.description,
+      country: organization.country,
+      address: organization.address,
+      website: organization.website,
+    });
+    setIsModalVisible(true);
+  };
+
+  const handleView = (organization: OrganizationDetailed) => {
+    setViewingOrganization(organization);
+    setIsViewModalVisible(true);
+  };
+
+  const handleDelete = async (organizationId: string) => {
+    Modal.confirm({
+      title: "Xác nhận xóa",
+      content: "Bạn có chắc chắn muốn xóa tổ chức này?",
+      okText: "Xóa",
+      cancelText: "Hủy",
+      onOk: async () => {
+        try {
+          await OrganizationService.deleteOrganization(organizationId);
+          message.success("Xóa tổ chức thành công");
+          loadOrganizations();
+        } catch (error) {
+          console.error("Error deleting organization:", error);
+          message.error("Không thể xóa tổ chức");
+        }
+      },
+    });
+  };
+
+  const handleModalOk = async () => {
+    try {
+      const values = await form.validateFields();
+
+      if (editingOrganization) {
+        // Update organization
+        await OrganizationService.updateOrganization(
+          editingOrganization._id!,
+          values
+        );
+        message.success("Cập nhật tổ chức thành công");
+      } else {
+        // Create organization
+        await OrganizationService.createOrganization(values);
+        message.success("Thêm tổ chức thành công");
+      }
+
+      setIsModalVisible(false);
+      loadOrganizations();
+    } catch (error) {
+      console.error("Error saving organization:", error);
+      message.error("Có lỗi xảy ra");
+    }
+  };
+
+  const handleModalCancel = () => {
+    setIsModalVisible(false);
+    form.resetFields();
+  };
+
+  const handleViewModalCancel = () => {
+    setIsViewModalVisible(false);
+    setViewingOrganization(null);
+  };
+
+  return (
+    <div>
+      <div className="mb-6">
+        <h1 className="text-2xl sm:text-xl xs:text-lg font-bold text-gray-900 mb-4 text-left">
+          Quản lý tổ chức
+        </h1>
+
+        <div className="mb-4 flex justify-start">
+          <button
+            onClick={handleAdd}
+            className="inline-flex items-center px-4 py-2 text-base sm:text-sm xs:text-xs font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors duration-200"
+          >
+            <PlusOutlined className="mr-2" />
+            Thêm tổ chức
+          </button>
+        </div>
+      </div>
+
+      <OrganizationTable
+        organizations={organizations}
+        loading={loading}
+        onEdit={handleEdit}
+        onDelete={handleDelete}
+        onView={handleView}
+      />
+
+      <OrganizationForm
+        visible={isModalVisible}
+        editingOrganization={editingOrganization}
+        onOk={handleModalOk}
+        onCancel={handleModalCancel}
+      />
+
+      <OrganizationViewModal
+        visible={isViewModalVisible}
+        organization={viewingOrganization}
+        onCancel={handleViewModalCancel}
+      />
+    </div>
+  );
+};
+
+export default ManageOrganizationsPage;

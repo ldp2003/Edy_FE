@@ -17,7 +17,7 @@ import DocumentActions from "../../../components/user/document/documentDetail/Do
 
 const DocumentDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
-  const { isLoggedIn, addToReadHistory } = useContext(UserContext);
+  const { isLoggedIn, user, addToReadHistory } = useContext(UserContext);
   const addToReadHistoryRef = useRef(addToReadHistory);
 
   // Update ref when addToReadHistory changes
@@ -167,6 +167,11 @@ const DocumentDetail: React.FC = () => {
     );
   }
 
+  // Check if current user is the owner of the document
+  const isUserOwner = Boolean(
+    document && user && document.publisher === user._id
+  );
+
   return (
     <div className="h-screen flex flex-col md:flex-row overflow-hidden">
       {/* Document Side - ẩn trên mobile, hiện trên desktop */}
@@ -180,9 +185,9 @@ const DocumentDetail: React.FC = () => {
       </div>
 
       {/* Main content - có thể scroll */}
-      <div className="flex-1 overflow-y-auto relative pb-8">
+      <div className="flex-1 overflow-y-auto pb-8">
         <div className="p-4">
-          <div className="hidden sm:flex flex-col">
+          <div className="hidden md:flex flex-col">
             <AuthorInfo document={document!} />
             <DocumentActions document={document!} />
           </div>
@@ -194,6 +199,7 @@ const DocumentDetail: React.FC = () => {
             currentPage={currentPage}
             onPageUpdate={handlePageUpdate}
             zoom={zoom}
+            isUser={isUserOwner}
             totalPages={totalPages}
             onPrevPage={handlePrevPage}
             onNextPage={handleNextPage}
