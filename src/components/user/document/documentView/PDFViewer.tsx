@@ -2,7 +2,6 @@ import React, { useState, useEffect, useCallback } from "react";
 import { Button, Typography, Card } from "antd";
 import { DownloadOutlined } from "@ant-design/icons";
 import * as pdfjsLib from "pdfjs-dist";
-import DescriptionModal from "../description/DescriptionModal";
 
 const { Text } = Typography;
 
@@ -256,7 +255,6 @@ const PDFViewer: React.FC<PDFViewerProps> = ({
                   className="w-full h-auto rounded-lg sm:rounded-2xl hover:shadow-lg transition-shadow duration-300"
                 />
                 {/* Add DescriptionModal overlay for pages after 10 if not user */}
-                {!isUser && index >= 9 && <DescriptionModal />}
               </div>
             ))}
 

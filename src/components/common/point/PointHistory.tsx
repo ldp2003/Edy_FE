@@ -1,5 +1,5 @@
-import React from "react";
-import { Table, Tag } from "antd";
+import React, { useState, useMemo } from "react";
+import { Table, Tag, Select } from "antd";
 import type { ColumnsType } from "antd/es/table";
 
 interface Transaction {
@@ -27,6 +27,20 @@ const PointHistory: React.FC<PointHistoryProps> = ({
   loading = false,
   onViewMore,
 }) => {
+  const [transactionTypeFilter, setTransactionTypeFilter] = useState<
+    string | undefined
+  >();
+  const [pointTypeFilter, setPointTypeFilter] = useState<string | undefined>();
+
+  const filteredTransactions = useMemo(() => {
+    return transactions.filter((transaction) => {
+      if (transactionTypeFilter && transaction.type !== transactionTypeFilter)
+        return false;
+      if (pointTypeFilter && transaction.pointType !== pointTypeFilter)
+        return false;
+      return true;
+    });
+  }, [transactions, transactionTypeFilter, pointTypeFilter]);
   const columns: ColumnsType<Transaction> = [
     {
       title: "Thời gian",
@@ -45,17 +59,21 @@ const PointHistory: React.FC<PointHistoryProps> = ({
         </Tag>
       ),
       width: 110,
+      align: "center",
     },
     {
       title: "Loại điểm",
       dataIndex: "pointType",
       key: "pointType",
+      align: "center",
       render: (pointType: string) => (
-        <Tag color={pointType === "RANK" ? "blue" : "orange"}>
-          {pointType === "RANK"
+        <Tag color={pointType === "RANKPOINT" ? "blue" : "orange"}>
+          {pointType === "RANKPOINT"
             ? "Điểm hạng"
             : pointType === "USAGE"
             ? "Điểm dùng"
+            : pointType === "BOTH"
+            ? "Cả hai"
             : "Không xác định"}
         </Tag>
       ),
@@ -67,7 +85,7 @@ const PointHistory: React.FC<PointHistoryProps> = ({
       key: "point",
       render: (point: number, record) => (
         <span
-          className={`font-semibold ${
+          className={` font-semibold ${
             record.type === "EARN" ? "text-green-600" : "text-red-600"
           }`}
         >
@@ -76,6 +94,8 @@ const PointHistory: React.FC<PointHistoryProps> = ({
         </span>
       ),
       width: 80,
+      // căn giữa
+      align: "center",
     },
     {
       title: "Lý do",
@@ -101,9 +121,45 @@ const PointHistory: React.FC<PointHistoryProps> = ({
         )}
       </div>
 
+      <div className="flex gap-4 mb-4">
+        <div>
+          <label className="text-xs font-medium text-gray-600 block mb-1">
+            Loại giao dịch:
+          </label>
+          <Select
+            placeholder="Tất cả"
+            allowClear
+            value={transactionTypeFilter}
+            onChange={setTransactionTypeFilter}
+            className="w-32"
+            size="small"
+          >
+            <Select.Option value="EARN">Tích điểm</Select.Option>
+            <Select.Option value="SPEND">Tiêu điểm</Select.Option>
+          </Select>
+        </div>
+        <div>
+          <label className="text-xs font-medium text-gray-600 block mb-1">
+            Loại điểm:
+          </label>
+          <Select
+            placeholder="Tất cả"
+            allowClear
+            value={pointTypeFilter}
+            onChange={setPointTypeFilter}
+            className="w-32"
+            size="small"
+          >
+            <Select.Option value="RANKPOINT">Điểm hạng</Select.Option>
+            <Select.Option value="USAGE">Điểm dùng</Select.Option>
+            <Select.Option value="BOTH">Cả hai</Select.Option>
+          </Select>
+        </div>
+      </div>
+
       <Table
         columns={columns}
-        dataSource={transactions}
+        dataSource={filteredTransactions}
         loading={loading}
         pagination={false}
         size="small"

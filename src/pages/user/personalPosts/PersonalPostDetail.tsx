@@ -208,7 +208,7 @@ const PersonalPostDetail: React.FC = () => {
 
       {/* Document Side - ẩn trên mobile, hiện trên desktop */}
       <div className="hidden md:block md:w-80">
-        <DocumentSide document={document} />
+        <DocumentSide document={document} isUser={true} />
       </div>
 
       {/* Mobile Header */}
