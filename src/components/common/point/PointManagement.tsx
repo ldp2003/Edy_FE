@@ -14,6 +14,7 @@ interface Transaction {
   point: number;
   reason: string;
   createdAt: string;
+  pointType?: "RANKPOINT" | "USAGE" | "BOTH"; // Thêm loại điểm
 }
 
 interface PointManagementProps {

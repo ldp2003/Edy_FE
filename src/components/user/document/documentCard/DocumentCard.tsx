@@ -95,7 +95,7 @@ const DocumentCard: React.FC<DocumentCardProps> = ({
 
       {/* Content */}
       <div className="p-2 md:p-3 h-[88px] md:h-[104px]">
-        <h3 className="text-xs md:text-sm font-medium text-[var(--primary-text-color)] line-clamp-3 mb-1">
+        <h3 className="text-xs md:text-sm font-medium text-[var(--primary-text-color)] line-clamp-2 mb-1">
           {document.title}
         </h3>
         <div className="space-y-1">

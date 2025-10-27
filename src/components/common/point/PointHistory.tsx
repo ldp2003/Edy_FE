@@ -13,6 +13,7 @@ interface Transaction {
   point: number;
   reason: string;
   createdAt: string;
+  pointType?: "RANKPOINT" | "USAGE" | "BOTH"; // Thêm loại điểm
 }
 
 interface PointHistoryProps {
@@ -35,12 +36,27 @@ const PointHistory: React.FC<PointHistoryProps> = ({
       width: 120,
     },
     {
-      title: "Loại",
+      title: "Loại giao dịch",
       dataIndex: "type",
       key: "type",
       render: (type: string) => (
         <Tag color={type === "EARN" ? "green" : "red"}>
           {type === "EARN" ? "Tích điểm" : "Tiêu điểm"}
+        </Tag>
+      ),
+      width: 110,
+    },
+    {
+      title: "Loại điểm",
+      dataIndex: "pointType",
+      key: "pointType",
+      render: (pointType: string) => (
+        <Tag color={pointType === "RANK" ? "blue" : "orange"}>
+          {pointType === "RANK"
+            ? "Điểm hạng"
+            : pointType === "USAGE"
+            ? "Điểm dùng"
+            : "Không xác định"}
         </Tag>
       ),
       width: 100,
