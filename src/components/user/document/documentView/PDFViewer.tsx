@@ -140,7 +140,7 @@ const PDFViewer: React.FC<PDFViewerProps> = ({
         currentPdf.destroy();
       }
     };
-  }, [url]);
+  }, [url, renderPages]);
 
   useEffect(() => {
     if (currentPage !== visiblePage) {
@@ -153,7 +153,7 @@ const PDFViewer: React.FC<PDFViewerProps> = ({
     if (pdfDocument) {
       renderPages(pdfDocument);
     }
-  }, [zoom, pdfDocument]);
+  }, [zoom, pdfDocument, renderPages]);
 
   const scrollToPage = (pageNumber: number) => {
     const pageElement = document.getElementById(`pdf-page-${pageNumber}`);
@@ -247,13 +247,14 @@ const PDFViewer: React.FC<PDFViewerProps> = ({
               <div
                 key={index}
                 id={`pdf-page-${index + 1}`}
-                className="mb-4 sm:mb-7 border border-gray-300 mx-2 sm:mx-[10%] rounded-lg overflow-hidden"
+                className="mb-4 sm:mb-7 border border-gray-300 mx-2 sm:mx-[10%] rounded-lg overflow-hidden relative"
               >
                 <img
                   src={imgSrc}
                   alt={`Page ${index + 1}`}
                   className="w-full h-auto rounded-lg sm:rounded-2xl hover:shadow-lg transition-shadow duration-300"
                 />
+                {/* Add DescriptionModal overlay for pages after 10 if not user */}
               </div>
             ))}
 

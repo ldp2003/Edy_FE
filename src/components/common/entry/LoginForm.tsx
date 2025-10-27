@@ -83,14 +83,7 @@ const LoginForm: React.FC<LoginFormProps> = ({
             name="password"
             rules={[{ required: true, message: "Vui lòng nhập mật khẩu!" }]}
           >
-            <Input.Password
-              placeholder="Mật khẩu"
-              style={{
-                borderColor: "var(--primary-color)",
-                borderRadius: "8px",
-                padding: "12px",
-              }}
-            />
+            <Input.Password placeholder="Mật khẩu" />
           </Form.Item>
 
           <Form.Item>

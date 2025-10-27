@@ -17,7 +17,9 @@ interface UserProviderProps {
   account: Account | null;
   role: string | null;
   favoriteDocuments: Document[];
-  setFavoriteDocuments: (docs: Document[] | ((prev: Document[]) => Document[])) => void;
+  setFavoriteDocuments: (
+    docs: Document[] | ((prev: Document[]) => Document[])
+  ) => void;
   readHistory: ReadHistoryItem[];
   setReadHistory: (history: ReadHistoryItem[]) => void;
   personalDocuments: Document[];
@@ -29,6 +31,7 @@ interface UserProviderProps {
   unreadCount: number;
   setUnreadCount: (count: number) => void;
   refreshNotifications?: () => Promise<void>;
+  setUser?: (user: User | null) => void;
 }
 
 export const UserProvider: React.FC<UserProviderProps> = ({
@@ -50,6 +53,7 @@ export const UserProvider: React.FC<UserProviderProps> = ({
   unreadCount,
   setUnreadCount,
   refreshNotifications: propRefreshNotifications,
+  setUser: propSetUser,
 }) => {
   // Refresh notifications function - use the one passed from AuthRoute
   const refreshNotifications = useCallback(async () => {
@@ -104,6 +108,7 @@ export const UserProvider: React.FC<UserProviderProps> = ({
     setUnreadCount,
     refreshNotifications,
     addToReadHistory, // Added to context value
+    setUser: propSetUser || (() => {}),
   };
 
   return (

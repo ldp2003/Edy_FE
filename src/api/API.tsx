@@ -47,8 +47,12 @@ export const AuthAPI = {
   },
   logout: async () => {
     try {
-      const response = await apiClient.post("/auth/logout", {}, { withCredentials: true });
-      
+      const response = await apiClient.post(
+        "/auth/logout",
+        {},
+        { withCredentials: true }
+      );
+
       return response.data;
     } catch (error) {
       console.error("Error logging out:", error);
@@ -130,6 +134,7 @@ export const OrganizationAPI = {
     country: string;
     address: string;
     website: string;
+    logo?: string;
   }) => {
     try {
       const response = await apiClient.post("/organizations", organization);
@@ -146,6 +151,52 @@ export const OrganizationAPI = {
       return response.data;
     } catch (error) {
       console.error("Error fetching organizations:", error);
+      throw error;
+    }
+  },
+
+  getOrganizationById: async (organizationId: string) => {
+    try {
+      const response = await apiClient.get(`/organizations/${organizationId}`);
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching organization by ID:", error);
+      throw error;
+    }
+  },
+
+  updateOrganization: async (
+    organizationId: string,
+    organizationData: {
+      name?: string;
+      code?: string;
+      description?: string;
+      country?: string;
+      address?: string;
+      website?: string;
+      logo?: string;
+    }
+  ) => {
+    try {
+      const response = await apiClient.put(
+        `/organizations/${organizationId}`,
+        organizationData
+      );
+      return response.data;
+    } catch (error) {
+      console.error("Error updating organization:", error);
+      throw error;
+    }
+  },
+
+  deleteOrganization: async (organizationId: string) => {
+    try {
+      const response = await apiClient.delete(
+        `/organizations/${organizationId}`
+      );
+      return response.data;
+    } catch (error) {
+      console.error("Error deleting organization:", error);
       throw error;
     }
   },
@@ -294,6 +345,9 @@ export const UserAPI = {
   getPermissionByUserId: async (userId: string) => {
     return await apiClient.get(`/users/${userId}/roles`);
   },
+  updateFieldStudy: async (field_of_study: string[]) => {
+    return await apiClient.put(`/users/field-of-study`, { field_of_study });
+  },
 };
 
 export const SubjectAPI = {
@@ -387,6 +441,30 @@ export const SubjectAPI = {
       return response.data;
     } catch (error) {
       console.error("Error fetching documents by subject:", error);
+      throw error;
+    }
+  },
+
+  // Sync subject document count
+  syncSubjectDocCount: async (subjectId: string) => {
+    try {
+      const response = await apiClient.post(
+        `/subjects/${subjectId}/sync-doc-count`
+      );
+      return response.data;
+    } catch (error) {
+      console.error("Error syncing subject document count:", error);
+      throw error;
+    }
+  },
+
+  // Sync all subjects document count
+  syncAllSubjectsDocCount: async () => {
+    try {
+      const response = await apiClient.post(`/subjects/sync-all-doc-counts`);
+      return response.data;
+    } catch (error) {
+      console.error("Error syncing all subjects document count:", error);
       throw error;
     }
   },
@@ -900,7 +978,10 @@ export const DocumentAPI = {
     }
   ) => {
     try {
-      const response = await apiClient.put(`/documents/edit/${editId}`, editData);
+      const response = await apiClient.put(
+        `/documents/edit/${editId}`,
+        editData
+      );
       return response.data;
     } catch (error) {
       console.error("Error updating edit document:", error);
@@ -933,7 +1014,9 @@ export const DocumentAPI = {
   // Get edit approval by document ID
   getEditApprovalByDocumentId: async (documentId: string) => {
     try {
-      const response = await apiClient.get(`/documents/pending-edit-request/${documentId}`);
+      const response = await apiClient.get(
+        `/documents/pending-edit-request/${documentId}`
+      );
       return response.data;
     } catch (error) {
       console.error("Error fetching edit approval:", error);
@@ -942,12 +1025,18 @@ export const DocumentAPI = {
   },
 
   // Handle edit approval (approve/reject)
-  handleEditApproval: async (editApprovalId: string, actionData: {
-    action: 'APPROVE' | 'REJECT';
-    message?: string;
-  }) => {
+  handleEditApproval: async (
+    editApprovalId: string,
+    actionData: {
+      action: "APPROVE" | "REJECT";
+      message?: string;
+    }
+  ) => {
     try {
-      const response = await apiClient.put(`/documents/approve-edit/${editApprovalId}`, actionData);
+      const response = await apiClient.put(
+        `/documents/approve-edit/${editApprovalId}`,
+        actionData
+      );
       return response.data;
     } catch (error) {
       console.error("Error handling edit approval:", error);
@@ -1456,4 +1545,124 @@ export const PointTransactionAPI = {
       params,
     });
   },
+
+  // Spend points
+  spendPoints: async (data: { amount: number; reason: string }) => {
+    try {
+      const response = await apiClient.post("/point-transactions/spend", data);
+      return response.data;
+    } catch (error) {
+      console.error("Error spending points:", error);
+      throw error;
+    }
+  },
+};
+
+export const CloudinaryAPI = {
+  // Delete file from Cloudinary
+  deleteFile: async (data: {
+    fileUrl?: string;
+    publicId?: string;
+    resourceType?: "raw" | "image" | "video";
+  }) => {
+    try {
+      // Extract publicId and resourceType from URL if provided
+      let publicId = data.publicId;
+      let resourceType: "raw" | "image" | "video" = data.resourceType || "raw";
+
+      if (data.fileUrl && !publicId) {
+        const extractedPublicId = extractPublicIdFromUrl(data.fileUrl);
+        if (extractedPublicId) {
+          publicId = extractedPublicId;
+          // Only auto-detect resourceType if not explicitly provided
+          if (!data.resourceType) {
+            resourceType = extractResourceTypeFromUrl(data.fileUrl);
+          }
+        }
+      }
+
+      if (!publicId) {
+        throw new Error("Không thể trích xuất public ID từ URL");
+      }
+
+      const response = await apiClient.delete("/cloudinary/delete-file", {
+        data: { publicId, resourceType: resourceType },
+      });
+      return response.data;
+    } catch (error) {
+      console.error("Error deleting file:", error);
+      throw error;
+    }
+  },
+
+  // Get file info from Cloudinary
+  getFileInfo: async (data: {
+    fileUrl: string;
+    resourceType?: "raw" | "image" | "video";
+  }) => {
+    try {
+      const publicId = extractPublicIdFromUrl(data.fileUrl);
+      const resourceType =
+        data.resourceType || extractResourceTypeFromUrl(data.fileUrl);
+
+      if (!publicId) {
+        throw new Error("Không thể trích xuất public ID từ URL");
+      }
+
+      const response = await apiClient.post("/cloudinary/file-info", {
+        publicId,
+        resourceType,
+      });
+      return response.data;
+    } catch (error) {
+      console.error("Error getting file info:", error);
+      throw error;
+    }
+  },
+};
+
+// Helper functions to extract public ID and resource type from Cloudinary URL
+const extractPublicIdFromUrl = (url: string): string | null => {
+  try {
+    if (!url) return null;
+
+    // Tìm pattern: /(raw|image|video)/upload/[v123456789/]publicId.extension
+    const match = url.match(/\/(raw|image|video)\/upload\/(?:v\d+\/)?(.+)$/);
+
+    if (match && match[2]) {
+      // Decode URL để chuyển từ %C4%90 về tiếng Việt
+      const decodedPath = decodeURIComponent(match[2]);
+
+      // Kiểm tra xem có phải file Word không (.doc, .docx)
+      const isWordFile = /\.(doc|docx)$/i.test(decodedPath);
+
+      if (isWordFile) {
+        // Giữ nguyên extension cho file Word
+        return decodedPath;
+      } else {
+        // Loại bỏ extension cho các file khác
+        const lastDotIndex = decodedPath.lastIndexOf(".");
+        if (lastDotIndex !== -1) {
+          return decodedPath.substring(0, lastDotIndex);
+        }
+        return decodedPath;
+      }
+    }
+
+    return null;
+  } catch (error) {
+    console.error("Error extracting publicId:", error);
+    return null;
+  }
+};
+
+const extractResourceTypeFromUrl = (url: string): "raw" | "image" | "video" => {
+  try {
+    // Tìm resource type từ URL pattern: /resource_type/
+    const match = url.match(/\/(raw|image|video)\//);
+    return match ? (match[1] as "raw" | "image" | "video") : "image"; // Mặc định là image nếu không tìm thấy
+  } catch (error) {
+    console.error("Error extracting resource type:", error);
+    return "image";
+  }
 };

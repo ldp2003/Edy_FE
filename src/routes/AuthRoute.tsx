@@ -3,7 +3,6 @@ import React, { useEffect, useState, useRef } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import {
   getCurrentUser,
-  refreshToken,
   hasValidToken,
 } from "../utils/AuthService";
 import { UserProvider } from "../contexts/UserProvider";
@@ -27,7 +26,7 @@ const AuthRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [user, setUser] = useState<User>(defaultUser);
+  const [user, setUser] = useState<User | null>(defaultUser);
   const [role, setRole] = useState<RoleCode | null>(null);
   const [account, setAccount] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -120,15 +119,12 @@ const AuthRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
       setIsLoading(true);
       try {
         // Kiểm tra có token hợp lệ không trước khi refresh
-        const hasToken = await hasValidToken();
-        if (hasToken) {
-          try {
-            await refreshToken(); // Chỉ refresh nếu có token
-            // eslint-disable-next-line @typescript-eslint/no-unused-vars
-          } catch (refreshError) {
-            console.log("🔄 Token refresh failed, proceeding without refresh");
-            // Không throw error, tiếp tục với getCurrentUser()
-          }
+        try {
+          // await refreshToken(); // Chỉ refresh nếu có token
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        } catch (refreshError) {
+          console.log("🔄 Token refresh failed, proceeding without refresh");
+          // Không throw error, tiếp tục với getCurrentUser()
         }
 
         // Luôn gọi getCurrentUser() để kiểm tra trạng thái auth
@@ -413,6 +409,7 @@ const AuthRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
       unreadCount={unreadCount}
       setUnreadCount={setUnreadCount}
       refreshNotifications={fetchNotifications}
+      setUser={setUser}
     >
       {children}
       <LoginRequiredModal

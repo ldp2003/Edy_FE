@@ -29,6 +29,22 @@ export const PointTransactionService = {
       throw error;
     }
   },
+
+  /**
+   * Spend points for a user
+   * @param data - Spend data (amount, reason)
+   * @returns Promise with spend result
+   */
+  async spendPoints(data: { amount: number; reason: string }) {
+    try {
+      const response = await PointTransactionAPI.spendPoints(data);
+      console.log("Spent points:", response);
+      return response;
+    } catch (error) {
+      console.error("Error in PointTransactionService.spendPoints:", error);
+      throw error;
+    }
+  },
 };
 
 // Legacy export for backward compatibility

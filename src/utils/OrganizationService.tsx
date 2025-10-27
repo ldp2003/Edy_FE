@@ -40,4 +40,43 @@ export const OrganizationService = {
       throw error;
     }
   },
+
+  getOrganizationById: async (
+    organizationId: string
+  ): Promise<OrganizationDetailed> => {
+    try {
+      const response = await OrganizationAPI.getOrganizationById(
+        organizationId
+      );
+      return response.data || response;
+    } catch (error) {
+      console.error("Failed to fetch organization by ID:", error);
+      throw error;
+    }
+  },
+
+  updateOrganization: async (
+    organizationId: string,
+    organizationData: Partial<OrganizationDetailed>
+  ): Promise<OrganizationDetailed> => {
+    try {
+      const response = await OrganizationAPI.updateOrganization(
+        organizationId,
+        organizationData
+      );
+      return response.data || response;
+    } catch (error) {
+      console.error("Failed to update organization:", error);
+      throw error;
+    }
+  },
+
+  deleteOrganization: async (organizationId: string): Promise<void> => {
+    try {
+      await OrganizationAPI.deleteOrganization(organizationId);
+    } catch (error) {
+      console.error("Failed to delete organization:", error);
+      throw error;
+    }
+  },
 };

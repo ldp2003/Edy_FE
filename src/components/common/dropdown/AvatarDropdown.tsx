@@ -37,27 +37,27 @@ const AvatarDropdown: React.FC = () => {
     setLoginModalVisible(true);
   };
 
-  const menu = (
-    <Menu onClick={handleMenuClick}>
-      <Menu.Item key="login" icon={null}>
-        <div className="flex justify-between items-center gap-4">
-          <span>Đăng nhập</span>
-          <LogIn size={16} />
-        </div>
-      </Menu.Item>
-      <Menu.Item key="register" icon={null}>
-        <div className="flex justify-between items-center gap-4">
-          <span>Đăng ký</span>
-          <UserPlus size={16} />
-        </div>
-      </Menu.Item>
-    </Menu>
-  );
-
   return (
     <>
-      {menu}
       {contextHolder}
+      <Menu
+        onClick={handleMenuClick}
+        className="border-none"
+        style={{ minWidth: 150 }}
+      >
+        <Menu.Item key="login" icon={null}>
+          <div className="flex justify-between items-center gap-4 text-gray-700 hover:text-blue-600">
+            <span>Đăng nhập</span>
+            <LogIn size={16} />
+          </div>
+        </Menu.Item>
+        <Menu.Item key="register" icon={null}>
+          <div className="flex justify-between items-center gap-4 text-gray-700 hover:text-blue-600">
+            <span>Đăng ký</span>
+            <UserPlus size={16} />
+          </div>
+        </Menu.Item>
+      </Menu>
       <Modal
         open={isLoginModalVisible}
         onCancel={() => setLoginModalVisible(false)}
