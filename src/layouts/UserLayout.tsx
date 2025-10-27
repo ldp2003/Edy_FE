@@ -16,7 +16,7 @@ const UserLayout: React.FC = () => {
   // Set sidebar visibility based on screen size
   useEffect(() => {
     const handleResize = () => {
-      const isMobile = window.innerWidth < 768;
+      const isMobile = window.innerWidth < 1024;
       setIsSidebarVisible(!isMobile);
       if (!isMobile) {
         setIsMobileSidebarVisible(false);
@@ -27,14 +27,14 @@ const UserLayout: React.FC = () => {
     handleResize();
 
     // Add event listener
-    window.addEventListener('resize', handleResize);
+    window.addEventListener("resize", handleResize);
 
     // Cleanup
-    return () => window.removeEventListener('resize', handleResize);
+    return () => window.removeEventListener("resize", handleResize);
   }, []);
 
   const handleMenuToggle = () => {
-    const isMobile = window.innerWidth < 768;
+    const isMobile = window.innerWidth < 1024;
     if (isMobile) {
       setIsMobileSidebarVisible(!isMobileSidebarVisible);
     } else {
@@ -52,7 +52,7 @@ const UserLayout: React.FC = () => {
       {/* Content area bên dưới header */}
       <div className="flex flex-1 overflow-hidden">
         {/* Desktop Sidebar - chỉ hiển thị trên desktop */}
-        <div className="hidden md:block">
+        <div className="hidden lg:block">
           <Sidebar
             isVisible={isSidebarVisible}
             setIsVisible={setIsSidebarVisible}

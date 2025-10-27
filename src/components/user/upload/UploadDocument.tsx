@@ -5,6 +5,7 @@ import type { UploadFile, UploadProps } from "antd";
 import { renderAsync } from "docx-preview";
 import html2canvas from "html2canvas";
 import * as pdfjsLib from "pdfjs-dist";
+import { generateRandomPublicId } from "../../../utils/CloudinaryService";
 
 // Set up PDF.js worker
 pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
@@ -340,6 +341,7 @@ const UploadDocument: React.FC<UploadDocumentProps> = ({
     }
 
     formData.append("resource_type", "auto");
+    formData.append("public_id", generateRandomPublicId());
 
     try {
       // Simulate progress for better UX

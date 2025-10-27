@@ -154,6 +154,16 @@ export const UserService = {
       throw error;
     }
   },
+  async updateFieldOfStudy(field_of_study: string[]) {
+    try {
+      const result = await UserAPI.updateFieldStudy(field_of_study);
+      console.log("Field of study updated successfully:", result);
+      return result;
+    } catch (error) {
+      console.error("Failed to update field of study:", error);
+      throw error;
+    }
+  },
 };
 
 // Legacy exports for backward compatibility
@@ -169,3 +179,4 @@ export const addToFavorites = UserService.addToFavorites;
 export const removeFromFavorites = UserService.removeFromFavorites;
 export const followUser = UserService.followUser;
 export const unfollowUser = UserService.unfollowUser;
+export const updateFieldOfStudy = UserService.updateFieldOfStudy;

@@ -13,7 +13,6 @@ const PointMechanism: React.FC<PointMechanismProps> = ({ onViewMore }) => {
       points: "+15 điểm",
     },
     { action: "Đánh giá tài liệu", points: "+1 điểm / mỗi tài liệu" },
-    { action: "Hoàn thành hồ sơ cá nhân", points: "+3 điểm" },
   ];
 
   const spendData = [

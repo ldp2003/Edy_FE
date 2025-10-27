@@ -44,12 +44,12 @@ const EditProfile: React.FC = () => {
           avatar={user?.avatar || ""}
         />
       </div>
-      <div className="mt-8 flex flex-col md:flex-row bg-white p-6 rounded-lg border border-[var(--border-color)]">
-        <div className="w-full md:w-1/2 md:pr-2 flex flex-col gap-4">
+      <div className="mt-8 flex flex-col lg:flex-row bg-white p-6 rounded-lg border border-[var(--border-color)]">
+        <div className="w-full lg:w-1/2 lg:pr-2 flex flex-col gap-4">
           <div className="font-bold text-xs md:text-sm">Cập nhật mật khẩu</div>
           <ResetPassword messageApi={messageApi} />
         </div>
-        <div className="w-full md:w-1/2 md:pl-2 flex flex-col gap-4">
+        <div className="w-full lg:w-1/2 lg:pl-2 flex flex-col gap-4">
           <div className="font-bold text-xs md:text-sm">Phạm vi tìm kiếm</div>
 
           <StudyList fieldOfStudy={user?.field_of_study || []} />

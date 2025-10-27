@@ -1,13 +1,10 @@
 import React, { useEffect, useRef, useState } from "react";
 import { renderAsync } from "docx-preview";
 import "../../../../docx-preview.css";
-import DescriptionModal from "../description/DescriptionModal";
 
 interface WordViewerProps {
   url: string;
   onPageChange?: (currentPage: number, totalPages: number) => void;
-  currentPage?: number;
-  onPageUpdate?: (page: number) => void;
   zoom?: number;
   isUser?: boolean; // True if document belongs to current user
 }
@@ -43,10 +40,24 @@ const WordViewer: React.FC<WordViewerProps> = ({
           // Assuming a standard page height of 800px for pagination
           const contentHeight = containerRef.current.scrollHeight;
           const pageHeight = 800; // Approximate height of one page in pixels
-          const totalPages = Math.max(1, Math.ceil(contentHeight / pageHeight));
+          const calculatedTotalPages = Math.max(
+            1,
+            Math.ceil(contentHeight / pageHeight)
+          );
+
+          // Limit to 10 pages for non-users
+          const limitedTotalPages = isUser
+            ? calculatedTotalPages
+            : Math.min(calculatedTotalPages, 10);
 
           if (onPageChange) {
-            onPageChange(1, totalPages);
+            onPageChange(1, limitedTotalPages);
+          }
+
+          // Limit content height for non-users
+          if (!isUser && calculatedTotalPages > 10) {
+            containerRef.current.style.maxHeight = `${pageHeight * 10}px`;
+            containerRef.current.style.overflow = "hidden";
           }
         }
       } catch (e) {
@@ -57,7 +68,7 @@ const WordViewer: React.FC<WordViewerProps> = ({
     };
 
     fetchAndRender();
-  }, [url, onPageChange]);
+  }, [url, onPageChange, isUser]);
 
   return (
     <div className="w-full max-w-full md:max-w-4xl lg:max-w-5xl xl:max-w-6xl z-0 min-h-[200px]">
@@ -84,14 +95,7 @@ const WordViewer: React.FC<WordViewerProps> = ({
           transform: `scale(${zoom})`,
           transformOrigin: "top left",
         }}
-      >
-        {/* Add DescriptionModal overlay for non-owner users */}
-        {!isUser && (
-          <div className="absolute inset-0 flex items-center justify-center bg-white/90 z-10">
-            <DescriptionModal />
-          </div>
-        )}
-      </div>
+      ></div>
     </div>
   );
 };

@@ -96,8 +96,6 @@ const DocumentViewer: React.FC<DocumentViewerProps> = ({
         <WordViewer
           url={url}
           onPageChange={onPageChange}
-          currentPage={currentPage}
-          onPageUpdate={onPageUpdate}
           zoom={zoom}
           isUser={isUser}
         />

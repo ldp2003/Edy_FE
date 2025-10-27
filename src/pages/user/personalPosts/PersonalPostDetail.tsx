@@ -203,16 +203,16 @@ const PersonalPostDetail: React.FC = () => {
   }
 
   return (
-    <div className="h-screen flex flex-col md:flex-row overflow-hidden">
+    <div className="h-screen flex flex-col lg:flex-row overflow-hidden">
       {contextHolder}
 
-      {/* Document Side - ẩn trên mobile, hiện trên desktop */}
-      <div className="hidden md:block md:w-80">
-        <DocumentSide document={document} />
+      {/* Document Side - ẩn trên mobile và tablet, hiện trên desktop */}
+      <div className="hidden lg:block lg:w-80">
+        <DocumentSide document={document} isUser={true} />
       </div>
 
       {/* Mobile Header */}
-      <div className="md:hidden bg-white shadow-lg">
+      <div className="lg:hidden bg-white shadow-lg">
         <div className="p-4">
           <div className="flex items-center justify-between">
             <Avatar
@@ -253,8 +253,8 @@ const PersonalPostDetail: React.FC = () => {
 
       {/* Main content - có thể scroll */}
       <div className="flex-1 overflow-y-auto pb-8">
-        <div className="p-2 md:p-4">
-          <div className="hidden md:flex flex-col">
+        <div className="p-2 lg:p-4">
+          <div className="hidden lg:flex flex-col">
             <PersonalPostHeader
               document={document}
               onEdit={handleEdit}

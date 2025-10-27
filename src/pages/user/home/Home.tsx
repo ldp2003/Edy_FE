@@ -1,4 +1,5 @@
 import { useEffect, useState, useContext } from "react";
+import { useNavigate } from "react-router-dom";
 import DocumentGrid from "../../../components/user/document/documentList/DocumentGrid";
 import SubjectGrid from "../../../components/user/subject/SubjectGrid";
 import { DocumentService } from "../../../utils/DocumentService";
@@ -16,6 +17,7 @@ export default function HomePage() {
   const [loading, setLoading] = useState(true);
   const [messageApi, contextHolder] = message.useMessage();
   const { user, readHistory } = useContext(UserContext);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchDocuments = async () => {
@@ -69,6 +71,48 @@ export default function HomePage() {
     fetchDocuments();
   }, [messageApi, user]);
 
+  // Handler functions for "View More" buttons
+  const handleViewMoreFeatured = () => {
+    navigate("/documents", {
+      state: {
+        documents: featuredDocuments,
+        title: "Tài liệu nổi bật",
+        type: "featured",
+      },
+    });
+  };
+
+  const handleViewMoreNewest = () => {
+    navigate("/documents", {
+      state: {
+        documents: newestDocuments,
+        title: "Tài liệu mới nhất",
+        type: "newest",
+      },
+    });
+  };
+
+  const handleViewMoreRelated = () => {
+    navigate("/documents", {
+      state: {
+        documents: relatedDocuments,
+        title: "Tài liệu bạn có thể quan tâm",
+        type: "related",
+      },
+    });
+  };
+
+  const handleViewMoreRecent = () => {
+    const recentDocs = readHistory.slice(0, 10).map((item) => item.document);
+    navigate("/documents", {
+      state: {
+        documents: recentDocs,
+        title: "Đã xem gần đây",
+        type: "recent",
+      },
+    });
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -101,17 +145,24 @@ export default function HomePage() {
             <DocumentGrid
               title="Đã xem gần đây"
               documents={readHistory.slice(0, 10).map((item) => item.document)}
+              onViewMore={handleViewMoreRecent}
             />
           )}
           <DocumentGrid
             title="Tài liệu nổi bật"
             documents={featuredDocuments}
+            onViewMore={handleViewMoreFeatured}
           />
-          <DocumentGrid title="Tài liệu mới nhất" documents={newestDocuments} />
+          <DocumentGrid
+            title="Tài liệu mới nhất"
+            documents={newestDocuments}
+            onViewMore={handleViewMoreNewest}
+          />
 
           <DocumentGrid
             title="Tài liệu bạn có thể quan tâm"
             documents={relatedDocuments}
+            onViewMore={handleViewMoreRelated}
           />
         </main>
       </div>
