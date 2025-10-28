@@ -15,6 +15,8 @@ import ManageRolesPage from "../pages/admin/user/ManageRolesPage";
 import AssignRolesPage from "../pages/admin/user/AssignRolesPage";
 import ManageSubjectsPage from "../pages/admin/subject/ManageSubjectsPage";
 import ManageOrganizationsPage from "../pages/admin/organization/ManageOrganizationsPage";
+import DocumentStatisticsPage from "../pages/admin/statistics/DocumentStatisticsPage";
+import UserStatisticsPage from "../pages/admin/statistics/UserStatisticsPage";
 
 const AdminRoute: React.FC = () => {
   return (
@@ -27,9 +29,11 @@ const AdminRoute: React.FC = () => {
           <Route index element={<AdminHomePage />} />
           {/* Future admin routes will be added here */}
           {/* Statistics routes */}
-          {/* <Route path="statistics/documents" element={<DocumentStatisticsPage />} />
-                <Route path="statistics/users" element={<UserStatisticsPage />} />
-                <Route path="statistics/general" element={<GeneralStatisticsPage />} /> */}
+          <Route
+            path="statistics/documents"
+            element={<DocumentStatisticsPage />}
+          />
+          <Route path="statistics/users" element={<UserStatisticsPage />} />
 
           {/* Document management routes */}
           <Route path="documents" element={<AllDocumentsPage />} />
