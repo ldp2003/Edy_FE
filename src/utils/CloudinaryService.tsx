@@ -1,5 +1,5 @@
-import { CloudinaryAPI } from "../api/API";
 import type { RcFile } from "antd/es/upload/interface";
+import { CloudinaryAPI } from "../api/API";
 
 const CLOUDINARY_URL = import.meta.env.VITE_CLOUDINARY_CLOUD_URL;
 const UPLOAD_PRESET = import.meta.env.VITE_CLOUDINARY_PRESET;
@@ -15,12 +15,23 @@ export interface CloudinaryUploadResponse {
   height: number;
 }
 
+// Generate random public_id để tránh trùng tên file
+export const generateRandomPublicId = (): string => {
+  const timestamp = Date.now();
+  const randomString = Math.random().toString(36).substring(2, 15);
+  return `upload_${timestamp}_${randomString}`;
+};
+
 export const uploadImageToCloudinary = async (
   file: RcFile
 ): Promise<CloudinaryUploadResponse> => {
   const formData = new FormData();
   formData.append("file", file);
   formData.append("upload_preset", UPLOAD_PRESET);
+
+  // Generate random public_id để tránh overwrite khi trùng tên file
+  const publicId = generateRandomPublicId();
+  formData.append("public_id", publicId);
 
   const response = await fetch(CLOUDINARY_URL, {
     method: "POST",

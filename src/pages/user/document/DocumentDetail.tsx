@@ -173,21 +173,21 @@ const DocumentDetail: React.FC = () => {
   );
 
   return (
-    <div className="h-screen flex flex-col md:flex-row overflow-hidden">
-      {/* Document Side - ẩn trên mobile, hiện trên desktop */}
-      <div className="hidden md:block md:w-80">
+    <div className="h-screen flex flex-col lg:flex-row overflow-hidden">
+      {/* Document Side - ẩn trên mobile và tablet, hiện trên desktop */}
+      <div className="hidden lg:block lg:w-80">
         <DocumentSide document={document!} />
       </div>
 
       {/* Mobile Header */}
-      <div className="md:hidden">
+      <div className="lg:hidden">
         <MobileDocumentHeader document={document!} />
       </div>
 
       {/* Main content - có thể scroll */}
       <div className="flex-1 overflow-y-auto pb-8">
         <div className="p-4">
-          <div className="hidden md:flex flex-col">
+          <div className="hidden lg:flex flex-col">
             <AuthorInfo document={document!} />
             <DocumentActions document={document!} />
           </div>

@@ -8,6 +8,7 @@ import UploadPage from "../pages/user/upload/UploadPage";
 import AccountActivation from "../pages/auth/AccountActivation";
 import EditProfile from "../pages/user/personalProfile/EditProfile";
 import DocumentDetail from "../pages/user/document/DocumentDetail";
+import DocumentListPage from "../pages/user/document/DocumentListPage";
 import RoleSelectionPage from "../pages/auth/RoleSelectionPage";
 import AuthRoute from "./AuthRoute";
 import PersonalPost from "../pages/user/personalPosts/PersonalPost";
@@ -44,6 +45,7 @@ const UserRoute: React.FC = () => {
           {/* Public pages - accessible by anyone */}
           <Route index element={<HomePage />} />
           <Route path="search" element={<SearchPage />} />
+          <Route path="documents" element={<DocumentListPage />} />
           <Route
             path="document-detail/:id"
             element={
@@ -87,12 +89,12 @@ const UserRoute: React.FC = () => {
           <Route path="edit-profile" element={<EditProfile />} />
           <Route path="favorites" element={<FavoritePage />} />
           <Route path="history" element={<ReadHistoryPage />} />
+          <Route path="point-management" element={<PointManagementPage />} />
           <Route path="notifications" element={<NotificationListPage />} />
           <Route path="stats" element={<StatsPage />} />
           <Route path="user/:userId" element={<UserProfilePage />} />
           <Route path="following" element={<FollowPage />} />
           <Route path="follower" element={<FollowPage />} />
-          <Route path="point-management" element={<PointManagementPage />} />
 
           {/* 404 Page */}
           <Route path="*" element={<NotFoundPage />} />

@@ -32,6 +32,7 @@ const AdminRoute: React.FC = () => {
                 <Route path="statistics/general" element={<GeneralStatisticsPage />} /> */}
 
           {/* Document management routes */}
+          <Route path="documents" element={<AllDocumentsPage />} />
           <Route path="documents/all" element={<AllDocumentsPage />} />
           <Route path="documents/review/:id" element={<DocumentReviewPage />} />
           {/* <Route path="documents/pending" element={<PendingDocumentsPage />} /> */}
