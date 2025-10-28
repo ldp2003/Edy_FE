@@ -82,10 +82,7 @@ const DocumentReviewPage: React.FC = () => {
 
   const handleApprove = async (approvalData: {
     documentRequestId: string;
-    summaryRequestId?: string;
     isIntensive: boolean;
-    summaryAction?: "approve" | "reject";
-    summaryRejectReason?: string;
   }) => {
     try {
       // If this is an edit request, use edit approval API
@@ -104,20 +101,6 @@ const DocumentReviewPage: React.FC = () => {
             isIntensive: approvalData.isIntensive,
           }
         );
-
-        // Handle summary request if exists
-        if (approvalData.summaryRequestId) {
-          if (approvalData.summaryAction === "approve") {
-            await DocumentService.approveDocumentByRequestId(
-              approvalData.summaryRequestId
-            );
-          } else if (approvalData.summaryAction === "reject") {
-            await DocumentService.rejectDocumentByRequestId(
-              approvalData.summaryRequestId,
-              approvalData.summaryRejectReason || "Tóm tắt không phù hợp"
-            );
-          }
-        }
       }
 
       message.success("Xử lý thành công!");

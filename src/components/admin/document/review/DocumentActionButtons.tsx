@@ -8,19 +8,13 @@ const { TextArea } = Input;
 
 interface DocumentActionButtonsProps {
   documentRequest: PendingRequest | null;
-  summaryRequest: PendingRequest | null;
   isIntensive: boolean;
-  summaryAction: "approve" | "reject";
-  summaryRejectReason: string;
   processing: boolean;
   documentId: string;
   documentStatus?: string; // Thêm status của document
   onApprove: (approvalData: {
     documentRequestId: string;
-    summaryRequestId?: string;
     isIntensive: boolean;
-    summaryAction?: "approve" | "reject";
-    summaryRejectReason?: string;
   }) => void;
   onReject: (reason: string, requestId: string) => void;
   onDelete: (reason: string) => void;
@@ -28,10 +22,7 @@ interface DocumentActionButtonsProps {
 
 const DocumentActionButtons: React.FC<DocumentActionButtonsProps> = ({
   documentRequest,
-  summaryRequest,
   isIntensive,
-  summaryAction,
-  summaryRejectReason,
   processing,
   documentId,
   documentStatus,
@@ -66,24 +57,10 @@ const DocumentActionButtons: React.FC<DocumentActionButtonsProps> = ({
       return;
     }
 
-    // Validate summary rejection reason if needed
-    if (
-      summaryRequest &&
-      summaryAction === "reject" &&
-      !summaryRejectReason.trim()
-    ) {
-      messageApi.error("Vui lòng nhập lý do từ chối tóm tắt!");
-      return;
-    }
-
     try {
       const approvalData = {
         documentRequestId: documentRequest._id,
-        summaryRequestId: summaryRequest?._id,
         isIntensive,
-        summaryAction: summaryRequest ? summaryAction : undefined,
-        summaryRejectReason:
-          summaryAction === "reject" ? summaryRejectReason : undefined,
       };
 
       await onApprove(approvalData);
@@ -104,9 +81,6 @@ const DocumentActionButtons: React.FC<DocumentActionButtonsProps> = ({
     }
   }, [
     documentRequest,
-    summaryRequest,
-    summaryAction,
-    summaryRejectReason,
     isIntensive,
     onApprove,
     messageApi,

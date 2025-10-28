@@ -489,7 +489,6 @@ export const DocumentAPI = {
     level?: string;
     subject?: string;
     status?: string;
-    summary_status?: string;
     public_mode?: string;
   }) => {
     try {
@@ -519,7 +518,6 @@ export const DocumentAPI = {
     level?: string;
     subject?: string;
     status?: string;
-    summary_status?: string;
     public_mode?: string;
   }) => {
     try {

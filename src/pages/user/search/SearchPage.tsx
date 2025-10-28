@@ -21,7 +21,6 @@ export interface SearchFilters {
   keyword?: string[];
   subject?: string;
   status?: string;
-  summary_status?: string;
   public_mode?: string;
   page?: number;
   title?: string;
@@ -61,7 +60,6 @@ const SearchPage: React.FC = () => {
     const keyword = searchParams.get("keyword");
     const subject = searchParams.get("subject");
     const status = searchParams.get("status");
-    const summary_status = searchParams.get("summary_status");
     const public_mode = searchParams.get("public_mode");
     const pageFilter = searchParams.get("pageFilter"); // Số trang của document
     const title = searchParams.get("title");
@@ -82,7 +80,6 @@ const SearchPage: React.FC = () => {
     if (keyword) filters.keyword = keyword.split(",");
     if (subject) filters.subject = subject;
     if (status) filters.status = status;
-    if (summary_status) filters.summary_status = summary_status;
     if (public_mode) filters.public_mode = public_mode;
     if (pageFilter) filters.page = parseInt(pageFilter);
     if (title) filters.title = title;
@@ -177,8 +174,6 @@ const SearchPage: React.FC = () => {
       newSearchParams.set("keyword", newFilters.keyword.join(","));
     if (newFilters.subject) newSearchParams.set("subject", newFilters.subject);
     if (newFilters.status) newSearchParams.set("status", newFilters.status);
-    if (newFilters.summary_status)
-      newSearchParams.set("summary_status", newFilters.summary_status);
     if (newFilters.public_mode)
       newSearchParams.set("public_mode", newFilters.public_mode);
     if (newFilters.page)

@@ -20,7 +20,6 @@ interface ApprovalRequest {
   requester: string;
   reviewed_by: string | null;
   reviewed_at: Date | null;
-  is_summary: boolean;
   status: "PENDING" | "APPROVED" | "REJECTED";
   message: string;
   ai_checked: boolean;
@@ -469,10 +468,6 @@ const AdminDocumentTable: React.FC = () => {
             APPROVED: {
               text: "Đã duyệt",
               color: "bg-green-100 text-green-800",
-            },
-            PENDING_SUMMARY: {
-              text: "Chờ tóm tắt",
-              color: "bg-blue-100 text-blue-800",
             },
             REJECTED: { text: "Đã từ chối", color: "bg-red-100 text-red-800" },
             REQUESTED_EDIT: {
