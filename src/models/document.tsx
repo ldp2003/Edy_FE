@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable react-refresh/only-export-components */
 // TypeScript interfaces for Document
 import type { User, Organization } from "./user";
