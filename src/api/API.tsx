@@ -1666,3 +1666,76 @@ const extractResourceTypeFromUrl = (url: string): "raw" | "image" | "video" => {
     return "image";
   }
 };
+
+export const UserStatisticsAPI = {
+  // Get user statistics
+  getMyStatistics: async (year?: number) => {
+    try {
+      const params = year ? { year } : {};
+      const response = await apiClient.get("/user-statistics/me", { params });
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching user statistics:", error);
+      throw error;
+    }
+  },
+
+  // Sync user statistics
+  syncMyStatistics: async (year?: number) => {
+    try {
+      const params = year ? { year } : {};
+      const response = await apiClient.post("/user-statistics/sync", {
+        params,
+      });
+      return response.data;
+    } catch (error) {
+      console.error("Error syncing user statistics:", error);
+      throw error;
+    }
+  },
+
+  // Get statistics by year
+  getStatisticsByYear: async (year: number) => {
+    try {
+      const response = await apiClient.get(`/user-statistics/year/${year}`);
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching statistics by year:", error);
+      throw error;
+    }
+  },
+};
+
+export const AdminStatisticsAPI = {
+  // Get admin dashboard statistics
+  getDashboardStats: async (params?: {
+    period?: "day" | "week" | "month" | "year";
+    year?: number;
+    month?: number;
+  }) => {
+    try {
+      const response = await apiClient.get("/admin/statistics/dashboard", {
+        params,
+      });
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching admin dashboard statistics:", error);
+      throw error;
+    }
+  },
+
+  // Sync admin statistics
+  syncDashboardStats: async (params?: {
+    period?: "day" | "week" | "month" | "year";
+    year?: number;
+    month?: number;
+  }) => {
+    try {
+      const response = await apiClient.post("/admin/statistics/sync", params);
+      return response.data;
+    } catch (error) {
+      console.error("Error syncing admin statistics:", error);
+      throw error;
+    }
+  },
+};

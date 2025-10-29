@@ -3,13 +3,10 @@ import { ChevronDown, ChevronLeft, ChevronRight, Search } from "lucide-react";
 import {
   BarChart,
   Bar,
-  LineChart,
-  Line,
   XAxis,
   YAxis,
   CartesianGrid,
   Tooltip,
-  Legend,
   ResponsiveContainer,
 } from "recharts";
 
@@ -66,72 +63,6 @@ const newUsersData = [
   { month: "T10", newUsers: 45 },
   { month: "T11", newUsers: 55 },
   { month: "T12", newUsers: 70 },
-];
-
-// Dữ liệu thống kê lượt đăng tài liệu theo tháng
-const documentUploadsData = [
-  { month: "T1", uploads: 120 },
-  { month: "T2", uploads: 150 },
-  { month: "T3", uploads: 180 },
-  { month: "T4", uploads: 200 },
-  { month: "T5", uploads: 170 },
-  { month: "T6", uploads: 220 },
-  { month: "T7", uploads: 190 },
-  { month: "T8", uploads: 240 },
-  { month: "T9", uploads: 210 },
-  { month: "T10", uploads: 230 },
-  { month: "T11", uploads: 250 },
-  { month: "T12", uploads: 280 },
-];
-
-// Dữ liệu thống kê lượt tải tài liệu theo tháng
-const documentDownloadsData = [
-  { month: "T1", downloads: 450 },
-  { month: "T2", downloads: 520 },
-  { month: "T3", downloads: 480 },
-  { month: "T4", downloads: 600 },
-  { month: "T5", downloads: 550 },
-  { month: "T6", downloads: 650 },
-  { month: "T7", downloads: 580 },
-  { month: "T8", downloads: 700 },
-  { month: "T9", downloads: 620 },
-  { month: "T10", downloads: 680 },
-  { month: "T11", downloads: 720 },
-  { month: "T12", downloads: 750 },
-];
-
-// Top 5 loại tài liệu được xem và tải nhiều nhất
-const topDocumentTypes = [
-  {
-    id: 1,
-    type: "Bài giảng",
-    views: 15420,
-    downloads: 2840,
-  },
-  {
-    id: 2,
-    type: "Đề thi",
-    views: 12850,
-    downloads: 2150,
-  },
-  {
-    id: 3,
-    type: "Tài liệu tham khảo",
-    views: 11260,
-    downloads: 1890,
-  },
-  {
-    id: 4,
-    type: "Bài tập",
-    views: 9840,
-    downloads: 1650,
-  },
-  {
-    id: 5,
-    type: "Sách giáo khoa",
-    views: 8760,
-    downloads: 1420,
-  },
 ];
 
 const UserStatisticsPage: React.FC = () => {
@@ -293,12 +224,12 @@ const UserStatisticsPage: React.FC = () => {
         {/* Pagination */}
         <div className="bg-gray-50 border-t border-gray-200 px-2 sm:px-4 py-4 flex flex-col sm:flex-row items-center justify-between gap-2">
           <div className="flex items-center gap-2">
-            <span className="text-sm text-gray-600">50 dòng:</span>
+            <span className="text-sm text-gray-600">50 hàng:</span>
             <button className="text-sm text-gray-600 hover:text-gray-900 flex items-center gap-1">
               5 <ChevronDown size={16} />
             </button>
           </div>
-          <div className="text-sm text-gray-600">1-2 of 250</div>
+          <div className="text-sm text-gray-600">1-2 trong 250</div>
           <div className="flex items-center gap-2">
             <button className="p-1 hover:bg-gray-200 rounded">
               <ChevronLeft size={18} className="text-gray-600" />
@@ -310,144 +241,23 @@ const UserStatisticsPage: React.FC = () => {
         </div>
       </div>
 
-      {/* Charts Section */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        {/* New Users Chart */}
-        <div className="bg-white rounded-lg p-3 sm:p-4 border border-gray-200">
-          <h3
-            className="text-base sm:text-lg font-semibold mb-3 text-left"
-            style={{ color: "var(--primary-text-color)" }}
-          >
-            Thống kê người dùng mới
-          </h3>
-          <ResponsiveContainer width="100%" height={250}>
-            <BarChart data={newUsersData}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-              <XAxis dataKey="month" />
-              <YAxis />
-              <Tooltip />
-              <Bar dataKey="newUsers" fill="#3b82f6" radius={[4, 4, 0, 0]} />
-            </BarChart>
-          </ResponsiveContainer>
-        </div>
-
-        {/* Document Uploads Chart */}
-        <div className="bg-white rounded-lg p-3 sm:p-4 border border-gray-200">
-          <h3
-            className="text-base sm:text-lg font-semibold mb-3 text-left"
-            style={{ color: "var(--primary-text-color)" }}
-          >
-            Thống kê lượt đăng tài liệu
-          </h3>
-          <ResponsiveContainer width="100%" height={250}>
-            <LineChart data={documentUploadsData}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-              <XAxis dataKey="month" />
-              <YAxis />
-              <Tooltip />
-              <Legend />
-              <Line
-                type="monotone"
-                dataKey="uploads"
-                stroke="#06b6d4"
-                strokeWidth={2}
-                dot={{ fill: "#06b6d4", r: 4 }}
-              />
-            </LineChart>
-          </ResponsiveContainer>
-        </div>
-      </div>
-
-      {/* Downloads and Top Types Section */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        {/* Document Downloads Chart */}
-        <div className="bg-white rounded-lg p-3 sm:p-4 border border-gray-200">
-          <h3
-            className="text-base sm:text-lg font-semibold mb-3 text-left"
-            style={{ color: "var(--primary-text-color)" }}
-          >
-            Thống kê lượt tải tài liệu
-          </h3>
-          <ResponsiveContainer width="100%" height={250}>
-            <LineChart data={documentDownloadsData}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-              <XAxis dataKey="month" />
-              <YAxis />
-              <Tooltip />
-              <Legend />
-              <Line
-                type="monotone"
-                dataKey="downloads"
-                stroke="#ec4899"
-                strokeWidth={2}
-                dot={{ fill: "#ec4899", r: 4 }}
-              />
-            </LineChart>
-          </ResponsiveContainer>
-        </div>
-
-        {/* Top Document Types */}
-        <div className="bg-white rounded-lg p-3 sm:p-4 border border-gray-200">
-          <h3
-            className="text-base sm:text-lg font-semibold mb-3 text-left"
-            style={{ color: "var(--primary-text-color)" }}
-          >
-            TOP 5 loại tài liệu được xem và tải nhiều nhất
-          </h3>
-          <div className="overflow-x-auto">
-            <table className="w-full text-xs sm:text-sm">
-              <thead>
-                <tr className="border-b border-gray-200">
-                  <th className="text-left py-1.5 px-1 sm:px-1.5 text-gray-600 font-medium">
-                    STT
-                  </th>
-                  <th className="text-left py-1.5 px-1 sm:px-1.5 text-gray-600 font-medium">
-                    Loại tài liệu
-                  </th>
-                  <th className="text-center py-1.5 px-1 sm:px-1.5 text-gray-600 font-medium">
-                    Lượt xem
-                  </th>
-                  <th className="text-center py-1.5 px-1 sm:px-1.5 text-gray-600 font-medium">
-                    Lượt tải
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {topDocumentTypes.map((type) => (
-                  <tr
-                    key={type.id}
-                    className="border-b border-gray-100 hover:bg-gray-50"
-                  >
-                    <td
-                      className="py-2 px-1 sm:px-1.5"
-                      style={{ color: "var(--third-text-color)" }}
-                    >
-                      {type.id}
-                    </td>
-                    <td
-                      className="py-2 px-1 sm:px-1.5 font-medium"
-                      style={{ color: "var(--third-text-color)" }}
-                    >
-                      {type.type}
-                    </td>
-                    <td
-                      className="py-2 px-1 sm:px-1.5 text-center"
-                      style={{ color: "var(--third-text-color)" }}
-                    >
-                      {type.views.toLocaleString()}
-                    </td>
-                    <td
-                      className="py-2 px-1 sm:px-1.5 text-center"
-                      style={{ color: "var(--third-text-color)" }}
-                    >
-                      {type.downloads.toLocaleString()}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
+      {/* New Users Chart */}
+      <div className="bg-white rounded-lg p-3 sm:p-4 border border-gray-200">
+        <h3
+          className="text-base sm:text-lg font-semibold mb-3 text-left"
+          style={{ color: "var(--primary-text-color)" }}
+        >
+          Thống kê người dùng mới
+        </h3>
+        <ResponsiveContainer width="100%" height={300}>
+          <BarChart data={newUsersData}>
+            <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+            <XAxis dataKey="month" />
+            <YAxis />
+            <Tooltip />
+            <Bar dataKey="newUsers" fill="#3b82f6" radius={[4, 4, 0, 0]} />
+          </BarChart>
+        </ResponsiveContainer>
       </div>
     </div>
   );

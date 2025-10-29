@@ -214,3 +214,57 @@ export const getDocumentTypeFromFileName = (
 
   return "OTHER";
 };
+
+// User Statistics interfaces
+export interface UserStats {
+  totalUploads: number;
+  totalContributions: number;
+  totalComments: number;
+  totalDownloads: number;
+}
+
+export interface DocumentTypes {
+  RESEARCH_REPORT: number;
+  VIDEO: number;
+  STUDY_GUIDE: number;
+  TEXTBOOK: number;
+  ESSAY: number;
+  SOLUTION_SET: number;
+  THESIS: number;
+  LECTURE: number;
+  OTHER: number;
+}
+
+export interface MonthlyPoints {
+  labels: string[];
+  earned: number[];
+  spent: number[];
+}
+
+export interface TopDocument {
+  key: string;
+  stt: number;
+  title: string;
+  views: number;
+  downloads: number;
+  rating: string;
+}
+
+export interface MonthlyReportsDataset {
+  label: string;
+  data: number[];
+}
+
+export interface MonthlyReports {
+  labels: string[];
+  datasets: MonthlyReportsDataset[];
+}
+
+export interface UserStatistics {
+  stats: UserStats;
+  documentTypes: DocumentTypes;
+  monthlyPoints: MonthlyPoints;
+  topDocuments: TopDocument[];
+  monthlyReports: MonthlyReports;
+  lastSyncAt: string;
+}

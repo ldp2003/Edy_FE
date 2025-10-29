@@ -1,26 +1,34 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect, useCallback } from "react";
 import {
-  BarChart,
-  Bar,
-  LineChart,
-  Line,
-  AreaChart,
-  Area,
-  XAxis,
-  YAxis,
-  CartesianGrid,
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  BarElement,
+  Title,
   Tooltip,
   Legend,
-  ResponsiveContainer,
-} from "recharts";
+  ArcElement,
+  LineController,
+  BarController,
+} from "chart.js";
 import { ChevronDown } from "lucide-react";
 
-const barChartData = [
-  { name: "Tiêu luận", value: 5 },
-  { name: "Nguyên cứu khoa học", value: 4 },
-  { name: "Khác", value: 2 },
-];
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  BarElement,
+  Title,
+  Tooltip,
+  Legend,
+  ArcElement,
+  LineController,
+  BarController
+);
 
 // Dữ liệu theo tháng (12 tháng)
 const monthlyData = {
@@ -284,6 +292,14 @@ const DocumentStatisticsPage: React.FC = () => {
     dateTo: "",
   });
 
+  // Chart refs
+  const barChartRef = useRef<HTMLCanvasElement>(null);
+  const lineChartRef = useRef<HTMLCanvasElement>(null);
+
+  // Chart instances
+  const barChartInstanceRef = useRef<ChartJS | null>(null);
+  const lineChartInstanceRef = useRef<ChartJS | null>(null);
+
   const months = [
     { value: "", label: "Tất cả tháng" },
     { value: "T1", label: "Tháng 1" },
@@ -303,7 +319,7 @@ const DocumentStatisticsPage: React.FC = () => {
   const years = ["2024", "2025"];
 
   // Lọc dữ liệu theo tháng hoặc năm
-  const getFilteredData = () => {
+  const getFilteredData = useCallback(() => {
     if (selectedMonth) {
       // Nếu chọn tháng, trả về dữ liệu theo ngày của tháng đó
       const yearData =
@@ -315,7 +331,7 @@ const DocumentStatisticsPage: React.FC = () => {
         yearlyData[selectedYear as unknown as keyof typeof yearlyData] || [];
       return yearData;
     }
-  };
+  }, [selectedYear, selectedMonth]);
 
   const lineChartData = getFilteredData();
 
@@ -333,6 +349,128 @@ const DocumentStatisticsPage: React.FC = () => {
       !approvedFilter.dateTo || doc.uploadDate <= approvedFilter.dateTo;
     return matchesAuthor && matchesSubject && matchesDateFrom && matchesDateTo;
   });
+
+  // Initialize charts
+  useEffect(() => {
+    // Destroy existing charts
+    if (barChartInstanceRef.current) {
+      barChartInstanceRef.current.destroy();
+      barChartInstanceRef.current = null;
+    }
+    if (lineChartInstanceRef.current) {
+      lineChartInstanceRef.current.destroy();
+      lineChartInstanceRef.current = null;
+    }
+
+    // Bar Chart - Biểu đồ thống kê theo loại
+    const barCtx = barChartRef.current?.getContext("2d");
+    if (barCtx) {
+      barChartInstanceRef.current = new ChartJS(barCtx, {
+        type: "bar",
+        data: {
+          labels: ["Tiêu luận", "Nghiên cứu khoa học", "Khác"],
+          datasets: [
+            {
+              data: [5, 4, 2],
+              backgroundColor: ["#00BFFF", "#8A2BE2", "#FF6347"],
+              borderRadius: 4,
+            },
+          ],
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              display: false,
+            },
+            tooltip: {
+              callbacks: {
+                label: function (context) {
+                  return `Số lượng: ${context.parsed.y}`;
+                },
+              },
+            },
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              max: 10,
+              ticks: {
+                stepSize: 2,
+              },
+            },
+          },
+        },
+      });
+    }
+
+    // Line Chart - Thống kê lượt xem và tải tài liệu
+    const lineCtx = lineChartRef.current?.getContext("2d");
+    if (lineCtx) {
+      const lineChartData = getFilteredData();
+      const labels = lineChartData.map((item) =>
+        selectedMonth ? (item as any).day : (item as any).month
+      );
+      const viewsData = lineChartData.map((item) => item.views);
+      const downloadsData = lineChartData.map((item) => item.downloads);
+
+      lineChartInstanceRef.current = new ChartJS(lineCtx, {
+        type: "line",
+        data: {
+          labels: labels,
+          datasets: [
+            {
+              label: "Lượt xem",
+              data: viewsData,
+              borderColor: "#06b6d4",
+              backgroundColor: "rgba(6, 182, 212, 0.1)",
+              tension: 0.4,
+            },
+            {
+              label: "Lượt tải",
+              data: downloadsData,
+              borderColor: "#ec4899",
+              backgroundColor: "rgba(236, 72, 153, 0.1)",
+              tension: 0.4,
+            },
+          ],
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              position: "bottom",
+            },
+            tooltip: {
+              callbacks: {
+                label: function (context) {
+                  return `${context.dataset.label}: ${context.parsed.y}`;
+                },
+              },
+            },
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+            },
+          },
+        },
+      });
+    }
+
+    return () => {
+      if (barChartInstanceRef.current) {
+        barChartInstanceRef.current.destroy();
+        barChartInstanceRef.current = null;
+      }
+      if (lineChartInstanceRef.current) {
+        lineChartInstanceRef.current.destroy();
+        lineChartInstanceRef.current = null;
+      }
+    };
+  }, [selectedYear, selectedMonth, chartType, getFilteredData]);
   return (
     <div className="space-y-6">
       {/* Breadcrumb */}
@@ -415,15 +553,9 @@ const DocumentStatisticsPage: React.FC = () => {
               Tất cả <ChevronDown size={16} />
             </button>
           </div>
-          <ResponsiveContainer width="100%" height={280}>
-            <BarChart data={barChartData}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-              <XAxis dataKey="name" />
-              <YAxis />
-              <Tooltip />
-              <Bar dataKey="value" fill="#06b6d4" radius={[8, 8, 0, 0]} />
-            </BarChart>
-          </ResponsiveContainer>
+          <div className="h-64">
+            <canvas ref={barChartRef}></canvas>
+          </div>
         </div>
 
         {/* Top Documents Table */}
@@ -517,8 +649,6 @@ const DocumentStatisticsPage: React.FC = () => {
                 className="text-sm border border-gray-300 rounded px-2 py-1"
               >
                 <option value="line">Biểu đồ đường</option>
-                <option value="area">Biểu đồ miền</option>
-                <option value="bar">Biểu đồ cột</option>
                 <option value="table">Bảng</option>
               </select>
             </div>
@@ -571,75 +701,9 @@ const DocumentStatisticsPage: React.FC = () => {
               </table>
             </div>
           ) : (
-            <ResponsiveContainer width="100%" height={250}>
-              {chartType === "line" ? (
-                <LineChart data={lineChartData}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-                  <XAxis dataKey={selectedMonth ? "day" : "month"} />
-                  <YAxis />
-                  <Tooltip />
-                  <Legend />
-                  <Line
-                    type="monotone"
-                    dataKey="views"
-                    stroke="#06b6d4"
-                    strokeWidth={2}
-                    dot={{ fill: "#06b6d4", r: 4 }}
-                  />
-                  <Line
-                    type="monotone"
-                    dataKey="downloads"
-                    stroke="#ec4899"
-                    strokeWidth={2}
-                    dot={{ fill: "#ec4899", r: 4 }}
-                  />
-                </LineChart>
-              ) : chartType === "bar" ? (
-                <BarChart data={lineChartData}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-                  <XAxis dataKey={selectedMonth ? "day" : "month"} />
-                  <YAxis />
-                  <Tooltip />
-                  <Legend />
-                  <Bar
-                    dataKey="views"
-                    fill="#06b6d4"
-                    radius={[4, 4, 0, 0]}
-                    name="Lượt xem"
-                  />
-                  <Bar
-                    dataKey="downloads"
-                    fill="#ec4899"
-                    radius={[4, 4, 0, 0]}
-                    name="Lượt tải"
-                  />
-                </BarChart>
-              ) : (
-                <AreaChart data={lineChartData}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-                  <XAxis dataKey={selectedMonth ? "day" : "month"} />
-                  <YAxis />
-                  <Tooltip />
-                  <Legend />
-                  <Area
-                    type="monotone"
-                    dataKey="views"
-                    stackId="1"
-                    stroke="#06b6d4"
-                    fill="#06b6d4"
-                    fillOpacity={0.6}
-                  />
-                  <Area
-                    type="monotone"
-                    dataKey="downloads"
-                    stackId="1"
-                    stroke="#ec4899"
-                    fill="#ec4899"
-                    fillOpacity={0.6}
-                  />
-                </AreaChart>
-              )}
-            </ResponsiveContainer>
+            <div className="h-64">
+              <canvas ref={lineChartRef}></canvas>
+            </div>
           )}
         </div>
 
@@ -653,7 +717,7 @@ const DocumentStatisticsPage: React.FC = () => {
               Thống kê tài liệu đã duyệt
             </h3>
             <div className="text-sm text-gray-600">
-              Tổng: {filteredApprovedDocuments.length}
+              Tổng số: {filteredApprovedDocuments.length}
             </div>
           </div>
 
