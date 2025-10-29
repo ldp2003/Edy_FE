@@ -1684,7 +1684,7 @@ export const UserStatisticsAPI = {
   syncMyStatistics: async (year?: number) => {
     try {
       const params = year ? { year } : {};
-      const response = await apiClient.post("/user-statistics/sync", null, {
+      const response = await apiClient.post("/user-statistics/sync", {
         params,
       });
       return response.data;
@@ -1701,6 +1701,40 @@ export const UserStatisticsAPI = {
       return response.data;
     } catch (error) {
       console.error("Error fetching statistics by year:", error);
+      throw error;
+    }
+  },
+};
+
+export const AdminStatisticsAPI = {
+  // Get admin dashboard statistics
+  getDashboardStats: async (params?: {
+    period?: "day" | "week" | "month" | "year";
+    year?: number;
+    month?: number;
+  }) => {
+    try {
+      const response = await apiClient.get("/admin/statistics/dashboard", {
+        params,
+      });
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching admin dashboard statistics:", error);
+      throw error;
+    }
+  },
+
+  // Sync admin statistics
+  syncDashboardStats: async (params?: {
+    period?: "day" | "week" | "month" | "year";
+    year?: number;
+    month?: number;
+  }) => {
+    try {
+      const response = await apiClient.post("/admin/statistics/sync", params);
+      return response.data;
+    } catch (error) {
+      console.error("Error syncing admin statistics:", error);
       throw error;
     }
   },
