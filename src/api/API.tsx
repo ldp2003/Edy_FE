@@ -1666,3 +1666,42 @@ const extractResourceTypeFromUrl = (url: string): "raw" | "image" | "video" => {
     return "image";
   }
 };
+
+export const UserStatisticsAPI = {
+  // Get user statistics
+  getMyStatistics: async (year?: number) => {
+    try {
+      const params = year ? { year } : {};
+      const response = await apiClient.get("/user-statistics/me", { params });
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching user statistics:", error);
+      throw error;
+    }
+  },
+
+  // Sync user statistics
+  syncMyStatistics: async (year?: number) => {
+    try {
+      const params = year ? { year } : {};
+      const response = await apiClient.post("/user-statistics/sync", null, {
+        params,
+      });
+      return response.data;
+    } catch (error) {
+      console.error("Error syncing user statistics:", error);
+      throw error;
+    }
+  },
+
+  // Get statistics by year
+  getStatisticsByYear: async (year: number) => {
+    try {
+      const response = await apiClient.get(`/user-statistics/year/${year}`);
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching statistics by year:", error);
+      throw error;
+    }
+  },
+};

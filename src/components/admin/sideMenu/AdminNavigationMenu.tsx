@@ -44,7 +44,6 @@ export function AdminNavigationMenu({ isCompact }: AdminNavigationMenuProps) {
       children: [
         { label: "Thống kê tài liệu", path: "/admin/statistics/documents" },
         { label: "Thống kê người dùng", path: "/admin/statistics/users" },
-        { label: "Thống kê chung", path: "/admin/statistics/general" },
       ],
     },
     { icon: FileText, label: "Tài liệu", path: "/admin/documents/all" },

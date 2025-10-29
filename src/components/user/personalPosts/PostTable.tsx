@@ -22,6 +22,7 @@ import {
   publicModeLabels,
   type PublicModeType,
   type Document,
+  documentTypeLabels,
 } from "../../../models/document";
 import ShareModal from "../share/ShareModal";
 import { DocumentService } from "../../../utils/DocumentService";
@@ -63,6 +64,7 @@ const PostTable: React.FC<PostTableProps> = ({
       "comment_count",
       "download_count",
       "file_type",
+      "doc_type",
       "rating",
       "action",
     ])
@@ -356,6 +358,25 @@ const PostTable: React.FC<PostTableProps> = ({
       render: (fileType: string) => createFileTypeTag(fileType),
     },
     {
+      title: "Loại tài liệu",
+      dataIndex: "doc_type",
+      key: "doc_type",
+      align: "center",
+      width: 120,
+      responsive: ["md"],
+      render: (docType: string) => {
+        if (!docType) return <span className="text-gray-400">-</span>;
+        const label =
+          documentTypeLabels[docType as keyof typeof documentTypeLabels] ||
+          docType;
+        return (
+          <span className="text-[var(--primary-text-color)] text-sm">
+            {label}
+          </span>
+        );
+      },
+    },
+    {
       title: "Đánh giá",
       dataIndex: "rating",
       key: "rating",
@@ -519,6 +540,7 @@ const PostTable: React.FC<PostTableProps> = ({
     { key: "comment_count", label: "Bình luận" },
     { key: "download_count", label: "Lượt tải" },
     { key: "file_type", label: "Loại file" },
+    { key: "doc_type", label: "Loại tài liệu" },
     { key: "rating", label: "Đánh giá" },
     { key: "action", label: "Thao tác", disabled: true },
   ];
