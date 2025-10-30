@@ -189,7 +189,7 @@ const StatsPage: React.FC = () => {
       monthlyBarChartInstanceRef.current = null;
     }
 
-    // Bar Chart - Biểu đồ thống kê theo loại
+    // Bar Chart - Biểu đồ thống kê theo loại tài liệu
     const barCtx = barChartRef.current?.getContext("2d");
     if (barCtx && statistics) {
       const documentTypesData = [
@@ -584,7 +584,7 @@ const StatsPage: React.FC = () => {
           <div className="bg-white p-4 rounded-lg border border-gray-200">
             <div className="flex justify-between items-center mb-4">
               <h3 className="font-semibold text-[var(--primary-text-color)]">
-                Biểu đồ Thống kê theo loại
+                Biểu đồ thống kê theo loại tài liệu
               </h3>
               <div className="flex items-center gap-2">
                 <Select

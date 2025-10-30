@@ -428,6 +428,8 @@ const PostTable: React.FC<PostTableProps> = ({
       fixed: "right",
       render: (_, record) => {
         const isRejected = record.status === "REJECTED";
+        const isPendingApproval =
+          record.status === "PENDING" || record.status === "PENDING_EDIT";
         const isLoading = visibilityLoading === record._id;
 
         // Create dropdown items for visibility change
@@ -449,21 +451,23 @@ const PostTable: React.FC<PostTableProps> = ({
             {/* Edit Button */}
             <button
               className={`p-2 text-xs text-white rounded transition-all duration-300 ${
-                isRejected
+                isRejected || isPendingApproval
                   ? "bg-gray-400 cursor-not-allowed"
                   : "bg-[var(--green-button-color)] hover:bg-blue-600 hover:shadow-lg transform hover:scale-105"
               }`}
               onClick={
-                isRejected
+                isRejected || isPendingApproval
                   ? undefined
                   : () => navigate(`/personal-posts/edit/${record._id}`)
               }
               title={
                 isRejected
                   ? "Không thể sửa tài liệu bị từ chối"
+                  : isPendingApproval
+                  ? "Không thể chỉnh sửa tài liệu đang chờ duyệt"
                   : "Chỉnh sửa tài liệu"
               }
-              disabled={isRejected}
+              disabled={isRejected || isPendingApproval}
             >
               <Edit size={13} />
             </button>
@@ -472,11 +476,11 @@ const PostTable: React.FC<PostTableProps> = ({
             <Dropdown
               menu={{ items: dropdownItems }}
               placement="bottomRight"
-              disabled={isRejected || isLoading}
+              disabled={isRejected || isLoading || isPendingApproval}
             >
               <button
                 className={`p-2 text-xs text-white rounded transition-all duration-300 ${
-                  isRejected
+                  isRejected || isPendingApproval
                     ? "bg-gray-400 cursor-not-allowed"
                     : isLoading
                     ? "bg-blue-300 cursor-wait"
@@ -485,9 +489,11 @@ const PostTable: React.FC<PostTableProps> = ({
                 title={
                   isRejected
                     ? "Không thể thay đổi chế độ hiển thị tài liệu bị từ chối"
+                    : isPendingApproval
+                    ? "Không thể thay đổi chế độ hiển thị tài liệu đang chờ duyệt"
                     : "Thay đổi chế độ hiển thị"
                 }
-                disabled={isRejected || isLoading}
+                disabled={isRejected || isLoading || isPendingApproval}
               >
                 {isLoading ? (
                   <Settings size={13} className="animate-spin" />
@@ -500,21 +506,23 @@ const PostTable: React.FC<PostTableProps> = ({
             {/* Delete Button */}
             <button
               className={`p-2 text-xs text-white rounded transition-all duration-300 ${
-                isRejected
+                isRejected || isPendingApproval
                   ? "bg-gray-400 cursor-not-allowed"
                   : "bg-[var(--red-button-color)] hover:bg-red-600 hover:shadow-lg transform hover:scale-105"
               }`}
               onClick={
-                isRejected
+                isRejected || isPendingApproval
                   ? undefined
                   : () => console.log("Delete action triggered")
               }
               title={
                 isRejected
                   ? "Không thể xóa tài liệu bị từ chối"
+                  : isPendingApproval
+                  ? "Không thể xóa tài liệu đang chờ duyệt"
                   : "Xóa tài liệu"
               }
-              disabled={isRejected}
+              disabled={isRejected || isPendingApproval}
             >
               <Trash size={13} />
             </button>

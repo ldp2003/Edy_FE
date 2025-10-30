@@ -1739,3 +1739,43 @@ export const AdminStatisticsAPI = {
     }
   },
 };
+
+export const DocumentStatisticsAPI = {
+  // Get document statistics
+  getDocumentStatistics: async (params?: { year?: number; month?: number }) => {
+    try {
+      const response = await apiClient.get("/document-statistics", { params });
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching document statistics:", error);
+      throw error;
+    }
+  },
+
+  // Sync statistics for a specific month/year
+  syncMonthStatistics: async (params?: { year?: number; month?: number }) => {
+    try {
+      const response = await apiClient.post(
+        "/document-statistics/generate",
+        params
+      );
+      return response.data;
+    } catch (error) {
+      console.error("Error syncing month statistics:", error);
+      throw error;
+    }
+  },
+
+  // Sync all statistics for the entire system
+  syncAllStatistics: async () => {
+    try {
+      const response = await apiClient.post(
+        "/document-statistics/generate-all"
+      );
+      return response.data;
+    } catch (error) {
+      console.error("Error syncing all statistics:", error);
+      throw error;
+    }
+  },
+};

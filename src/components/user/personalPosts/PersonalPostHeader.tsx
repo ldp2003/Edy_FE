@@ -54,6 +54,10 @@ const PersonalPostHeader: React.FC<PersonalPostHeaderProps> = ({
     }
   };
 
+  // Check if document is pending approval (cannot be edited or deleted)
+  const isPendingApproval =
+    document.status === "PENDING" || document.status === "PENDING_EDIT";
+
   // Get icon for public mode
   const getPublicModeIcon = (mode: PublicModeType) => {
     switch (mode) {
@@ -196,7 +200,13 @@ const PersonalPostHeader: React.FC<PersonalPostHeaderProps> = ({
         type="default"
         icon={<Edit size={13} />}
         onClick={handleEditClick}
+        disabled={isPendingApproval}
         className="flex items-center text-xs gap-2"
+        title={
+          isPendingApproval
+            ? "Không thể chỉnh sửa tài liệu đang chờ duyệt"
+            : "Chỉnh sửa"
+        }
       >
         <span className="text-xs">Chỉnh sửa</span>
       </Button>,
