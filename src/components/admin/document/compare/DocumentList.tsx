@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import { List, Input, Spin, Pagination } from "antd";
 import { SearchOutlined } from "@ant-design/icons";
 import { DocumentService } from "../../../../utils/DocumentService";
@@ -29,34 +29,66 @@ const DocumentList: React.FC<DocumentListProps> = ({
   );
   const pageSize = 10;
   const initialLimit = 10;
+  const searchDebounceRef = useRef<number | null>(null);
+  const [isSearching, setIsSearching] = useState(false);
+  const hasFetchedRef = useRef(false);
+  const isFetchingRef = useRef(false);
 
-  const fetchDocuments = useCallback(async () => {
-    try {
-      setLoading(true);
-      let response;
+  useEffect(() => {
+    // Skip API call if we're in the middle of a search debounce or doc_id is not available
+    if (isSearching || !doc_id) return;
 
-      if (searchText && searchText.trim()) {
-        // Nếu có tìm kiếm, sử dụng getAllDocuments
-        response = await DocumentService.getAllDocuments({
-          search: searchText,
-          page: currentPage,
-          limit: pageSize,
-          ordering: "createdAt",
-          order: -1,
-        });
-      } else {
-        // Nếu không có tìm kiếm, sử dụng getSimilarDocuments
-        response = await DocumentService.getSimilarDocuments(doc_id || "");
-      }
-
-      setDocuments(response.documents || []);
-      setTotal(response.total || response.totalCount || 0);
-    } catch (error) {
-      console.error("Error fetching documents:", error);
-    } finally {
-      setLoading(false);
+    // Prevent double execution in development (StrictMode) - check if already fetching
+    if (isFetchingRef.current) {
+      console.log("Skipping duplicate fetch - already fetching");
+      return;
     }
-  }, [currentPage, searchText, doc_id]);
+
+    // Prevent double execution in development (StrictMode) - check if already fetched initial data
+    if (hasFetchedRef.current && searchText === "" && currentPage === 1) {
+      console.log("Skipping duplicate fetch - already fetched initial data");
+      return;
+    }
+
+    const fetchDocuments = async () => {
+      console.log(
+        `Fetching documents: searchText="${searchText}", currentPage=${currentPage}, doc_id="${doc_id}"`
+      );
+      isFetchingRef.current = true; // Mark as fetching
+
+      try {
+        setLoading(true);
+        let response;
+
+        if (searchText && searchText.trim()) {
+          // Nếu có tìm kiếm, sử dụng getAllDocuments
+          response = await DocumentService.getAllDocuments({
+            search: searchText,
+            page: currentPage,
+            limit: pageSize,
+            ordering: "createdAt",
+            order: -1,
+          });
+        } else {
+          // Nếu không có tìm kiếm, sử dụng getSimilarDocuments
+          response = await DocumentService.getSimilarDocumentsForAdmin(
+            doc_id || ""
+          );
+          hasFetchedRef.current = true; // Mark as fetched for initial load
+        }
+
+        setDocuments(response.documents || []);
+        setTotal(response.total || response.totalCount || 0);
+      } catch (error) {
+        console.error("Error fetching documents:", error);
+      } finally {
+        setLoading(false);
+        isFetchingRef.current = false; // Reset fetching flag
+      }
+    };
+
+    fetchDocuments();
+  }, [currentPage, searchText, doc_id, isSearching]);
 
   // Local Storage functions
   const getStorageKey = useCallback(
@@ -106,24 +138,50 @@ const DocumentList: React.FC<DocumentListProps> = ({
     [saveCheckedDocuments]
   );
 
-  useEffect(() => {
-    fetchDocuments();
-  }, [fetchDocuments]);
-
   // Load checked documents from localStorage on component mount
   useEffect(() => {
     if (doc_id) {
-      setCheckedDocuments(loadCheckedDocuments());
+      // Reset fetch flag when doc_id changes
+      hasFetchedRef.current = false;
+      const checked = loadCheckedDocuments();
+      setCheckedDocuments(checked);
     }
-  }, [doc_id, loadCheckedDocuments]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [doc_id]);
+
+  // Cleanup debounce timer on unmount
+  useEffect(() => {
+    return () => {
+      if (searchDebounceRef.current) {
+        clearTimeout(searchDebounceRef.current);
+      }
+    };
+  }, []);
 
   const handleSearch = (value: string) => {
-    setSearchText(value);
-    setCurrentPage(1);
-    setDisplayLimit(initialLimit);
+    // Clear previous debounce timer
+    if (searchDebounceRef.current) {
+      clearTimeout(searchDebounceRef.current);
+    }
+
+    // Reset fetch flag when starting a new search
+    hasFetchedRef.current = false;
+
+    // Set searching flag
+    setIsSearching(true);
+
+    // Set new debounce timer
+    searchDebounceRef.current = setTimeout(() => {
+      setSearchText(value);
+      setCurrentPage(1);
+      setDisplayLimit(initialLimit);
+      setIsSearching(false);
+    }, 300); // 300ms debounce
   };
 
   const handlePageChange = (page: number) => {
+    // Reset fetch flag when changing page
+    hasFetchedRef.current = false;
     setCurrentPage(page);
   };
 

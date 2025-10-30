@@ -79,12 +79,7 @@ const DocumentActionButtons: React.FC<DocumentActionButtonsProps> = ({
       console.error("Approve error:", error);
       messageApi.error("Có lỗi xảy ra khi duyệt tài liệu!");
     }
-  }, [
-    documentRequest,
-    isIntensive,
-    onApprove,
-    messageApi,
-  ]);
+  }, [documentRequest, isIntensive, onApprove, messageApi]);
 
   const handleReject = async () => {
     if (!documentRequest) {
@@ -215,18 +210,20 @@ const DocumentActionButtons: React.FC<DocumentActionButtonsProps> = ({
           {
             key: "request-edit",
             text: "Yêu cầu chỉnh sửa",
-            color: "#f59e0b",
+            color: "#6b7280",
             onClick: () => setEditRequestModalVisible(true),
+            disabled: true,
           },
           {
             key: "delete",
             text: "Xóa bài",
-            color: "#ef4444",
+            color: "#6b7280",
             onClick: () => setDeleteModalVisible(true),
+            disabled: true,
           },
         ],
       },
-      
+
       [DOCUMENT_STATUS.PENDING_EDIT]: {
         statusBadge: {
           text: "✏️ Yêu cầu chỉnh sửa đang chờ duyệt",
@@ -250,12 +247,13 @@ const DocumentActionButtons: React.FC<DocumentActionButtonsProps> = ({
           {
             key: "delete",
             text: "Xóa bài",
-            color: "#ef4444",
+            color: "#6b7280",
             onClick: () => setDeleteModalVisible(true),
+            disabled: true,
           },
         ],
       },
-      
+
       [DOCUMENT_STATUS.APPROVED]: {
         statusBadge: {
           text: "✓ Đã duyệt",
