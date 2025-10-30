@@ -350,6 +350,14 @@ export const DocumentService = {
     }
   },
 
+  async getSimilarDocumentsForAdmin(documentId: string, limit?: number) {
+    try {
+      return await DocumentAPI.getSimilarDocumentsForAdmin(documentId, limit);
+    } catch (error) {
+      console.error("Error in DocumentService.getSimilarDocForAdmin:", error);
+      throw error;
+    }
+  },
   // Thực hiện phản ứng với tài liệu (like/dislike/unreact)
   async reactDocument(
     documentId: string,

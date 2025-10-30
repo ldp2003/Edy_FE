@@ -903,6 +903,21 @@ export const DocumentAPI = {
       throw error;
     }
   },
+  getSimilarDocumentsForAdmin: async (documentId: string, limit?: number) => {
+    try {
+      const params = limit ? { limit } : {};
+      const response = await apiClient.get(
+        `/documents/${documentId}/similar-admin`,
+        {
+          params,
+        }
+      );
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching similar documents for admin:", error);
+      throw error;
+    }
+  },
   getDocumentByUser: async (
     userId: string,
     params?: {
