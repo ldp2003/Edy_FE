@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useState, useEffect } from "react";
 import { Form, message, Alert, Input } from "antd";
 import type { Document, PendingRequest } from "../../../models/document";

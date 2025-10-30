@@ -903,6 +903,21 @@ export const DocumentAPI = {
       throw error;
     }
   },
+  getSimilarDocumentsForAdmin: async (documentId: string, limit?: number) => {
+    try {
+      const params = limit ? { limit } : {};
+      const response = await apiClient.get(
+        `/documents/${documentId}/similar-admin`,
+        {
+          params,
+        }
+      );
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching similar documents for admin:", error);
+      throw error;
+    }
+  },
   getDocumentByUser: async (
     userId: string,
     params?: {
@@ -1665,4 +1680,117 @@ const extractResourceTypeFromUrl = (url: string): "raw" | "image" | "video" => {
     console.error("Error extracting resource type:", error);
     return "image";
   }
+};
+
+export const UserStatisticsAPI = {
+  // Get user statistics
+  getMyStatistics: async (year?: number) => {
+    try {
+      const params = year ? { year } : {};
+      const response = await apiClient.get("/user-statistics/me", { params });
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching user statistics:", error);
+      throw error;
+    }
+  },
+
+  // Sync user statistics
+  syncMyStatistics: async (year?: number) => {
+    try {
+      const params = year ? { year } : {};
+      const response = await apiClient.post("/user-statistics/sync", {
+        params,
+      });
+      return response.data;
+    } catch (error) {
+      console.error("Error syncing user statistics:", error);
+      throw error;
+    }
+  },
+
+  // Get statistics by year
+  getStatisticsByYear: async (year: number) => {
+    try {
+      const response = await apiClient.get(`/user-statistics/year/${year}`);
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching statistics by year:", error);
+      throw error;
+    }
+  },
+};
+
+export const AdminStatisticsAPI = {
+  // Get admin dashboard statistics
+  getDashboardStats: async (params?: {
+    period?: "day" | "week" | "month" | "year";
+    year?: number;
+    month?: number;
+  }) => {
+    try {
+      const response = await apiClient.get("/admin/statistics/dashboard", {
+        params,
+      });
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching admin dashboard statistics:", error);
+      throw error;
+    }
+  },
+
+  // Sync admin statistics
+  syncDashboardStats: async (params?: {
+    period?: "day" | "week" | "month" | "year";
+    year?: number;
+    month?: number;
+  }) => {
+    try {
+      const response = await apiClient.post("/admin/statistics/sync", params);
+      return response.data;
+    } catch (error) {
+      console.error("Error syncing admin statistics:", error);
+      throw error;
+    }
+  },
+};
+
+export const DocumentStatisticsAPI = {
+  // Get document statistics
+  getDocumentStatistics: async (params?: { year?: number; month?: number }) => {
+    try {
+      const response = await apiClient.get("/document-statistics", { params });
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching document statistics:", error);
+      throw error;
+    }
+  },
+
+  // Sync statistics for a specific month/year
+  syncMonthStatistics: async (params?: { year?: number; month?: number }) => {
+    try {
+      const response = await apiClient.post(
+        "/document-statistics/generate",
+        params
+      );
+      return response.data;
+    } catch (error) {
+      console.error("Error syncing month statistics:", error);
+      throw error;
+    }
+  },
+
+  // Sync all statistics for the entire system
+  syncAllStatistics: async () => {
+    try {
+      const response = await apiClient.post(
+        "/document-statistics/generate-all"
+      );
+      return response.data;
+    } catch (error) {
+      console.error("Error syncing all statistics:", error);
+      throw error;
+    }
+  },
 };
