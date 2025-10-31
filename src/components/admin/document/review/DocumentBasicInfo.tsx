@@ -5,7 +5,7 @@ const { Option } = Select;
 
 const DocumentBasicInfo: React.FC = () => {
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 text-left">
       <Form.Item
         style={{ marginBottom: 13.5 }}
         name="documentName"
