@@ -13,8 +13,12 @@ import {
   ArcElement,
   LineController,
   BarController,
+  DoughnutController,
+  PolarAreaController,
+  RadialLinearScale,
+  Filler,
 } from "chart.js";
-import { ChevronDown } from "lucide-react";
+import { documentTypeLabels } from "../../../models/document";
 import { useNavigate } from "react-router-dom";
 import { Button, message } from "antd";
 import { documentStatisticsService } from "../../../utils/DocumentStatisticsService";
@@ -31,13 +35,18 @@ ChartJS.register(
   Legend,
   ArcElement,
   LineController,
-  BarController
+  BarController,
+  DoughnutController,
+  PolarAreaController,
+  RadialLinearScale,
+  Filler
 );
 
 const DocumentStatisticsPage: React.FC = () => {
   const [selectedYear, setSelectedYear] = useState("2025");
   const [selectedMonth, setSelectedMonth] = useState("");
   const [chartType, setChartType] = useState("line");
+  const [documentChartType, setDocumentChartType] = useState("bar");
   const [approvedFilter, setApprovedFilter] = useState({
     author: "",
     subject: "",
@@ -49,8 +58,81 @@ const DocumentStatisticsPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [syncAllLoading, setSyncAllLoading] = useState(false);
   const [syncMonthLoading, setSyncMonthLoading] = useState(false);
+  const [pageLoading, setPageLoading] = useState(false);
 
   const navigate = useNavigate();
+
+  // Function to translate document types to Vietnamese
+  const translateDocumentType = (type: string): string => {
+    // Use documentTypeLabels for document types, fallback to file type translation
+    if (documentTypeLabels[type as keyof typeof documentTypeLabels]) {
+      return documentTypeLabels[type as keyof typeof documentTypeLabels];
+    }
+
+    // Fallback to file type translation for backward compatibility
+    const typeMap: { [key: string]: string } = {
+      // Documents
+      pdf: "PDF",
+      doc: "Word",
+      docx: "Word",
+      odt: "OpenDocument",
+
+      // Presentations
+      ppt: "PowerPoint",
+      pptx: "PowerPoint",
+      odp: "OpenDocument",
+
+      // Spreadsheets
+      xls: "Excel",
+      xlsx: "Excel",
+      csv: "CSV",
+      ods: "OpenDocument",
+
+      // Text files
+      txt: "Văn bản",
+      rtf: "Rich Text",
+
+      // Images
+      jpg: "Hình ảnh",
+      jpeg: "Hình ảnh",
+      png: "Hình ảnh",
+      gif: "Hình ảnh",
+      bmp: "Hình ảnh",
+      svg: "Vector",
+      webp: "Hình ảnh",
+      tiff: "Hình ảnh",
+      tif: "Hình ảnh",
+
+      // Videos
+      mp4: "Video",
+      avi: "Video",
+      mov: "Video",
+      wmv: "Video",
+      flv: "Video",
+      mkv: "Video",
+      webm: "Video",
+      m4v: "Video",
+      "3gp": "Video",
+
+      // Audio
+      mp3: "Âm thanh",
+      wav: "Âm thanh",
+      flac: "Âm thanh",
+      aac: "Âm thanh",
+      ogg: "Âm thanh",
+
+      // Archives
+      zip: "Nén",
+      rar: "Nén",
+      "7z": "Nén",
+      tar: "Nén",
+      gz: "Nén",
+
+      // Other
+      other: "Khác",
+    };
+    return typeMap[type.toLowerCase()] || type.toUpperCase();
+  };
 
   // Handle navigation to document review page
   const handleDocumentClick = (documentId: string | undefined) => {
@@ -66,6 +148,7 @@ const DocumentStatisticsPage: React.FC = () => {
   const handleSyncAllStatistics = async () => {
     try {
       setSyncAllLoading(true);
+      setPageLoading(true);
       await documentStatisticsService.syncAllStatistics();
       message.success("Đã đồng bộ toàn bộ thống kê thành công!");
       // Refresh data
@@ -82,6 +165,7 @@ const DocumentStatisticsPage: React.FC = () => {
       message.error("Đồng bộ toàn bộ thống kê thất bại!");
     } finally {
       setSyncAllLoading(false);
+      setPageLoading(false);
     }
   };
 
@@ -89,6 +173,7 @@ const DocumentStatisticsPage: React.FC = () => {
   const handleSyncMonthStatistics = async () => {
     try {
       setSyncMonthLoading(true);
+      setPageLoading(true);
       const params: any = { year: parseInt(selectedYear) };
       if (selectedMonth) {
         params.month = parseInt(selectedMonth.replace("T", ""));
@@ -105,6 +190,7 @@ const DocumentStatisticsPage: React.FC = () => {
       message.error("Đồng bộ thống kê theo thời gian thất bại!");
     } finally {
       setSyncMonthLoading(false);
+      setPageLoading(false);
     }
   };
 
@@ -112,11 +198,13 @@ const DocumentStatisticsPage: React.FC = () => {
   const barChartRef = useRef<HTMLCanvasElement>(null);
   const lineChartRef = useRef<HTMLCanvasElement>(null);
   const monthlyBarChartRef = useRef<HTMLCanvasElement>(null);
+  const pieChartRef = useRef<HTMLCanvasElement>(null);
 
   // Chart instances
   const barChartInstanceRef = useRef<ChartJS | null>(null);
   const lineChartInstanceRef = useRef<ChartJS | null>(null);
   const monthlyBarChartInstanceRef = useRef<ChartJS | null>(null);
+  const pieChartInstanceRef = useRef<ChartJS | null>(null);
 
   const months = [
     { value: "", label: "Tất cả tháng" },
@@ -189,6 +277,10 @@ const DocumentStatisticsPage: React.FC = () => {
       barChartInstanceRef.current.destroy();
       barChartInstanceRef.current = null;
     }
+    if (pieChartInstanceRef.current) {
+      pieChartInstanceRef.current.destroy();
+      pieChartInstanceRef.current = null;
+    }
     if (lineChartInstanceRef.current) {
       lineChartInstanceRef.current.destroy();
       lineChartInstanceRef.current = null;
@@ -198,58 +290,275 @@ const DocumentStatisticsPage: React.FC = () => {
       monthlyBarChartInstanceRef.current = null;
     }
 
-    // Bar Chart - Biểu đồ thống kê theo loại tài liệu
-    const barCtx = barChartRef.current?.getContext("2d");
-    if (barCtx) {
-      const documentTypes = statisticsData?.documentTypes || {};
-      const labels = Object.keys(documentTypes);
-      const data = Object.values(documentTypes) as number[];
-      const maxValue = Math.max(...data, 10);
+    // Chart for document types - supports multiple chart types (bar, horizontal, area, line, pie, doughnut, polarArea)
+    const documentTypes = statisticsData?.documentTypes || {};
+    const labels = Object.keys(documentTypes).map((type) =>
+      translateDocumentType(type)
+    );
+    const data = Object.values(documentTypes) as number[];
+    const maxValue = Math.max(...data, 10);
 
-      barChartInstanceRef.current = new ChartJS(barCtx, {
-        type: "bar",
-        data: {
-          labels: labels,
-          datasets: [
-            {
-              data: data,
-              backgroundColor: [
-                "#00BFFF",
-                "#8A2BE2",
-                "#FF6347",
-                "#32CD32",
-                "#FFD700",
+    // choose canvas based on chart type: bar/horizontal/area/line -> barChartRef, pie/doughnut/polarArea -> pieChartRef
+    const barCtx = barChartRef.current?.getContext("2d");
+    const pieCtx = pieChartRef.current?.getContext("2d");
+
+    const commonColors = [
+      "#00BFFF",
+      "#8A2BE2",
+      "#FF6347",
+      "#32CD32",
+      "#FFD700",
+      "#FF69B4",
+      "#20B2AA",
+      "#87CEEB",
+      "#DDA0DD",
+    ];
+
+    switch (documentChartType) {
+      case "bar":
+        if (barCtx) {
+          barChartInstanceRef.current = new ChartJS(barCtx, {
+            type: "bar",
+            data: {
+              labels,
+              datasets: [
+                {
+                  data,
+                  backgroundColor: commonColors,
+                  borderRadius: 4,
+                },
               ],
-              borderRadius: 4,
             },
-          ],
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: {
-            legend: {
-              display: false,
-            },
-            tooltip: {
-              callbacks: {
-                label: function (context) {
-                  return `Số lượng: ${context.parsed.y}`;
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              plugins: {
+                legend: { display: false },
+                tooltip: {
+                  callbacks: {
+                    label: function (context) {
+                      return `Số lượng: ${context.parsed.y}`;
+                    },
+                  },
+                },
+              },
+              scales: {
+                y: {
+                  beginAtZero: true,
+                  max: maxValue + 2,
+                  ticks: { stepSize: Math.ceil(maxValue / 5) },
                 },
               },
             },
-          },
-          scales: {
-            y: {
-              beginAtZero: true,
-              max: maxValue + 2,
-              ticks: {
-                stepSize: Math.ceil(maxValue / 5),
+          });
+        }
+        break;
+      case "horizontal":
+        if (barCtx) {
+          barChartInstanceRef.current = new ChartJS(barCtx, {
+            type: "bar",
+            data: {
+              labels,
+              datasets: [
+                {
+                  data,
+                  backgroundColor: commonColors,
+                  borderRadius: 4,
+                },
+              ],
+            },
+            options: {
+              indexAxis: "y",
+              responsive: true,
+              maintainAspectRatio: false,
+              plugins: {
+                legend: { display: false },
+                tooltip: {
+                  callbacks: {
+                    label: function (context) {
+                      return `Số lượng: ${context.parsed.x}`;
+                    },
+                  },
+                },
+              },
+              scales: {
+                x: { beginAtZero: true, max: maxValue + 2 },
               },
             },
-          },
-        },
-      });
+          });
+        }
+        break;
+      case "area":
+        if (barCtx) {
+          // area as a filled line chart
+          barChartInstanceRef.current = new ChartJS(barCtx, {
+            type: "line",
+            data: {
+              labels,
+              datasets: [
+                {
+                  label: "Số lượng",
+                  data,
+                  borderColor: "#06b6d4",
+                  backgroundColor: "rgba(6,182,212,0.2)",
+                  fill: true,
+                  tension: 0.4,
+                },
+              ],
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              plugins: { legend: { position: "bottom" } },
+              scales: { y: { beginAtZero: true, max: maxValue + 2 } },
+            },
+          });
+        }
+        break;
+      case "line":
+        if (barCtx) {
+          barChartInstanceRef.current = new ChartJS(barCtx, {
+            type: "line",
+            data: {
+              labels,
+              datasets: [
+                {
+                  label: "Số lượng",
+                  data,
+                  borderColor: "#06b6d4",
+                  backgroundColor: "rgba(6,182,212,0.1)",
+                  tension: 0.4,
+                },
+              ],
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              plugins: { legend: { position: "bottom" } },
+              scales: { y: { beginAtZero: true, max: maxValue + 2 } },
+            },
+          });
+        }
+        break;
+      case "doughnut":
+        if (pieCtx) {
+          pieChartInstanceRef.current = new ChartJS(pieCtx, {
+            type: "doughnut",
+            data: {
+              labels,
+              datasets: [
+                {
+                  data,
+                  backgroundColor: commonColors,
+                  borderWidth: 2,
+                  borderColor: "#ffffff",
+                },
+              ],
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              plugins: {
+                legend: { position: "bottom", labels: { padding: 12 } },
+                tooltip: {
+                  callbacks: {
+                    label: function (context) {
+                      const total = (context.dataset.data as number[]).reduce(
+                        (a, b) => a + b,
+                        0
+                      );
+                      const percentage = (
+                        (context.parsed / total) *
+                        100
+                      ).toFixed(1);
+                      return `${context.label}: ${context.parsed} (${percentage}%)`;
+                    },
+                  },
+                },
+              },
+            },
+          });
+        }
+        break;
+      case "polarArea":
+        if (pieCtx) {
+          pieChartInstanceRef.current = new ChartJS(pieCtx, {
+            type: "polarArea",
+            data: {
+              labels,
+              datasets: [
+                {
+                  data,
+                  backgroundColor: commonColors,
+                },
+              ],
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              plugins: {
+                legend: { position: "bottom" },
+                tooltip: {
+                  callbacks: {
+                    label: function (context) {
+                      return `${context.label}: ${context.parsed}`;
+                    },
+                  },
+                },
+              },
+              scales: {
+                r: {
+                  beginAtZero: true,
+                },
+              },
+            },
+          });
+        }
+        break;
+      case "pie":
+      default:
+        if (pieCtx) {
+          pieChartInstanceRef.current = new ChartJS(pieCtx, {
+            type: "pie",
+            data: {
+              labels,
+              datasets: [
+                {
+                  data,
+                  backgroundColor: commonColors,
+                  borderWidth: 2,
+                  borderColor: "#ffffff",
+                },
+              ],
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              plugins: {
+                legend: {
+                  position: "bottom",
+                  labels: { padding: 20, usePointStyle: true },
+                },
+                tooltip: {
+                  callbacks: {
+                    label: function (context) {
+                      const total = (context.dataset.data as number[]).reduce(
+                        (a, b) => a + b,
+                        0
+                      );
+                      const percentage = (
+                        (context.parsed / total) *
+                        100
+                      ).toFixed(1);
+                      return `${context.label}: ${context.parsed} (${percentage}%)`;
+                    },
+                  },
+                },
+              },
+            },
+          });
+        }
+        break;
     }
 
     // Line Chart - Thống kê lượt xem và tải tài liệu
@@ -365,6 +674,10 @@ const DocumentStatisticsPage: React.FC = () => {
         barChartInstanceRef.current.destroy();
         barChartInstanceRef.current = null;
       }
+      if (pieChartInstanceRef.current) {
+        pieChartInstanceRef.current.destroy();
+        pieChartInstanceRef.current = null;
+      }
       if (lineChartInstanceRef.current) {
         lineChartInstanceRef.current.destroy();
         lineChartInstanceRef.current = null;
@@ -374,9 +687,26 @@ const DocumentStatisticsPage: React.FC = () => {
         monthlyBarChartInstanceRef.current = null;
       }
     };
-  }, [selectedYear, selectedMonth, chartType, getFilteredData, statisticsData]);
+  }, [
+    selectedYear,
+    selectedMonth,
+    chartType,
+    documentChartType,
+    getFilteredData,
+    statisticsData,
+  ]);
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 relative">
+      {/* Page Loading Overlay */}
+      {pageLoading && (
+        <div className="fixed inset-0 bg-black/50 bg-opacity-50 flex items-center h-screen justify-center z-50">
+          <div className="bg-white rounded-lg p-6 flex items-center space-x-4">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+            <div className="text-lg text-gray-700">Đang đồng bộ dữ liệu...</div>
+          </div>
+        </div>
+      )}
+
       {loading ? (
         <div className="flex justify-center items-center h-64">
           <div className="text-lg text-gray-600">Đang tải dữ liệu...</div>
@@ -409,7 +739,7 @@ const DocumentStatisticsPage: React.FC = () => {
               >
                 {statisticsData?.stats?.totalDocuments || 0}
               </div>
-              <div className="text-sm text-gray-600 mt-2">Bài báo</div>
+              <div className="text-sm text-gray-600 mt-2">Tài liệu</div>
             </div>
             <div className="bg-cyan-400 rounded-lg p-3 sm:p-4 text-center">
               <div className="text-2xl sm:text-3xl font-bold text-white">
@@ -480,12 +810,28 @@ const DocumentStatisticsPage: React.FC = () => {
                 >
                   Biểu đồ thống kê theo loại tài liệu
                 </h3>
-                <button className="text-sm text-gray-600 hover:text-gray-900 flex items-center gap-1">
-                  Tất cả <ChevronDown size={16} />
-                </button>
+                <select
+                  value={documentChartType}
+                  onChange={(e) => setDocumentChartType(e.target.value)}
+                  className="text-sm border border-gray-300 rounded px-2 py-1"
+                >
+                  <option value="bar">Biểu đồ cột</option>
+                  <option value="horizontal">Biểu đồ cột ngang</option>
+                  <option value="area">Biểu đồ miền (Area)</option>
+                  <option value="line">Biểu đồ đường</option>
+                  <option value="pie">Biểu đồ tròn</option>
+                  <option value="doughnut">Biểu đồ vòng</option>
+                  <option value="polarArea">Biểu đồ miền</option>
+                </select>
               </div>
               <div className="h-64">
-                <canvas ref={barChartRef}></canvas>
+                {["bar", "horizontal", "area", "line"].includes(
+                  documentChartType
+                ) ? (
+                  <canvas ref={barChartRef}></canvas>
+                ) : (
+                  <canvas ref={pieChartRef}></canvas>
+                )}
               </div>
             </div>
 
@@ -644,7 +990,9 @@ const DocumentStatisticsPage: React.FC = () => {
                   {lineChartData.length > 0 ? (
                     <canvas ref={monthlyBarChartRef}></canvas>
                   ) : (
-                    <div className="text-gray-500 text-lg">không</div>
+                    <div className="text-gray-500 text-lg">
+                      Không có dữ liệu
+                    </div>
                   )}
                 </div>
               ) : (
@@ -652,7 +1000,9 @@ const DocumentStatisticsPage: React.FC = () => {
                   {lineChartData.length > 0 ? (
                     <canvas ref={lineChartRef}></canvas>
                   ) : (
-                    <div className="text-gray-500 text-lg">không</div>
+                    <div className="text-gray-500 text-lg">
+                      Không có dữ liệu
+                    </div>
                   )}
                 </div>
               )}
