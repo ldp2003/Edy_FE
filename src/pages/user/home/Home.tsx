@@ -26,7 +26,6 @@ export default function HomePage() {
 
         // Fetch newest documents (for "Tài liệu mới nhất")
         const newestResponse = await DocumentService.fetchNewestDocuments({
-          ordering: "createdAt",
           order: -1,
           limit: 5,
         });

@@ -414,7 +414,10 @@ const InformationForm = ({
                   { required: true, message: "Vui lòng chọn quyền riêng tư!" },
                 ]}
               >
-                <Select disabled={isUploading}>
+                <Select
+                  disabled={isUploading}
+                  className="text-left"
+                >
                   <Option value="PUBLIC">Công khai</Option>
                   <Option value="PRIVATE">Riêng tư</Option>
                 </Select>
@@ -440,7 +443,7 @@ const InformationForm = ({
                 label={<span className="text-xs">Môn học</span>}
                 rules={[{ required: true, message: "Vui lòng chọn môn học!" }]}
               >
-                <div className="flex gap-2">
+                <div className="flex gap-2  text-left">
                   <Select
                     placeholder="Chọn hoặc nhập môn học"
                     disabled={isUploading || subjectsLoading}
@@ -486,6 +489,7 @@ const InformationForm = ({
                 <Select
                   placeholder="Tổ chức"
                   disabled={true} // Disable because it's auto-set from user context
+                  className="text-left"
                 >
                   {user?.organization &&
                     typeof user.organization === "object" && (
@@ -499,12 +503,17 @@ const InformationForm = ({
               <Form.Item
                 style={{ marginBottom: 13.5 }}
                 name="documentType"
+                className="text-left"
                 label={<span className="text-xs">Loại tài liệu</span>}
                 rules={[
                   { required: true, message: "Vui lòng chọn loại tài liệu!" },
                 ]}
               >
-                <Select placeholder="Loại tài liệu" disabled={isUploading}>
+                <Select
+                  placeholder="Loại tài liệu"
+                  disabled={isUploading}
+                  dropdownStyle={{ textAlign: "left" }}
+                >
                   <Option value="RESEARCH_REPORT">
                     Báo cáo nghiên cứu khoa học
                   </Option>
@@ -542,7 +551,11 @@ const InformationForm = ({
                     { required: true, message: "Vui lòng chọn trình độ!" },
                   ]}
                 >
-                  <Select placeholder="Chọn trình độ" disabled={isUploading}>
+                  <Select
+                    placeholder="Chọn trình độ"
+                    disabled={isUploading}
+                    dropdownStyle={{ textAlign: "left" }}
+                  >
                     <Option value="STUDENT">Học sinh</Option>
                     <Option value="UNIVERSITY">Sinh viên (ĐH/CĐ)</Option>
                     <Option value="LECTURER">Giảng viên</Option>
@@ -620,13 +633,15 @@ const InformationForm = ({
                       )}
                     </div>
                   ))}
-                  <Button
-                    type="dashed"
-                    icon={<Plus size={16} />}
-                    onClick={addAuthor}
-                    className="w-12 h-10"
-                    disabled={isUploading}
-                  />
+                  <div className="flex justify-baseline items-baseline w-full">
+                    <Button
+                      type="dashed"
+                      icon={<Plus size={16} />}
+                      onClick={addAuthor}
+                      className="w-12 h-10"
+                      disabled={isUploading}
+                    />
+                  </div>
                 </div>
               </div>
 

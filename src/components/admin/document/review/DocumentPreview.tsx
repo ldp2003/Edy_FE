@@ -31,6 +31,26 @@ const DocumentPreview: React.FC<DocumentPreviewProps> = ({
     target.src = "/public/image/default_cover.png";
   };
 
+  // Function to get the correct image source
+  const getImageSource = (coverPage: string | undefined): string => {
+    if (!coverPage) {
+      return "/public/image/default_cover.png";
+    }
+
+    // Check if it's a base64 image (starts with data:image/)
+    if (coverPage.startsWith("data:image/")) {
+      return coverPage;
+    }
+
+    // Check if it's a full URL
+    if (coverPage.startsWith("http://") || coverPage.startsWith("https://")) {
+      return coverPage;
+    }
+
+    // Assume it's a relative path
+    return coverPage;
+  };
+
   // Calculate estimated file size (placeholder since we don't have actual size)
   const estimatedFileSize = 1024 * 1024; // 1MB placeholder
 
@@ -38,7 +58,7 @@ const DocumentPreview: React.FC<DocumentPreviewProps> = ({
     <div className="space-y-4">
       <div className="mb-0 relative group">
         <img
-          src={document.cover_page || "/public/image/default_cover.png"}
+          src={getImageSource(document.cover_page)}
           alt="Document preview"
           className="border bg-white border-gray-200 rounded object-cover cursor-pointer hover:opacity-90 transition-opacity"
           style={{ maxHeight: "300px", width: "100%" }}
