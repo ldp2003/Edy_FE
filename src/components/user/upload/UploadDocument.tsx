@@ -445,6 +445,14 @@ const UploadDocument: React.FC<UploadDocumentProps> = ({
       case "xls":
       case "xlsx":
         return "EXCEL";
+      case "mp4":
+      case "avi":
+      case "mov":
+      case "wmv":
+      case "flv":
+      case "mkv":
+      case "webm":
+        return "VIDEO";
       default:
         return "OTHER";
     }
@@ -515,7 +523,7 @@ const UploadDocument: React.FC<UploadDocumentProps> = ({
         <Upload.Dragger
           multiple={false}
           maxCount={1}
-          accept=".doc,.docx,.pdf,.ppt,.pptx,.xls,.xlsx"
+          accept=".doc,.docx,.pdf,.ppt,.pptx,.xls,.xlsx,.mp4,.avi,.mov,.wmv,.flv,.mkv,.webm"
           customRequest={customUpload}
           fileList={fileList}
           onChange={handleChange}
@@ -546,7 +554,8 @@ const UploadDocument: React.FC<UploadDocumentProps> = ({
             </p>
             <p className="text-xs sm:text-sm text-gray-500 italic px-2">
               Các file có thể đăng tải lên hệ thống bao gồm: doc, docx, pdf,
-              ppt, pptx, xls, xlsx tối đa 10MB
+              ppt, pptx, xls, xlsx, mp4, avi, mov, wmv, flv, mkv, webm tối đa
+              10MB
             </p>
 
             {uploading && (

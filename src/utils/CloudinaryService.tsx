@@ -15,6 +15,55 @@ export interface CloudinaryUploadResponse {
   height: number;
 }
 
+// Helper functions to extract public ID and resource type from Cloudinary URL
+export const extractPublicIdFromUrl = (url: string): string | null => {
+  try {
+    if (!url) return null;
+
+    // Tìm pattern: /(raw|image|video)/upload/[v123456789/]publicId.extension
+    const match = url.match(/\/(raw|image|video)\/upload\/(?:v\d+\/)?(.+)$/);
+
+    if (match && match[2]) {
+      // Decode URL để chuyển từ %C4%90 về tiếng Việt
+      const decodedPath = decodeURIComponent(match[2]);
+
+      // Kiểm tra xem có phải file Word hoặc Excel không (.doc, .docx, .xls, .xlsx)
+      const isWordFile = /\.(doc|docx)$/i.test(decodedPath);
+      const isExcelFile = /\.(xls|xlsx)$/i.test(decodedPath);
+
+      if (isWordFile || isExcelFile) {
+        // Giữ nguyên extension cho file Word và Excel
+        return decodedPath;
+      } else {
+        // Loại bỏ extension cho các file khác
+        const lastDotIndex = decodedPath.lastIndexOf(".");
+        if (lastDotIndex !== -1) {
+          return decodedPath.substring(0, lastDotIndex);
+        }
+        return decodedPath;
+      }
+    }
+
+    return null;
+  } catch (error) {
+    console.error("Error extracting publicId:", error);
+    return null;
+  }
+};
+
+export const extractResourceTypeFromUrl = (
+  url: string
+): "raw" | "image" | "video" => {
+  try {
+    // Tìm resource type từ URL pattern: /resource_type/
+    const match = url.match(/\/(raw|image|video)\//);
+    return match ? (match[1] as "raw" | "image" | "video") : "image"; // Mặc định là image nếu không tìm thấy
+  } catch (error) {
+    console.error("Error extracting resource type:", error);
+    return "image";
+  }
+};
+
 // Generate random public_id để tránh trùng tên file
 export const generateRandomPublicId = (): string => {
   const timestamp = Date.now();
