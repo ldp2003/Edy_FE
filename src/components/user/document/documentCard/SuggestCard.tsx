@@ -19,30 +19,27 @@ const SuggestCard: React.FC<SuggestCardProps> = ({ document }) => {
   return (
     <div
       key={_id}
-      className="cursor-pointer hover:bg-gray-200 rounded-lg mb-2 flex flex-row gap-2"
+      className="cursor-pointer hover:bg-gray-200 rounded-lg mb-2 flex flex-row gap-3 p-2 border border-gray-200 bg-white shadow-sm hover:shadow-md transition-shadow duration-200"
       onClick={onClick}
     >
-      <div
-        className="relative w-1/3 rounded-lg p-1 h-fit flex justify-center items-center"
-        style={{ backgroundColor: "var(--card-background-color)" }}
-      >
+      <div className="relative w-15 h-15 md:w-18 md:h-18 rounded-lg overflow-hidden flex-shrink-0 bg-[var(--secondary-background-color)]">
         <img
           src={cover_page || "/public/image/default_cover.png"}
           alt={title}
-          className="h-16 w-16 object-cover rounded-lg"
+          className="w-full h-full object-cover"
           onError={handleImageError}
         />
       </div>
-      <div className="flex-1  text-[var(--primary-text-color)]">
-        <div className="item-title font-bold text-xs  line-clamp-1">
+      <div className="flex-1 text-[var(--primary-text-color)] min-w-0">
+        <div className="item-title font-bold text-sm line-clamp-2 mb-1">
           {title}
         </div>
-        <p className="text-xs mb-2 line-clamp-2">
+        <p className="text-xs text-[var(--secondary-text-color)] mb-2 line-clamp-1">
           {subject?.name || <span>Chưa có môn</span>}
         </p>
-        <span className="">
+        <div className="flex items-center justify-between">
           <LikeCount like={0}></LikeCount>
-        </span>
+        </div>
       </div>
     </div>
   );

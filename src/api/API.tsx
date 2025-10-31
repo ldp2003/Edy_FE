@@ -11,6 +11,85 @@ const apiClient = axios.create({
   withCredentials: true, // Ensure cookies are sent with requests
 });
 
+// Flag to prevent multiple refresh attempts
+let isRefreshing = false;
+let failedQueue: Array<{
+  resolve: (value?: unknown) => void;
+  reject: (error?: unknown) => void;
+}> = [];
+
+// Process queued requests after token refresh
+const processQueue = (error: unknown, token: string | null = null) => {
+  failedQueue.forEach(({ resolve, reject }) => {
+    if (error) {
+      reject(error);
+    } else {
+      resolve(token);
+    }
+  });
+
+  failedQueue = [];
+};
+
+// Response interceptor to handle 401 errors
+apiClient.interceptors.response.use(
+  (response) => response,
+  async (error) => {
+    const originalRequest = error.config;
+
+    if (error.response?.status === 401 && !originalRequest._retry) {
+      if (isRefreshing) {
+        // If refresh is already in progress, queue the request
+        return new Promise((resolve, reject) => {
+          failedQueue.push({ resolve, reject });
+        })
+          .then(() => {
+            return apiClient(originalRequest);
+          })
+          .catch((err) => {
+            return Promise.reject(err);
+          });
+      }
+
+      originalRequest._retry = true;
+      isRefreshing = true;
+
+      try {
+        // Attempt to refresh token
+        await AuthAPI.refreshToken();
+        isRefreshing = false;
+
+        // Process queued requests
+        processQueue(null);
+
+        // Retry the original request
+        return apiClient(originalRequest);
+      } catch (refreshError) {
+        isRefreshing = false;
+
+        // Process queued requests with error
+        processQueue(refreshError, null);
+
+        // If refresh fails, logout user
+        try {
+          await AuthAPI.logout();
+        } catch (logoutError) {
+          console.error("Error during logout:", logoutError);
+        }
+
+        // Redirect to login or handle logout
+        if (typeof window !== "undefined") {
+          window.location.href = "/auth/login";
+        }
+
+        return Promise.reject(refreshError);
+      }
+    }
+
+    return Promise.reject(error);
+  }
+);
+
 export const AuthAPI = {
   login: async (email: string, password: string) => {
     try {
