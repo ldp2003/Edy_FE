@@ -65,8 +65,8 @@ const UploadDocument: React.FC<UploadDocumentProps> = ({
       // Get first page
       const page = await pdf.getPage(1);
 
-      // Set scale for good quality thumbnail
-      const scale = 0.5;
+      // Set scale for high quality thumbnail
+      const scale = 1.0;
       const viewport = page.getViewport({ scale });
 
       // Create canvas
@@ -90,7 +90,7 @@ const UploadDocument: React.FC<UploadDocumentProps> = ({
       await page.render(renderContext).promise;
 
       // Convert to JPEG with good quality
-      const thumbnailDataUrl = canvas.toDataURL("image/jpeg", 0.3);
+      const thumbnailDataUrl = canvas.toDataURL("image/jpeg", 0.8);
 
       console.log("PDF thumbnail generated successfully");
       return thumbnailDataUrl;
@@ -189,9 +189,9 @@ const UploadDocument: React.FC<UploadDocumentProps> = ({
       // Wait for rendering to complete
       await new Promise((resolve) => setTimeout(resolve, 500));
 
-      // Take screenshot with moderate quality
+      // Take screenshot with high quality
       const canvas = await html2canvas(container, {
-        scale: 0.8,
+        scale: 1.0,
         useCORS: true,
         allowTaint: true,
         backgroundColor: "#ffffff",
@@ -203,7 +203,7 @@ const UploadDocument: React.FC<UploadDocumentProps> = ({
       document.body.removeChild(container);
 
       // Convert to JPEG with lower quality to reduce size
-      const thumbnailDataUrl = canvas.toDataURL("image/jpeg", 0.3);
+      const thumbnailDataUrl = canvas.toDataURL("image/jpeg", 0.8);
       return thumbnailDataUrl;
     } catch (error) {
       console.error("Error creating Word thumbnail:", error);
@@ -324,6 +324,7 @@ const UploadDocument: React.FC<UploadDocumentProps> = ({
       }
     }
 
+    // Upload main file first
     const uploadUrl = `https://api.cloudinary.com/v1_1/${
       import.meta.env.VITE_CLOUDINARY_NAME
     }/auto/upload`;
@@ -366,12 +367,49 @@ const UploadDocument: React.FC<UploadDocumentProps> = ({
       }
 
       const data = await response.json();
-      console.log("Upload success:", data);
+      console.log("Main file upload success:", data);
+
+      let thumbnailUrl: string | undefined;
+
+      // Upload thumbnail if available
+      if (wordThumbnail) {
+        try {
+          console.log("Uploading Word thumbnail to Cloudinary...");
+
+          // Convert data URL to blob
+          const response = await fetch(wordThumbnail);
+          const blob = await response.blob();
+
+          const thumbnailFormData = new FormData();
+          thumbnailFormData.append("file", blob);
+          thumbnailFormData.append("upload_preset", preset || "");
+          thumbnailFormData.append("resource_type", "image");
+          thumbnailFormData.append(
+            "public_id",
+            `${generateRandomPublicId()}_thumb`
+          );
+
+          const thumbnailResponse = await fetch(uploadUrl, {
+            method: "POST",
+            body: thumbnailFormData,
+          });
+
+          if (thumbnailResponse.ok) {
+            const thumbnailData = await thumbnailResponse.json();
+            thumbnailUrl = thumbnailData.secure_url;
+            console.log("Thumbnail uploaded successfully:", thumbnailUrl);
+          } else {
+            console.error("Failed to upload thumbnail");
+          }
+        } catch (error) {
+          console.error("Error uploading thumbnail:", error);
+        }
+      }
 
       return {
         url: data.secure_url,
         thumbnail:
-          wordThumbnail || (await createPdfThumbnail(file)) || undefined,
+          thumbnailUrl || (await createPdfThumbnail(file)) || undefined,
         pageCount,
       };
     } catch (error) {
