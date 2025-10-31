@@ -12,6 +12,7 @@ interface DocumentActionButtonsProps {
   processing: boolean;
   documentId: string;
   documentStatus?: string; // Thêm status của document
+  documentType?: string; // Thêm loại tài liệu
   onApprove: (approvalData: {
     documentRequestId: string;
     isIntensive: boolean;
@@ -26,6 +27,7 @@ const DocumentActionButtons: React.FC<DocumentActionButtonsProps> = ({
   processing,
   documentId,
   documentStatus,
+  documentType,
   onApprove,
   onReject,
   onDelete,
@@ -166,6 +168,13 @@ const DocumentActionButtons: React.FC<DocumentActionButtonsProps> = ({
   const handleCompare = () => {
     navigate(`/admin/documents/compare/${documentId}`);
   };
+
+  // Check if document type supports comparison (Word or PDF)
+  const canCompare = useMemo(() => {
+    if (!documentType) return false;
+    const supportedTypes = ["WORD", "PDF"];
+    return supportedTypes.includes(documentType.toUpperCase());
+  }, [documentType]);
 
   // Button configurations based on document status
   const statusConfig = useMemo(() => {
@@ -373,18 +382,20 @@ const DocumentActionButtons: React.FC<DocumentActionButtonsProps> = ({
               </Button>
             ))}
 
-            {/* Button "Xem trùng" luôn hiển thị */}
-            <Button
-              style={{
-                backgroundColor: "#8b5cf6",
-                borderColor: "#8b5cf6",
-                color: "white",
-              }}
-              onClick={handleCompare}
-              disabled={processing}
-            >
-              Xem trùng
-            </Button>
+            {/* Button "Xem trùng" chỉ hiển thị cho Word và PDF */}
+            {canCompare && (
+              <Button
+                style={{
+                  backgroundColor: "#8b5cf6",
+                  borderColor: "#8b5cf6",
+                  color: "white",
+                }}
+                onClick={handleCompare}
+                disabled={processing}
+              >
+                Xem trùng
+              </Button>
+            )}
           </div>
         </div>
       </div>
