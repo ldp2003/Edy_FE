@@ -99,14 +99,14 @@ const DocumentReview: React.FC<DocumentReviewProps> = ({
     const loadPendingRequests = async () => {
       try {
         setLoading(true);
-        
+
         // For edit requests, use the provided edit approval data
         if (isEdit && editApprovalData) {
           setDocumentRequest({
             _id: editApprovalData._id,
             doc: document._id,
             status: editApprovalData.status,
-            message: editApprovalData.message || '',
+            message: editApprovalData.message || "",
             reviewed_by: editApprovalData.reviewed_by,
             reviewed_at: editApprovalData.reviewed_at,
             createdAt: editApprovalData.createdAt,
@@ -137,20 +137,24 @@ const DocumentReview: React.FC<DocumentReviewProps> = ({
     if (document._id) {
       loadPendingRequests();
     }
-  }, [document._id, messageApi, isEdit, editApprovalData]);
+  }, [document._id, messageApi, isEdit, editApprovalData]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     if (document) {
       // If this is an edit request, use edit data, otherwise use original document
       const dataToUse = isEdit && editData ? editData : document;
-      
+
       const documentAuthors = dataToUse.author || [""];
       setAuthors(documentAuthors.length > 0 ? documentAuthors : [""]);
 
       form.setFieldsValue({
         documentName: dataToUse.title,
-        subject: typeof dataToUse.subject === 'object' ? dataToUse.subject?.name : '',
-        organization: typeof dataToUse.organization === 'object' ? dataToUse.organization?.name : '',
+        subject:
+          typeof dataToUse.subject === "object" ? dataToUse.subject?.name : "",
+        organization:
+          typeof dataToUse.organization === "object"
+            ? dataToUse.organization?.name
+            : "",
         documentType: dataToUse.doc_type,
         pageCount: dataToUse.page,
         level: dataToUse.level,
@@ -158,7 +162,10 @@ const DocumentReview: React.FC<DocumentReviewProps> = ({
         publisher: dataToUse.publisher || "",
         publishYear: dataToUse.published_year?.toString() || "",
         authors: documentAuthors,
-        summary: dataToUse.summary_by_user || dataToUse.description?.summary_by_user || "",
+        summary:
+          dataToUse.summary_by_user ||
+          dataToUse.description?.summary_by_user ||
+          "",
         public_mode: dataToUse.public_mode || document.public_mode || "PUBLIC",
       });
     }
@@ -199,10 +206,12 @@ const DocumentReview: React.FC<DocumentReviewProps> = ({
           message="Chỉnh sửa tài liệu"
           description={
             <div>
-              <p className="mb-2">Tài liệu này có yêu cầu chỉnh sửa đang chờ duyệt.</p>
+              <p className="mb-2">
+                Tài liệu này có yêu cầu chỉnh sửa đang chờ duyệt.
+              </p>
               <p className="text-sm text-gray-600">
-                Thông tin bên dưới đang hiển thị dữ liệu đã chỉnh sửa. 
-                Khi duyệt, dữ liệu này sẽ thay thế dữ liệu cũ.
+                Thông tin bên dưới đang hiển thị dữ liệu đã chỉnh sửa. Khi
+                duyệt, dữ liệu này sẽ thay thế dữ liệu cũ.
               </p>
             </div>
           }
@@ -274,6 +283,7 @@ const DocumentReview: React.FC<DocumentReviewProps> = ({
               processing={processing}
               documentId={document._id}
               documentStatus={document.status}
+              documentType={document.doc_type}
               onApprove={onApprove}
               onReject={onReject}
               onDelete={onDelete}
