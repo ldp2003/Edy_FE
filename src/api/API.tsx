@@ -759,7 +759,8 @@ export const DocumentAPI = {
   // Download file using link
   downloadFile: async (linkId: string) => {
     try {
-      const response = await apiClient.get(`/documents/download/${linkId}`);
+      const response = await apiClient.get(`/documents/download/${linkId}`, 
+        { responseType: 'blob' });
       return response;
     } catch (error) {
       console.error("Error downloading file:", error);
