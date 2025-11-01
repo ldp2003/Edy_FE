@@ -232,8 +232,9 @@ const PostTable: React.FC<PostTableProps> = ({
       title: "Tên tài liệu",
       dataIndex: "title",
       key: "title",
-      width: 300,
       fixed: "left",
+      className: "text-xs",
+      width: 300,
       sorter: (a, b) => a.title.localeCompare(b.title),
       sortDirections: ["ascend", "descend"],
       render: (text: string, record: Document) => {

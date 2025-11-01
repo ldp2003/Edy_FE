@@ -64,17 +64,32 @@ export function UserProfile({ isCompact }: UserProfileProps) {
       </div>
       {!isCompact && (
         <div className="flex justify-between mt-3 text-center text-[var(--primary-text-color)]">
-          <div>
-            <div className="text-xs font-bold ">{user?.point}</div>
-            <div className="text-[10px] ">Điểm tiêu dùng</div>
+          <div
+            className="cursor-pointer rounded px-2 py-1 transition-colors"
+            onClick={() => navigate("/point-management?showHistory=true")}
+          >
+            <div className="text-xs font-bold hover:text-[var(--primary-color)]">
+              {user?.point}
+            </div>
+            <div className="text-[10px]">Điểm tiêu dùng</div>
           </div>
-          <div>
-            <div className="text-xs font-bold ">{user?.rank_point}</div>
-            <div className="text-[10px] ">Điểm hạng</div>
+          <div
+            className="cursor-pointer rounded px-2 py-1 transition-colors"
+            onClick={() => navigate("/point-management?showHistory=true")}
+          >
+            <div className="text-xs font-bold hover:text-[var(--primary-color)]">
+              {user?.rank_point}
+            </div>
+            <div className="text-[10px]">Điểm hạng</div>
           </div>
-          <div>
-            <div className="text-xs font-bold ">{user?.doc_count}</div>
-            <div className="text-[10px] ">Bài đăng</div>
+          <div
+            className="cursor-pointer rounded px-2 py-1 transition-colors"
+            onClick={() => navigate("/personal-posts")}
+          >
+            <div className="text-xs font-bold hover:text-[var(--primary-color)]">
+              {user?.doc_count}
+            </div>
+            <div className="text-[10px]">Bài đăng</div>
           </div>
         </div>
       )}
