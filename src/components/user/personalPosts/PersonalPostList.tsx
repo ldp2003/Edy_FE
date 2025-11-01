@@ -213,17 +213,20 @@ const PersonalPostList: React.FC = () => {
 
         {/* Pagination */}
         {total > 0 && (
-          <div className="flex justify-center mt-4 md:mt-6">
+          <div className="flex justify-center mt-4 md:mt-6 ">
             <Pagination
               current={currentPage}
               total={total}
               pageSize={pageSize}
+              className="text-[10px]"
               showSizeChanger={true}
               showQuickJumper={true}
               locale={paginationLocale}
-              showTotal={(total, range) =>
-                `Hiển thị ${range[0]}-${range[1]} của ${total} tài liệu`
-              }
+              showTotal={(total, range) => (
+                <div className="text-[10px] md:text-sm text-[var(--secondary-text-color)]">
+                  Hiển thị {range[0]}-{range[1]} của {total} tài liệu
+                </div>
+              )}
               onChange={(page, size) => {
                 setCurrentPage(page);
                 if (size !== pageSize) {
@@ -233,7 +236,6 @@ const PersonalPostList: React.FC = () => {
                 }
               }}
               pageSizeOptions={["5", "10", "20", "50"]}
-              className="text-xs md:text-sm"
             />
           </div>
         )}

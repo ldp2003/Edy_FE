@@ -52,7 +52,7 @@ const PointMechanism: React.FC<PointMechanismProps> = ({ onViewMore }) => {
         {onViewMore && (
           <button
             onClick={onViewMore}
-            className="text-xs md:text-sm text-[var(--link-color)] hover:underline"
+            className="text-xs md:text-sm text-[var(--link-color)] hover:underline cursor-pointer"
           >
             Xem thêm &gt;
           </button>

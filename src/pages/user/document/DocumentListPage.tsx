@@ -90,10 +90,10 @@ const DocumentListPage: React.FC = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8 py-4 sm:py-6 bg-white rounded-lg shadow">
         {/* Header */}
         <div className="mb-6">
-          <h1 className="text-2xl font-bold text-[var(--primary-text-color)] mb-2">
+          <h1 className="text-base text-left font-bold text-[var(--primary-text-color)] mb-2">
             {title}
           </h1>
-          <p className="text-gray-600">Hiển thị {totalDocuments} tài liệu</p>
+          <p className="text-gray-600 text-left text-sm">Hiển thị {totalDocuments} tài liệu</p>
         </div>
 
         {/* Main Content */}

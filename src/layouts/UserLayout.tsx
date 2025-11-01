@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Header } from "../components/common/header/Header";
 import { Sidebar } from "../components/user/sideMenu/SideBar";
 import { NavigationMenu } from "../components/user/sideMenu/NavigationMenu";
@@ -11,7 +11,15 @@ const UserLayout: React.FC = () => {
   const [isSidebarVisible, setIsSidebarVisible] = useState(false);
   const [isMobileSidebarVisible, setIsMobileSidebarVisible] = useState(false);
   const location = useLocation();
+  const mainRef = useRef<HTMLElement>(null);
   const isDocumentDetailPage = location.pathname.includes("/document-detail");
+
+  // Scroll to top when route changes
+  useEffect(() => {
+    if (mainRef.current) {
+      mainRef.current.scrollTo(0, 0);
+    }
+  }, [location.pathname]);
 
   // Set sidebar visibility based on screen size
   useEffect(() => {
@@ -60,7 +68,10 @@ const UserLayout: React.FC = () => {
         </div>
 
         {/* Page content - có thể scroll */}
-        <main className="flex-1 relative overflow-y-auto focus:outline-none">
+        <main
+          ref={mainRef}
+          className="flex-1 relative overflow-y-auto focus:outline-none"
+        >
           <div className="flex flex-col min-h-full">
             <div
               className={`flex-1 transition-all duration-300 ${

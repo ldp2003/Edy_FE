@@ -1,5 +1,5 @@
 import React from "react";
-import { Dropdown } from "antd";
+import { Dropdown, Badge } from "antd";
 import { useNavigate } from "react-router-dom";
 import type { Notification } from "../../../models/notification";
 import { Bell } from "lucide-react";
@@ -8,11 +8,13 @@ import NotificationItem from "./NotificationItem";
 interface NotificationDropdownProps {
   notifications: Notification[];
   loading?: boolean;
+  unreadCount?: number;
 }
 
 const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
   notifications,
   loading = false,
+  unreadCount = 0,
 }) => {
   const navigate = useNavigate();
 
@@ -62,15 +64,23 @@ const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
       }}
       trigger={["hover"]}
     >
-      <button
-        className="p-2 hover:bg-gray-100 rounded-md transition-colors cursor-pointer"
-        onClick={(e) => {
-          e.stopPropagation(); // Ngăn chặn sự kiện dropdown
-          handleViewAllNotifications();
-        }}
+      <Badge
+        count={unreadCount > 9 ? "9+" : unreadCount}
+        overflowCount={9}
+        style={{ backgroundColor: "#ff4d4f" }}
+        offset={[-4, 8]}
+        size="small"
       >
-        <Bell className="w-5 h-5" />
-      </button>
+        <button
+          className="p-2 hover:bg-gray-100 rounded-md transition-colors cursor-pointer"
+          onClick={(e) => {
+            e.stopPropagation(); // Ngăn chặn sự kiện dropdown
+            handleViewAllNotifications();
+          }}
+        >
+          <Bell className="w-5 h-5" />
+        </button>
+      </Badge>
     </Dropdown>
   );
 };

@@ -16,7 +16,7 @@ const AdminFooter: React.FC = () => {
                 <img src={logo} alt="Logo" />
               </div>
               <span className="bg-gradient-to-b from-[#50C4FE] to-[#3586DB] bg-clip-text text-transparent font-bold text-xl">
-                Edy Admin
+                Admin
               </span>
             </div>
             <p className="text-sm text-gray-400 leading-relaxed">
@@ -114,7 +114,7 @@ const AdminFooter: React.FC = () => {
             </h3>
             <ul className="space-y-3">
               <li className="text-sm">
-                <span>admin@edy.edu.vn</span>
+                <span>admin@gmail.com</span>
               </li>
               <li className="text-sm">
                 <span>+84 123 456 789</span>
@@ -132,7 +132,7 @@ const AdminFooter: React.FC = () => {
         {/* Bottom Bar */}
         <div className="border-t border-gray-700 mt-8 pt-6 flex flex-col md:flex-row justify-between items-center gap-4">
           <p className="text-sm text-gray-400">
-            © {currentYear} Edy Admin. All rights reserved.
+            © {currentYear} Admin. All rights reserved.
           </p>
           <div className="flex gap-6 text-sm">
             <Link

@@ -20,7 +20,7 @@ import {
 } from "chart.js";
 import { documentTypeLabels } from "../../../models/document";
 import { useNavigate } from "react-router-dom";
-import { Button, message } from "antd";
+import { message } from "antd";
 import { documentStatisticsService } from "../../../utils/DocumentStatisticsService";
 import type { DocumentStatistics } from "../../../models/documentStatistics";
 
@@ -140,8 +140,13 @@ const DocumentStatisticsPage: React.FC = () => {
       console.warn("Document ID is undefined");
       return;
     }
-    // Navigate to all documents page with document ID in search
-    navigate(`/admin/documents/all?search=${documentId}`);
+    try {
+      // Navigate to document review page
+      navigate(`/admin/documents/review/${documentId}`);
+    } catch (error) {
+      console.error("Error navigating to document:", error);
+      message.error("Không thể chuyển đến trang tài liệu!");
+    }
   };
 
   // Handle sync all statistics
@@ -701,33 +706,36 @@ const DocumentStatisticsPage: React.FC = () => {
       {pageLoading && (
         <div className="fixed inset-0 bg-black/50 bg-opacity-50 flex items-center h-screen justify-center z-50">
           <div className="bg-white rounded-lg p-6 flex items-center space-x-4">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-            <div className="text-lg text-gray-700">Đang đồng bộ dữ liệu...</div>
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[var(--primary-color)]"></div>
+            <div className="text-base text-[var(--third-text-color)]">
+              Đang đồng bộ dữ liệu...
+            </div>
           </div>
         </div>
       )}
 
       {loading ? (
         <div className="flex justify-center items-center h-64">
-          <div className="text-lg text-gray-600">Đang tải dữ liệu...</div>
+          <div className="text-lg text-[var(--third-text-color)]">
+            Đang tải dữ liệu...
+          </div>
         </div>
       ) : (
         <>
           {/* Breadcrumb */}
-          <div className="text-sm text-gray-600 text-left">
+          <div className="text-sm text-[var(--third-text-color)] text-left">
             Thống kê <span className="text-gray-400">›</span> Thống kê tài liệu
           </div>
 
           {/* Sync Buttons */}
           <div className="flex gap-4 mb-4">
-            <Button
-              type="primary"
-              loading={syncAllLoading}
+            <button
+              disabled={syncAllLoading}
               onClick={handleSyncAllStatistics}
-              className="bg-blue-600 hover:bg-blue-700"
+              className="px-4 py-2 bg-[var(--primary-color)] text-white rounded hover:bg-[var(--secondary-color)] cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              Đồng bộ toàn bộ hệ thống
-            </Button>
+              {syncAllLoading ? "Đang tải..." : "Tải lại"}
+            </button>
           </div>
 
           {/* Stat Cards */}
@@ -739,7 +747,9 @@ const DocumentStatisticsPage: React.FC = () => {
               >
                 {statisticsData?.stats?.totalDocuments || 0}
               </div>
-              <div className="text-sm text-gray-600 mt-2">Tài liệu</div>
+              <div className="text-sm text-[var(--third-text-color)] mt-2">
+                Tài liệu
+              </div>
             </div>
             <div className="bg-cyan-400 rounded-lg p-3 sm:p-4 text-center">
               <div className="text-2xl sm:text-3xl font-bold text-white">
@@ -766,7 +776,7 @@ const DocumentStatisticsPage: React.FC = () => {
                 <select
                   value={selectedMonth}
                   onChange={(e) => setSelectedMonth(e.target.value)}
-                  className="flex-1 text-sm border border-gray-300 rounded px-2 py-1"
+                  className="flex-1 text-sm border border-gray-300 rounded cursor-pointer px-2 py-1"
                 >
                   {months.map((month) => (
                     <option key={month.value} value={month.value}>
@@ -777,7 +787,7 @@ const DocumentStatisticsPage: React.FC = () => {
                 <select
                   value={selectedYear}
                   onChange={(e) => setSelectedYear(e.target.value)}
-                  className="flex-1 text-sm border border-gray-300 rounded px-2 py-1"
+                  className="flex-1 text-sm border border-gray-300 cursor-pointer rounded px-2 py-1"
                 >
                   {years.map((year) => (
                     <option key={year} value={year}>
@@ -786,16 +796,13 @@ const DocumentStatisticsPage: React.FC = () => {
                   ))}
                 </select>
               </div>
-              <Button
-                type="default"
-                size="small"
-                loading={syncMonthLoading}
+              <button
+                disabled={syncMonthLoading}
                 onClick={handleSyncMonthStatistics}
-                className="w-full mt-2 border-blue-600 text-blue-600 hover:border-blue-700 hover:text-blue-700"
+                className="w-full mt-2 px-3 py-2 border border-[var(--primary-color)] text-[var(--primary-color)] rounded hover:border-[var(--secondary-color)] hover:text-[var(--secondary-color)] cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                Đồng bộ theo thời gian
-              </Button>
-              <div className="text-xs text-gray-500 mt-1">Tháng và Năm</div>
+                {syncMonthLoading ? "Đang tải..." : "Tải lại"}
+              </button>
             </div>
           </div>
 
@@ -841,25 +848,25 @@ const DocumentStatisticsPage: React.FC = () => {
                 className="text-base sm:text-lg font-semibold mb-3 text-left"
                 style={{ color: "var(--primary-text-color)" }}
               >
-                TOP 5 TÀI LIỆU ĐƯỢC XEM VÀ TẢI NHIỀU NHẤT
+                Top 5 tài liệu phổ biến nhất
               </h3>
               <div className="overflow-x-auto">
                 <table className="w-full text-xs sm:text-sm">
                   <thead>
                     <tr className="border-b border-gray-200">
-                      <th className="text-left py-1.5 px-1 sm:px-1.5 text-gray-600 font-medium">
+                      <th className="text-left py-1.5 px-1 sm:px-1.5 text-[var(--third-text-color)] font-medium">
                         STT
                       </th>
-                      <th className="text-left py-1.5 px-1 sm:px-1.5 text-gray-600 font-medium">
+                      <th className="text-left py-1.5 px-1 sm:px-1.5 text-[var(--third-text-color)] font-medium">
                         Tên tài liệu
                       </th>
-                      <th className="text-center py-1.5 px-1 sm:px-1.5 text-gray-600 font-medium">
+                      <th className="text-center py-1.5 px-1 sm:px-1.5 text-[var(--third-text-color)] font-medium">
                         Lượt xem
                       </th>
-                      <th className="text-center py-1.5 px-1 sm:px-1.5 text-gray-600 font-medium">
+                      <th className="text-center py-1.5 px-1 sm:px-1.5 text-[var(--third-text-color)] font-medium">
                         Lượt tải
                       </th>
-                      <th className="text-center py-1.5 px-1 sm:px-1.5 text-gray-600 font-medium">
+                      <th className="text-center py-1.5 px-1 sm:px-1.5 text-[var(--third-text-color)] font-medium">
                         Đánh giá
                       </th>
                     </tr>
@@ -882,10 +889,7 @@ const DocumentStatisticsPage: React.FC = () => {
                           >
                             {index + 1}
                           </td>
-                          <td
-                            className="py-2 px-1 sm:px-1.5 text-xs"
-                            style={{ color: "var(--third-text-color)" }}
-                          >
+                          <td className="py-2 px-1 sm:px-1.5 text-xs text-left text-[var(--primary-text-color)]">
                             {doc.title}
                           </td>
                           <td
@@ -943,13 +947,13 @@ const DocumentStatisticsPage: React.FC = () => {
                   <table className="w-full text-xs sm:text-sm">
                     <thead>
                       <tr className="border-b border-gray-200">
-                        <th className="text-left py-1.5 px-1 sm:px-1.5 text-gray-600 font-medium">
+                        <th className="text-left py-1.5 px-1 sm:px-1.5 text-[var(--third-text-color)] font-medium">
                           {selectedMonth ? "Ngày" : "Tháng"}
                         </th>
-                        <th className="text-center py-1.5 px-1 sm:px-1.5 text-gray-600 font-medium">
+                        <th className="text-center py-1.5 px-1 sm:px-1.5 text-[var(--third-text-color)] font-medium">
                           Lượt xem
                         </th>
-                        <th className="text-center py-1.5 px-1 sm:px-1.5 text-gray-600 font-medium">
+                        <th className="text-center py-1.5 px-1 sm:px-1.5 text-[var(--third-text-color)] font-medium">
                           Lượt tải
                         </th>
                       </tr>
@@ -1017,7 +1021,7 @@ const DocumentStatisticsPage: React.FC = () => {
                 >
                   Thống kê tài liệu đã duyệt
                 </h3>
-                <div className="text-sm text-gray-600">
+                <div className="text-sm text-[var(--third-text-color)]">
                   Tổng số: {filteredApprovedDocuments.length}
                 </div>
               </div>
@@ -1077,13 +1081,16 @@ const DocumentStatisticsPage: React.FC = () => {
                 <table className="w-full text-xs">
                   <thead>
                     <tr className="border-b border-gray-200">
-                      <th className="text-left py-1 px-1 text-gray-600 font-medium">
+                      <th className="text-left py-1 px-1 text-[var(--third-text-color)] font-medium">
+                        STT
+                      </th>
+                      <th className="text-left py-1 px-1 text-[var(--third-text-color)] font-medium">
                         Tên tài liệu
                       </th>
-                      <th className="text-left py-1 px-1 text-gray-600 font-medium">
+                      <th className="text-left py-1 px-1 text-[var(--third-text-color)] font-medium">
                         Người duyệt
                       </th>
-                      <th className="text-left py-1 px-1 text-gray-600 font-medium">
+                      <th className="text-left py-1 px-1 text-[var(--third-text-color)] font-medium">
                         Ngày duyệt
                       </th>
                     </tr>
@@ -1097,12 +1104,20 @@ const DocumentStatisticsPage: React.FC = () => {
                           handleDocumentClick(doc.document || doc._id || doc.id)
                         }
                       >
+                        <td>
+                          <div
+                            className="py-1 px-1 text-center"
+                            style={{ color: "var(--third-text-color)" }}
+                          >
+                            {index + 1}
+                          </div>
+                        </td>
                         <td
-                          className="py-1 px-1 text-xs"
+                          className="py-1 px-1 text-xs text-left"
                           style={{ color: "var(--third-text-color)" }}
                         >
-                          {doc.title.length > 20
-                            ? doc.title.substring(0, 20) + "..."
+                          {doc.title.length > 30
+                            ? doc.title.substring(0, 30) + "..."
                             : doc.title}
                         </td>
                         <td

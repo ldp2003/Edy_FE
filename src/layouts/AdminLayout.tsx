@@ -1,15 +1,24 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Header } from "../components/common/header/Header";
 import { AdminSidebar } from "../components/admin/sideMenu/AdminSidebar";
 import { AdminNavigationMenu } from "../components/admin/sideMenu/AdminNavigationMenu";
 import AdminFooter from "../components/common/footer/AdminFooter";
-import { Outlet } from "react-router-dom";
+import { Outlet, useLocation } from "react-router-dom";
 import { MobileNavBar } from "../components/common/navigation/MobileNavBar";
 import { MobileSidebar } from "../components/common/navigation/MobileSidebar";
 
 const AdminLayout: React.FC = () => {
   const [isSidebarVisible, setIsSidebarVisible] = useState(false);
   const [isMobileSidebarVisible, setIsMobileSidebarVisible] = useState(false);
+  const location = useLocation();
+  const mainRef = useRef<HTMLElement>(null);
+
+  // Scroll to top when route changes
+  useEffect(() => {
+    if (mainRef.current) {
+      mainRef.current.scrollTo(0, 0);
+    }
+  }, [location.pathname]);
 
   // Set sidebar visibility based on screen size
   useEffect(() => {
@@ -58,7 +67,10 @@ const AdminLayout: React.FC = () => {
         </div>
 
         {/* Page content - có thể scroll */}
-        <main className="flex-1 relative overflow-y-auto focus:outline-none">
+        <main
+          ref={mainRef}
+          className="flex-1 relative overflow-y-auto focus:outline-none"
+        >
           <div className="flex flex-col min-h-full">
             <div className="flex-1 p-4 md:p-6">
               <Outlet />

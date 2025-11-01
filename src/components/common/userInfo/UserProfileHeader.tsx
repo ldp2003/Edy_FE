@@ -44,6 +44,7 @@ const UserProfileHeader: React.FC<UserProfileHeaderProps> = ({
   const [organizationValue, setOrganizationValue] = useState(initialOrgId);
   const [loading, setLoading] = useState(false);
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
+  const [isEditMode, setIsEditMode] = useState(false);
 
   const beforeUpload = (file: RcFile) => {
     const isImage = file.type.startsWith("image/");
@@ -123,101 +124,138 @@ const UserProfileHeader: React.FC<UserProfileHeaderProps> = ({
     setLastNameValue(lastName);
     setOrganizationValue(initialOrgId);
     setAvatarUrl(null);
+    setIsEditMode(false);
+  };
+
+  const handleEditToggle = () => {
+    setIsEditMode(!isEditMode);
   };
   return (
     <div
-      className="rounded-lg text-center md:text-left p-4 shadow-lg"
+      className="rounded-lg text-center md:text-left p-3 sm:p-4 shadow-lg"
       style={{ backgroundColor: "var(--card-background-color)" }}
     >
       <style>
         {`
           .avatar-uploader .ant-upload {
-            width: 80px;
-            height: 80px;
+            width: 60px;
+            height: 60px;
             border-radius: 50%;
           }
           .avatar-uploader .ant-upload-select {
-            width: 80px !important;
-            height: 80px !important;
+            width: 60px !important;
+            height: 60px !important;
             border-radius: 50% !important;
+          }
+          @media (min-width: 768px) {
+            .avatar-uploader .ant-upload {
+              width: 80px;
+              height: 80px;
+            }
+            .avatar-uploader .ant-upload-select {
+              width: 80px !important;
+              height: 80px !important;
+            }
           }
         `}
       </style>
-      <div className="flex flex-col md:flex-row items-start gap-4">
-        <Upload
-          name="avatar"
-          listType="picture-circle"
-          className="avatar-uploader"
-          showUploadList={false}
-          accept="image/*"
-          customRequest={customUpload}
-          beforeUpload={beforeUpload}
-        >
-          <div className="relative">
-            <img
-              src={avatarUrl || avatar || "/image/avatar-default.svg"}
-              alt="avatar"
-              style={{ width: "100%", height: "100%", borderRadius: "50%" }}
-            />
-            <div className="absolute inset-0 bg-black bg-opacity-50 rounded-full flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
-              <span className="text-white text-xs">Thay đổi</span>
-            </div>
-          </div>
-        </Upload>
 
-        <div className="flex-1 flex flex-col gap-4">
+      {/* Header with Edit Button */}
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 mb-4">
+        <h3 className="text-sm sm:text-base font-semibold text-[var(--primary-text-color)]">
+          Thông tin cá nhân
+        </h3>
+        <Button
+          type="primary"
+          size="small"
+          onClick={handleEditToggle}
+          disabled={loading}
+          className="bg-[var(--primary-color)] border-[var(--primary-color)] hover:bg-[var(--secondary-color)] hover:border-[var(--secondary-color)] w-full sm:w-auto"
+        >
+          {isEditMode ? "Hủy chỉnh sửa" : "Chỉnh sửa"}
+        </Button>
+      </div>
+      <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4">
+        <div className="flex justify-center sm:justify-start">
+          <Upload
+            name="avatar"
+            listType="picture-circle"
+            className="avatar-uploader"
+            showUploadList={false}
+            accept="image/*"
+            customRequest={customUpload}
+            beforeUpload={beforeUpload}
+            disabled={!isEditMode}
+          >
+            <div className="relative">
+              <img
+                src={avatarUrl || avatar || "/image/avatar-default.svg"}
+                alt="avatar"
+                style={{ width: "100%", height: "100%", borderRadius: "50%" }}
+              />
+              <div className="absolute inset-0 bg-black bg-opacity-50 rounded-full flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
+                <span className="text-white text-xs">Thay đổi</span>
+              </div>
+            </div>
+          </Upload>
+        </div>
+
+        <div className="flex-1 flex flex-col gap-3 sm:gap-4 w-full">
           {/* Họ */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-3">
             <label
               htmlFor="first-name"
-              className="text-xs font-medium md:col-span-1"
+              className="text-xs font-medium sm:col-span-1 lg:col-span-1 flex items-center"
             >
               Họ:
             </label>
-            <div className="md:col-span-3">
+            <div className="sm:col-span-2 lg:col-span-3">
               <Input
                 id="first-name"
                 value={firstNameValue}
                 onChange={(e) => setFirstNameValue(e.target.value)}
                 className="text-sm"
                 size="small"
+                disabled={!isEditMode}
               />
             </div>
           </div>
 
           {/* Tên */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-3">
             <label
               htmlFor="last-name"
-              className="text-xs font-medium md:col-span-1"
+              className="text-xs font-medium sm:col-span-1 lg:col-span-1 flex items-center"
             >
               Tên:
             </label>
-            <div className="md:col-span-3">
+            <div className="sm:col-span-2 lg:col-span-3">
               <Input
                 id="last-name"
                 value={lastNameValue}
                 onChange={(e) => setLastNameValue(e.target.value)}
                 className="text-sm"
                 size="small"
+                disabled={!isEditMode}
               />
             </div>
           </div>
 
           {/* Học tập/làm việc tại */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-3">
             <label
               htmlFor="hoc-tap"
-              className="text-xs font-medium md:col-span-1"
+              className="text-xs font-medium sm:col-span-1 lg:col-span-1 flex items-center"
             >
               Học tập/làm việc tại:
             </label>
-            <div className="md:col-span-3">
+            <div className="sm:col-span-2 lg:col-span-3">
               <Select
                 value={organizationValue}
                 onChange={(value) => setOrganizationValue(value)}
-                className="text-sm"
+                className="text-sm w-full text-left"
                 size="small"
+                disabled={!isEditMode}
               >
                 {organizationOptions.map((org) => (
                   <Option key={org._id} value={org._id}>
@@ -229,14 +267,14 @@ const UserProfileHeader: React.FC<UserProfileHeaderProps> = ({
           </div>
 
           {/* Email */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-3">
             <label
               htmlFor="email"
-              className="text-xs font-medium md:col-span-1"
+              className="text-xs font-medium sm:col-span-1 lg:col-span-1 flex items-center"
             >
               Email:
             </label>
-            <div className="md:col-span-3">
+            <div className="sm:col-span-2 lg:col-span-3">
               <Input
                 id="email"
                 defaultValue={email}
@@ -249,19 +287,28 @@ const UserProfileHeader: React.FC<UserProfileHeaderProps> = ({
         </div>
       </div>
 
-      <div className="flex justify-end gap-2 mt-4">
-        <Button danger size="small" onClick={handleCancel} disabled={loading}>
-          Hủy
-        </Button>
-        <Button
-          type="primary"
-          size="small"
-          onClick={handleSave}
-          loading={loading}
-        >
-          Lưu
-        </Button>
-      </div>
+      {isEditMode && (
+        <div className="flex flex-col sm:flex-row justify-end gap-2 mt-4">
+          <Button
+            danger
+            size="small"
+            onClick={handleCancel}
+            disabled={loading}
+            className="w-full sm:w-auto order-2 sm:order-1"
+          >
+            Hủy
+          </Button>
+          <Button
+            type="primary"
+            size="small"
+            onClick={handleSave}
+            loading={loading}
+            className="w-full sm:w-auto order-1 sm:order-2"
+          >
+            Lưu
+          </Button>
+        </div>
+      )}
     </div>
   );
 };

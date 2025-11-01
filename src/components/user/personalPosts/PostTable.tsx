@@ -60,11 +60,12 @@ const PostTable: React.FC<PostTableProps> = ({
       "createdAt",
       "status",
       "public_mode",
+      "author",
+      "subject",
+      "level",
       "view",
       "comment_count",
       "download_count",
-      "file_type",
-      "doc_type",
       "rating",
       "action",
     ])
@@ -232,8 +233,9 @@ const PostTable: React.FC<PostTableProps> = ({
       title: "Tên tài liệu",
       dataIndex: "title",
       key: "title",
-      width: 300,
       fixed: "left",
+      className: "text-xs",
+      width: 300,
       sorter: (a, b) => a.title.localeCompare(b.title),
       sortDirections: ["ascend", "descend"],
       render: (text: string, record: Document) => {
@@ -419,6 +421,154 @@ const PostTable: React.FC<PostTableProps> = ({
         );
       },
     },
+    {
+      title: "Tác giả",
+      dataIndex: "author",
+      key: "author",
+      width: 150,
+      responsive: ["lg"],
+      render: (authors: string[]) => {
+        if (!authors || authors.length === 0)
+          return <span className="text-gray-400">-</span>;
+        return (
+          <span className="text-[var(--primary-text-color)] text-sm">
+            {authors.join(", ")}
+          </span>
+        );
+      },
+    },
+    {
+      title: "Môn học",
+      dataIndex: "subject",
+      key: "subject",
+      width: 120,
+      responsive: ["md"],
+      render: (subject: { name: string }) => {
+        if (!subject) return <span className="text-gray-400">-</span>;
+        return (
+          <span className="text-[var(--primary-text-color)] text-sm">
+            {subject.name}
+          </span>
+        );
+      },
+    },
+    {
+      title: "Cấp độ",
+      dataIndex: "level",
+      key: "level",
+      align: "center",
+      width: 100,
+      responsive: ["md"],
+      render: (level: string) => {
+        if (!level) return <span className="text-gray-400">-</span>;
+        const levelLabels: Record<string, string> = {
+          STUDENT: "Sinh viên",
+          UNIVERSITY: "Đại học",
+          LECTURER: "Giảng viên",
+          RESEARCHER: "Nghiên cứu",
+          OTHER: "Khác",
+        };
+        return (
+          <span className="text-[var(--primary-text-color)] text-sm">
+            {levelLabels[level] || level}
+          </span>
+        );
+      },
+    },
+    {
+      title: "Chuyên sâu",
+      dataIndex: "intensive",
+      key: "intensive",
+      align: "center",
+      width: 100,
+      responsive: ["md"],
+      render: (intensive: boolean) => (
+        <span
+          className={`px-2 py-1 rounded-full text-xs font-medium ${
+            intensive
+              ? "bg-orange-100 text-orange-800"
+              : "bg-gray-100 text-gray-600"
+          }`}
+        >
+          {intensive ? "Có" : "Không"}
+        </span>
+      ),
+    },
+    {
+      title: "Năm XB",
+      dataIndex: "published_year",
+      key: "published_year",
+      align: "center",
+      width: 80,
+      responsive: ["lg"],
+      render: (year: number) => {
+        if (!year) return <span className="text-gray-400">-</span>;
+        return (
+          <span className="text-[var(--primary-text-color)] text-sm">
+            {year}
+          </span>
+        );
+      },
+    },
+    {
+      title: "Nhà XB",
+      dataIndex: "publisher",
+      key: "publisher",
+      width: 120,
+      responsive: ["lg"],
+      render: (publisher: string) => {
+        if (!publisher) return <span className="text-gray-400">-</span>;
+        return (
+          <span className="text-[var(--primary-text-color)] text-sm">
+            {publisher}
+          </span>
+        );
+      },
+    },
+    {
+      title: "Số trang",
+      dataIndex: "page",
+      key: "page",
+      align: "center",
+      width: 80,
+      responsive: ["lg"],
+      render: (page: number) => {
+        if (!page) return <span className="text-gray-400">-</span>;
+        return (
+          <span className="text-[var(--primary-text-color)] text-sm">
+            {page}
+          </span>
+        );
+      },
+    },
+    {
+      title: "Từ khóa",
+      dataIndex: "keyword",
+      key: "keyword",
+      width: 150,
+      responsive: ["xl"],
+      render: (keywords: string[]) => {
+        if (!keywords || keywords.length === 0)
+          return <span className="text-gray-400">-</span>;
+        return (
+          <div className="flex flex-wrap gap-1">
+            {keywords.slice(0, 2).map((keyword, index) => (
+              <span
+                key={index}
+                className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded"
+              >
+                {keyword}
+              </span>
+            ))}
+            {keywords.length > 2 && (
+              <span className="text-xs text-gray-500">
+                +{keywords.length - 2}
+              </span>
+            )}
+          </div>
+        );
+      },
+    },
 
     {
       title: "Thao tác",
@@ -474,7 +624,10 @@ const PostTable: React.FC<PostTableProps> = ({
 
             {/* Visibility Dropdown Button */}
             <Dropdown
-              menu={{ items: dropdownItems }}
+              menu={{
+                items: dropdownItems,
+                style: { maxHeight: "200px", overflowY: "auto" },
+              }}
               placement="bottomRight"
               disabled={isRejected || isLoading || isPendingApproval}
             >
@@ -550,6 +703,14 @@ const PostTable: React.FC<PostTableProps> = ({
     { key: "file_type", label: "Loại file" },
     { key: "doc_type", label: "Loại tài liệu" },
     { key: "rating", label: "Đánh giá" },
+    { key: "author", label: "Tác giả" },
+    { key: "subject", label: "Môn học" },
+    { key: "level", label: "Cấp độ" },
+    { key: "intensive", label: "Chuyên sâu" },
+    { key: "published_year", label: "Năm XB" },
+    { key: "publisher", label: "Nhà XB" },
+    { key: "page", label: "Số trang" },
+    { key: "keyword", label: "Từ khóa" },
     { key: "action", label: "Thao tác", disabled: true },
   ];
 
@@ -586,11 +747,14 @@ const PostTable: React.FC<PostTableProps> = ({
             Danh sách tài liệu cá nhân
           </h3>
           <Dropdown
-            menu={columnVisibilityMenu}
+            menu={{
+              ...columnVisibilityMenu,
+              style: { maxHeight: "300px", overflowY: "auto" },
+            }}
             placement="bottomRight"
             trigger={["click"]}
           >
-            <button className="flex items-center gap-2 px-3 py-2 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors">
+            <button className="flex items-center gap-2 px-3 py-2 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors cursor-pointer">
               <Eye size={16} />
               <span className="text-sm">Ẩn/Hiện cột</span>
             </button>
