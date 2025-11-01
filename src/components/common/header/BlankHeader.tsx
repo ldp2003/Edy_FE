@@ -16,7 +16,7 @@ export function BlankHeader() {
             <img src={logo} alt="Logo" />
           </div>
           <span className="text-3xl font-bold bg-gradient-to-b from-[#50C4FE] to-[#3586DB] bg-clip-text text-transparent">
-            EDY
+            STUDYSHARE
           </span>
         </div>
 

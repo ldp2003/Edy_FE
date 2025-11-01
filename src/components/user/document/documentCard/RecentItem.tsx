@@ -24,7 +24,7 @@ const RecentItem: React.FC<RecentItemProps> = ({
   intensive,
 }) => {
   return (
-    <div className="flex flex-col md:flex-row text-left w-full gap-2 md:gap-4 justify-between px-2 py-1 border rounded-lg shadow-md bg-white mb-2">
+    <div className="flex flex-col md:flex-row text-left w-full gap-2 md:gap-4 justify-between px-2 py-1 rounded-lg shadow-md bg-white mb-2 hover:shadow-xl hover:scale-[1.01] transition-all duration-200 cursor-pointer">
       <div className="flex items-start md:items-center w-full md:w-auto">
         <div className="icon bg-[var(--primary-color)] text-white p-2 rounded-full mr-2 md:mr-4 flex-shrink-0">
           <FileText size={20} className="md:w-6 md:h-6" />

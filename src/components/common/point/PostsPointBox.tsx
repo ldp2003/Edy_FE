@@ -19,7 +19,11 @@ const PostsPointBox: React.FC<PostsPointBoxProps> = ({
   const navigate = useNavigate();
 
   const handleViewMore = () => {
-    navigate("/point-management");
+    navigate("/point-management?showHistory=true");
+  };
+
+  const handlePointClick = () => {
+    navigate("/point-management?showHistory=true");
   };
 
   if (loading) {
@@ -35,7 +39,7 @@ const PostsPointBox: React.FC<PostsPointBoxProps> = ({
         {onViewMore && (
           <button
             onClick={onViewMore}
-            className="text-xs text-[var(--link-color)] hover:underline"
+            className="text-xs text-[var(--link-color)] hover:underline cursor-pointer"
           >
             Xem thêm &gt;
           </button>
@@ -45,11 +49,21 @@ const PostsPointBox: React.FC<PostsPointBoxProps> = ({
       <div className="flex flex-col justify-between text-left">
         <div className="flex flex-row justify-between">
           <p className="text-xs text-gray-600">Điểm hạng (RP)</p>
-          <p className="text-sm font-bold">{rankPoints}</p>
+          <p
+            className="text-sm font-bold cursor-pointer hover:text-[var(--primary-color)] transition-colors"
+            onClick={handlePointClick}
+          >
+            {rankPoints}
+          </p>
         </div>
         <div className="flex flex-row justify-between">
           <p className="text-xs text-gray-600">Điểm tiêu dùng (UP)</p>
-          <p className="text-sm font-bold">{usagePoints}</p>
+          <p
+            className="text-sm font-bold cursor-pointer hover:text-[var(--primary-color)] transition-colors"
+            onClick={handlePointClick}
+          >
+            {usagePoints}
+          </p>
         </div>
         <div className="flex flex-row justify-between">
           <p className="text-xs text-gray-600">Tài khoản</p>

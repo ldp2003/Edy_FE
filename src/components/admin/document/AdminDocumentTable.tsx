@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useState, useEffect, useRef, useCallback } from "react";
-import { Table, Select, Button, message } from "antd";
+import { Table, Select, message, Dropdown, Checkbox } from "antd";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import type { ColumnsType } from "antd/es/table";
 // import { Download, Printer } from "lucide-react";
@@ -10,6 +10,7 @@ import AdminDocumentFilterSearch, {
 } from "./AdminDocumentFilterSearch";
 import { DocumentService } from "../../../utils/DocumentService";
 import { calculateDocumentRating } from "../../../utils/CalcRate";
+import { Eye } from "lucide-react";
 
 const { Option } = Select;
 
@@ -35,7 +36,6 @@ const AdminDocumentTable: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(5);
-  const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
   const [documents, setDocuments] = useState<Document[]>([]);
   const [loading, setLoading] = useState(false);
   const [totalDocuments, setTotalDocuments] = useState(0);
@@ -45,7 +45,71 @@ const AdminDocumentTable: React.FC = () => {
     {}
   );
 
+  // Sorting state
+  const [sortInfo, setSortInfo] = useState<{
+    field: string | null;
+    order: "ascend" | "descend" | null;
+  }>({ field: null, order: null });
+
+  // State for column visibility
+  const [visibleColumns, setVisibleColumns] = useState<Set<string>>(
+    new Set([
+      "index",
+      "title",
+      "doc_type",
+      "file_type",
+      "level",
+      "intensive",
+      "view",
+      "comment_count",
+      "rating",
+      "download_count",
+      "createdAt",
+      "user",
+      "public_mode",
+      "status",
+    ])
+  );
+
   const isInitialized = useRef(false);
+
+  // Load column visibility from localStorage on mount
+  useEffect(() => {
+    const saved = localStorage.getItem("adminDocumentTableVisibleColumns");
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        setVisibleColumns(new Set(parsed));
+      } catch (error) {
+        console.error("Error loading column visibility:", error);
+      }
+    }
+  }, []);
+
+  // Save column visibility to localStorage
+  const saveColumnVisibility = (columns: Set<string>) => {
+    localStorage.setItem(
+      "adminDocumentTableVisibleColumns",
+      JSON.stringify([...columns])
+    );
+  };
+
+  // Toggle column visibility
+  const toggleColumnVisibility = (columnKey: string, checked: boolean) => {
+    const newVisibleColumns = new Set(visibleColumns);
+    if (checked) {
+      newVisibleColumns.add(columnKey);
+    } else {
+      // Don't allow hiding essential columns
+      if (columnKey === "title" || columnKey === "status") {
+        message.warning("Không thể ẩn cột Tên tài liệu và Trạng thái!");
+        return;
+      }
+      newVisibleColumns.delete(columnKey);
+    }
+    setVisibleColumns(newVisibleColumns);
+    saveColumnVisibility(newVisibleColumns);
+  };
 
   // Initialize filter from URL params on mount - only once
   useEffect(() => {
@@ -84,16 +148,25 @@ const AdminDocumentTable: React.FC = () => {
     isInitialized.current = true;
   }, [searchParams]);
 
-  // Fetch documents from API - only when appliedFilters change
+  // Fetch documents from API - only when appliedFilters, currentPage, pageSize, or sortInfo change
   useEffect(() => {
     const fetchDocuments = async () => {
       setLoading(true);
       try {
+        // Build ordering parameter
+        let ordering = appliedFilters.ordering || "createdAt";
+        let order: 1 | -1 = appliedFilters.order || -1;
+
+        if (sortInfo.field && sortInfo.order) {
+          ordering = sortInfo.field;
+          order = sortInfo.order === "ascend" ? 1 : -1;
+        }
+
         const apiParams = {
           page: currentPage,
           limit: pageSize,
-          ordering: appliedFilters.ordering || "createdAt",
-          order: appliedFilters.order || -1,
+          ordering,
+          order,
           search: appliedFilters.search,
           status: appliedFilters.status,
           doc_type: appliedFilters.doc_type,
@@ -120,7 +193,7 @@ const AdminDocumentTable: React.FC = () => {
     };
 
     fetchDocuments();
-  }, [currentPage, pageSize, appliedFilters]);
+  }, [currentPage, pageSize, appliedFilters, sortInfo]);
 
   const handleFilterChange = useCallback(
     (newParams: AdminFilterSearchParams) => {
@@ -207,15 +280,24 @@ const AdminDocumentTable: React.FC = () => {
       dataIndex: "title",
       key: "title",
       fixed: "left",
+      width: 200,
+      sorter: true,
+      sortDirections: ["ascend", "descend"],
       render: (text: string, record: DocumentDisplay) => (
-        <Button
-          type="link"
+        <span
           onClick={() => handleRowClick(record)}
-          className="text-left p-0 h-auto"
-          style={{ whiteSpace: "normal", textAlign: "left", color: "black" }}
+          className="line-clamp-1"
+          style={{
+            overflow: "hidden",
+            textAlign: "left",
+            color: "var(--primary-text-color)",
+            fontWeight: 500,
+            cursor: "pointer",
+          }}
+          title={text}
         >
           {text}
-        </Button>
+        </span>
       ),
     },
     {
@@ -346,17 +428,23 @@ const AdminDocumentTable: React.FC = () => {
       dataIndex: "view",
       key: "view",
       align: "center",
+      sorter: true,
+      sortDirections: ["ascend", "descend"],
     },
     {
-      title: "Lượt bình luận",
+      title: "Bình luận",
       dataIndex: "comment_count",
       key: "comment_count",
       align: "center",
+      sorter: true,
+      sortDirections: ["ascend", "descend"],
     },
     {
       title: "Đánh giá",
       key: "rating",
       align: "center",
+      sorter: true,
+      sortDirections: ["ascend", "descend"],
       render: (_, record: DocumentDisplay) => {
         const rating = calculateDocumentRating(
           record.like || 0,
@@ -386,11 +474,15 @@ const AdminDocumentTable: React.FC = () => {
       dataIndex: "download_count",
       key: "download_count",
       align: "center",
+      sorter: true,
+      sortDirections: ["ascend", "descend"],
     },
     {
       title: "Ngày tạo",
       dataIndex: "createdAt",
       key: "createdAt",
+      sorter: true,
+      sortDirections: ["ascend", "descend"],
       render: (text: string) => {
         const date = new Date(text);
         return date.toLocaleDateString("vi-VN", {
@@ -530,6 +622,18 @@ const AdminDocumentTable: React.FC = () => {
     }
   };
 
+  // Handle table change (sorting, pagination, etc.)
+  const handleTableChange = (pagination: any, filters: any, sorter: any) => {
+    if (sorter.field && sorter.order) {
+      setSortInfo({
+        field: sorter.field,
+        order: sorter.order,
+      });
+    } else {
+      setSortInfo({ field: null, order: null });
+    }
+  };
+
   const handleNextPage = () => {
     if (currentPage < totalPages) {
       const newPage = currentPage + 1;
@@ -541,11 +645,43 @@ const AdminDocumentTable: React.FC = () => {
     }
   };
 
-  const rowSelection = {
-    selectedRowKeys,
-    onChange: (newSelectedRowKeys: React.Key[]) => {
-      setSelectedRowKeys(newSelectedRowKeys);
-    },
+  // Filter columns based on visibility
+  const filteredColumns = columns.filter((column) =>
+    visibleColumns.has(column.key as string)
+  );
+
+  // Column options for visibility toggle
+  const columnOptions = [
+    { key: "index", label: "STT" },
+    { key: "title", label: "Tên tài liệu", disabled: true },
+    { key: "doc_type", label: "Loại tài liệu" },
+    { key: "file_type", label: "File" },
+    { key: "level", label: "Trình độ" },
+    { key: "intensive", label: "Chuyên sâu" },
+    { key: "view", label: "Lượt xem" },
+    { key: "comment_count", label: "Lượt bình luận" },
+    { key: "rating", label: "Đánh giá" },
+    { key: "download_count", label: "Lượt tải" },
+    { key: "createdAt", label: "Ngày tạo" },
+    { key: "user", label: "Người đăng tải" },
+    { key: "public_mode", label: "Chế độ" },
+    { key: "status", label: "Trạng thái", disabled: true },
+  ];
+
+  // Dropdown menu for column visibility
+  const columnVisibilityMenu = {
+    items: columnOptions.map((option) => ({
+      key: option.key,
+      label: (
+        <Checkbox
+          checked={visibleColumns.has(option.key)}
+          disabled={option.disabled}
+          onChange={(e) => toggleColumnVisibility(option.key, e.target.checked)}
+        >
+          {option.label}
+        </Checkbox>
+      ),
+    })),
   };
 
   return (
@@ -558,11 +694,27 @@ const AdminDocumentTable: React.FC = () => {
         initialFilters={filterParams}
       />
 
+      {/* Table Header with Column Visibility Controls */}
+      <div className="flex justify-between items-center mb-4">
+        <h3 className="text-base font-bold text-[var(--primary-text-color)]">
+          Danh sách tài liệu
+        </h3>
+        <Dropdown
+          menu={columnVisibilityMenu}
+          placement="bottomRight"
+          trigger={["click"]}
+        >
+          <button className="flex items-center gap-2 px-3 py-2 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors">
+            <Eye size={16} />
+            <span className="text-sm">Ẩn/Hiện cột</span>
+          </button>
+        </Dropdown>
+      </div>
+
       {/* Table */}
       <div className="rounded-md overflow-hidden w-full border border-[rgba(0,0,0,0.2)]">
         <Table
-          rowSelection={rowSelection}
-          columns={columns}
+          columns={filteredColumns}
           dataSource={currentData}
           pagination={false}
           size="small"
@@ -571,8 +723,16 @@ const AdminDocumentTable: React.FC = () => {
           scroll={{ x: "max-content" }}
           bordered
           sticky={{ offsetHeader: 0 }}
+          onChange={handleTableChange}
           onRow={(record) => ({
             style: { cursor: "pointer" },
+            onMouseEnter: (e) => {
+              e.currentTarget.style.backgroundColor = "#f5f5f5";
+              e.currentTarget.style.transition = "background-color 0.2s ease";
+            },
+            onMouseLeave: (e) => {
+              e.currentTarget.style.backgroundColor = "";
+            },
             onClick: () => handleRowClick(record),
           })}
         />

@@ -31,7 +31,7 @@ const SuggestCard: React.FC<SuggestCardProps> = ({ document }) => {
         />
       </div>
       <div className="flex-1 text-[var(--primary-text-color)] min-w-0">
-        <div className="item-title font-bold text-sm line-clamp-2 mb-1">
+        <div className="item-title font-bold text-xs line-clamp-2 mb-1">
           {title}
         </div>
         <p className="text-xs text-[var(--secondary-text-color)] mb-2 line-clamp-1">

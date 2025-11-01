@@ -76,22 +76,7 @@ const SubjectTable: React.FC<SubjectTableProps> = ({
       className: "text-left text-base sm:text-sm xs:text-xs",
       responsive: ["sm"],
     },
-    {
-      title: "Trạng thái",
-      dataIndex: "is_checked",
-      key: "is_checked",
-      className: "text-left text-base sm:text-sm xs:text-xs",
-      responsive: ["md"],
-      render: (isChecked: boolean) => (
-        <span
-          className={`${
-            isChecked ? "text-green-600" : "text-orange-600"
-          } text-base sm:text-sm xs:text-xs`}
-        >
-          {isChecked ? "Đã duyệt" : "Chưa duyệt"}
-        </span>
-      ),
-    },
+
     {
       title: "Thao tác",
       key: "actions",

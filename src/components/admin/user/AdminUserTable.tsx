@@ -9,6 +9,8 @@ import {
   Popconfirm,
   Tooltip,
   Tag,
+  Dropdown,
+  Checkbox,
 } from "antd";
 import { useNavigate } from "react-router-dom";
 import type { ColumnsType } from "antd/es/table";
@@ -22,11 +24,11 @@ import {
   Edit,
   List,
   Grid3X3,
+  Eye,
 } from "lucide-react";
 import type { User } from "../../../models/user";
 import { UserService } from "../../../utils/UserService";
 import { getRoleDisplayName } from "../../../constants/RoleConstants";
-import { OrganizationService } from "../../../utils/OrganizationService";
 import UserFilterModal from "./UserFilterModal";
 import UserItem from "./UserItem";
 
@@ -41,7 +43,6 @@ const AdminUserTable: React.FC = () => {
   const navigate = useNavigate();
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
-  const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(false);
   const [totalUsers, setTotalUsers] = useState(0);
@@ -49,25 +50,48 @@ const AdminUserTable: React.FC = () => {
   const [filters, setFilters] = useState<any>({});
   const [isFilterPanelVisible, setIsFilterPanelVisible] = useState(false);
   const [viewMode, setViewMode] = useState<"table" | "list">("table");
-  const [organizations, setOrganizations] = useState<
-    Array<{ _id: string; name: string }>
-  >([]);
 
-  // Auto-switch view mode based on screen size
+  // State for column visibility
+  const [visibleColumns, setVisibleColumns] = useState<Set<string>>(
+    new Set([
+      "index",
+      "fullName",
+      "organization",
+      "role_names",
+      "field_of_study",
+      "follower",
+      "following",
+      "doc_count",
+      "point",
+      "rank_point",
+      "strike",
+      "createdAt",
+      "status",
+      "actions",
+    ])
+  );
+
   useEffect(() => {
     const updateViewMode = () => {
-      const isMobile = window.innerWidth < 1024; // lg breakpoint - switch to list on tablets
+      const isMobile = window.innerWidth < 1024;
       setViewMode(isMobile ? "list" : "table");
     };
-
-    // Set initial view mode
     updateViewMode();
-
-    // Add resize listener
     window.addEventListener("resize", updateViewMode);
-
-    // Cleanup
     return () => window.removeEventListener("resize", updateViewMode);
+  }, []);
+
+  // Load column visibility from localStorage on mount
+  useEffect(() => {
+    const saved = localStorage.getItem("adminUserTableVisibleColumns");
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        setVisibleColumns(new Set(parsed));
+      } catch (error) {
+        console.error("Error loading column visibility:", error);
+      }
+    }
   }, []);
 
   // Fetch users from API
@@ -121,23 +145,219 @@ const AdminUserTable: React.FC = () => {
     fetchUsers();
   }, []);
 
-  // Fetch organizations for filter display
-  useEffect(() => {
-    const fetchOrganizations = async () => {
-      try {
-        const orgResponse = await OrganizationService.getOrganizations();
-        setOrganizations(
-          (orgResponse || []).map((org) => ({
-            _id: org._id || "",
-            name: org.name,
-          }))
+  // Save column visibility to localStorage
+  const saveColumnVisibility = (columns: Set<string>) => {
+    localStorage.setItem(
+      "adminUserTableVisibleColumns",
+      JSON.stringify([...columns])
+    );
+  };
+
+  // Toggle column visibility
+  const toggleColumnVisibility = (columnKey: string, checked: boolean) => {
+    const newVisibleColumns = new Set(visibleColumns);
+    if (checked) {
+      newVisibleColumns.add(columnKey);
+    } else {
+      // Don't allow hiding essential columns
+      if (
+        columnKey === "fullName" ||
+        columnKey === "status" ||
+        columnKey === "actions"
+      ) {
+        message.warning(
+          "Không thể ẩn cột Tên người dùng, Trạng thái và Thao tác!"
         );
-      } catch (error) {
-        console.error("Error fetching organizations:", error);
+        return;
       }
-    };
-    fetchOrganizations();
-  }, []);
+      newVisibleColumns.delete(columnKey);
+    }
+    setVisibleColumns(newVisibleColumns);
+    saveColumnVisibility(newVisibleColumns);
+  };
+
+  // Column visibility menu items
+  const columnVisibilityMenu = {
+    items: [
+      {
+        key: "index",
+        label: (
+          <Checkbox
+            checked={visibleColumns.has("index")}
+            onChange={(e) => toggleColumnVisibility("index", e.target.checked)}
+          >
+            STT
+          </Checkbox>
+        ),
+      },
+      {
+        key: "fullName",
+        label: (
+          <Checkbox
+            checked={visibleColumns.has("fullName")}
+            onChange={(e) =>
+              toggleColumnVisibility("fullName", e.target.checked)
+            }
+            disabled
+          >
+            Người dùng
+          </Checkbox>
+        ),
+      },
+      {
+        key: "organization",
+        label: (
+          <Checkbox
+            checked={visibleColumns.has("organization")}
+            onChange={(e) =>
+              toggleColumnVisibility("organization", e.target.checked)
+            }
+          >
+            Tổ chức
+          </Checkbox>
+        ),
+      },
+      {
+        key: "role_names",
+        label: (
+          <Checkbox
+            checked={visibleColumns.has("role_names")}
+            onChange={(e) =>
+              toggleColumnVisibility("role_names", e.target.checked)
+            }
+          >
+            Vai trò
+          </Checkbox>
+        ),
+      },
+      {
+        key: "field_of_study",
+        label: (
+          <Checkbox
+            checked={visibleColumns.has("field_of_study")}
+            onChange={(e) =>
+              toggleColumnVisibility("field_of_study", e.target.checked)
+            }
+          >
+            Lĩnh vực
+          </Checkbox>
+        ),
+      },
+      {
+        key: "follower",
+        label: (
+          <Checkbox
+            checked={visibleColumns.has("follower")}
+            onChange={(e) =>
+              toggleColumnVisibility("follower", e.target.checked)
+            }
+          >
+            Người theo dõi
+          </Checkbox>
+        ),
+      },
+      {
+        key: "following",
+        label: (
+          <Checkbox
+            checked={visibleColumns.has("following")}
+            onChange={(e) =>
+              toggleColumnVisibility("following", e.target.checked)
+            }
+          >
+            Đang theo dõi
+          </Checkbox>
+        ),
+      },
+      {
+        key: "doc_count",
+        label: (
+          <Checkbox
+            checked={visibleColumns.has("doc_count")}
+            onChange={(e) =>
+              toggleColumnVisibility("doc_count", e.target.checked)
+            }
+          >
+            Tài liệu
+          </Checkbox>
+        ),
+      },
+      {
+        key: "point",
+        label: (
+          <Checkbox
+            checked={visibleColumns.has("point")}
+            onChange={(e) => toggleColumnVisibility("point", e.target.checked)}
+          >
+            Điểm
+          </Checkbox>
+        ),
+      },
+      {
+        key: "rank_point",
+        label: (
+          <Checkbox
+            checked={visibleColumns.has("rank_point")}
+            onChange={(e) =>
+              toggleColumnVisibility("rank_point", e.target.checked)
+            }
+          >
+            Xếp hạng
+          </Checkbox>
+        ),
+      },
+      {
+        key: "strike",
+        label: (
+          <Checkbox
+            checked={visibleColumns.has("strike")}
+            onChange={(e) => toggleColumnVisibility("strike", e.target.checked)}
+          >
+            Cảnh cáo
+          </Checkbox>
+        ),
+      },
+      {
+        key: "createdAt",
+        label: (
+          <Checkbox
+            checked={visibleColumns.has("createdAt")}
+            onChange={(e) =>
+              toggleColumnVisibility("createdAt", e.target.checked)
+            }
+          >
+            Ngày tạo
+          </Checkbox>
+        ),
+      },
+      {
+        key: "status",
+        label: (
+          <Checkbox
+            checked={visibleColumns.has("status")}
+            onChange={(e) => toggleColumnVisibility("status", e.target.checked)}
+            disabled
+          >
+            Trạng thái
+          </Checkbox>
+        ),
+      },
+      {
+        key: "actions",
+        label: (
+          <Checkbox
+            checked={visibleColumns.has("actions")}
+            onChange={(e) =>
+              toggleColumnVisibility("actions", e.target.checked)
+            }
+            disabled
+          >
+            Thao tác
+          </Checkbox>
+        ),
+      },
+    ],
+  };
 
   const handleViewUser = (userId: string) => {
     navigate(`/admin/users/detail/${userId}`);
@@ -496,6 +716,11 @@ const AdminUserTable: React.FC = () => {
     },
   ];
 
+  // Filter columns based on visibility
+  const filteredColumns = columns.filter((column) =>
+    visibleColumns.has(column.key as string)
+  );
+
   // Transform API data to display format
   const getDisplayData = (): UserDisplay[] => {
     return users.map((user, index) => ({
@@ -547,13 +772,6 @@ const AdminUserTable: React.FC = () => {
     setIsFilterPanelVisible(false);
   };
 
-  const rowSelection = {
-    selectedRowKeys,
-    onChange: (newSelectedRowKeys: React.Key[]) => {
-      setSelectedRowKeys(newSelectedRowKeys);
-    },
-  };
-
   return (
     <div className="w-full overflow-hidden relative">
       <div className="space-y-4 md:space-y-6">
@@ -568,6 +786,11 @@ const AdminUserTable: React.FC = () => {
               <Button icon={<Printer size={14} />} size="small">
                 Print
               </Button>
+              <Dropdown menu={columnVisibilityMenu} trigger={["click"]}>
+                <Button icon={<Eye size={14} />} size="small">
+                  Ẩn hiện cột
+                </Button>
+              </Dropdown>
             </div>
 
             <div className="flex items-center space-x-2 w-full sm:w-auto">
@@ -644,11 +867,7 @@ const AdminUserTable: React.FC = () => {
           )}
           {filters?.organization && (
             <span className="bg-purple-50 text-purple-700 px-2 py-1 rounded">
-              Tổ chức:{" "}
-              {filters.organizationName ||
-                organizations.find((org) => org._id === filters.organization)
-                  ?.name ||
-                filters.organization}
+              Tổ chức: {filters.organizationName || filters.organization}
             </span>
           )}
           {filters?.point_range &&
@@ -751,8 +970,7 @@ const AdminUserTable: React.FC = () => {
               `}
               </style>
               <Table
-                rowSelection={rowSelection}
-                columns={columns}
+                columns={filteredColumns}
                 dataSource={currentData}
                 pagination={false}
                 size="middle"

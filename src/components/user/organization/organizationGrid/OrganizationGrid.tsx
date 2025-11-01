@@ -4,12 +4,10 @@ import { useNavigate } from "react-router-dom";
 import type { OrganizationDetailed } from "../../../../models/organization";
 
 interface OrganizationGridProps {
-  title: string;
   organizations: OrganizationDetailed[];
 }
 
 const OrganizationGrid: React.FC<OrganizationGridProps> = ({
-  title,
   organizations,
 }) => {
   const navigate = useNavigate();
@@ -18,9 +16,7 @@ const OrganizationGrid: React.FC<OrganizationGridProps> = ({
   }
   return (
     <div className="mb-8 text-left bg-white p-4 rounded-lg border border-[var(--border-color)]">
-      <h2 className="text-base font-bold text-[var(--primary-text-color)] mb-4 text-center md:text-left">
-        {title}
-      </h2>
+    
       <div className="grid sm:grid-cols-1 grid-cols-2 gap-4">
         {organizations.map((org) => (
           <div
