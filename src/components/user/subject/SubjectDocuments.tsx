@@ -208,7 +208,7 @@ const SubjectDocuments: React.FC = () => {
             title={`Tài liệu gần đây`}
             documents={recentDocuments}
             loading={loading}
-            maxDisplay={4}
+            maxDisplay={5}
             canExpand={true}
           />
         )}
@@ -219,7 +219,7 @@ const SubjectDocuments: React.FC = () => {
             title={`Tài liệu phổ biến`}
             documents={popularDocuments}
             loading={loading}
-            maxDisplay={4}
+            maxDisplay={5}
             canExpand={true}
           />
         )}
@@ -240,7 +240,7 @@ const SubjectDocuments: React.FC = () => {
                 title={`${title} (${docs.length})`}
                 documents={docs}
                 loading={loading}
-                maxDisplay={docs.length >= 6 ? 6 : 4} // Hiển thị nhiều hơn nếu có nhiều tài liệu
+                maxDisplay={docs.length >= 6 ? 6 : 5} // Hiển thị nhiều hơn nếu có nhiều tài liệu
                 canExpand={docs.length > 4}
               />
             );
@@ -271,7 +271,7 @@ const SubjectDocuments: React.FC = () => {
             title="Tài liệu"
             documents={[]}
             loading={false}
-            maxDisplay={4}
+            maxDisplay={5}
             canExpand={false}
             emptyMessage={
               searchTerm

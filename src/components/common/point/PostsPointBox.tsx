@@ -22,6 +22,10 @@ const PostsPointBox: React.FC<PostsPointBoxProps> = ({
     navigate("/point-management");
   };
 
+  const handlePointClick = () => {
+    navigate("/point-management", { state: { showHistory: true } });
+  };
+
   if (loading) {
     return <div className="w-40 h-24 bg-gray-200 animate-pulse rounded" />;
   }
@@ -45,11 +49,21 @@ const PostsPointBox: React.FC<PostsPointBoxProps> = ({
       <div className="flex flex-col justify-between text-left">
         <div className="flex flex-row justify-between">
           <p className="text-xs text-gray-600">Điểm hạng (RP)</p>
-          <p className="text-sm font-bold">{rankPoints}</p>
+          <p
+            className="text-sm font-bold cursor-pointer hover:text-[var(--primary-color)] transition-colors"
+            onClick={handlePointClick}
+          >
+            {rankPoints}
+          </p>
         </div>
         <div className="flex flex-row justify-between">
           <p className="text-xs text-gray-600">Điểm tiêu dùng (UP)</p>
-          <p className="text-sm font-bold">{usagePoints}</p>
+          <p
+            className="text-sm font-bold cursor-pointer hover:text-[var(--primary-color)] transition-colors"
+            onClick={handlePointClick}
+          >
+            {usagePoints}
+          </p>
         </div>
         <div className="flex flex-row justify-between">
           <p className="text-xs text-gray-600">Tài khoản</p>
