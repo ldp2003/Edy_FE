@@ -71,34 +71,84 @@ export default function HomePage() {
   }, [messageApi, user]);
 
   // Handler functions for "View More" buttons
-  const handleViewMoreFeatured = () => {
-    navigate("/documents", {
-      state: {
-        documents: featuredDocuments,
-        title: "Tài liệu nổi bật",
-        type: "featured",
-      },
-    });
+  const handleViewMoreFeatured = async () => {
+    try {
+      const featuredResponse = await DocumentService.fetchNewestDocuments({
+        ordering: "view",
+        order: -1,
+        limit: 50, // Fetch more documents for the list page
+      });
+      navigate("/documents", {
+        state: {
+          documents: featuredResponse.documents || [],
+          title: "Tài liệu nổi bật",
+          type: "featured",
+        },
+      });
+    } catch (error) {
+      console.error("Error fetching featured documents:", error);
+      // Fallback to current documents
+      navigate("/documents", {
+        state: {
+          documents: featuredDocuments,
+          title: "Tài liệu nổi bật",
+          type: "featured",
+        },
+      });
+    }
   };
 
-  const handleViewMoreNewest = () => {
-    navigate("/documents", {
-      state: {
-        documents: newestDocuments,
-        title: "Tài liệu mới nhất",
-        type: "newest",
-      },
-    });
+  const handleViewMoreNewest = async () => {
+    try {
+      const newestResponse = await DocumentService.fetchNewestDocuments({
+        order: -1,
+        limit: 50, // Fetch more documents for the list page
+      });
+      navigate("/documents", {
+        state: {
+          documents: newestResponse.documents || [],
+          title: "Tài liệu mới nhất",
+          type: "newest",
+        },
+      });
+    } catch (error) {
+      console.error("Error fetching newest documents:", error);
+      // Fallback to current documents
+      navigate("/documents", {
+        state: {
+          documents: newestDocuments,
+          title: "Tài liệu mới nhất",
+          type: "newest",
+        },
+      });
+    }
   };
 
-  const handleViewMoreRelated = () => {
-    navigate("/documents", {
-      state: {
-        documents: relatedDocuments,
-        title: "Tài liệu bạn có thể quan tâm",
-        type: "related",
-      },
-    });
+  const handleViewMoreRelated = async () => {
+    try {
+      const relatedResponse = await DocumentService.fetchNewestDocuments({
+        ordering: "download_count",
+        order: -1,
+        limit: 50, // Fetch more documents for the list page
+      });
+      navigate("/documents", {
+        state: {
+          documents: relatedResponse.documents || [],
+          title: "Tài liệu bạn có thể quan tâm",
+          type: "related",
+        },
+      });
+    } catch (error) {
+      console.error("Error fetching related documents:", error);
+      // Fallback to current documents
+      navigate("/documents", {
+        state: {
+          documents: relatedDocuments,
+          title: "Tài liệu bạn có thể quan tâm",
+          type: "related",
+        },
+      });
+    }
   };
 
   const handleViewMoreRecent = () => {

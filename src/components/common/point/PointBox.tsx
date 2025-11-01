@@ -24,7 +24,7 @@ const PointBox: React.FC<PointBoxProps> = ({
         {onViewMore && (
           <button
             onClick={onViewMore}
-            className="text-xs text-[var(--link-color)] hover:underline"
+            className="text-xs text-[var(--link-color)] hover:underline cursor-pointer"
           >
             Xem thêm &gt;
           </button>

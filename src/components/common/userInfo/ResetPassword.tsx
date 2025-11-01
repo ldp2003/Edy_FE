@@ -16,6 +16,7 @@ const ResetPassword: React.FC<ResetPasswordProps> = ({ messageApi }) => {
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const [isEditMode, setIsEditMode] = useState(false);
 
   // Check if required fields are filled
   const isRequiredFieldsFilled =
@@ -65,11 +66,37 @@ const ResetPassword: React.FC<ResetPasswordProps> = ({ messageApi }) => {
     }
   };
 
+  const handleEditToggle = () => {
+    setIsEditMode(!isEditMode);
+    // Reset form when canceling edit
+    if (isEditMode) {
+      setOldPassword("");
+      setNewPassword("");
+      setConfirmPassword("");
+    }
+  };
+
   return (
     <div
       className="rounded-lg text-center md:text-left border border-gray-200 p-6 shadow"
       style={{ backgroundColor: "var(--card-background-color)" }}
     >
+      {/* Header with Edit Button */}
+      <div className="flex justify-between items-center mb-4">
+        <h3 className="text-sm font-semibold text-[var(--primary-text-color)]">
+          Đổi mật khẩu
+        </h3>
+        <Button
+          type="primary"
+          size="small"
+          onClick={handleEditToggle}
+          disabled={loading}
+          className="bg-[var(--primary-color)] border-[var(--primary-color)] hover:bg-[var(--secondary-color)] hover:border-[var(--secondary-color)]"
+        >
+          {isEditMode ? "Vô hiệu hóa chỉnh sửa" : "Cho phép chỉnh sửa"}
+        </Button>
+      </div>
+
       <div className="space-y-2">
         <div>
           <label htmlFor="old-password" className="text-xs font-medium">
@@ -80,6 +107,7 @@ const ResetPassword: React.FC<ResetPasswordProps> = ({ messageApi }) => {
             type="password"
             value={oldPassword}
             onChange={(e) => setOldPassword(e.target.value)}
+            disabled={!isEditMode}
           />
         </div>
 
@@ -92,6 +120,7 @@ const ResetPassword: React.FC<ResetPasswordProps> = ({ messageApi }) => {
             type="password"
             value={newPassword}
             onChange={(e) => setNewPassword(e.target.value)}
+            disabled={!isEditMode}
           />
         </div>
 
@@ -104,6 +133,7 @@ const ResetPassword: React.FC<ResetPasswordProps> = ({ messageApi }) => {
             type="password"
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
+            disabled={!isEditMode}
           />
         </div>
       </div>
@@ -112,20 +142,22 @@ const ResetPassword: React.FC<ResetPasswordProps> = ({ messageApi }) => {
         <Button
           type="primary"
           size="small"
-          disabled={!isRequiredFieldsFilled || !passwordsMatch}
+          disabled={!isRequiredFieldsFilled || !passwordsMatch || !isEditMode}
           onClick={() => setOtpModalVisible(true)}
           loading={loading}
           style={{
             backgroundColor:
-              isRequiredFieldsFilled && passwordsMatch
+              isRequiredFieldsFilled && passwordsMatch && isEditMode
                 ? "var(--primary-color)"
                 : undefined,
             borderColor:
-              isRequiredFieldsFilled && passwordsMatch
+              isRequiredFieldsFilled && passwordsMatch && isEditMode
                 ? "var(--primary-color)"
                 : undefined,
             color:
-              isRequiredFieldsFilled && passwordsMatch ? "white" : undefined,
+              isRequiredFieldsFilled && passwordsMatch && isEditMode
+                ? "white"
+                : undefined,
           }}
         >
           <span className="text-xs">Lấy OTP</span>

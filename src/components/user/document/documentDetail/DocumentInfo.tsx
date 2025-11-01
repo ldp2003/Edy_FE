@@ -10,12 +10,15 @@ import {
 } from "lucide-react";
 import IntensiveMark from "../documentElement/IntensiveMark";
 import type { Document } from "../../../../models/document";
+import { useNavigate } from "react-router-dom";
 
 interface DocumentInfoProps {
   document: Document;
 }
 
 const DocumentInfo: React.FC<DocumentInfoProps> = ({ document }) => {
+  const navigate = useNavigate();
+
   // Helper function to get visibility info
   const getVisibilityInfo = (mode?: string) => {
     switch (mode) {
@@ -87,7 +90,7 @@ const DocumentInfo: React.FC<DocumentInfoProps> = ({ document }) => {
   return (
     <div className="space-y-4 text-sm document-info">
       <div className="space-y-2">
-        <div className="text-sm font-bold text-[var(--primary-text-color)]">
+        <div className="text-sm line-clamp-1 font-bold text-[var(--primary-text-color)]">
           {document.title}
         </div>
 
@@ -116,7 +119,7 @@ const DocumentInfo: React.FC<DocumentInfoProps> = ({ document }) => {
           className="font-bold text-xs text-[var(--primary-color)] cursor-pointer"
           onClick={() => {
             if (document.organization && document.organization._id) {
-              window.location.href = `/organization/${document.organization._id}`;
+              navigate(`/organization/${document.organization._id}`);
             }
           }}
         >
@@ -129,7 +132,14 @@ const DocumentInfo: React.FC<DocumentInfoProps> = ({ document }) => {
           <FolderClosed size={15} />
           <span className="text-sm font-medium">Môn:</span>
         </div>
-        <span className="font-bold text-xs text-[var(--primary-color)]">
+        <span
+          className="font-bold text-xs text-[var(--primary-color)] cursor-pointer"
+          onClick={() => {
+            if (document.subject && document.subject._id) {
+              navigate(`/subject/${document.subject._id}/documents`);
+            }
+          }}
+        >
           {document.subject?.name}
         </span>
       </div>

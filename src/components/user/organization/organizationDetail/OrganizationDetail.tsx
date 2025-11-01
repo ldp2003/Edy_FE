@@ -230,7 +230,6 @@ const OrganizationDetail: React.FC = () => {
             {/* Other Organizations Section */}
             {otherOrganizations.length > 0 && (
               <OrganizationGrid
-                title="Các tổ chức/trường học khác"
                 organizations={otherOrganizations.slice(0, 8)}
               />
             )}

@@ -1,4 +1,3 @@
-import { Badge } from "antd";
 import { Search, Shield, User } from "lucide-react";
 import { Dropdown } from "antd";
 import logo from "/image/Logo.png";
@@ -95,7 +94,7 @@ export function Header({ onMenuToggle }: HeaderProps) {
             <img src={logo} alt="Logo" />
           </div>
           <span className="text-[24px] md:text-[29px] font-bold bg-gradient-to-b from-[#50C4FE] to-[#3586DB] bg-clip-text text-transparent">
-            EDY
+            STUDYSHARE
           </span>
         </div>
 
@@ -159,15 +158,10 @@ export function Header({ onMenuToggle }: HeaderProps) {
                 </button>
               )}
 
-              <Badge
-                count={unreadCount > 9 ? "9+" : unreadCount}
-                overflowCount={9}
-                style={{ backgroundColor: "#ff4d4f" }}
-                offset={[-4, 8]}
-                size="small"
-              >
-                <NotificationDropdown notifications={notifications} />
-              </Badge>
+              <NotificationDropdown
+                notifications={notifications}
+                unreadCount={unreadCount}
+              />
 
               <Dropdown
                 dropdownRender={() =>

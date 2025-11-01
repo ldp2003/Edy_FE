@@ -13,6 +13,7 @@ const ManageOrganizationsPage: React.FC = () => {
   );
   const [loading, setLoading] = useState(false);
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const [messageApi, contextHolder] = message.useMessage();
   const [editingOrganization, setEditingOrganization] =
     useState<OrganizationDetailed | null>(null);
   const [viewingOrganization, setViewingOrganization] =
@@ -27,7 +28,7 @@ const ManageOrganizationsPage: React.FC = () => {
       setOrganizations(orgs);
     } catch (error) {
       console.error("Error loading organizations:", error);
-      message.error("Không thể tải danh sách tổ chức");
+      messageApi.error("Không thể tải danh sách tổ chức");
     } finally {
       setLoading(false);
     }
@@ -62,19 +63,24 @@ const ManageOrganizationsPage: React.FC = () => {
   };
 
   const handleDelete = async (organizationId: string) => {
+    const organization = organizations.find(
+      (org) => org._id === organizationId
+    );
+    const organizationName = organization?.name || "tổ chức này";
+
     Modal.confirm({
       title: "Xác nhận xóa",
-      content: "Bạn có chắc chắn muốn xóa tổ chức này?",
+      content: `Bạn có chắc chắn muốn xóa tổ chức "${organizationName}"?`,
       okText: "Xóa",
       cancelText: "Hủy",
       onOk: async () => {
         try {
           await OrganizationService.deleteOrganization(organizationId);
-          message.success("Xóa tổ chức thành công");
+          messageApi.success(`Xóa tổ chức "${organizationName}" thành công`);
           loadOrganizations();
         } catch (error) {
           console.error("Error deleting organization:", error);
-          message.error("Không thể xóa tổ chức");
+          messageApi.error("Không thể xóa tổ chức");
         }
       },
     });
@@ -90,18 +96,20 @@ const ManageOrganizationsPage: React.FC = () => {
           editingOrganization._id!,
           values
         );
-        message.success("Cập nhật tổ chức thành công");
+        messageApi.success(
+          `Cập nhật thông tin tổ chức "${editingOrganization.name}" thành công`
+        );
       } else {
         // Create organization
         await OrganizationService.createOrganization(values);
-        message.success("Thêm tổ chức thành công");
+        messageApi.success(`Thêm tổ chức "${values.name}" thành công`);
       }
 
       setIsModalVisible(false);
       loadOrganizations();
     } catch (error) {
       console.error("Error saving organization:", error);
-      message.error("Có lỗi xảy ra");
+      messageApi.error("Có lỗi xảy ra");
     }
   };
 
@@ -117,6 +125,7 @@ const ManageOrganizationsPage: React.FC = () => {
 
   return (
     <div>
+      {contextHolder}
       <div className="mb-6">
         <h1 className="text-2xl sm:text-xl xs:text-lg font-bold text-gray-900 mb-4 text-left">
           Quản lý tổ chức
@@ -146,6 +155,7 @@ const ManageOrganizationsPage: React.FC = () => {
         editingOrganization={editingOrganization}
         onOk={handleModalOk}
         onCancel={handleModalCancel}
+        form={form}
       />
 
       <OrganizationViewModal
