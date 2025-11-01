@@ -67,4 +67,4 @@ export default tseslint.config([
   },
 ])
 ```
-"# Edy_FE" 
+"# STUDYSHARE_FE" 

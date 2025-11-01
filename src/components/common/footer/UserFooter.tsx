@@ -20,7 +20,7 @@ const UserFooter: React.FC = () => {
                 />
               </div>
               <span className="bg-gradient-to-b from-[#50C4FE] to-[#3586DB] bg-clip-text text-transparent font-bold text-lg md:text-xl">
-                Edy
+                STUDYSHARE
               </span>
             </div>
             <p className="text-xs md:text-sm text-gray-400 leading-relaxed">
@@ -126,7 +126,7 @@ const UserFooter: React.FC = () => {
             </h3>
             <ul className="space-y-2 md:space-y-3">
               <li className="text-xs md:text-sm">
-                <span>support@edy.edu.vn</span>
+                <span>support@gmail.com</span>
               </li>
               <li className="text-xs md:text-sm">
                 <span>+84 987 654 321</span>
@@ -144,7 +144,7 @@ const UserFooter: React.FC = () => {
         {/* Bottom Bar */}
         <div className="border-t border-gray-700 mt-6 md:mt-8 pt-4 md:pt-6 flex flex-col sm:flex-row justify-between items-center gap-3 md:gap-4">
           <p className="text-xs md:text-sm text-gray-400 text-center sm:text-left">
-            © {currentYear} Edy. All rights reserved.
+            © {currentYear} STUDYSHARE. All rights reserved.
           </p>
           <div className="flex flex-wrap justify-center sm:justify-end gap-3 md:gap-6 text-xs md:text-sm">
             <Link to="/about" className="hover:text-blue-400 transition-colors">

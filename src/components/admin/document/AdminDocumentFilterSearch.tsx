@@ -309,7 +309,7 @@ const AdminDocumentFilterSearch: React.FC<AdminDocumentFilterSearchProps> = ({
 
         {/* Filter Summary - chỉ hiển thị khi đã áp dụng filter */}
         {Object.keys(appliedFilters).length > 0 && (
-          <div className="mt-4 pt-4 border-t">
+          <div className="mt-2 pt-2 border-t border-[var(--border-color)]">
             <div className="flex flex-wrap gap-2">
               <span className="text-sm font-medium text-gray-600">
                 Đang lọc:

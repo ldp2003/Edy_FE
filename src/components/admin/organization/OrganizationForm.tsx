@@ -1,5 +1,6 @@
 import React from "react";
 import { Modal, Form, Input, Row, Col } from "antd";
+import type { FormInstance } from "antd";
 import type { OrganizationDetailed } from "../../../models/organization";
 
 interface OrganizationFormProps {
@@ -7,6 +8,7 @@ interface OrganizationFormProps {
   editingOrganization: OrganizationDetailed | null;
   onOk: () => void;
   onCancel: () => void;
+  form: FormInstance;
 }
 
 const OrganizationForm: React.FC<OrganizationFormProps> = ({
@@ -14,9 +16,8 @@ const OrganizationForm: React.FC<OrganizationFormProps> = ({
   editingOrganization,
   onOk,
   onCancel,
+  form,
 }) => {
-  const [form] = Form.useForm();
-
   React.useEffect(() => {
     if (editingOrganization) {
       form.setFieldsValue({

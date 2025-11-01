@@ -19,11 +19,11 @@ const PostsPointBox: React.FC<PostsPointBoxProps> = ({
   const navigate = useNavigate();
 
   const handleViewMore = () => {
-    navigate("/point-management");
+    navigate("/point-management?showHistory=true");
   };
 
   const handlePointClick = () => {
-    navigate("/point-management", { state: { showHistory: true } });
+    navigate("/point-management?showHistory=true");
   };
 
   if (loading) {
@@ -39,7 +39,7 @@ const PostsPointBox: React.FC<PostsPointBoxProps> = ({
         {onViewMore && (
           <button
             onClick={onViewMore}
-            className="text-xs text-[var(--link-color)] hover:underline"
+            className="text-xs text-[var(--link-color)] hover:underline cursor-pointer"
           >
             Xem thêm &gt;
           </button>

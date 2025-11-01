@@ -696,7 +696,7 @@ const AdminDocumentTable: React.FC = () => {
 
       {/* Table Header with Column Visibility Controls */}
       <div className="flex justify-between items-center mb-4">
-        <h3 className="text-lg font-medium text-[var(--primary-text-color)]">
+        <h3 className="text-base font-bold text-[var(--primary-text-color)]">
           Danh sách tài liệu
         </h3>
         <Dropdown
