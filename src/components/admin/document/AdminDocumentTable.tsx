@@ -623,7 +623,7 @@ const AdminDocumentTable: React.FC = () => {
   };
 
   // Handle table change (sorting, pagination, etc.)
-  const handleTableChange = (pagination: any, filters: any, sorter: any) => {
+  const handleTableChange = (_pagination: any, _filters: any, sorter: any) => {
     if (sorter.field && sorter.order) {
       setSortInfo({
         field: sorter.field,
