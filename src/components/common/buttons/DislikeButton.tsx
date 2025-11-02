@@ -3,23 +3,30 @@ import { ThumbsDown } from "lucide-react";
 import React, { useState, useEffect } from "react";
 import { DocumentService } from "../../../utils/DocumentService";
 import { message } from "antd";
+import { UserContext } from "../../../contexts/UserContext";
+import { NotificationService } from "../../../utils/NotificationService";
 
 interface DislikeButtonProps {
   documentId: string;
   initialDislikeCount?: number;
   initialUserReaction?: "LIKE" | "DISLIKE" | null;
+  documentOwnerId?: string;
+  documentTitle?: string;
 }
 
 const DislikeButton: React.FC<DislikeButtonProps> = ({
   documentId,
   initialDislikeCount = 0,
   initialUserReaction = null,
+  documentOwnerId,
+  documentTitle,
 }) => {
   const [dislikeCount, setDislikeCount] = useState(initialDislikeCount);
   const [userReaction, setUserReaction] = useState<"LIKE" | "DISLIKE" | null>(
     initialUserReaction
   );
   const [loading, setLoading] = useState(false);
+  const { user } = React.useContext(UserContext);
 
   const handleDislikeClick = async () => {
     try {
@@ -34,6 +41,39 @@ const DislikeButton: React.FC<DislikeButtonProps> = ({
       }
 
       await DocumentService.reactDocument(documentId, newReaction);
+
+      // Hiển thị thông báo thành công
+      if (newReaction === "UNREACT") {
+        message.success("Đã bỏ không thích tài liệu!");
+      } else {
+        message.success("Đã không thích tài liệu!");
+      }
+
+      // Tạo thông báo cho chủ tài liệu nếu không phải là người dùng hiện tại
+      if (
+        user &&
+        documentOwnerId &&
+        documentTitle &&
+        newReaction === "DISLIKE" &&
+        user._id !== documentOwnerId
+      ) {
+        try {
+          await NotificationService.createReactionNotification(
+            {
+              _id: user._id,
+              first_name: user.first_name,
+              last_name: user.last_name,
+            },
+            documentOwnerId,
+            documentId,
+            documentTitle,
+            "DISLIKE"
+          );
+        } catch (error) {
+          console.error("Error creating reaction notification:", error);
+          // Không hiển thị lỗi cho user vì đây là tính năng phụ
+        }
+      }
 
       // Trigger refetch reactions từ parent
       window.dispatchEvent(

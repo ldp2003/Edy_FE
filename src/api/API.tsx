@@ -759,7 +759,9 @@ export const DocumentAPI = {
   // Download file using link
   downloadFile: async (linkId: string) => {
     try {
-      const response = await apiClient.get(`/documents/download/${linkId}`);
+      const response = await apiClient.get(`/documents/download/${linkId}`, {
+        responseType: "blob",
+      });
       return response;
     } catch (error) {
       console.error("Error downloading file:", error);
@@ -1824,6 +1826,58 @@ export const DocumentStatisticsAPI = {
       return response.data;
     } catch (error) {
       console.error("Error syncing all statistics:", error);
+      throw error;
+    }
+  },
+};
+
+export const AdminUserStatisticsAPI = {
+  // Get admin user statistics
+  getAdminUserStatistics: async (params?: {
+    year?: number;
+    month?: number;
+  }) => {
+    try {
+      const response = await apiClient.get("/admin-user-statistics", {
+        params,
+      });
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching admin user statistics:", error);
+      throw error;
+    }
+  },
+
+  // Get users list for admin
+  getUsersList: async (params?: {
+    page?: number;
+    limit?: number;
+    search?: string;
+  }) => {
+    try {
+      const response = await apiClient.get("/admin-user-statistics/users", {
+        params,
+      });
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching users list:", error);
+      throw error;
+    }
+  },
+
+  // Sync admin user statistics
+  syncAdminUserStatistics: async (params?: {
+    year?: number;
+    month?: number;
+  }) => {
+    try {
+      const response = await apiClient.post(
+        "/admin-user-statistics/sync",
+        params
+      );
+      return response.data;
+    } catch (error) {
+      console.error("Error syncing admin user statistics:", error);
       throw error;
     }
   },

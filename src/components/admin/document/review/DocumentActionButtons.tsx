@@ -1,7 +1,8 @@
-import React, { useState, useMemo, useCallback } from "react";
+import React, { useState, useMemo, useCallback, useEffect } from "react";
 import { Button, Modal, message, Input } from "antd";
 import { useNavigate } from "react-router-dom";
 import { NotificationService } from "../../../../utils/NotificationService";
+import { DocumentService } from "../../../../utils/DocumentService";
 import type { PendingRequest } from "../../../../models/document";
 
 const { TextArea } = Input;
@@ -40,6 +41,26 @@ const DocumentActionButtons: React.FC<DocumentActionButtonsProps> = ({
   const [rejectReason, setRejectReason] = useState("");
   const [deleteReason, setDeleteReason] = useState("");
   const [editRequestReason, setEditRequestReason] = useState("");
+  const [documentTitle, setDocumentTitle] = useState<string>("");
+
+  // Fetch document title when component mounts
+  useEffect(() => {
+    const fetchDocumentTitle = async () => {
+      if (documentRequest?.doc) {
+        try {
+          const documentData = await DocumentService.getDocumentById(
+            documentRequest.doc
+          );
+          setDocumentTitle(documentData.title || "Tài liệu");
+        } catch (error) {
+          console.error("Error fetching document title:", error);
+          setDocumentTitle("Tài liệu");
+        }
+      }
+    };
+
+    fetchDocumentTitle();
+  }, [documentRequest?.doc]);
 
   // Document status constants
   const DOCUMENT_STATUS = {
@@ -69,19 +90,18 @@ const DocumentActionButtons: React.FC<DocumentActionButtonsProps> = ({
       messageApi.success("Tài liệu đã được duyệt thành công!");
 
       // Send notification to the document owner
-      if (documentRequest.requester) {
-        await NotificationService.createNotification({
-          userId: documentRequest.requester,
-          type: "SYSTEM",
-          message: `Quản trị viên đã duyệt tài liệu của bạn.`,
-          docId: documentRequest.doc,
-        });
+      if (documentRequest.requester && documentTitle) {
+        await NotificationService.createDocumentApprovedNotification(
+          documentRequest.requester,
+          documentRequest.doc,
+          documentTitle
+        );
       }
     } catch (error) {
       console.error("Approve error:", error);
       messageApi.error("Có lỗi xảy ra khi duyệt tài liệu!");
     }
-  }, [documentRequest, isIntensive, onApprove, messageApi]);
+  }, [documentRequest, isIntensive, onApprove, messageApi, documentTitle]);
 
   const handleReject = async () => {
     if (!documentRequest) {
@@ -101,13 +121,13 @@ const DocumentActionButtons: React.FC<DocumentActionButtonsProps> = ({
       setRejectReason("");
 
       // Send notification to the document owner
-      if (documentRequest.requester) {
-        await NotificationService.createNotification({
-          userId: documentRequest.requester,
-          type: "SYSTEM",
-          message: `Quản trị viên đã từ chối tài liệu của bạn. Lý do: ${rejectReason}`,
-          docId: documentRequest.doc,
-        });
+      if (documentRequest.requester && documentTitle) {
+        await NotificationService.createDocumentRejectedNotification(
+          documentRequest.requester,
+          documentRequest.doc,
+          documentTitle,
+          rejectReason
+        );
       }
     } catch (error) {
       console.error("Reject error:", error);
@@ -128,12 +148,14 @@ const DocumentActionButtons: React.FC<DocumentActionButtonsProps> = ({
       setDeleteReason("");
 
       // Send notification to the document owner
-      await NotificationService.createNotification({
-        userId: documentRequest?.requester || "",
-        type: "SYSTEM",
-        message: `Quản trị viên đã xóa tài liệu của bạn. Lý do: ${deleteReason}`,
-        docId: documentRequest?.doc,
-      });
+      if (documentRequest?.requester && documentTitle) {
+        await NotificationService.createDocumentRemovedNotification(
+          documentRequest.requester,
+          documentRequest.doc,
+          documentTitle,
+          deleteReason
+        );
+      }
     } catch (error) {
       console.error("Delete error:", error);
       messageApi.error("Có lỗi xảy ra khi xóa tài liệu!");
@@ -153,12 +175,13 @@ const DocumentActionButtons: React.FC<DocumentActionButtonsProps> = ({
       setEditRequestReason("");
 
       // Send notification to the document owner
-      await NotificationService.createNotification({
-        userId: documentRequest?.requester || "",
-        type: "SYSTEM",
-        message: `Quản trị viên yêu cầu chỉnh sửa tài liệu của bạn. Lý do: ${editRequestReason}`,
-        docId: documentRequest?.doc,
-      });
+      if (documentRequest?.requester && documentTitle) {
+        await NotificationService.createSystemNotification(
+          documentRequest.requester,
+          `Quản trị viên yêu cầu chỉnh sửa tài liệu "${documentTitle}". Lý do: ${editRequestReason}`,
+          documentRequest.doc
+        );
+      }
     } catch (error) {
       console.error("Edit request error:", error);
       messageApi.error("Có lỗi xảy ra khi gửi yêu cầu chỉnh sửa!");

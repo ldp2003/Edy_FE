@@ -197,11 +197,15 @@ const DocumentActions: React.FC<DocumentActionsProps> = ({
               documentId={document._id}
               initialLikeCount={reactionData.likes}
               initialUserReaction={reactionData.userReaction}
+              documentOwnerId={document.user._id}
+              documentTitle={document.title}
             />
             <DislikeButton
               documentId={document._id}
               initialDislikeCount={reactionData.dislikes}
               initialUserReaction={reactionData.userReaction}
+              documentOwnerId={document.user._id}
+              documentTitle={document.title}
             />
           </>
         )}
