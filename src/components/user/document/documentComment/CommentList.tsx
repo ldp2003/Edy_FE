@@ -11,6 +11,7 @@ const { TextArea } = Input;
 
 interface CommentListProps {
   documentId: string;
+  documentOwnerId?: string;
   comments: Comment[];
   onAddComment?: (content: string, parentId?: string) => Promise<void>;
   onCommentsUpdate?: (updatedComments: Comment[]) => void;
@@ -18,6 +19,7 @@ interface CommentListProps {
 
 const CommentList: React.FC<CommentListProps> = ({
   documentId,
+  documentOwnerId,
   comments,
   onAddComment,
   onCommentsUpdate,
@@ -137,27 +139,36 @@ const CommentList: React.FC<CommentListProps> = ({
         }
 
         // Send notification to the document owner
-        await NotificationService.createNotification({
-          userId: user?._id ?? "", // Use the correct user ID from the comment data, fallback to empty string
-          type: "SYSTEM",
-          message: `${res.data.user.first_name} ${res.data.user.last_name} đã bình luận vào tài liệu của bạn.`,
-          docId: documentId,
-        });
+        if (documentOwnerId) {
+          await NotificationService.createCommentNotification(
+            {
+              _id: user?._id || "",
+              first_name: user?.first_name || "",
+              last_name: user?.last_name || "",
+            },
+            documentOwnerId,
+            documentId
+          );
+        }
 
-        // // Send notification for replies
-        // if (parentId) {
-        //   const parentComment = comments.find(
-        //     (comment) => comment._id === parentId
-        //   );
-        //   if (parentComment) {
-        //     await NotificationService.createNotification({
-        //       userId: parentComment.user._id, // Notify the parent comment's author
-        //       type: "SYSTEM",
-        //       message: `${user?.first_name} ${user?.last_name} đã trả lời bình luận của bạn trong tài liệu.`,
-        //       docId: documentId,
-        //     });
-        //   }
-        // }
+        // Send notification for replies
+        if (parentId) {
+          const parentComment = comments.find(
+            (comment) => comment._id === parentId
+          );
+          if (parentComment && parentComment.user._id !== user?._id) {
+            await NotificationService.createReplyNotification(
+              {
+                _id: user?._id || "",
+                first_name: user?.first_name || "",
+                last_name: user?.last_name || "",
+              },
+              parentComment.user._id,
+              documentId,
+              parentId
+            );
+          }
+        }
 
         message.success(parentId ? "Đã thêm trả lời!" : "Đã thêm bình luận!");
       }

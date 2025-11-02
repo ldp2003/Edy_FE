@@ -3,23 +3,30 @@ import { ThumbsUp } from "lucide-react";
 import React, { useState, useEffect } from "react";
 import { DocumentService } from "../../../utils/DocumentService";
 import { message } from "antd";
+import { UserContext } from "../../../contexts/UserContext";
+import { NotificationService } from "../../../utils/NotificationService";
 
 interface LikeButtonProps {
   documentId: string;
   initialLikeCount?: number;
   initialUserReaction?: "LIKE" | "DISLIKE" | null;
+  documentOwnerId?: string;
+  documentTitle?: string;
 }
 
 const LikeButton: React.FC<LikeButtonProps> = ({
   documentId,
   initialLikeCount = 0,
   initialUserReaction = null,
+  documentOwnerId,
+  documentTitle,
 }) => {
   const [likeCount, setLikeCount] = useState(initialLikeCount);
   const [userReaction, setUserReaction] = useState<"LIKE" | "DISLIKE" | null>(
     initialUserReaction
   );
   const [loading, setLoading] = useState(false);
+  const { user } = React.useContext(UserContext);
 
   const handleLikeClick = async () => {
     try {
@@ -34,6 +41,39 @@ const LikeButton: React.FC<LikeButtonProps> = ({
       }
 
       await DocumentService.reactDocument(documentId, newReaction);
+
+      // Hiển thị thông báo thành công
+      if (newReaction === "UNREACT") {
+        message.success("Đã bỏ thích tài liệu!");
+      } else {
+        message.success("Đã thích tài liệu!");
+      }
+
+      // Tạo thông báo cho chủ tài liệu nếu không phải là người dùng hiện tại
+      if (
+        user &&
+        documentOwnerId &&
+        documentTitle &&
+        newReaction === "LIKE" &&
+        user._id !== documentOwnerId
+      ) {
+        try {
+          await NotificationService.createReactionNotification(
+            {
+              _id: user._id,
+              first_name: user.first_name,
+              last_name: user.last_name,
+            },
+            documentOwnerId,
+            documentId,
+            documentTitle,
+            "LIKE"
+          );
+        } catch (error) {
+          console.error("Error creating reaction notification:", error);
+          // Không hiển thị lỗi cho user vì đây là tính năng phụ
+        }
+      }
 
       // Trigger refetch reactions từ parent
       window.dispatchEvent(
