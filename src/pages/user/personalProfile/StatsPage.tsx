@@ -145,31 +145,26 @@ const StatsPage: React.FC = () => {
       title: "STT",
       dataIndex: "stt",
       key: "stt",
-      width: 50,
     },
     {
       title: "Tên tài liệu",
       dataIndex: "title",
       key: "title",
-      width: 300,
     },
     {
       title: "Lượt xem",
       dataIndex: "views",
       key: "views",
-      width: 100,
     },
     {
       title: "Lượt tải",
       dataIndex: "downloads",
       key: "downloads",
-      width: 100,
     },
     {
       title: "Đánh giá",
       dataIndex: "rating",
       key: "rating",
-      width: 100,
     },
   ];
 
@@ -487,7 +482,7 @@ const StatsPage: React.FC = () => {
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Đang tải dữ liệu thống kê...</p>
+          <p className="mt-4 text-[var(--primary-text-color)]">Đang tải dữ liệu thống kê...</p>
         </div>
       </div>
     );
@@ -663,6 +658,7 @@ const StatsPage: React.FC = () => {
                 pagination={false}
                 size="small"
                 className="text-xs"
+                scroll={{ x: "max-content" }}
                 onRow={(record) => ({
                   onClick: () => handleRowClick(record),
                   style: { cursor: "pointer" },

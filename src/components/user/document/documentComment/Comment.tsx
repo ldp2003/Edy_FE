@@ -3,6 +3,8 @@ import { Spin, message } from "antd";
 import CommentList from "./CommentList";
 import type { Comment as CommentType } from "../../../../models/comment";
 import { CommentService } from "../../../../utils/CommentService";
+import { DocumentService } from "../../../../utils/DocumentService";
+import type { Document } from "../../../../models/document";
 
 interface CommentProps {
   documentId: string;
@@ -11,27 +13,33 @@ interface CommentProps {
 const Comment: React.FC<CommentProps> = ({ documentId }) => {
   const [comments, setComments] = useState<CommentType[]>([]);
   const [loading, setLoading] = useState(false);
+  const [document, setDocument] = useState<Document | null>(null);
 
-  // Fetch comments khi component mount
+  // Fetch document info and comments khi component mount
   useEffect(() => {
-    const fetchComments = async () => {
+    const fetchData = async () => {
       if (!documentId) return;
 
       setLoading(true);
       try {
+        // Fetch document info để lấy owner ID
+        const documentData = await DocumentService.getDocumentById(documentId);
+        setDocument(documentData);
+
+        // Fetch comments
         const result = await CommentService.getCommentsByDocument(documentId);
         if (result.success) {
           setComments(result.data.comments || []);
         }
       } catch (error) {
-        console.error("Error fetching comments:", error);
-        message.error("Không thể tải bình luận!");
+        console.error("Error fetching data:", error);
+        message.error("Không thể tải dữ liệu!");
       } finally {
         setLoading(false);
       }
     };
 
-    fetchComments();
+    fetchData();
   }, [documentId]);
 
   // Hàm cập nhật comments (dùng cho service)
@@ -79,6 +87,7 @@ const Comment: React.FC<CommentProps> = ({ documentId }) => {
   return (
     <CommentList
       documentId={documentId}
+      documentOwnerId={document?.user?._id}
       comments={comments}
       onAddComment={handleAddComment}
       onCommentsUpdate={handleCommentsUpdate}

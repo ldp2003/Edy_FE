@@ -37,11 +37,15 @@ const FollowButton: React.FC<FollowButtonProps> = ({
     try {
       const response = await UserService.followUser(user._id);
       if (response) {
-        await NotificationService.createNotification({
-          userId: user._id,
-          type: "SYSTEM",
-          message: `${currentUser?.first_name} ${currentUser?.last_name} đã theo dõi bạn.`,
-        });
+        // Tạo thông báo cho người được follow
+        await NotificationService.createFollowNotification(
+          {
+            _id: currentUser?._id || "",
+            first_name: currentUser?.first_name || "",
+            last_name: currentUser?.last_name || "",
+          },
+          user._id
+        );
         setIsFollowing(true);
         onFollowerCountChange?.(true);
         messageApi.success("Theo dõi thành công!");
@@ -50,7 +54,14 @@ const FollowButton: React.FC<FollowButtonProps> = ({
       console.error("Error following user:", error);
       messageApi.error("Theo dõi thất bại. Vui lòng thử lại sau.");
     }
-  }, [currentUser?.first_name, currentUser?.last_name, messageApi, onFollowerCountChange, user._id]);
+  }, [
+    currentUser?.first_name,
+    currentUser?.last_name,
+    currentUser?._id,
+    messageApi,
+    onFollowerCountChange,
+    user._id,
+  ]);
 
   const handleUnfollow = useCallback(async () => {
     try {

@@ -127,7 +127,6 @@ export class NotificationService {
     }
   }
 
-
   static async createNotification(data: CreateNotificationRequest): Promise<{
     success: boolean;
     message: string;
@@ -288,6 +287,345 @@ export class NotificationService {
         return "#595959"; // gray
       default:
         return "#1890ff"; // blue
+    }
+  }
+
+  // ==================== NOTIFICATION TEMPLATES ====================
+
+  /**
+   * Tạo thông báo follow user
+   */
+  static async createFollowNotification(
+    followerUser: { _id: string; first_name: string; last_name: string },
+    targetUserId: string
+  ): Promise<{
+    success: boolean;
+    message: string;
+    notification: Notification;
+  }> {
+    try {
+      const message = `${followerUser.first_name} ${followerUser.last_name} đã theo dõi bạn.`;
+
+      const response = await this.createNotification({
+        userId: targetUserId,
+        type: "SYSTEM",
+        message,
+      });
+
+      return {
+        success: response.success,
+        message: response.message,
+        notification: response.notification,
+      };
+    } catch (error) {
+      console.error("Error in createFollowNotification:", error);
+      throw new Error("Không thể tạo thông báo theo dõi");
+    }
+  }
+
+  /**
+   * Tạo thông báo comment trên tài liệu
+   */
+  static async createCommentNotification(
+    commenterUser: { _id: string; first_name: string; last_name: string },
+    documentOwnerId: string,
+    documentId: string
+  ): Promise<{
+    success: boolean;
+    message: string;
+    notification: Notification;
+  }> {
+    try {
+      // Kiểm tra nếu người comment là chủ sở hữu tài liệu thì không tạo thông báo
+      if (commenterUser._id === documentOwnerId) {
+        return {
+          success: true,
+          message: "Không tạo thông báo cho thao tác của chính chủ sở hữu",
+          notification: {} as Notification,
+        };
+      }
+
+      const message = `${commenterUser.first_name} ${commenterUser.last_name} đã bình luận vào tài liệu của bạn.`;
+
+      const response = await this.createNotification({
+        userId: documentOwnerId,
+        docId: documentId,
+        type: "COMMENT",
+        message,
+      });
+
+      return {
+        success: response.success,
+        message: response.message,
+        notification: response.notification,
+      };
+    } catch (error) {
+      console.error("Error in createCommentNotification:", error);
+      throw new Error("Không thể tạo thông báo bình luận");
+    }
+  }
+
+  /**
+   * Tạo thông báo reply comment
+   */
+  static async createReplyNotification(
+    replierUser: { _id: string; first_name: string; last_name: string },
+    originalCommenterId: string,
+    documentId: string,
+    commentId: string
+  ): Promise<{
+    success: boolean;
+    message: string;
+    notification: Notification;
+  }> {
+    try {
+      // Kiểm tra nếu người reply là người tạo comment gốc thì không tạo thông báo
+      if (replierUser._id === originalCommenterId) {
+        return {
+          success: true,
+          message:
+            "Không tạo thông báo cho thao tác của chính người tạo comment",
+          notification: {} as Notification,
+        };
+      }
+
+      const message = `${replierUser.first_name} ${replierUser.last_name} đã trả lời bình luận của bạn.`;
+
+      const response = await this.createNotification({
+        userId: originalCommenterId,
+        docId: documentId,
+        cmtId: commentId,
+        type: "REPLY",
+        message,
+      });
+
+      return {
+        success: response.success,
+        message: response.message,
+        notification: response.notification,
+      };
+    } catch (error) {
+      console.error("Error in createReplyNotification:", error);
+      throw new Error("Không thể tạo thông báo trả lời");
+    }
+  }
+
+  /**
+   * Tạo thông báo tài liệu được duyệt
+   */
+  static async createDocumentApprovedNotification(
+    documentOwnerId: string,
+    documentId: string,
+    documentTitle: string
+  ): Promise<{
+    success: boolean;
+    message: string;
+    notification: Notification;
+  }> {
+    try {
+      const message = `Tài liệu "${documentTitle}" của bạn đã được duyệt và công khai.`;
+
+      const response = await this.createNotification({
+        userId: documentOwnerId,
+        docId: documentId,
+        type: "APPROVED",
+        message,
+      });
+
+      return {
+        success: response.success,
+        message: response.message,
+        notification: response.notification,
+      };
+    } catch (error) {
+      console.error("Error in createDocumentApprovedNotification:", error);
+      throw new Error("Không thể tạo thông báo duyệt tài liệu");
+    }
+  }
+
+  /**
+   * Tạo thông báo tài liệu bị từ chối
+   */
+  static async createDocumentRejectedNotification(
+    documentOwnerId: string,
+    documentId: string,
+    documentTitle: string,
+    reason?: string
+  ): Promise<{
+    success: boolean;
+    message: string;
+    notification: Notification;
+  }> {
+    try {
+      const message = reason
+        ? `Tài liệu "${documentTitle}" của bạn đã bị từ chối. Lý do: ${reason}`
+        : `Tài liệu "${documentTitle}" của bạn đã bị từ chối.`;
+
+      const response = await this.createNotification({
+        userId: documentOwnerId,
+        docId: documentId,
+        type: "REJECTED",
+        message,
+      });
+
+      return {
+        success: response.success,
+        message: response.message,
+        notification: response.notification,
+      };
+    } catch (error) {
+      console.error("Error in createDocumentRejectedNotification:", error);
+      throw new Error("Không thể tạo thông báo từ chối tài liệu");
+    }
+  }
+
+  /**
+   * Tạo thông báo tài liệu bị xóa
+   */
+  static async createDocumentRemovedNotification(
+    documentOwnerId: string,
+    documentId: string,
+    documentTitle: string,
+    reason?: string
+  ): Promise<{
+    success: boolean;
+    message: string;
+    notification: Notification;
+  }> {
+    try {
+      const message = reason
+        ? `Tài liệu "${documentTitle}" của bạn đã bị xóa. Lý do: ${reason}`
+        : `Tài liệu "${documentTitle}" của bạn đã bị xóa.`;
+
+      const response = await this.createNotification({
+        userId: documentOwnerId,
+        docId: documentId,
+        type: "REMOVED",
+        message,
+      });
+
+      return {
+        success: response.success,
+        message: response.message,
+        notification: response.notification,
+      };
+    } catch (error) {
+      console.error("Error in createDocumentRemovedNotification:", error);
+      throw new Error("Không thể tạo thông báo xóa tài liệu");
+    }
+  }
+
+  /**
+   * Tạo thông báo tài liệu bị ẩn
+   */
+  static async createDocumentHiddenNotification(
+    documentOwnerId: string,
+    documentId: string,
+    documentTitle: string,
+    reason?: string
+  ): Promise<{
+    success: boolean;
+    message: string;
+    notification: Notification;
+  }> {
+    try {
+      const message = reason
+        ? `Tài liệu "${documentTitle}" của bạn đã bị ẩn. Lý do: ${reason}`
+        : `Tài liệu "${documentTitle}" của bạn đã bị ẩn.`;
+
+      const response = await this.createNotification({
+        userId: documentOwnerId,
+        docId: documentId,
+        type: "HIDDEN",
+        message,
+      });
+
+      return {
+        success: response.success,
+        message: response.message,
+        notification: response.notification,
+      };
+    } catch (error) {
+      console.error("Error in createDocumentHiddenNotification:", error);
+      throw new Error("Không thể tạo thông báo ẩn tài liệu");
+    }
+  }
+
+  /**
+   * Tạo thông báo reaction (thích/không thích) trên tài liệu
+   */
+  static async createReactionNotification(
+    reactorUser: { _id: string; first_name: string; last_name: string },
+    documentOwnerId: string,
+    documentId: string,
+    documentTitle: string,
+    reactionType: "LIKE" | "DISLIKE"
+  ): Promise<{
+    success: boolean;
+    message: string;
+    notification: Notification;
+  }> {
+    try {
+      // Kiểm tra nếu người reaction là chủ sở hữu tài liệu thì không tạo thông báo
+      if (reactorUser._id === documentOwnerId) {
+        return {
+          success: true,
+          message: "Không tạo thông báo cho thao tác của chính chủ sở hữu",
+          notification: {} as Notification,
+        };
+      }
+
+      const reactionText = reactionType === "LIKE" ? "thích" : "không thích";
+      const message = `${reactorUser.first_name} ${reactorUser.last_name} đã ${reactionText} tài liệu "${documentTitle}" của bạn.`;
+
+      const response = await this.createNotification({
+        userId: documentOwnerId,
+        docId: documentId,
+        type: "SYSTEM",
+        message,
+      });
+
+      return {
+        success: response.success,
+        message: response.message,
+        notification: response.notification,
+      };
+    } catch (error) {
+      console.error("Error in createReactionNotification:", error);
+      throw new Error("Không thể tạo thông báo reaction");
+    }
+  }
+
+  /**
+   * Tạo thông báo hệ thống chung
+   */
+  static async createSystemNotification(
+    userId: string,
+    message: string,
+    docId?: string,
+    cmtId?: string
+  ): Promise<{
+    success: boolean;
+    message: string;
+    notification: Notification;
+  }> {
+    try {
+      const response = await this.createNotification({
+        userId,
+        docId,
+        cmtId,
+        type: "SYSTEM",
+        message,
+      });
+
+      return {
+        success: response.success,
+        message: response.message,
+        notification: response.notification,
+      };
+    } catch (error) {
+      console.error("Error in createSystemNotification:", error);
+      throw new Error("Không thể tạo thông báo hệ thống");
     }
   }
 }
