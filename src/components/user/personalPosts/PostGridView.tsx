@@ -1,5 +1,5 @@
 import React from "react";
-import { Row, Col, Spin } from "antd";
+import { Spin } from "antd";
 import DocumentCard from "../document/documentCard/DocumentCard";
 import type { Document } from "../../../models/document";
 
@@ -21,42 +21,33 @@ const PostGridView: React.FC<PostGridViewProps> = ({ data, loading }) => {
 
   return (
     <div className="w-full">
-      <Row gutter={[12, 12]} justify="start">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
         {displayData.map((document) => {
           const isRejected = document.status === "REJECTED";
           return (
-            <Col
+            <div
               key={document._id}
-              xs={24}
-              sm={12}
-              md={8}
-              lg={6}
-              xl={6}
-              xxl={4}
+              className={isRejected ? "cursor-not-allowed opacity-60" : ""}
+              onClick={(e) => {
+                if (isRejected) {
+                  e.preventDefault();
+                  e.stopPropagation();
+                }
+              }}
             >
-              <div
-                className={isRejected ? "cursor-not-allowed opacity-60" : ""}
-                onClick={(e) => {
-                  if (isRejected) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                  }
-                }}
-              >
-                <DocumentCard
-                  document={document}
-                  navigationPath={
-                    isRejected
-                      ? undefined
-                      : `/personal-posts/document-detail/${document._id}`
-                  }
-                  disableClick={!!isRejected}
-                />
-              </div>
-            </Col>
+              <DocumentCard
+                document={document}
+                navigationPath={
+                  isRejected
+                    ? undefined
+                    : `/personal-posts/document-detail/${document._id}`
+                }
+                disableClick={!!isRejected}
+              />
+            </div>
           );
         })}
-      </Row>
+      </div>
     </div>
   );
 };

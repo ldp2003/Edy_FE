@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import { Form, Input, Button, message } from "antd";
-import { login } from "../../../utils/AuthService";
+import { login, forgotPassword } from "../../../utils/AuthService";
+import ForgotPasswordModal from "../ForgotPasswordModal";
+import OTPModal from "../OTPModal";
 
 interface LoginFormProps {
   onSuccess: () => void;
@@ -14,6 +16,37 @@ const LoginForm: React.FC<LoginFormProps> = ({
   const [loading, setLoading] = useState(false);
   const [form] = Form.useForm();
   const [messageApi, contextHolder] = message.useMessage();
+  const [forgotPasswordVisible, setForgotPasswordVisible] = useState(false);
+  const [otpVisible, setOtpVisible] = useState(false);
+  const [resetEmail, setResetEmail] = useState("");
+  const handleForgotPassword = () => {
+    setForgotPasswordVisible(true);
+  };
+
+  const handleForgotPasswordSuccess = (email: string) => {
+    setResetEmail(email);
+    setForgotPasswordVisible(false);
+    setOtpVisible(true);
+  };
+
+  const handleOtpSuccess = async () => {
+    try {
+      await forgotPassword(resetEmail);
+      messageApi.success("Mật khẩu mới đã được gửi về email của bạn!");
+      setOtpVisible(false);
+    } catch (error) {
+      console.error("Gửi mật khẩu mới thất bại:", error);
+      messageApi.error("Gửi mật khẩu mới thất bại!");
+    }
+  };
+
+  const handleCancelForgotPassword = () => {
+    setForgotPasswordVisible(false);
+  };
+
+  const handleCancelOtp = () => {
+    setOtpVisible(false);
+  };
 
   const onFinish = async (values: { email: string; password: string }) => {
     setLoading(true);
@@ -109,6 +142,17 @@ const LoginForm: React.FC<LoginFormProps> = ({
           className="mt-4 text-center"
           style={{ color: "var(--primary-text-color)" }}
         >
+          <button
+            type="button"
+            onClick={handleForgotPassword}
+            className="bg-transparent border-none p-0 cursor-pointer font-medium mr-4"
+            style={{
+              color: "var(--primary-color)",
+              textDecoration: "underline",
+            }}
+          >
+            Quên mật khẩu?
+          </button>
           Chưa có tài khoản?{" "}
           <button
             type="button"
@@ -123,6 +167,22 @@ const LoginForm: React.FC<LoginFormProps> = ({
           </button>
         </p>
       </div>
+
+      <ForgotPasswordModal
+        visible={forgotPasswordVisible}
+        onCancel={handleCancelForgotPassword}
+        onSuccess={handleForgotPasswordSuccess}
+      />
+
+      <OTPModal
+        visible={otpVisible}
+        onCancel={handleCancelOtp}
+        onSuccess={handleOtpSuccess}
+        email={resetEmail}
+        type="RESET_PASSWORD"
+        title="Đặt lại mật khẩu"
+        description={`Chúng tôi đã gửi mã OTP 6 chữ số đến email ${resetEmail}. Vui lòng nhập mã để đặt lại mật khẩu.`}
+      />
     </div>
   );
 };

@@ -214,6 +214,9 @@ export const AuthAPI = {
       throw error;
     }
   },
+  forgotPassword: async (email: string) => {
+    return apiClient.post("/auth/forgot-password", { email });
+  },
 };
 
 export const OrganizationAPI = {
@@ -235,7 +238,16 @@ export const OrganizationAPI = {
     }
   },
 
-  getOrganizations: async (params?: { is_dropdown?: boolean }) => {
+  getOrganizations: async (params?: {
+    is_dropdown?: boolean;
+    search?: string;
+    country?: string;
+    code?: string;
+    page?: number;
+    limit?: number;
+    sortBy?: string;
+    sortOrder?: "asc" | "desc";
+  }) => {
     try {
       const response = await apiClient.get("/organizations", { params });
       return response.data;
@@ -316,9 +328,19 @@ export const UserAPI = {
     }
   },
 
-  getAllUsers: async () => {
+  getAllUsers: async (params?: {
+    page?: number;
+    limit?: number;
+    search?: string;
+    field_of_study?: string[];
+    status?: string[];
+    rank_point_min?: number;
+    rank_point_max?: number;
+    strike_min?: number;
+    strike_max?: number;
+  }) => {
     try {
-      const response = await apiClient.get("/users");
+      const response = await apiClient.get("/users", { params });
       return response.data;
     } catch (error) {
       console.error("Error fetching all users:", error);

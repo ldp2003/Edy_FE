@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { message, Form, Modal } from "antd";
-import { PlusOutlined } from "@ant-design/icons";
+import { message, Form, Modal, Input } from "antd";
+import { PlusOutlined, SearchOutlined } from "@ant-design/icons";
 import { OrganizationService } from "../../../utils/OrganizationService";
 import type { OrganizationDetailed } from "../../../models/organization";
 import OrganizationTable from "../../../components/admin/organization/OrganizationTable";
@@ -19,12 +19,19 @@ const ManageOrganizationsPage: React.FC = () => {
   const [viewingOrganization, setViewingOrganization] =
     useState<OrganizationDetailed | null>(null);
   const [isViewModalVisible, setIsViewModalVisible] = useState(false);
+  const [searchText, setSearchText] = useState("");
   const [form] = Form.useForm();
 
   const loadOrganizations = useCallback(async () => {
     setLoading(true);
     try {
-      const orgs = await OrganizationService.getOrganizations();
+      const params: {
+        search?: string;
+      } = {};
+      if (searchText.trim()) {
+        params.search = searchText.trim();
+      }
+      const orgs = await OrganizationService.getOrganizations(params);
       setOrganizations(orgs);
     } catch (error) {
       console.error("Error loading organizations:", error);
@@ -32,11 +39,11 @@ const ManageOrganizationsPage: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [messageApi, searchText]);
 
   useEffect(() => {
     loadOrganizations();
-  }, [loadOrganizations]);
+  }, [loadOrganizations]); // Load on mount and when loadOrganizations changes
 
   const handleAdd = () => {
     setEditingOrganization(null);
@@ -126,19 +133,38 @@ const ManageOrganizationsPage: React.FC = () => {
   return (
     <div>
       {contextHolder}
-      <div className="mb-6">
-        <h1 className="text-2xl sm:text-xl xs:text-lg font-bold text-gray-900 mb-4 text-left">
+      <div className="mb-4">
+        <h1 className="text-xl sm:text-lg xs:text-base font-bold text-[var(--primary-text-color)] mb-4 text-left">
           Quản lý tổ chức
         </h1>
 
-        <div className="mb-4 flex justify-start">
-          <button
-            onClick={handleAdd}
-            className="inline-flex items-center px-4 py-2 text-base sm:text-sm xs:text-xs font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors duration-200"
-          >
-            <PlusOutlined className="mr-2" />
-            Thêm tổ chức
-          </button>
+        <div className="mb-3 flex flex-col sm:flex-row gap-3">
+          <div className="flex-1 flex gap-2">
+            <Input
+              placeholder="Tìm kiếm tổ chức theo tên hoặc mã..."
+              prefix={<SearchOutlined />}
+              value={searchText}
+              onChange={(e) => setSearchText(e.target.value)}
+              allowClear
+              className="text-sm sm:text-sm xs:text-xs"
+            />
+            <button
+              onClick={loadOrganizations}
+              className="inline-flex items-center px-3 py-1.5 text-xs sm:text-xs xs:text-xs font-medium rounded-md text-white bg-[var(--primary-color)] hover:bg-[var(--secondary-color)] focus:ring-2 focus:ring-[var(--primary-color)] focus:ring-offset-2 transition-colors duration-200"
+            >
+              <SearchOutlined className="mr-1.5" />
+              Tìm kiếm
+            </button>
+          </div>
+          <div className="flex justify-start">
+            <button
+              onClick={handleAdd}
+              className="inline-flex items-center px-3 py-1.5 text-xs sm:text-xs xs:text-xs font-medium rounded-md text-white bg-[var(--primary-color)] hover:bg-[var(--secondary-color)] focus:ring-2 focus:ring-[var(--primary-color)] focus:ring-offset-2 transition-colors duration-200"
+            >
+              <PlusOutlined className="mr-1.5" />
+              Thêm tổ chức
+            </button>
+          </div>
         </div>
       </div>
 

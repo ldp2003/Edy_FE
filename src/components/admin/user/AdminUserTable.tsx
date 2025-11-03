@@ -12,7 +12,7 @@ import {
   Dropdown,
   Checkbox,
 } from "antd";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import type { ColumnsType } from "antd/es/table";
 import {
   Download,
@@ -41,6 +41,7 @@ interface UserDisplay extends User {
 
 const AdminUserTable: React.FC = () => {
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [users, setUsers] = useState<User[]>([]);
@@ -81,56 +82,74 @@ const AdminUserTable: React.FC = () => {
     return () => window.removeEventListener("resize", updateViewMode);
   }, []);
 
-  // Load column visibility from localStorage on mount
+  // Initialize from URL params
   useEffect(() => {
-    const saved = localStorage.getItem("adminUserTableVisibleColumns");
-    if (saved) {
-      try {
-        const parsed = JSON.parse(saved);
-        setVisibleColumns(new Set(parsed));
-      } catch (error) {
-        console.error("Error loading column visibility:", error);
-      }
-    }
-  }, []);
+    const page = parseInt(searchParams.get("page") || "1");
+    const limit = parseInt(searchParams.get("limit") || "10");
+    const search = searchParams.get("search") || "";
+    const status = searchParams.get("status");
+    const organization = searchParams.get("organization");
+    const field_of_study = searchParams.getAll("field_of_study");
+    const rank_point_min = searchParams.get("rank_point_min");
+    const rank_point_max = searchParams.get("rank_point_max");
+    const strike_min = searchParams.get("strike_min");
+    const strike_max = searchParams.get("strike_max");
+
+    setCurrentPage(page);
+    setPageSize(limit);
+    setSearchText(search);
+    setFilters({
+      status: status || undefined,
+      organization: organization || undefined,
+      field_of_study: field_of_study.length > 0 ? field_of_study : undefined,
+      point_range:
+        rank_point_min || rank_point_max
+          ? ([
+              rank_point_min ? parseInt(rank_point_min) : undefined,
+              rank_point_max ? parseInt(rank_point_max) : undefined,
+            ].filter((x) => x !== undefined) as [number, number])
+          : undefined,
+      strike_range:
+        strike_min || strike_max
+          ? ([
+              strike_min ? parseInt(strike_min) : undefined,
+              strike_max ? parseInt(strike_max) : undefined,
+            ].filter((x) => x !== undefined) as [number, number])
+          : undefined,
+    });
+
+    fetchUsers({
+      page,
+      limit,
+      search: search || undefined,
+      status: status ? [status] : undefined,
+      organization: organization ? [organization] : undefined,
+      field_of_study: field_of_study.length > 0 ? field_of_study : undefined,
+      rank_point_min: rank_point_min ? parseInt(rank_point_min) : undefined,
+      rank_point_max: rank_point_max ? parseInt(rank_point_max) : undefined,
+      strike_min: strike_min ? parseInt(strike_min) : undefined,
+      strike_max: strike_max ? parseInt(strike_max) : undefined,
+    });
+  }, [searchParams]);
 
   // Fetch users from API
-  const fetchUsers = async (
-    search?: string,
-    appliedFilters?: { status?: string; organization?: string }
-  ) => {
+  const fetchUsers = async (params?: {
+    page?: number;
+    limit?: number;
+    search?: string;
+    status?: string[];
+    organization?: string[];
+    field_of_study?: string[];
+    rank_point_min?: number;
+    rank_point_max?: number;
+    strike_min?: number;
+    strike_max?: number;
+  }) => {
     setLoading(true);
     try {
-      // For now, just fetch all users. In real implementation, pass search and filters to API
-      const response = await UserService.getAllUsers();
-      let filteredUsers: User[] = response || [];
-
-      // Apply client-side filtering if needed
-      if (search) {
-        filteredUsers = filteredUsers.filter(
-          (user: User) =>
-            user.first_name.toLowerCase().includes(search.toLowerCase()) ||
-            user.last_name.toLowerCase().includes(search.toLowerCase()) ||
-            user.contact_email.toLowerCase().includes(search.toLowerCase())
-        );
-      }
-
-      if (appliedFilters?.status) {
-        filteredUsers = filteredUsers.filter(
-          (user: User) => user.status === appliedFilters.status
-        );
-      }
-
-      if (appliedFilters?.organization) {
-        filteredUsers = filteredUsers.filter(
-          (user: User) =>
-            typeof user.organization === "object" &&
-            user.organization?._id === appliedFilters.organization
-        );
-      }
-
-      setUsers(filteredUsers);
-      setTotalUsers(filteredUsers.length);
+      const response = await UserService.getAllUsers(params);
+      setUsers(response.data || []);
+      setTotalUsers(response.pagination?.totalUsers || 0);
     } catch (error) {
       console.error("Error fetching users:", error);
       message.error("Không thể tải danh sách người dùng!");
@@ -144,6 +163,45 @@ const AdminUserTable: React.FC = () => {
   useEffect(() => {
     fetchUsers();
   }, []);
+
+  // Update URL with search params
+  const updateURL = (params: {
+    page?: number;
+    limit?: number;
+    search?: string;
+    status?: string[];
+    organization?: string[];
+    field_of_study?: string[];
+    rank_point_min?: number;
+    rank_point_max?: number;
+    strike_min?: number;
+    strike_max?: number;
+  }) => {
+    const newParams = new URLSearchParams();
+    if (params.page && params.page !== 1)
+      newParams.set("page", params.page.toString());
+    if (params.limit && params.limit !== 10)
+      newParams.set("limit", params.limit.toString());
+    if (params.search) newParams.set("search", params.search);
+    if (params.status && params.status.length > 0)
+      newParams.set("status", params.status[0]);
+    if (params.organization && params.organization.length > 0)
+      newParams.set("organization", params.organization[0]);
+    if (params.field_of_study && params.field_of_study.length > 0) {
+      params.field_of_study.forEach((field) =>
+        newParams.append("field_of_study", field)
+      );
+    }
+    if (params.rank_point_min !== undefined)
+      newParams.set("rank_point_min", params.rank_point_min.toString());
+    if (params.rank_point_max !== undefined)
+      newParams.set("rank_point_max", params.rank_point_max.toString());
+    if (params.strike_min !== undefined)
+      newParams.set("strike_min", params.strike_min.toString());
+    if (params.strike_max !== undefined)
+      newParams.set("strike_max", params.strike_max.toString());
+    setSearchParams(newParams);
+  };
 
   // Save column visibility to localStorage
   const saveColumnVisibility = (columns: Set<string>) => {
@@ -738,30 +796,108 @@ const AdminUserTable: React.FC = () => {
   const handlePageSizeChange = (value: number) => {
     setPageSize(value);
     setCurrentPage(1);
+    const params = {
+      page: 1,
+      limit: value,
+      search: searchText || undefined,
+      status: filters.status ? [filters.status] : undefined,
+      organization: filters.organization ? [filters.organization] : undefined,
+      field_of_study: filters.field_of_study,
+      rank_point_min: filters.point_range?.[0],
+      rank_point_max: filters.point_range?.[1],
+      strike_min: filters.strike_range?.[0],
+      strike_max: filters.strike_range?.[1],
+    };
+    updateURL(params);
+    fetchUsers(params);
   };
 
   const handlePreviousPage = () => {
     if (currentPage > 1) {
-      setCurrentPage(currentPage - 1);
+      const newPage = currentPage - 1;
+      setCurrentPage(newPage);
+      const params = {
+        page: newPage,
+        limit: pageSize,
+        search: searchText || undefined,
+        status: filters.status ? [filters.status] : undefined,
+        organization: filters.organization ? [filters.organization] : undefined,
+        field_of_study: filters.field_of_study,
+        rank_point_min: filters.point_range?.[0],
+        rank_point_max: filters.point_range?.[1],
+        strike_min: filters.strike_range?.[0],
+        strike_max: filters.strike_range?.[1],
+      };
+      updateURL(params);
+      fetchUsers(params);
     }
   };
 
   const handleNextPage = () => {
     if (currentPage < totalPages) {
-      setCurrentPage(currentPage + 1);
+      const newPage = currentPage + 1;
+      setCurrentPage(newPage);
+      const params = {
+        page: newPage,
+        limit: pageSize,
+        search: searchText || undefined,
+        status: filters.status ? [filters.status] : undefined,
+        organization: filters.organization ? [filters.organization] : undefined,
+        field_of_study: filters.field_of_study,
+        rank_point_min: filters.point_range?.[0],
+        rank_point_max: filters.point_range?.[1],
+        strike_min: filters.strike_range?.[0],
+        strike_max: filters.strike_range?.[1],
+      };
+      updateURL(params);
+      fetchUsers(params);
     }
   };
 
   const handleSearch = () => {
-    fetchUsers(searchText, filters);
+    const params = {
+      page: 1,
+      limit: pageSize,
+      search: searchText || undefined,
+      status: filters.status ? [filters.status] : undefined,
+      organization: filters.organization ? [filters.organization] : undefined,
+      field_of_study: filters.field_of_study,
+      rank_point_min: filters.point_range?.[0],
+      rank_point_max: filters.point_range?.[1],
+      strike_min: filters.strike_range?.[0],
+      strike_max: filters.strike_range?.[1],
+    };
+    updateURL(params);
+    fetchUsers(params);
+    setCurrentPage(1);
   };
 
   const handleApplyFilters = (newFilters: {
     status?: string;
     organization?: string;
+    organizationName?: string;
+    field_of_study?: string[];
+    point_range?: [number, number];
+    strike_range?: [number, number];
   }) => {
     setFilters(newFilters);
-    fetchUsers(searchText, newFilters);
+    const params = {
+      page: 1,
+      limit: pageSize,
+      search: searchText || undefined,
+      status: newFilters.status ? [newFilters.status] : undefined,
+      organization: newFilters.organization
+        ? [newFilters.organization]
+        : undefined,
+      field_of_study: newFilters.field_of_study,
+      rank_point_min: newFilters.point_range?.[0],
+      rank_point_max: newFilters.point_range?.[1],
+      strike_min: newFilters.strike_range?.[0],
+      strike_max: newFilters.strike_range?.[1],
+    };
+    updateURL(params);
+    fetchUsers(params);
+    setCurrentPage(1);
   };
 
   const handleToggleFilterPanel = () => {
@@ -894,7 +1030,10 @@ const AdminUserTable: React.FC = () => {
               onClick={() => {
                 setSearchText("");
                 setFilters({});
-                fetchUsers("", {});
+                const params = { page: 1, limit: pageSize };
+                updateURL(params);
+                fetchUsers(params);
+                setCurrentPage(1);
               }}
             >
               Xóa tất cả

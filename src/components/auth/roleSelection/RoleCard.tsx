@@ -10,28 +10,38 @@ interface RoleCardProps {
 const RoleCard: React.FC<RoleCardProps> = ({ role, isSelected, onSelect }) => {
   return (
     <div
-      className={`
-        cursor-pointer rounded-lg border-2 transition-all duration-200 p-6 text-center min-h-[200px] flex flex-col justify-center
-        ${
-          isSelected
-            ? "border-blue-500 bg-blue-50 shadow-lg scale-105"
-            : "border-gray-200 bg-white hover:border-gray-300 hover:shadow-md hover:scale-102"
-        }
-      `}
+      className="cursor-pointer rounded-xl border-2 transition-all duration-300 p-8 text-center min-h-[250px] flex flex-col justify-center transform hover:scale-105 active:scale-95"
+      style={{
+        borderColor: isSelected
+          ? "var(--primary-color)"
+          : "var(--border-color)",
+        backgroundColor: isSelected
+          ? "var(--field-background-color)"
+          : "var(--primary-background-color)",
+        boxShadow: isSelected
+          ? "0 8px 25px rgba(0, 0, 0, 0.15)"
+          : "0 4px 15px rgba(0, 0, 0, 0.1)",
+      }}
       onClick={() => onSelect(role)}
     >
-      <div className="mb-4 text-6xl">{role.icon}</div>
+      <div className="mb-6 text-7xl animate-pulse">{role.icon}</div>
       <h3
-        className={`text-xl font-bold mb-3 ${
-          isSelected ? "text-blue-700" : "text-gray-800"
-        }`}
+        className="text-2xl font-bold mb-4"
+        style={{
+          color: isSelected
+            ? "var(--primary-color)"
+            : "var(--primary-text-color)",
+        }}
       >
         {role.displayName}
       </h3>
       <p
-        className={`text-sm leading-relaxed ${
-          isSelected ? "text-blue-600" : "text-gray-600"
-        }`}
+        className="text-base leading-relaxed"
+        style={{
+          color: isSelected
+            ? "var(--secondary-text-color)"
+            : "var(--third-text-color)",
+        }}
       >
         {role.description}
       </p>

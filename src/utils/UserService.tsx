@@ -12,9 +12,20 @@ export const UserService = {
     }
   },
 
-  async getAllUsers() {
+  async getAllUsers(params?: {
+    page?: number;
+    limit?: number;
+    search?: string;
+    status?: string[];
+    organization?: string[];
+    field_of_study?: string[];
+    rank_point_min?: number;
+    rank_point_max?: number;
+    strike_min?: number;
+    strike_max?: number;
+  }) {
     try {
-      const users = await UserAPI.getAllUsers();
+      const users = await UserAPI.getAllUsers(params);
       console.log("Fetched users:", users);
       return users;
     } catch (error) {
