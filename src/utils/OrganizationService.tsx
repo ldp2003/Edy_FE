@@ -21,7 +21,7 @@ export const OrganizationService = {
     page?: number;
     limit?: number;
     sortBy?: string;
-    sortOrder?: 'asc' | 'desc';
+    sortOrder?: "asc" | "desc";
   }): Promise<OrganizationDetailed[]> => {
     try {
       const response = await OrganizationAPI.getOrganizations(params);

@@ -34,7 +34,9 @@ const ManageSubjectsPage: React.FC = () => {
     if (searchText.trim()) {
       setLoading(true);
       try {
-        const subjectsData = await SubjectService.searchSubjects(searchText.trim());
+        const subjectsData = await SubjectService.searchSubjects(
+          searchText.trim()
+        );
         setSubjects(subjectsData);
       } catch (error) {
         console.error("Error searching subjects:", error);
