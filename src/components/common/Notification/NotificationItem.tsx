@@ -49,15 +49,24 @@ const NotificationItem: React.FC<NotificationItemProps> = ({
     <div className="p-2 text-left cursor-pointer" onClick={handleClick}>
       <div className="flex items-center gap-1.5">
         {notification.isRead ? (
-          <CheckCircle className="w-3.5 h-3.5 text-gray-400 flex-shrink-0" />
+          <CheckCircle
+            className="w-3.5 h-3.5 flex-shrink-0"
+            style={{ color: "var(--secondary-text-color)" }}
+          />
         ) : (
-          <Circle className="w-3.5 h-3.5 text-green-500 flex-shrink-0" />
+          <Circle
+            className="w-3.5 h-3.5 flex-shrink-0"
+            style={{ color: "var(--green-button-color)" }}
+          />
         )}
         <div className="text-xs font-medium flex-1 line-clamp-2">
           {notification.message}
         </div>
       </div>
-      <div className="text-[10px] text-gray-500 mt-0.5 ml-5">
+      <div
+        className="text-[10px] mt-0.5 ml-5"
+        style={{ color: "var(--secondary-text-color)" }}
+      >
         {NotificationService.formatNotificationTime(notification.createdAt)}
       </div>
     </div>

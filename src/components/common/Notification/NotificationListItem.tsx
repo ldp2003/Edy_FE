@@ -45,19 +45,25 @@ const NotificationListItem: React.FC<NotificationListItemProps> = ({
 
   return (
     <li
-      className={`mb-2 shadow rounded-lg p-2 text-sm ${
-        notification.isRead ? "bg-white" : "bg-[var(--field-background-color)]"
-      } flex items-center gap-2 text-left cursor-pointer`}
+      className={`mb-2 shadow rounded-lg p-2 text-sm flex items-center gap-2 text-left cursor-pointer`}
+      style={{
+        backgroundColor: notification.isRead
+          ? "var(--primary-background-color)"
+          : "var(--field-background-color)",
+      }}
       onClick={handleClick}
     >
       <div className="flex-1">
         <p>{notification.message}</p>
-        <small className="text-gray-500">
+        <small style={{ color: "var(--secondary-text-color)" }}>
           {NotificationService.formatNotificationTime(notification.createdAt)}
         </small>
       </div>
       {!notification.isRead && (
-        <span className="w-2 h-2 bg-blue-500 rounded-full ml-auto"></span>
+        <span
+          className="w-2 h-2 rounded-full ml-auto"
+          style={{ backgroundColor: "var(--primary-color)" }}
+        ></span>
       )}
     </li>
   );

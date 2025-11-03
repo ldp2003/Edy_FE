@@ -1,5 +1,5 @@
-import React, { useMemo, useCallback } from "react";
-import { Dropdown, Badge, Spin, Menu } from "antd";
+import React, { useCallback } from "react";
+import { Dropdown, Badge, Spin } from "antd";
 import { useNavigate } from "react-router-dom";
 import type { Notification } from "../../../models/notification";
 import { Bell, ChevronRight } from "lucide-react";
@@ -27,102 +27,59 @@ const NotificationDropdown: React.FC<NotificationDropdownProps> = React.memo(
       [handleViewAllNotifications]
     );
 
-    // Memoized menu items để tránh re-render không cần thiết
-    const menuItems = useMemo(() => {
-      const items: Array<
-        | {
-            key: string;
-            label: React.ReactNode;
-            disabled?: boolean;
-            onClick?: () => void;
-            className?: string;
-          }
-        | {
-            type: "divider";
-          }
-      > = [];
+    const menu = (
+      <div
+        className="bg-white shadow-lg rounded-lg overflow-hidden"
+        style={{ minWidth: 320, maxWidth: 380 }}
+      >
+        {/* Header */}
+        <div className="flex justify-between items-center px-4 py-3 border-b border-gray-200 bg-gray-50">
+          <span className="text-sm font-semibold text-gray-800">Thông báo</span>
+          {unreadCount > 0 && (
+            <span className="text-xs bg-red-500 text-white font-semibold px-2 py-0.5 rounded-full">
+              {unreadCount > 99 ? "99+" : unreadCount}
+            </span>
+          )}
+        </div>
 
-      // Header item
-      items.push({
-        key: "header",
-        label: (
-          <div className="flex justify-between items-center gap-2 text-gray-700 font-medium px-2 py-0.5">
-            <span className="text-sm">Thông báo</span>
-            {unreadCount > 0 && (
-              <span className="text-xs text-red-600 font-medium">
-                {unreadCount > 99 ? "99+" : unreadCount}
-              </span>
-            )}
-          </div>
-        ),
-        disabled: true,
-        className: "bg-transparent cursor-default hover:bg-transparent",
-      });
-
-      // Loading state
-      if (loading) {
-        items.push({
-          key: "loading",
-          label: (
-            <div className="flex justify-center items-center gap-2 text-gray-700 px-2 py-2">
+        {/* Content */}
+        <div className="max-h-96 overflow-y-auto">
+          {loading ? (
+            <div className="flex justify-center items-center gap-2 text-gray-600 py-8">
               <Spin size="small" />
-              <span className="text-xs">Đang tải...</span>
+              <span className="text-sm">Đang tải...</span>
             </div>
-          ),
-          disabled: true,
-          className: "bg-transparent cursor-default hover:bg-transparent",
-        });
-      }
-      // Notifications
-      else if (notifications.length > 0) {
-        notifications.slice(0, 5).forEach((notification) => {
-          items.push({
-            key: notification._id,
-            label: <NotificationItem notification={notification} />,
-            className:
-              "border-b border-gray-100 last:border-b-0 hover:bg-gray-50",
-          });
-        });
-
-        // View all button
-        items.push({
-          type: "divider",
-        });
-        items.push({
-          key: "view-all",
-          label: (
-            <div className="flex justify-between items-center gap-2 text-gray-700 hover:text-blue-600 px-2 py-0.5">
-              <span className="text-sm">Xem tất cả</span>
-              <ChevronRight size={14} />
-            </div>
-          ),
-          onClick: handleViewAllNotifications,
-          className: "hover:bg-gray-50",
-        });
-      }
-      // Empty state
-      else {
-        items.push({
-          key: "empty",
-          label: (
-            <div className="text-center text-gray-500 px-2 py-2 text-xs">
+          ) : notifications.length > 0 ? (
+            <>
+              {notifications.slice(0, 5).map((notification) => (
+                <div
+                  key={notification._id}
+                  className="border-b border-gray-100 last:border-b-0 hover:bg-gray-50 transition-colors"
+                >
+                  <NotificationItem notification={notification} />
+                </div>
+              ))}
+            </>
+          ) : (
+            <div className="text-center text-gray-500 py-8 text-sm">
               Chưa có thông báo nào
             </div>
-          ),
-          disabled: true,
-          className: "bg-transparent cursor-default hover:bg-transparent",
-        });
-      }
+          )}
+        </div>
 
-      return items;
-    }, [notifications, loading, unreadCount, handleViewAllNotifications]);
-
-    const menu = (
-      <Menu
-        className="border-0 shadow-lg rounded-lg p-1 w-64 bg-white"
-        items={menuItems}
-        style={{ minWidth: 256 }}
-      />
+        {/* Footer - View all button */}
+        {!loading && notifications.length > 0 && (
+          <div className="border-t border-gray-200">
+            <button
+              onClick={handleViewAllNotifications}
+              className="w-full cursor-pointer flex justify-center items-center gap-2 px-4 py-3 text-sm font-medium text-blue-600 hover:bg-blue-50 transition-colors"
+            >
+              <span>Xem tất cả</span>
+              <ChevronRight size={16} />
+            </button>
+          </div>
+        )}
+      </div>
     );
 
     return (
@@ -135,9 +92,13 @@ const NotificationDropdown: React.FC<NotificationDropdownProps> = React.memo(
           count={unreadCount > 99 ? "99+" : unreadCount}
           overflowCount={99}
           style={{
-            backgroundColor: unreadCount > 0 ? "#ef4444" : "transparent",
-            color: unreadCount > 0 ? "#ffffff" : "#6b7280",
-            border: unreadCount > 0 ? "none" : "1px solid #d1d5db",
+            backgroundColor:
+              unreadCount > 0 ? "var(--red-button-color)" : "transparent",
+            color:
+              unreadCount > 0
+                ? "var(--primary-background-color)"
+                : "var(--secondary-text-color)",
+            border: unreadCount > 0 ? "none" : "1px solid var(--border-color)",
           }}
           offset={[-2, 2]}
           size="small"
