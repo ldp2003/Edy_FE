@@ -1,389 +1,339 @@
-import React, { useState, useEffect, useCallback } from "react";
-import { Row, Col, Divider, Select, Button, Spin } from "antd";
+import React from "react";
+import { Card, Row, Col } from "antd";
+import { useNavigate } from "react-router-dom";
 import {
   FileText,
   Users,
-  Clock,
-  AlertTriangle,
-  Eye,
   Download,
+  Eye,
+  AlertCircle,
+  TrendingUp,
   BookOpen,
-  UserCheck,
-  RefreshCw,
+  Building,
+  Flag,
+  BarChart3,
 } from "lucide-react";
-import AdminDashboardHeader from "../../../components/admin/dashboard/AdminDashboardHeader";
-import AdminStatsGrid from "../../../components/admin/dashboard/AdminStatsGrid";
-import AdminChartsSection from "../../../components/admin/dashboard/AdminChartsSection";
-import AdminQuickActions from "../../../components/admin/dashboard/AdminQuickActions";
-import AdminRecentActivities from "../../../components/admin/dashboard/AdminRecentActivities";
-import { type StatCard } from "../../../components/admin/dashboard/AdminStatsCard";
-import {
-  adminStatisticsService,
-  type AdminDashboardStats,
-} from "../../../utils/AdminStatisticsService";
-
-interface ActivityData {
-  key: string;
-  user: string;
-  action: string;
-  target: string;
-  time: string;
-  status: "success" | "warning" | "error";
-}
 
 const AdminHomePage: React.FC = () => {
-  const [currentTime, setCurrentTime] = useState(new Date());
-  const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
-  const [selectedPeriod, setSelectedPeriod] = useState<
-    "day" | "week" | "month" | "year"
-  >("month");
-  const [isLoading, setIsLoading] = useState(false);
-  const [isSyncing, setIsSyncing] = useState(false);
-  const [statsData, setStatsData] = useState<AdminDashboardStats | null>(null);
+  const navigate = useNavigate();
 
-  // Update time every minute
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setCurrentTime(new Date());
-    }, 60000);
-    return () => clearInterval(timer);
-  }, []);
-
-  const fetchStatistics = useCallback(async () => {
-    setIsLoading(true);
-    try {
-      const stats = await adminStatisticsService.getDashboardStats({
-        period: selectedPeriod,
-        year: selectedYear,
-      });
-      setStatsData(stats);
-    } catch (error) {
-      console.error("Error fetching statistics:", error);
-      // Fallback to mock data if API fails
-      setStatsData(null);
-    } finally {
-      setIsLoading(false);
-    }
-  }, [selectedYear, selectedPeriod]);
-
-  // Fetch statistics when year or period changes
-  useEffect(() => {
-    fetchStatistics();
-  }, [fetchStatistics]);
-
-  const handleSyncStatistics = async () => {
-    setIsSyncing(true);
-    try {
-      await adminStatisticsService.syncDashboardStats({
-        period: selectedPeriod,
-        year: selectedYear,
-      });
-      // Refresh data after sync
-      await fetchStatistics();
-    } catch (error) {
-      console.error("Error syncing statistics:", error);
-    } finally {
-      setIsSyncing(false);
-    }
-  };
-
-  // Generate years for selector (current year and 4 previous years)
-  const yearOptions = Array.from({ length: 5 }, (_, i) => {
-    const year = new Date().getFullYear() - i;
-    return { value: year, label: `${year}` };
-  });
-
-  const periodOptions = [
-    { value: "day", label: "Hôm nay" },
-    { value: "week", label: "Tuần này" },
-    { value: "month", label: "Tháng này" },
-    { value: "year", label: "Năm này" },
+  // Mock data - in real app, fetch from API
+  const stats = [
+    {
+      title: "Tổng tài liệu",
+      value: 1250,
+      icon: (
+        <FileText
+          className="w-6 h-6"
+          style={{ color: "var(--primary-color)" }}
+        />
+      ),
+      color: "var(--primary-color)",
+    },
+    {
+      title: "Tài liệu chờ duyệt",
+      value: 23,
+      icon: (
+        <AlertCircle
+          className="w-6 h-6"
+          style={{ color: "var(--red-button-color)" }}
+        />
+      ),
+      color: "var(--red-button-color)",
+    },
+    {
+      title: "Người dùng",
+      value: 856,
+      icon: (
+        <Users
+          className="w-6 h-6"
+          style={{ color: "var(--green-button-color)" }}
+        />
+      ),
+      color: "var(--green-button-color)",
+    },
+    {
+      title: "Lượt tải xuống",
+      value: 5432,
+      icon: (
+        <Download
+          className="w-6 h-6"
+          style={{ color: "var(--secondary-color)" }}
+        />
+      ),
+      color: "var(--secondary-color)",
+    },
+    {
+      title: "Lượt xem",
+      value: 12890,
+      icon: <Eye className="w-6 h-6" style={{ color: "var(--third-color)" }} />,
+      color: "var(--third-color)",
+    },
+    {
+      title: "Tăng trưởng",
+      value: "+12%",
+      icon: (
+        <TrendingUp
+          className="w-6 h-6"
+          style={{ color: "var(--favorite-color)" }}
+        />
+      ),
+      color: "var(--favorite-color)",
+    },
   ];
 
-  // Convert API data to StatCard format or use mock data
-  const getStatsCards = useCallback((): StatCard[] => {
-    if (!statsData) {
-      // Mock data as fallback
-      return [
-        {
-          title: "Tổng tài liệu",
-          value: 1247,
-          icon: <FileText size={24} />,
-          color: "var(--primary-color)",
-          bgColor: "rgba(13, 153, 255, 0.1)",
-          trend: { value: 12.5, isPositive: true },
-        },
-        {
-          title: "Người dùng hoạt động",
-          value: 892,
-          icon: <Users size={24} />,
-          color: "var(--green-button-color)",
-          bgColor: "rgba(39, 167, 67, 0.1)",
-          trend: { value: 8.2, isPositive: true },
-        },
-        {
-          title: "Chờ duyệt",
-          value: 23,
-          icon: <Clock size={24} />,
-          color: "var(--intensive-color)",
-          bgColor: "rgba(255, 213, 87, 0.1)",
-          trend: { value: -5.1, isPositive: false },
-        },
-        {
-          title: "Báo cáo vi phạm",
-          value: 7,
-          icon: <AlertTriangle size={24} />,
-          color: "var(--red-button-color)",
-          bgColor: "rgba(214, 56, 71, 0.1)",
-          trend: { value: -15.3, isPositive: false },
-        },
-        {
-          title: "Lượt xem",
-          value: "2.4K",
-          icon: <Eye size={24} />,
-          color: "var(--secondary-color)",
-          bgColor: "rgba(53, 134, 219, 0.1)",
-          trend: { value: 18.7, isPositive: true },
-        },
-        {
-          title: "Download",
-          value: 156,
-          icon: <Download size={24} />,
-          color: "var(--favorite-color)",
-          bgColor: "rgba(255, 184, 0, 0.1)",
-          trend: { value: 22.1, isPositive: true },
-        },
-        {
-          title: "Tài liệu mới",
-          value: 89,
-          icon: <BookOpen size={24} />,
-          color: "var(--primary-text-color)",
-          bgColor: "rgba(23, 67, 113, 0.1)",
-          trend: { value: 14.8, isPositive: true },
-        },
-        {
-          title: "Tỷ lệ phê duyệt",
-          value: "94.2%",
-          icon: <UserCheck size={24} />,
-          color: "var(--green-button-color)",
-          bgColor: "rgba(39, 167, 67, 0.1)",
-          trend: { value: 2.3, isPositive: true },
-        },
-      ];
-    }
-
-    return [
-      {
-        title: "Tổng tài liệu",
-        value: statsData.totalDocuments,
-        icon: <FileText size={24} />,
-        color: "var(--primary-color)",
-        bgColor: "rgba(13, 153, 255, 0.1)",
-        trend: { value: 12.5, isPositive: true },
-      },
-      {
-        title: "Người dùng hoạt động",
-        value: statsData.activeUsers,
-        icon: <Users size={24} />,
-        color: "var(--green-button-color)",
-        bgColor: "rgba(39, 167, 67, 0.1)",
-        trend: { value: 8.2, isPositive: true },
-      },
-      {
-        title: "Chờ duyệt",
-        value: statsData.pendingApprovals,
-        icon: <Clock size={24} />,
-        color: "var(--intensive-color)",
-        bgColor: "rgba(255, 213, 87, 0.1)",
-        trend: { value: -5.1, isPositive: false },
-      },
-      {
-        title: "Báo cáo vi phạm",
-        value: statsData.violationReports,
-        icon: <AlertTriangle size={24} />,
-        color: "var(--red-button-color)",
-        bgColor: "rgba(214, 56, 71, 0.1)",
-        trend: { value: -15.3, isPositive: false },
-      },
-      {
-        title: "Lượt xem",
-        value: statsData.dailyViews,
-        icon: <Eye size={24} />,
-        color: "var(--secondary-color)",
-        bgColor: "rgba(53, 134, 219, 0.1)",
-        trend: { value: 18.7, isPositive: true },
-      },
-      {
-        title: "Download",
-        value: statsData.dailyDownloads,
-        icon: <Download size={24} />,
-        color: "var(--favorite-color)",
-        bgColor: "rgba(255, 184, 0, 0.1)",
-        trend: { value: 22.1, isPositive: true },
-      },
-      {
-        title: "Tài liệu mới",
-        value: statsData.weeklyNewDocuments,
-        icon: <BookOpen size={24} />,
-        color: "var(--primary-text-color)",
-        bgColor: "rgba(23, 67, 113, 0.1)",
-        trend: { value: 14.8, isPositive: true },
-      },
-      {
-        title: "Tỷ lệ phê duyệt",
-        value: `${statsData.approvalRate}%`,
-        icon: <UserCheck size={24} />,
-        color: "var(--green-button-color)",
-        bgColor: "rgba(39, 167, 67, 0.1)",
-        trend: { value: 2.3, isPositive: true },
-      },
-    ];
-  }, [statsData]);
-
-  const recentActivities: ActivityData[] = [
+  const quickActions = [
     {
-      key: "1",
-      user: "Nguyễn Văn A",
-      action: "Upload tài liệu",
-      target: "Machine Learning Guide.pdf",
-      time: "2 phút trước",
-      status: "success",
+      title: "Quản lý tài liệu",
+      path: "/admin/documents/all",
+      icon: (
+        <FileText
+          className="w-8 h-8"
+          style={{ color: "var(--primary-color)" }}
+        />
+      ),
+      description: "Xem và quản lý tất cả tài liệu",
     },
     {
-      key: "2",
-      user: "Trần Thị B",
-      action: "Báo cáo vi phạm",
-      target: "Document ID: 12345",
-      time: "5 phút trước",
-      status: "warning",
+      title: "Quản lý người dùng",
+      path: "/admin/users",
+      icon: (
+        <Users
+          className="w-8 h-8"
+          style={{ color: "var(--green-button-color)" }}
+        />
+      ),
+      description: "Quản lý tài khoản và quyền",
     },
     {
-      key: "3",
-      user: "Lê Văn C",
-      action: "Đăng ký tài khoản",
-      target: "Đại học Bách khoa",
-      time: "12 phút trước",
-      status: "success",
+      title: "Quản lý môn học",
+      path: "/admin/subjects",
+      icon: (
+        <BookOpen
+          className="w-8 h-8"
+          style={{ color: "var(--secondary-color)" }}
+        />
+      ),
+      description: "Thêm, sửa, xóa môn học",
     },
     {
-      key: "4",
-      user: "Phạm Thị D",
-      action: "Download tài liệu",
-      target: "React Tutorial.pdf",
-      time: "18 phút trước",
-      status: "success",
+      title: "Quản lý tổ chức",
+      path: "/admin/organizations",
+      icon: (
+        <Building className="w-8 h-8" style={{ color: "var(--third-color)" }} />
+      ),
+      description: "Quản lý trường học và tổ chức",
     },
     {
-      key: "5",
-      user: "Hoàng Văn E",
-      action: "Bị khóa tài khoản",
-      target: "Vi phạm quy định",
-      time: "25 phút trước",
-      status: "error",
+      title: "Thống kê",
+      path: "/admin/statistics/documents",
+      icon: (
+        <BarChart3
+          className="w-8 h-8"
+          style={{ color: "var(--favorite-color)" }}
+        />
+      ),
+      description: "Xem báo cáo và thống kê",
+    },
+    {
+      title: "Báo cáo",
+      path: "/admin/reports",
+      icon: (
+        <Flag
+          className="w-8 h-8"
+          style={{ color: "var(--red-button-color)" }}
+        />
+      ),
+      description: "Xem và xử lý báo cáo vi phạm",
     },
   ];
 
   return (
     <div
+      className="p-4 md:p-6 lg:p-8"
       style={{
         backgroundColor: "var(--secondary-background-color)",
         minHeight: "100vh",
       }}
     >
-      {/* Header Section */}
-      <AdminDashboardHeader currentTime={currentTime} />
-
-      {/* Time Period Selector and Sync Button */}
-      <div
-        style={{
-          maxWidth: "1400px",
-          margin: "0 auto",
-          padding: "24px 24px 0 24px",
-        }}
-      >
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            marginBottom: "24px",
-            backgroundColor: "var(--card-background-color)",
-            padding: "16px 24px",
-            borderRadius: "8px",
-            border: "1px solid var(--border-color)",
-          }}
-        >
-          <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
-            <span
-              style={{ fontWeight: "500", color: "var(--primary-text-color)" }}
-            >
-              Thời gian thống kê:
-            </span>
-            <Select
-              value={selectedPeriod}
-              onChange={setSelectedPeriod}
-              style={{ width: 120 }}
-              options={periodOptions}
-            />
-            <Select
-              value={selectedYear}
-              onChange={setSelectedYear}
-              style={{ width: 100 }}
-              options={yearOptions}
-            />
-          </div>
-          <Button
-            type="primary"
-            icon={<RefreshCw size={16} />}
-            loading={isSyncing}
-            onClick={handleSyncStatistics}
-            style={{ display: "flex", alignItems: "center", gap: "8px" }}
+      <div className="max-w-7xl mx-auto">
+        {/* Header */}
+        <div className="mb-6 md:mb-8">
+          <h1
+            className="text-xl sm:text-2xl md:text-3xl font-bold mb-2"
+            style={{ color: "var(--primary-text-color)" }}
           >
-            Đồng bộ dữ liệu
-          </Button>
-        </div>
-      </div>
-
-      {/* Stats Cards */}
-      {isLoading ? (
-        <div style={{ textAlign: "center", padding: "40px" }}>
-          <Spin size="large" />
-          <div
-            style={{ marginTop: "16px", color: "var(--secondary-text-color)" }}
+            Trang chủ Admin
+          </h1>
+          <p
+            className="text-sm sm:text-base md:text-lg"
+            style={{ color: "var(--secondary-text-color)" }}
           >
-            Đang tải dữ liệu thống kê...
-          </div>
+            Tổng quan hệ thống quản lý chia sẻ tài liệu
+          </p>
         </div>
-      ) : (
-        <AdminStatsGrid statsData={getStatsCards()} />
-      )}
 
-      {/* Main Content Grid */}
-      <div
-        style={{
-          maxWidth: "1400px",
-          margin: "0 auto",
-          padding: "0 24px 32px 24px",
-        }}
-      >
-        <Row gutter={[24, 24]}>
-          {/* Charts Section */}
-          <Col xs={24} lg={16}>
-            <AdminChartsSection />
-          </Col>
-
-          {/* Quick Actions */}
-          <Col xs={24} lg={8}>
-            <AdminQuickActions />
-          </Col>
+        {/* Stats Grid */}
+        <Row gutter={[16, 16]}>
+          {stats.map((stat, index) => (
+            <Col xs={24} sm={12} md={8} lg={6} key={index}>
+              <Card
+                className="shadow-sm hover:shadow-md transition-shadow duration-200"
+                style={{
+                  borderColor: "var(--border-color)",
+                  backgroundColor: "var(--primary-background-color)",
+                }}
+                bodyStyle={{ padding: "20px" }}
+              >
+                <div className="flex items-center justify-between">
+                  <div className="flex-1">
+                    <div
+                      className="text-xs sm:text-sm font-medium mb-1"
+                      style={{ color: "var(--secondary-text-color)" }}
+                    >
+                      {stat.title}
+                    </div>
+                    <div
+                      className="text-lg sm:text-xl md:text-2xl font-bold"
+                      style={{ color: stat.color }}
+                    >
+                      {stat.value}
+                    </div>
+                  </div>
+                  <div
+                    className="p-2 rounded-lg"
+                    style={{ backgroundColor: "var(--field-background-color)" }}
+                  >
+                    {stat.icon}
+                  </div>
+                </div>
+              </Card>
+            </Col>
+          ))}
         </Row>
 
-        <Divider
-          style={{ margin: "32px 0", borderColor: "var(--border-color)" }}
-        />
+        {/* Recent Activity Section */}
+        <div className="mt-8 md:mt-12">
+          <h2
+            className="text-lg sm:text-xl md:text-2xl font-bold mb-4"
+            style={{ color: "var(--primary-text-color)" }}
+          >
+            Hoạt động gần đây
+          </h2>
+          <Card
+            className="shadow-sm"
+            style={{
+              borderColor: "var(--border-color)",
+              backgroundColor: "var(--primary-background-color)",
+            }}
+          >
+            <div className="space-y-3">
+              <div className="flex items-center justify-between py-2 border-b border-gray-100 last:border-b-0">
+                <div className="flex items-center gap-3">
+                  <div
+                    className="w-2 h-2 rounded-full"
+                    style={{ backgroundColor: "var(--green-button-color)" }}
+                  ></div>
+                  <span
+                    className="text-sm sm:text-base"
+                    style={{ color: "var(--primary-text-color)" }}
+                  >
+                    Tài liệu "Toán cao cấp" đã được duyệt
+                  </span>
+                </div>
+                <span
+                  className="text-xs sm:text-sm"
+                  style={{ color: "var(--secondary-text-color)" }}
+                >
+                  2 giờ trước
+                </span>
+              </div>
+              <div className="flex items-center justify-between py-2 border-b border-gray-100 last:border-b-0">
+                <div className="flex items-center gap-3">
+                  <div
+                    className="w-2 h-2 rounded-full"
+                    style={{ backgroundColor: "var(--primary-color)" }}
+                  ></div>
+                  <span
+                    className="text-sm sm:text-base"
+                    style={{ color: "var(--primary-text-color)" }}
+                  >
+                    Người dùng mới: Nguyễn Văn A
+                  </span>
+                </div>
+                <span
+                  className="text-xs sm:text-sm"
+                  style={{ color: "var(--secondary-text-color)" }}
+                >
+                  4 giờ trước
+                </span>
+              </div>
+              <div className="flex items-center justify-between py-2 border-b border-gray-100 last:border-b-0">
+                <div className="flex items-center gap-3">
+                  <div
+                    className="w-2 h-2 rounded-full"
+                    style={{ color: "var(--red-button-color)" }}
+                  ></div>
+                  <span
+                    className="text-sm sm:text-base"
+                    style={{ color: "var(--primary-text-color)" }}
+                  >
+                    Báo cáo vi phạm từ tài liệu ID: 1234
+                  </span>
+                </div>
+                <span
+                  className="text-xs sm:text-sm"
+                  style={{ color: "var(--secondary-text-color)" }}
+                >
+                  6 giờ trước
+                </span>
+              </div>
+            </div>
+          </Card>
+        </div>
 
-        {/* Recent Activities */}
-        <AdminRecentActivities activities={recentActivities} />
+        {/* Quick Actions Section */}
+        <div className="mt-8 md:mt-12">
+          <h2
+            className="text-lg sm:text-xl md:text-2xl font-bold mb-4"
+            style={{ color: "var(--primary-text-color)" }}
+          >
+            Chuyển hướng nhanh
+          </h2>
+          <Row gutter={[16, 16]}>
+            {quickActions.map((action, index) => (
+              <Col xs={24} sm={12} md={8} lg={6} key={index}>
+                <Card
+                  className="shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer"
+                  style={{
+                    borderColor: "var(--border-color)",
+                    backgroundColor: "var(--primary-background-color)",
+                  }}
+                  bodyStyle={{ padding: "20px" }}
+                  onClick={() => navigate(action.path)}
+                >
+                  <div className="text-center">
+                    <div className="mb-3 flex justify-center">
+                      {action.icon}
+                    </div>
+                    <h3
+                      className="text-sm sm:text-base font-semibold mb-2"
+                      style={{ color: "var(--primary-text-color)" }}
+                    >
+                      {action.title}
+                    </h3>
+                    <p
+                      className="text-xs sm:text-sm"
+                      style={{ color: "var(--secondary-text-color)" }}
+                    >
+                      {action.description}
+                    </p>
+                  </div>
+                </Card>
+              </Col>
+            ))}
+          </Row>
+        </div>
       </div>
     </div>
   );

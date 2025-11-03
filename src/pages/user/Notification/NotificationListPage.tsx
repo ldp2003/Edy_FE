@@ -1,4 +1,5 @@
 import React, { useContext, useEffect, useState } from "react";
+import { Pagination } from "antd";
 import { NotificationService } from "../../../utils/NotificationService";
 import NotificationListItem from "../../../components/common/Notification/NotificationListItem";
 import { UserContext } from "../../../contexts/UserContext";
@@ -53,18 +54,21 @@ const NotificationListPage: React.FC = () => {
       ) : (
         <p>Không có thông báo nào.</p>
       )}
-      <div className="mt-4">
-        {Array.from({ length: totalPages }, (_, index) => (
-          <button
-            key={index}
-            onClick={() => handlePageChange(index + 1)}
-            className={`px-3 py-1 border ${
-              page === index + 1 ? "bg-blue-500 text-white" : "bg-white"
-            }`}
-          >
-            {index + 1}
-          </button>
-        ))}
+      <div className="mt-4 flex justify-center">
+        <Pagination
+          current={page}
+          total={totalPages * 10} // Assuming 10 items per page
+          pageSize={10}
+          onChange={handlePageChange}
+          showSizeChanger={false}
+          showQuickJumper={false}
+          showTotal={(total, range) =>
+            `Hiển thị ${range[0]}-${range[1]} của ${total} thông báo`
+          }
+          style={{
+            color: "var(--primary-text-color)",
+          }}
+        />
       </div>
     </div>
   );

@@ -32,12 +32,16 @@ interface PostTableProps {
   data: Document[];
   loading?: boolean;
   onDataChange?: (updatedData: Document[]) => void;
+  currentPage?: number;
+  pageSize?: number;
 }
 
 const PostTable: React.FC<PostTableProps> = ({
   data,
   loading,
   onDataChange,
+  currentPage = 1,
+  pageSize = 5,
 }) => {
   const navigate = useNavigate();
   const [messageApi, contextHolder] = message.useMessage();
@@ -71,18 +75,10 @@ const PostTable: React.FC<PostTableProps> = ({
     ])
   );
 
-  // Load column visibility from localStorage on mount
+  // Update updatedData when data prop changes
   useEffect(() => {
-    const saved = localStorage.getItem("postTableVisibleColumns");
-    if (saved) {
-      try {
-        const parsed = JSON.parse(saved);
-        setVisibleColumns(new Set(parsed));
-      } catch (error) {
-        console.error("Error loading column visibility:", error);
-      }
-    }
-  }, []);
+    setUpdatedData(data);
+  }, [data]);
 
   // Save column visibility to localStorage
   const saveColumnVisibility = (columns: Set<string>) => {
@@ -227,7 +223,9 @@ const PostTable: React.FC<PostTableProps> = ({
       width: 60,
       fixed: true,
       responsive: ["md"],
-      render: (_: unknown, __: Document, index: number) => index + 1,
+      render: (_: unknown, __: Document, index: number) => {
+        return (currentPage - 1) * pageSize + index + 1;
+      },
     },
     {
       title: "Tên tài liệu",
