@@ -238,7 +238,16 @@ export const OrganizationAPI = {
     }
   },
 
-  getOrganizations: async (params?: { is_dropdown?: boolean }) => {
+  getOrganizations: async (params?: {
+    is_dropdown?: boolean;
+    search?: string;
+    country?: string;
+    code?: string;
+    page?: number;
+    limit?: number;
+    sortBy?: string;
+    sortOrder?: 'asc' | 'desc';
+  }) => {
     try {
       const response = await apiClient.get("/organizations", { params });
       return response.data;

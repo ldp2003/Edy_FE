@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { message, Form, Modal } from "antd";
-import { PlusOutlined } from "@ant-design/icons";
+import { message, Form, Modal, Input } from "antd";
+import { PlusOutlined, SearchOutlined } from "@ant-design/icons";
 import { OrganizationService } from "../../../utils/OrganizationService";
 import type { OrganizationDetailed } from "../../../models/organization";
 import OrganizationTable from "../../../components/admin/organization/OrganizationTable";
@@ -19,12 +19,19 @@ const ManageOrganizationsPage: React.FC = () => {
   const [viewingOrganization, setViewingOrganization] =
     useState<OrganizationDetailed | null>(null);
   const [isViewModalVisible, setIsViewModalVisible] = useState(false);
+  const [searchText, setSearchText] = useState("");
   const [form] = Form.useForm();
 
   const loadOrganizations = useCallback(async () => {
     setLoading(true);
     try {
-      const orgs = await OrganizationService.getOrganizations();
+      const params: {
+        search?: string;
+      } = {};
+      if (searchText.trim()) {
+        params.search = searchText.trim();
+      }
+      const orgs = await OrganizationService.getOrganizations(params);
       setOrganizations(orgs);
     } catch (error) {
       console.error("Error loading organizations:", error);
@@ -32,11 +39,20 @@ const ManageOrganizationsPage: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [searchText, messageApi]);
 
   useEffect(() => {
     loadOrganizations();
   }, [loadOrganizations]);
+
+  // Debounced search effect
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      loadOrganizations();
+    }, 500); // 500ms delay
+
+    return () => clearTimeout(timer);
+  }, [searchText, loadOrganizations]);
 
   const handleAdd = () => {
     setEditingOrganization(null);
@@ -131,14 +147,27 @@ const ManageOrganizationsPage: React.FC = () => {
           Quản lý tổ chức
         </h1>
 
-        <div className="mb-4 flex justify-start">
-          <button
-            onClick={handleAdd}
-            className="inline-flex items-center px-4 py-2 text-base sm:text-sm xs:text-xs font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors duration-200"
-          >
-            <PlusOutlined className="mr-2" />
-            Thêm tổ chức
-          </button>
+        <div className="mb-4 flex flex-col sm:flex-row gap-4">
+          <div className="flex-1">
+            <Input
+              placeholder="Tìm kiếm tổ chức theo tên hoặc mã..."
+              prefix={<SearchOutlined />}
+              value={searchText}
+              onChange={(e) => setSearchText(e.target.value)}
+              onPressEnter={loadOrganizations}
+              allowClear
+              className="text-base sm:text-sm xs:text-xs"
+            />
+          </div>
+          <div className="flex justify-start">
+            <button
+              onClick={handleAdd}
+              className="inline-flex items-center px-4 py-2 text-base sm:text-sm xs:text-xs font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors duration-200"
+            >
+              <PlusOutlined className="mr-2" />
+              Thêm tổ chức
+            </button>
+          </div>
         </div>
       </div>
 

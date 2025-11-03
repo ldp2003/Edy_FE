@@ -84,7 +84,7 @@ const NotificationDropdown: React.FC<NotificationDropdownProps> = React.memo(
 
     return (
       <Dropdown
-        overlay={menu}
+        popupRender={() => menu}
         trigger={["hover", "click"]}
         placement="bottomRight"
       >
