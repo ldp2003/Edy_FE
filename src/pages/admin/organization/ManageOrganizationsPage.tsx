@@ -39,20 +39,11 @@ const ManageOrganizationsPage: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  }, [searchText, messageApi]);
+  }, [messageApi, searchText]);
 
   useEffect(() => {
     loadOrganizations();
-  }, [loadOrganizations]);
-
-  // Debounced search effect
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      loadOrganizations();
-    }, 500); // 500ms delay
-
-    return () => clearTimeout(timer);
-  }, [searchText, loadOrganizations]);
+  }, [loadOrganizations]); // Load on mount and when loadOrganizations changes
 
   const handleAdd = () => {
     setEditingOrganization(null);
@@ -142,29 +133,35 @@ const ManageOrganizationsPage: React.FC = () => {
   return (
     <div>
       {contextHolder}
-      <div className="mb-6">
-        <h1 className="text-2xl sm:text-xl xs:text-lg font-bold text-gray-900 mb-4 text-left">
+      <div className="mb-4">
+        <h1 className="text-xl sm:text-lg xs:text-base font-bold text-[var(--primary-text-color)] mb-4 text-left">
           Quản lý tổ chức
         </h1>
 
-        <div className="mb-4 flex flex-col sm:flex-row gap-4">
-          <div className="flex-1">
+        <div className="mb-3 flex flex-col sm:flex-row gap-3">
+          <div className="flex-1 flex gap-2">
             <Input
               placeholder="Tìm kiếm tổ chức theo tên hoặc mã..."
               prefix={<SearchOutlined />}
               value={searchText}
               onChange={(e) => setSearchText(e.target.value)}
-              onPressEnter={loadOrganizations}
               allowClear
-              className="text-base sm:text-sm xs:text-xs"
+              className="text-sm sm:text-sm xs:text-xs"
             />
+            <button
+              onClick={loadOrganizations}
+              className="inline-flex items-center px-3 py-1.5 text-xs sm:text-xs xs:text-xs font-medium rounded-md text-white bg-[var(--primary-color)] hover:bg-[var(--secondary-color)] focus:ring-2 focus:ring-[var(--primary-color)] focus:ring-offset-2 transition-colors duration-200"
+            >
+              <SearchOutlined className="mr-1.5" />
+              Tìm kiếm
+            </button>
           </div>
           <div className="flex justify-start">
             <button
               onClick={handleAdd}
-              className="inline-flex items-center px-4 py-2 text-base sm:text-sm xs:text-xs font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors duration-200"
+              className="inline-flex items-center px-3 py-1.5 text-xs sm:text-xs xs:text-xs font-medium rounded-md text-white bg-[var(--primary-color)] hover:bg-[var(--secondary-color)] focus:ring-2 focus:ring-[var(--primary-color)] focus:ring-offset-2 transition-colors duration-200"
             >
-              <PlusOutlined className="mr-2" />
+              <PlusOutlined className="mr-1.5" />
               Thêm tổ chức
             </button>
           </div>
