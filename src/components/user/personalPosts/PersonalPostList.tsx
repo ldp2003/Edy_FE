@@ -246,16 +246,22 @@ const PersonalPostList: React.FC = () => {
                 </div>
               )}
               onChange={(page, size) => {
-                setCurrentPage(page);
-                if (size !== pageSize) {
-                  setPageSize(size);
-                  setCurrentPage(1); // Reset to first page when changing page size
-                }
-
                 // Update URL params
                 const newSearchParams = new URLSearchParams(searchParams);
-                newSearchParams.set("page", page.toString());
-                newSearchParams.set("limit", size.toString());
+                
+                if (size !== pageSize) {
+                  // If page size changed, reset to page 1
+                  setPageSize(size);
+                  setCurrentPage(1);
+                  newSearchParams.set("page", "1");
+                  newSearchParams.set("limit", size.toString());
+                } else {
+                  // Just change page
+                  setCurrentPage(page);
+                  newSearchParams.set("page", page.toString());
+                  newSearchParams.set("limit", size.toString());
+                }
+                
                 setSearchParams(newSearchParams);
               }}
               pageSizeOptions={["5", "10", "20", "50"]}

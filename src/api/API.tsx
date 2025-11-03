@@ -319,9 +319,19 @@ export const UserAPI = {
     }
   },
 
-  getAllUsers: async () => {
+  getAllUsers: async (params?: {
+    page?: number;
+    limit?: number;
+    search?: string;
+    field_of_study?: string[];
+    status?: string[];
+    rank_point_min?: number;
+    rank_point_max?: number;
+    strike_min?: number;
+    strike_max?: number;
+  }) => {
     try {
-      const response = await apiClient.get("/users");
+      const response = await apiClient.get("/users", { params });
       return response.data;
     } catch (error) {
       console.error("Error fetching all users:", error);
