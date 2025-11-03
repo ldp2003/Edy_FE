@@ -214,6 +214,9 @@ export const AuthAPI = {
       throw error;
     }
   },
+  forgotPassword: async (email: string) => {
+    return apiClient.post("/auth/forgot-password", { email });
+  },
 };
 
 export const OrganizationAPI = {
