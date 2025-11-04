@@ -1781,13 +1781,9 @@ export const UserStatisticsAPI = {
 
 export const AdminStatisticsAPI = {
   // Get admin dashboard statistics
-  getDashboardStats: async (params?: {
-    period?: "day" | "week" | "month" | "year";
-    year?: number;
-    month?: number;
-  }) => {
+  getDashboardStats: async (params?: { force_refresh?: boolean }) => {
     try {
-      const response = await apiClient.get("/admin/statistics/dashboard", {
+      const response = await apiClient.get("/admin/statistics", {
         params,
       });
       return response.data;
@@ -1798,16 +1794,28 @@ export const AdminStatisticsAPI = {
   },
 
   // Sync admin statistics
-  syncDashboardStats: async (params?: {
-    period?: "day" | "week" | "month" | "year";
-    year?: number;
-    month?: number;
-  }) => {
+  syncDashboardStats: async () => {
     try {
-      const response = await apiClient.post("/admin/statistics/sync", params);
+      const response = await apiClient.post("/admin/statistics");
       return response.data;
     } catch (error) {
       console.error("Error syncing admin statistics:", error);
+      throw error;
+    }
+  },
+
+  // Get recent activities
+  getRecentActivities: async (params?: { limit?: number }) => {
+    try {
+      const response = await apiClient.get(
+        "/admin/statistics/recent-activities",
+        {
+          params,
+        }
+      );
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching recent activities:", error);
       throw error;
     }
   },
