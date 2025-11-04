@@ -465,7 +465,11 @@ const AdminHomePage: React.FC = () => {
         <Row gutter={[24, 24]} className="mt-8 md:mt-12">
           {/* Tasks To Do Section */}
           <Col xs={24} lg={12}>
-            <AdminTasksToDo tasks={tasks} loading={loading} onTaskClick={handleTaskClick} />
+            <AdminTasksToDo
+              tasks={tasks}
+              loading={loading}
+              onTaskClick={handleTaskClick}
+            />
           </Col>
 
           {/* Recent Activity Section */}
