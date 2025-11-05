@@ -175,6 +175,16 @@ export const UserService = {
       throw error;
     }
   },
+  async getContributions(year?: number) {
+    try {
+      const contributions = await UserAPI.getContributions(year);
+      console.log("Fetched user contributions:", contributions);
+      return contributions;
+    } catch (error) {
+      console.error("Failed to fetch user contributions:", error);
+      throw error;
+    }
+  },
 };
 
 // Legacy exports for backward compatibility
@@ -191,3 +201,4 @@ export const removeFromFavorites = UserService.removeFromFavorites;
 export const followUser = UserService.followUser;
 export const unfollowUser = UserService.unfollowUser;
 export const updateFieldOfStudy = UserService.updateFieldOfStudy;
+export const getContributions = UserService.getContributions;

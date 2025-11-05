@@ -460,6 +460,26 @@ export const UserAPI = {
   updateFieldStudy: async (field_of_study: string[]) => {
     return await apiClient.put(`/users/field-of-study`, { field_of_study });
   },
+
+  getContributions: async (year?: number) => {
+    try {
+      const params = year ? { year } : {};
+      const response = await apiClient.get("/users/contributions", { params });
+      return response.data as {
+        success: boolean;
+        year: number;
+        contributions: {
+          total_documents: number;
+          total_reactions: number;
+          total_downloads: number;
+          total_comments: number;
+        };
+      };
+    } catch (error) {
+      console.error("Error fetching user contributions:", error);
+      throw error;
+    }
+  },
 };
 
 export const SubjectAPI = {
