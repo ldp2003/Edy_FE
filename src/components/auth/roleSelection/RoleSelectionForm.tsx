@@ -48,13 +48,25 @@ const RoleSelectionForm: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 px-4">
+    <div
+      className="min-h-screen flex items-center justify-center px-4 py-8"
+      style={{
+        background:
+          "linear-gradient(135deg, var(--secondary-background-color) 0%, var(--third-background-color) 100%)",
+      }}
+    >
       <div className="max-w-4xl w-full">
         <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-gray-800 mb-4">
+          <h1
+            className="text-4xl font-bold mb-4"
+            style={{ color: "var(--primary-text-color)" }}
+          >
             Chọn chế độ sử dụng
           </h1>
-          <p className="text-lg text-gray-600">
+          <p
+            className="text-lg"
+            style={{ color: "var(--secondary-text-color)" }}
+          >
             Bạn muốn sử dụng hệ thống với vai trò nào?
           </p>
         </div>
@@ -74,14 +86,18 @@ const RoleSelectionForm: React.FC = () => {
           <button
             onClick={handleContinue}
             disabled={!selectedRole}
-            className={`
-              px-10 py-4 rounded-lg font-semibold text-white text-lg transition-all duration-200 min-w-[200px]
-              ${
-                selectedRole
-                  ? "bg-blue-500 hover:bg-blue-600 shadow-lg hover:shadow-xl transform hover:-translate-y-1 active:translate-y-0"
-                  : "bg-gray-300 cursor-not-allowed opacity-50"
-              }
-            `}
+            className="px-10 py-4 rounded-lg font-semibold text-white text-lg transition-all duration-300 min-w-[200px] transform hover:scale-105 active:scale-95"
+            style={{
+              backgroundColor: selectedRole
+                ? "var(--primary-color)"
+                : "var(--border-color)",
+              border: `2px solid ${
+                selectedRole ? "var(--primary-color)" : "var(--border-color)"
+              }`,
+              boxShadow: selectedRole
+                ? "0 4px 15px rgba(0, 0, 0, 0.2)"
+                : "none",
+            }}
           >
             {selectedRole ? "Tiếp tục" : "Chọn vai trò để tiếp tục"}
           </button>

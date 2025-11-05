@@ -23,7 +23,7 @@ const AuthLayout: React.FC = () => {
           className={`
           ${isAccountActivationPage ? "p-4 md:p-6" : ""} 
           ${isRoleSelectionPage ? "p-0" : ""}
-          max-w-screen-xl mx-auto
+          max-w-screen
         `}
         >
           <Outlet />

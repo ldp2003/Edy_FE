@@ -164,7 +164,7 @@ export function Header({ onMenuToggle }: HeaderProps) {
               />
 
               <Dropdown
-                dropdownRender={() =>
+                popupRender={() =>
                   isOnAdminPage ? <AdminDropdown /> : <UserDropdown />
                 }
                 trigger={["hover"]}
@@ -216,7 +216,7 @@ export function Header({ onMenuToggle }: HeaderProps) {
             </>
           ) : (
             <Dropdown
-              dropdownRender={() => <AvatarDropdown />}
+              popupRender={() => <AvatarDropdown />}
               trigger={["hover"]}
               placement="bottomRight"
             >

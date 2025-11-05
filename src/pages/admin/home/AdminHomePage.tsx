@@ -1,389 +1,546 @@
-import React, { useState, useEffect, useCallback } from "react";
-import { Row, Col, Divider, Select, Button, Spin } from "antd";
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import React, { useState, useEffect } from "react";
+import { Card, Row, Col, Spin, Typography } from "antd";
+
+const { Text } = Typography;
+import { useNavigate } from "react-router-dom";
+import { CheckCircleOutlined } from "@ant-design/icons";
 import {
   FileText,
   Users,
-  Clock,
-  AlertTriangle,
-  Eye,
   Download,
+  Eye,
+  AlertCircle,
   BookOpen,
-  UserCheck,
-  RefreshCw,
+  Building,
+  Flag,
+  BarChart3,
+  Ban,
 } from "lucide-react";
-import AdminDashboardHeader from "../../../components/admin/dashboard/AdminDashboardHeader";
-import AdminStatsGrid from "../../../components/admin/dashboard/AdminStatsGrid";
-import AdminChartsSection from "../../../components/admin/dashboard/AdminChartsSection";
-import AdminQuickActions from "../../../components/admin/dashboard/AdminQuickActions";
-import AdminRecentActivities from "../../../components/admin/dashboard/AdminRecentActivities";
-import { type StatCard } from "../../../components/admin/dashboard/AdminStatsCard";
-import {
-  adminStatisticsService,
-  type AdminDashboardStats,
-} from "../../../utils/AdminStatisticsService";
+import AdminStatisticsService from "../../../utils/AdminStatisticsService";
+import AdminTasksToDo from "../../../components/admin/dashboard/AdminTasksToDo";
 
-interface ActivityData {
-  key: string;
-  user: string;
-  action: string;
-  target: string;
-  time: string;
-  status: "success" | "warning" | "error";
+// API Response interfaces
+interface ApiResponse {
+  success: boolean;
+  data: {
+    statistics: {
+      total_documents: number;
+      pending_documents: number;
+      total_users: number;
+      total_downloads: number;
+      total_views: number;
+      total_organizations: number;
+      total_reports: number;
+      banned_users: number;
+      approved_documents: number;
+      active_users: number;
+      pending_reports: number;
+      total_subjects: number;
+    };
+    recent_activities: any[];
+    tasks: TaskItem[];
+  };
+  cached: boolean;
+  last_updated: string;
+}
+
+// Task interface matching API response
+interface TaskItem {
+  id: string;
+  type: string;
+  title: string;
+  description: string;
+  priority: "low" | "medium" | "high" | "urgent";
+  status: "pending" | "in_progress" | "completed";
+  createdAt: string;
+  data: {
+    requestId: string;
+    documentId: string;
+    documentTitle: string;
+    requester: {
+      _id: string;
+      first_name: string;
+      last_name: string;
+    };
+    aiChecked: boolean;
+    aiViolationLevel: string;
+  };
 }
 
 const AdminHomePage: React.FC = () => {
-  const [currentTime, setCurrentTime] = useState(new Date());
-  const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
-  const [selectedPeriod, setSelectedPeriod] = useState<
-    "day" | "week" | "month" | "year"
-  >("month");
-  const [isLoading, setIsLoading] = useState(false);
-  const [isSyncing, setIsSyncing] = useState(false);
-  const [statsData, setStatsData] = useState<AdminDashboardStats | null>(null);
+  const navigate = useNavigate();
+  const [apiData, setApiData] = useState<ApiResponse["data"] | null>(null);
+  const [loading, setLoading] = useState(true);
 
-  // Update time every minute
+  // Load dashboard data on component mount
   useEffect(() => {
-    const timer = setInterval(() => {
-      setCurrentTime(new Date());
-    }, 60000);
-    return () => clearInterval(timer);
+    const loadDashboardData = async () => {
+      try {
+        const response = await AdminStatisticsService.getDashboardStats();
+        if (response.success && response.data) {
+          setApiData(response.data as unknown as ApiResponse["data"]);
+        }
+      } catch (error) {
+        console.error("Error loading dashboard data:", error);
+        // Keep fallback data
+        setApiData({
+          statistics: {
+            total_documents: 32,
+            pending_documents: 9,
+            total_users: 8,
+            total_downloads: 35,
+            total_views: 23,
+            total_organizations: 4,
+            total_reports: 0,
+            banned_users: 0,
+            approved_documents: 23,
+            active_users: 8,
+            pending_reports: 0,
+            total_subjects: 19,
+          },
+          recent_activities: [],
+          tasks: [
+            {
+              id: "690975ed1c07d5a1f5224d57",
+              type: "approval_request",
+              title: "Duyệt tài liệu: Câu chuyện xảy ra vào năm 1925",
+              description: "Yêu cầu duyệt từ Lê Đại Phát",
+              priority: "high",
+              status: "pending",
+              createdAt: "2025-11-04T03:41:33.229Z",
+              data: {
+                requestId: "690975ed1c07d5a1f5224d57",
+                documentId: "690975ec1c07d5a1f5224d35",
+                documentTitle: "Câu chuyện xảy ra vào năm 1925",
+                requester: {
+                  _id: "68c37e4014c04e538b78c890",
+                  first_name: "Lê Đại",
+                  last_name: "Phát",
+                },
+                aiChecked: true,
+                aiViolationLevel: "MEDIUM",
+              },
+            },
+            {
+              id: "6908fd32565449aba21cc6bf",
+              type: "approval_request",
+              title: "Duyệt tài liệu: Câu chuyện xảy ra vào năm 1925",
+              description: "Yêu cầu duyệt từ Lê Đại Phát",
+              priority: "high",
+              status: "pending",
+              createdAt: "2025-11-03T19:06:26.611Z",
+              data: {
+                requestId: "6908fd32565449aba21cc6bf",
+                documentId: "6908fd32565449aba21cc6ad",
+                documentTitle: "Câu chuyện xảy ra vào năm 1925",
+                requester: {
+                  _id: "68f4897b0071159f6786f7f4",
+                  first_name: "Lê",
+                  last_name: "Đại Phát",
+                },
+                aiChecked: true,
+                aiViolationLevel: "MEDIUM",
+              },
+            },
+            {
+              id: "6908fbde32bf2254a975b00b",
+              type: "approval_request",
+              title: "Duyệt tài liệu: Câu chuyện xảy ra vào năm 1925",
+              description: "Yêu cầu duyệt từ Lê Đại Phát",
+              priority: "high",
+              status: "pending",
+              createdAt: "2025-11-03T19:00:46.611Z",
+              data: {
+                requestId: "6908fbde32bf2254a975b00b",
+                documentId: "6908fbde32bf2254a975aff9",
+                documentTitle: "Câu chuyện xảy ra vào năm 1925",
+                requester: {
+                  _id: "68f4897b0071159f6786f7f4",
+                  first_name: "Lê",
+                  last_name: "Đại Phát",
+                },
+                aiChecked: true,
+                aiViolationLevel: "MEDIUM",
+              },
+            },
+          ],
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadDashboardData();
   }, []);
 
-  const fetchStatistics = useCallback(async () => {
-    setIsLoading(true);
-    try {
-      const stats = await adminStatisticsService.getDashboardStats({
-        period: selectedPeriod,
-        year: selectedYear,
-      });
-      setStatsData(stats);
-    } catch (error) {
-      console.error("Error fetching statistics:", error);
-      // Fallback to mock data if API fails
-      setStatsData(null);
-    } finally {
-      setIsLoading(false);
-    }
-  }, [selectedYear, selectedPeriod]);
+  // Extract data from API response
+  const statsData = apiData?.statistics || {
+    total_documents: 32,
+    pending_documents: 9,
+    total_users: 8,
+    total_downloads: 35,
+    total_views: 23,
+    total_organizations: 4,
+    total_reports: 0,
+    banned_users: 0,
+    approved_documents: 23,
+    active_users: 8,
+    pending_reports: 0,
+    total_subjects: 19,
+  };
 
-  // Fetch statistics when year or period changes
-  useEffect(() => {
-    fetchStatistics();
-  }, [fetchStatistics]);
+  const tasks = apiData?.tasks || [];
 
-  const handleSyncStatistics = async () => {
-    setIsSyncing(true);
-    try {
-      await adminStatisticsService.syncDashboardStats({
-        period: selectedPeriod,
-        year: selectedYear,
-      });
-      // Refresh data after sync
-      await fetchStatistics();
-    } catch (error) {
-      console.error("Error syncing statistics:", error);
-    } finally {
-      setIsSyncing(false);
+  // Handle task click - navigate to document review page
+  const handleTaskClick = (task: TaskItem) => {
+    if (task.type === "approval_request") {
+      navigate(`/admin/documents/review/${task.data.documentId}`);
     }
   };
 
-  // Generate years for selector (current year and 4 previous years)
-  const yearOptions = Array.from({ length: 5 }, (_, i) => {
-    const year = new Date().getFullYear() - i;
-    return { value: year, label: `${year}` };
-  });
-
-  const periodOptions = [
-    { value: "day", label: "Hôm nay" },
-    { value: "week", label: "Tuần này" },
-    { value: "month", label: "Tháng này" },
-    { value: "year", label: "Năm này" },
+  const statsCards = [
+    {
+      title: "Tổng tài liệu",
+      value: statsData.total_documents,
+      icon: (
+        <FileText
+          className="w-6 h-6"
+          style={{ color: "var(--primary-color)" }}
+        />
+      ),
+      color: "var(--primary-color)",
+    },
+    {
+      title: "Tài liệu chờ duyệt",
+      value: statsData.pending_documents,
+      icon: (
+        <AlertCircle
+          className="w-6 h-6"
+          style={{ color: "var(--red-button-color)" }}
+        />
+      ),
+      color: "var(--red-button-color)",
+    },
+    {
+      title: "Tài liệu đã duyệt",
+      value: statsData.approved_documents,
+      icon: (
+        <CheckCircleOutlined
+          className="w-6 h-6"
+          style={{ color: "var(--green-button-color)" }}
+        />
+      ),
+      color: "var(--green-button-color)",
+    },
+    {
+      title: "Người dùng",
+      value: statsData.total_users,
+      icon: (
+        <Users
+          className="w-6 h-6"
+          style={{ color: "var(--green-button-color)" }}
+        />
+      ),
+      color: "var(--green-button-color)",
+    },
+    {
+      title: "Người dùng hoạt động",
+      value: statsData.active_users,
+      icon: (
+        <Users className="w-6 h-6" style={{ color: "var(--primary-color)" }} />
+      ),
+      color: "var(--primary-color)",
+    },
+    {
+      title: "Lượt tải xuống",
+      value: statsData.total_downloads,
+      icon: (
+        <Download
+          className="w-6 h-6"
+          style={{ color: "var(--secondary-color)" }}
+        />
+      ),
+      color: "var(--secondary-color)",
+    },
+    {
+      title: "Lượt xem",
+      value: statsData.total_views,
+      icon: <Eye className="w-6 h-6" style={{ color: "var(--third-color)" }} />,
+      color: "var(--third-color)",
+    },
+    {
+      title: "Số lượng tổ chức",
+      value: statsData.total_organizations,
+      icon: (
+        <Building
+          className="w-6 h-6"
+          style={{ color: "var(--favorite-color)" }}
+        />
+      ),
+      color: "var(--favorite-color)",
+    },
+    {
+      title: "Lượt báo cáo",
+      value: statsData.total_reports,
+      icon: (
+        <Flag
+          className="w-6 h-6"
+          style={{ color: "var(--red-button-color)" }}
+        />
+      ),
+      color: "var(--red-button-color)",
+    },
+    {
+      title: "Báo cáo chờ xử lý",
+      value: statsData.pending_reports,
+      icon: (
+        <AlertCircle
+          className="w-6 h-6"
+          style={{ color: "var(--red-button-color)" }}
+        />
+      ),
+      color: "var(--red-button-color)",
+    },
+    {
+      title: "Môn học",
+      value: statsData.total_subjects,
+      icon: (
+        <BookOpen
+          className="w-6 h-6"
+          style={{ color: "var(--secondary-color)" }}
+        />
+      ),
+      color: "var(--secondary-color)",
+    },
+    {
+      title: "Bị cấm",
+      value: statsData.banned_users,
+      icon: (
+        <Ban className="w-6 h-6" style={{ color: "var(--secondary-color)" }} />
+      ),
+      color: "var(--secondary-color)",
+    },
   ];
 
-  // Convert API data to StatCard format or use mock data
-  const getStatsCards = useCallback((): StatCard[] => {
-    if (!statsData) {
-      // Mock data as fallback
-      return [
-        {
-          title: "Tổng tài liệu",
-          value: 1247,
-          icon: <FileText size={24} />,
-          color: "var(--primary-color)",
-          bgColor: "rgba(13, 153, 255, 0.1)",
-          trend: { value: 12.5, isPositive: true },
-        },
-        {
-          title: "Người dùng hoạt động",
-          value: 892,
-          icon: <Users size={24} />,
-          color: "var(--green-button-color)",
-          bgColor: "rgba(39, 167, 67, 0.1)",
-          trend: { value: 8.2, isPositive: true },
-        },
-        {
-          title: "Chờ duyệt",
-          value: 23,
-          icon: <Clock size={24} />,
-          color: "var(--intensive-color)",
-          bgColor: "rgba(255, 213, 87, 0.1)",
-          trend: { value: -5.1, isPositive: false },
-        },
-        {
-          title: "Báo cáo vi phạm",
-          value: 7,
-          icon: <AlertTriangle size={24} />,
-          color: "var(--red-button-color)",
-          bgColor: "rgba(214, 56, 71, 0.1)",
-          trend: { value: -15.3, isPositive: false },
-        },
-        {
-          title: "Lượt xem",
-          value: "2.4K",
-          icon: <Eye size={24} />,
-          color: "var(--secondary-color)",
-          bgColor: "rgba(53, 134, 219, 0.1)",
-          trend: { value: 18.7, isPositive: true },
-        },
-        {
-          title: "Download",
-          value: 156,
-          icon: <Download size={24} />,
-          color: "var(--favorite-color)",
-          bgColor: "rgba(255, 184, 0, 0.1)",
-          trend: { value: 22.1, isPositive: true },
-        },
-        {
-          title: "Tài liệu mới",
-          value: 89,
-          icon: <BookOpen size={24} />,
-          color: "var(--primary-text-color)",
-          bgColor: "rgba(23, 67, 113, 0.1)",
-          trend: { value: 14.8, isPositive: true },
-        },
-        {
-          title: "Tỷ lệ phê duyệt",
-          value: "94.2%",
-          icon: <UserCheck size={24} />,
-          color: "var(--green-button-color)",
-          bgColor: "rgba(39, 167, 67, 0.1)",
-          trend: { value: 2.3, isPositive: true },
-        },
-      ];
-    }
-
-    return [
-      {
-        title: "Tổng tài liệu",
-        value: statsData.totalDocuments,
-        icon: <FileText size={24} />,
-        color: "var(--primary-color)",
-        bgColor: "rgba(13, 153, 255, 0.1)",
-        trend: { value: 12.5, isPositive: true },
-      },
-      {
-        title: "Người dùng hoạt động",
-        value: statsData.activeUsers,
-        icon: <Users size={24} />,
-        color: "var(--green-button-color)",
-        bgColor: "rgba(39, 167, 67, 0.1)",
-        trend: { value: 8.2, isPositive: true },
-      },
-      {
-        title: "Chờ duyệt",
-        value: statsData.pendingApprovals,
-        icon: <Clock size={24} />,
-        color: "var(--intensive-color)",
-        bgColor: "rgba(255, 213, 87, 0.1)",
-        trend: { value: -5.1, isPositive: false },
-      },
-      {
-        title: "Báo cáo vi phạm",
-        value: statsData.violationReports,
-        icon: <AlertTriangle size={24} />,
-        color: "var(--red-button-color)",
-        bgColor: "rgba(214, 56, 71, 0.1)",
-        trend: { value: -15.3, isPositive: false },
-      },
-      {
-        title: "Lượt xem",
-        value: statsData.dailyViews,
-        icon: <Eye size={24} />,
-        color: "var(--secondary-color)",
-        bgColor: "rgba(53, 134, 219, 0.1)",
-        trend: { value: 18.7, isPositive: true },
-      },
-      {
-        title: "Download",
-        value: statsData.dailyDownloads,
-        icon: <Download size={24} />,
-        color: "var(--favorite-color)",
-        bgColor: "rgba(255, 184, 0, 0.1)",
-        trend: { value: 22.1, isPositive: true },
-      },
-      {
-        title: "Tài liệu mới",
-        value: statsData.weeklyNewDocuments,
-        icon: <BookOpen size={24} />,
-        color: "var(--primary-text-color)",
-        bgColor: "rgba(23, 67, 113, 0.1)",
-        trend: { value: 14.8, isPositive: true },
-      },
-      {
-        title: "Tỷ lệ phê duyệt",
-        value: `${statsData.approvalRate}%`,
-        icon: <UserCheck size={24} />,
-        color: "var(--green-button-color)",
-        bgColor: "rgba(39, 167, 67, 0.1)",
-        trend: { value: 2.3, isPositive: true },
-      },
-    ];
-  }, [statsData]);
-
-  const recentActivities: ActivityData[] = [
+  const quickActions = [
     {
-      key: "1",
-      user: "Nguyễn Văn A",
-      action: "Upload tài liệu",
-      target: "Machine Learning Guide.pdf",
-      time: "2 phút trước",
-      status: "success",
+      title: "Quản lý tài liệu",
+      path: "/admin/documents/all",
+      icon: (
+        <FileText
+          className="w-6 h-6"
+          style={{ color: "var(--primary-color)" }}
+        />
+      ),
+      description: "Xem và quản lý tất cả tài liệu",
     },
     {
-      key: "2",
-      user: "Trần Thị B",
-      action: "Báo cáo vi phạm",
-      target: "Document ID: 12345",
-      time: "5 phút trước",
-      status: "warning",
+      title: "Quản lý người dùng",
+      path: "/admin/users",
+      icon: (
+        <Users
+          className="w-6 h-6"
+          style={{ color: "var(--green-button-color)" }}
+        />
+      ),
+      description: "Quản lý tài khoản và quyền",
     },
     {
-      key: "3",
-      user: "Lê Văn C",
-      action: "Đăng ký tài khoản",
-      target: "Đại học Bách khoa",
-      time: "12 phút trước",
-      status: "success",
+      title: "Quản lý môn học",
+      path: "/admin/subjects",
+      icon: (
+        <BookOpen
+          className="w-6 h-6"
+          style={{ color: "var(--secondary-color)" }}
+        />
+      ),
+      description: "Thêm, sửa, xóa môn học",
     },
     {
-      key: "4",
-      user: "Phạm Thị D",
-      action: "Download tài liệu",
-      target: "React Tutorial.pdf",
-      time: "18 phút trước",
-      status: "success",
+      title: "Quản lý tổ chức",
+      path: "/admin/organizations",
+      icon: (
+        <Building className="w-6 h-6" style={{ color: "var(--third-color)" }} />
+      ),
+      description: "Quản lý trường học và tổ chức",
     },
     {
-      key: "5",
-      user: "Hoàng Văn E",
-      action: "Bị khóa tài khoản",
-      target: "Vi phạm quy định",
-      time: "25 phút trước",
-      status: "error",
+      title: "Thống kê",
+      path: "/admin/statistics/documents",
+      icon: (
+        <BarChart3
+          className="w-6 h-6"
+          style={{ color: "var(--favorite-color)" }}
+        />
+      ),
+      description: "Xem báo cáo và thống kê",
+    },
+    {
+      title: "Báo cáo",
+      path: "/admin/reports",
+      icon: (
+        <Flag
+          className="w-6 h-6"
+          style={{ color: "var(--red-button-color)" }}
+        />
+      ),
+      description: "Xem và xử lý báo cáo vi phạm",
     },
   ];
 
   return (
     <div
+      className="p-4 md:p-6 lg:p-8"
       style={{
         backgroundColor: "var(--secondary-background-color)",
         minHeight: "100vh",
       }}
     >
-      {/* Header Section */}
-      <AdminDashboardHeader currentTime={currentTime} />
-
-      {/* Time Period Selector and Sync Button */}
-      <div
-        style={{
-          maxWidth: "1400px",
-          margin: "0 auto",
-          padding: "24px 24px 0 24px",
-        }}
-      >
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            marginBottom: "24px",
-            backgroundColor: "var(--card-background-color)",
-            padding: "16px 24px",
-            borderRadius: "8px",
-            border: "1px solid var(--border-color)",
-          }}
-        >
-          <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
-            <span
-              style={{ fontWeight: "500", color: "var(--primary-text-color)" }}
-            >
-              Thời gian thống kê:
-            </span>
-            <Select
-              value={selectedPeriod}
-              onChange={setSelectedPeriod}
-              style={{ width: 120 }}
-              options={periodOptions}
-            />
-            <Select
-              value={selectedYear}
-              onChange={setSelectedYear}
-              style={{ width: 100 }}
-              options={yearOptions}
-            />
-          </div>
-          <Button
-            type="primary"
-            icon={<RefreshCw size={16} />}
-            loading={isSyncing}
-            onClick={handleSyncStatistics}
-            style={{ display: "flex", alignItems: "center", gap: "8px" }}
+      <div className="max-w-7xl mx-auto">
+        {/* Header */}
+        <div className="mb-4 sm:mb-6 md:mb-8">
+          <h1
+            className="text-lg xs:text-xl sm:text-2xl md:text-3xl font-bold mb-2 w-fit text-left"
+            style={{ color: "var(--primary-text-color)" }}
           >
-            Đồng bộ dữ liệu
-          </Button>
-        </div>
-      </div>
-
-      {/* Stats Cards */}
-      {isLoading ? (
-        <div style={{ textAlign: "center", padding: "40px" }}>
-          <Spin size="large" />
-          <div
-            style={{ marginTop: "16px", color: "var(--secondary-text-color)" }}
+            Trang chủ Admin
+          </h1>
+          <p
+            className="text-xs xs:text-sm sm:text-base md:text-lg w-fit text-left"
+            style={{ color: "var(--secondary-text-color)" }}
           >
-            Đang tải dữ liệu thống kê...
-          </div>
+            Tổng quan hệ thống quản lý chia sẻ tài liệu
+          </p>
         </div>
-      ) : (
-        <AdminStatsGrid statsData={getStatsCards()} />
-      )}
 
-      {/* Main Content Grid */}
-      <div
-        style={{
-          maxWidth: "1400px",
-          margin: "0 auto",
-          padding: "0 24px 32px 24px",
-        }}
-      >
-        <Row gutter={[24, 24]}>
-          {/* Charts Section */}
-          <Col xs={24} lg={16}>
-            <AdminChartsSection />
+        {/* Stats Grid */}
+        <Row gutter={[16, 16]}>
+          {statsCards.map((stat, index) => (
+            <Col xs={24} sm={12} md={8} lg={6} key={index}>
+              <Card
+                className="shadow-sm hover:shadow-md transition-shadow duration-200"
+                style={{
+                  borderColor: "var(--border-color)",
+                  backgroundColor: "var(--primary-background-color)",
+                }}
+                bodyStyle={{ padding: "20px" }}
+              >
+                {loading ? (
+                  <div className="flex items-center justify-center h-16">
+                    <Spin size="small" />
+                  </div>
+                ) : (
+                  <div className="flex items-center justify-between">
+                    <div className="flex-1">
+                      <div
+                        className="text-xs xs:text-xs sm:text-sm font-medium mb-1"
+                        style={{ color: "var(--secondary-text-color)" }}
+                      >
+                        {stat.title}
+                      </div>
+                      <div
+                        className="text-base xs:text-lg sm:text-xl md:text-2xl font-bold"
+                        style={{ color: stat.color }}
+                      >
+                        {stat.value}
+                      </div>
+                    </div>
+                    <div
+                      className="p-2 rounded-lg"
+                      style={{
+                        backgroundColor: "var(--field-background-color)",
+                      }}
+                    >
+                      {stat.icon}
+                    </div>
+                  </div>
+                )}
+              </Card>
+            </Col>
+          ))}
+        </Row>
+
+        {/* Tasks To Do and Recent Activity in 2 columns */}
+        <Row gutter={[24, 24]} className="mt-8 md:mt-12">
+          {/* Tasks To Do Section */}
+          <Col xs={24} lg={12}>
+            <AdminTasksToDo
+              tasks={tasks}
+              loading={loading}
+              onTaskClick={handleTaskClick}
+            />
           </Col>
 
-          {/* Quick Actions */}
-          <Col xs={24} lg={8}>
-            <AdminQuickActions />
+          {/* Recent Activity Section */}
+          <Col xs={24} lg={12}>
+            <h2
+              className="text-base xs:text-lg sm:text-xl md:text-2xl font-bold mb-4 w-fit text-left"
+              style={{ color: "var(--primary-text-color)" }}
+            >
+              Hoạt động gần đây
+            </h2>
+            <Card
+              className="shadow-sm"
+              style={{
+                borderColor: "var(--border-color)",
+                backgroundColor: "var(--primary-background-color)",
+              }}
+            >
+              <div className="text-center py-8">
+                <Text
+                  style={{ color: "var(--secondary-text-color)" }}
+                  className="text-xs xs:text-sm"
+                >
+                  Chưa có hoạt động gần đây
+                </Text>
+              </div>
+            </Card>
           </Col>
         </Row>
 
-        <Divider
-          style={{ margin: "32px 0", borderColor: "var(--border-color)" }}
-        />
-
-        {/* Recent Activities */}
-        <AdminRecentActivities activities={recentActivities} />
+        {/* Quick Actions Section */}
+        <div className="mt-6 sm:mt-8 md:mt-12">
+          <h2
+            className="text-base xs:text-lg sm:text-xl md:text-2xl font-bold mb-4 w-fit text-left"
+            style={{ color: "var(--primary-text-color)" }}
+          >
+            Chuyển hướng nhanh
+          </h2>
+          <Row gutter={[16, 16]}>
+            {quickActions.map((action, index) => (
+              <Col xs={24} sm={12} md={8} lg={6} key={index}>
+                <Card
+                  className="shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer"
+                  style={{
+                    borderColor: "var(--border-color)",
+                    backgroundColor: "var(--primary-background-color)",
+                  }}
+                  bodyStyle={{ padding: "16px" }}
+                  onClick={() => navigate(action.path)}
+                >
+                  <div className="text-center">
+                    <div className="mb-2 flex justify-center">
+                      {action.icon}
+                    </div>
+                    <h3
+                      className="text-xs xs:text-xs sm:text-sm font-semibold mb-1"
+                      style={{ color: "var(--primary-text-color)" }}
+                    >
+                      {action.title}
+                    </h3>
+                    <p
+                      className="text-xs xs:text-xs sm:text-xs"
+                      style={{ color: "var(--secondary-text-color)" }}
+                    >
+                      {action.description}
+                    </p>
+                  </div>
+                </Card>
+              </Col>
+            ))}
+          </Row>
+        </div>
       </div>
     </div>
   );

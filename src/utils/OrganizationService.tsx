@@ -15,12 +15,19 @@ export const OrganizationService = {
 
   getOrganizations: async (params?: {
     is_dropdown?: boolean;
+    search?: string;
+    country?: string;
+    code?: string;
+    page?: number;
+    limit?: number;
+    sortBy?: string;
+    sortOrder?: "asc" | "desc";
   }): Promise<OrganizationDetailed[]> => {
     try {
       const response = await OrganizationAPI.getOrganizations(params);
-      if (response && Array.isArray(response.organizations)) {
-        console.log("Fetched organizations:", response.organizations);
-        return response.organizations;
+      if (response && response.data && Array.isArray(response.data)) {
+        console.log("Fetched organizations:", response.data);
+        return response.data;
       } else {
         console.error("Unexpected response format:", response);
         throw new Error("API did not return an array of organizations.");

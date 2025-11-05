@@ -3,11 +3,14 @@ import {
   BarChart3,
   FileText,
   Users,
-  Flag,
   ChevronDown,
   ChevronRight,
   BookOpen,
+  Shield,
+  Settings,
   Building,
+  PieChart,
+  Flag,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
@@ -21,7 +24,7 @@ interface MenuItem {
   icon: LucideIcon;
   label: string;
   path?: string;
-  children?: { label: string; path: string }[];
+  children?: { icon: LucideIcon; label: string; path: string }[];
 }
 
 export function AdminNavigationMenu({ isCompact }: AdminNavigationMenuProps) {
@@ -39,26 +42,48 @@ export function AdminNavigationMenu({ isCompact }: AdminNavigationMenuProps) {
   const menuItems: MenuItem[] = [
     { icon: Home, label: "Trang chủ", path: "/admin" },
     {
-      icon: BarChart3,
-      label: "Thống kê",
+      icon: FileText,
+      label: "Quản lý nội dung",
       children: [
-        { label: "Thống kê tài liệu", path: "/admin/statistics/documents" },
-        { label: "Thống kê người dùng", path: "/admin/statistics/users" },
+        { icon: FileText, label: "Tài liệu", path: "/admin/documents/all" },
+        { icon: BookOpen, label: "Môn học", path: "/admin/subjects" },
       ],
     },
-    { icon: FileText, label: "Tài liệu", path: "/admin/documents/all" },
     {
       icon: Users,
-      label: "Người dùng",
+      label: "Quản lý người dùng",
       children: [
-        { label: "Tất cả người dùng", path: "/admin/users" },
-        { label: "Phân quyền", path: "/admin/users/assign-roles" },
-        { label: "Quản lý quyền", path: "/admin/users/manage-roles" },
+        { icon: Users, label: "Tất cả người dùng", path: "/admin/users" },
+        {
+          icon: Shield,
+          label: "Phân quyền",
+          path: "/admin/users/assign-roles",
+        },
+        {
+          icon: Settings,
+          label: "Quản lý quyền",
+          path: "/admin/users/manage-roles",
+        },
+        { icon: Building, label: "Tổ chức", path: "/admin/organizations" },
       ],
     },
-    { icon: BookOpen, label: "Môn học", path: "/admin/subjects" },
-    { icon: Building, label: "Tổ chức", path: "/admin/organizations" },
-    { icon: Flag, label: "Báo cáo", path: "/admin/reports" },
+    {
+      icon: BarChart3,
+      label: "Giám sát",
+      children: [
+        {
+          icon: BarChart3,
+          label: "Thống kê tài liệu",
+          path: "/admin/statistics/documents",
+        },
+        {
+          icon: PieChart,
+          label: "Thống kê người dùng",
+          path: "/admin/statistics/users",
+        },
+        { icon: Flag, label: "Báo cáo", path: "/admin/reports" },
+      ],
+    },
   ];
 
   const isItemActive = (item: MenuItem): boolean => {
@@ -120,12 +145,13 @@ export function AdminNavigationMenu({ isCompact }: AdminNavigationMenuProps) {
                       <li key={childIndex}>
                         <Link
                           to={child.path}
-                          className={`block px-3 py-2 rounded-md transition-colors text-sm cursor-pointer ${
+                          className={`flex items-center gap-2 px-3 py-2 rounded-md transition-colors text-sm cursor-pointer ${
                             isChildActive(child.path)
                               ? "bg-blue-50 text-[var(--primary-color)]"
                               : "text-[var(--secondary-text-color)] hover:bg-gray-50"
                           }`}
                         >
+                          <child.icon className="w-4 h-4" />
                           {child.label}
                         </Link>
                       </li>

@@ -80,7 +80,7 @@ const PersonalPostList: React.FC = () => {
     fetchDocuments();
   }, [fetchDocuments]);
 
-  // Initialize filters from URL params
+  // Initialize filters and pagination from URL params
   useEffect(() => {
     const urlFilters: FilterSearchParams = {};
 
@@ -111,6 +111,13 @@ const PersonalPostList: React.FC = () => {
     if (Object.keys(urlFilters).length > 0) {
       setFilters(urlFilters);
     }
+
+    // Initialize pagination from URL
+    const page = searchParams.get("page");
+    if (page) setCurrentPage(parseInt(page));
+
+    const limit = searchParams.get("limit");
+    if (limit) setPageSize(parseInt(limit));
   }, [searchParams]);
 
   // Handle filter changes
@@ -150,15 +157,26 @@ const PersonalPostList: React.FC = () => {
         newSearchParams.set("createdAt", newFilters.createdAt);
       }
 
+      // Add pagination params
+      newSearchParams.set("page", "1");
+      newSearchParams.set("limit", pageSize.toString());
+
       setSearchParams(newSearchParams);
     },
-    [setSearchParams]
+    [setSearchParams, pageSize]
   );
 
   const renderContent = () => {
     switch (viewMode) {
       case "table":
-        return <PostTable data={documents} loading={loading} />;
+        return (
+          <PostTable
+            data={documents}
+            loading={loading}
+            currentPage={currentPage}
+            pageSize={pageSize}
+          />
+        );
       case "list":
         return <PostListView data={documents} loading={loading} />;
       case "grid":
@@ -213,7 +231,7 @@ const PersonalPostList: React.FC = () => {
 
         {/* Pagination */}
         {total > 0 && (
-          <div className="flex justify-center mt-4 md:mt-6 ">
+          <div className="flex justify-center mt-4 md:mt-6">
             <Pagination
               current={currentPage}
               total={total}
@@ -228,12 +246,23 @@ const PersonalPostList: React.FC = () => {
                 </div>
               )}
               onChange={(page, size) => {
-                setCurrentPage(page);
+                // Update URL params
+                const newSearchParams = new URLSearchParams(searchParams);
+                
                 if (size !== pageSize) {
+                  // If page size changed, reset to page 1
                   setPageSize(size);
-                  setCurrentPage(1); // Reset to first page when changing page size
-                  console.log("Page size changed to:", size);
+                  setCurrentPage(1);
+                  newSearchParams.set("page", "1");
+                  newSearchParams.set("limit", size.toString());
+                } else {
+                  // Just change page
+                  setCurrentPage(page);
+                  newSearchParams.set("page", page.toString());
+                  newSearchParams.set("limit", size.toString());
                 }
+                
+                setSearchParams(newSearchParams);
               }}
               pageSizeOptions={["5", "10", "20", "50"]}
             />

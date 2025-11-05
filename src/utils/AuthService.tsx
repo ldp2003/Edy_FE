@@ -79,3 +79,7 @@ export const verifyOTP = async (
 export const registerWithOTP = async (data: RegisterWithOTPRequest) => {
   return AuthAPI.registerWithOTP(data);
 };
+
+export const forgotPassword = async (email: string) => {
+  return AuthAPI.forgotPassword(email);
+};
