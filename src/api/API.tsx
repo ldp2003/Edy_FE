@@ -1522,6 +1522,7 @@ export const NotificationAPI = {
     cmtId?: string;
     type: string;
     message: string;
+    redirectTo?: string;
   }) => {
     try {
       const response = await apiClient.post("/notifications/create", data);

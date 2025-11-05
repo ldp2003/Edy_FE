@@ -25,9 +25,6 @@ export class NotificationService {
     }
   }
 
-  /**
-   * Lấy số lượng thông báo chưa đọc
-   */
   static async getUnreadCount(): Promise<UnreadCountResponse> {
     try {
       const response = await NotificationAPI.getUnreadCount();
@@ -310,6 +307,7 @@ export class NotificationService {
         userId: targetUserId,
         type: "SYSTEM",
         message,
+        redirectTo: "USER",
       });
 
       return {
@@ -352,6 +350,7 @@ export class NotificationService {
         docId: documentId,
         type: "COMMENT",
         message,
+        redirectTo: "COMMENT",
       });
 
       return {
@@ -397,6 +396,7 @@ export class NotificationService {
         cmtId: commentId,
         type: "REPLY",
         message,
+        redirectTo: "COMMENT",
       });
 
       return {
@@ -430,6 +430,7 @@ export class NotificationService {
         docId: documentId,
         type: "APPROVED",
         message,
+        redirectTo: "DOCUMENT",
       });
 
       return {
@@ -466,6 +467,7 @@ export class NotificationService {
         docId: documentId,
         type: "REJECTED",
         message,
+        redirectTo: "DOCUMENT",
       });
 
       return {
@@ -502,6 +504,7 @@ export class NotificationService {
         docId: documentId,
         type: "REMOVED",
         message,
+        redirectTo: "NONE",
       });
 
       return {
@@ -538,6 +541,7 @@ export class NotificationService {
         docId: documentId,
         type: "HIDDEN",
         message,
+        redirectTo: "DOCUMENT",
       });
 
       return {
@@ -583,6 +587,7 @@ export class NotificationService {
         docId: documentId,
         type: "SYSTEM",
         message,
+        redirectTo: "DOCUMENT",
       });
 
       return {
@@ -616,6 +621,7 @@ export class NotificationService {
         cmtId,
         type: "SYSTEM",
         message,
+        redirectTo: "NONE",
       });
 
       return {

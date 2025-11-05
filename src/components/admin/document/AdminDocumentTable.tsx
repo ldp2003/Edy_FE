@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import React, { useState, useEffect, useRef, useCallback } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { Table, Select, message, Dropdown, Checkbox } from "antd";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import type { ColumnsType } from "antd/es/table";
@@ -71,8 +71,6 @@ const AdminDocumentTable: React.FC = () => {
     ])
   );
 
-  const isInitialized = useRef(false);
-
   // Load column visibility from localStorage on mount
   useEffect(() => {
     const saved = localStorage.getItem("adminDocumentTableVisibleColumns");
@@ -111,10 +109,8 @@ const AdminDocumentTable: React.FC = () => {
     saveColumnVisibility(newVisibleColumns);
   };
 
-  // Initialize filter from URL params on mount - only once
+  // Initialize filter from URL params on mount and when URL changes
   useEffect(() => {
-    if (isInitialized.current) return;
-
     const urlParams: AdminFilterSearchParams = {};
 
     // Extract all params from URL
@@ -145,7 +141,6 @@ const AdminDocumentTable: React.FC = () => {
 
     setFilterParams(urlParams);
     setAppliedFilters(urlParams);
-    isInitialized.current = true;
   }, [searchParams]);
 
   // Fetch documents from API - only when appliedFilters, currentPage, pageSize, or sortInfo change
