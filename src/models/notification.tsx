@@ -1,11 +1,12 @@
 export interface Notification {
   _id: string;
   user: string | User;
-  doc?:  Document;
+  doc?: Document;
   cmt?: Comment;
   type: NotificationType;
   message: string;
   isRead: boolean;
+  redirectTo: RedirectToType;
   createdAt: string;
   updatedAt: string;
 }
@@ -23,6 +24,17 @@ export const NotificationType = {
 export type NotificationType =
   (typeof NotificationType)[keyof typeof NotificationType];
 
+export const RedirectToType = {
+  DOCUMENT: "DOCUMENT",
+  COMMENT: "COMMENT",
+  USER: "USER",
+  SYSTEM: "SYSTEM",
+  NONE: "NONE",
+} as const;
+
+export type RedirectToType =
+  (typeof RedirectToType)[keyof typeof RedirectToType];
+
 // Request/Response interfaces
 export interface CreateNotificationRequest {
   userId: string;
@@ -30,6 +42,7 @@ export interface CreateNotificationRequest {
   cmtId?: string;
   type: NotificationType;
   message: string;
+  redirectTo?: RedirectToType;
 }
 
 export interface GetNotificationsParams {
@@ -47,13 +60,14 @@ export interface GetNotificationsResponse {
 }
 
 export interface NotificationStats {
-  total: number;
-  unread: number;
-  read: number;
+  total_notifications: number;
+  unread_notifications: number;
+  read_notifications: number;
+  by_type: Record<string, number>;
 }
 
 export interface UnreadCountResponse {
-  count: number;
+  unread_count: number;
 }
 
 // Import related types
