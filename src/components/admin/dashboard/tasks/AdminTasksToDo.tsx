@@ -1,5 +1,5 @@
 import React from "react";
-import { Card, List, Tag, Button, Avatar, Typography } from "antd";
+import { Card, List, Tag, Button, Avatar, Typography, Empty } from "antd";
 import {
   CheckCircleOutlined,
   ClockCircleOutlined,
@@ -117,6 +117,15 @@ const AdminTasksToDo: React.FC<AdminTasksToDoProps> = ({
         <List
           loading={loading}
           dataSource={tasks}
+          locale={{
+            emptyText: (
+              <Empty
+                image={Empty.PRESENTED_IMAGE_SIMPLE}
+                description="Không có nhiệm vụ nào"
+                className="py-4"
+              />
+            ),
+          }}
           renderItem={(task) => {
             const priorityInfo = getPriorityInfo(task.priority);
             const typeInfo = getTaskTypeInfo(task.type);

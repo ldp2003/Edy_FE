@@ -36,7 +36,10 @@ const SharedItem: React.FC<SharedItemProps> = ({
           <FileText size={20} className="md:w-6 md:h-6" />
         </div>
         <div className="min-w-0 flex-1">
-          <div className="item-title font-bold text-xs md:text-sm text-gray-800 truncate">
+          <div
+            className="item-title font-bold text-xs md:text-sm text-gray-800 truncate"
+            title={title as string}
+          >
             {title}
           </div>
           <div className="flex flex-wrap text-xs md:text-sm text-gray-600 gap-1 md:gap-2">

@@ -62,7 +62,7 @@ const AdminQuickActions: React.FC<AdminQuickActionsProps> = ({
             </button>
           </div>
           {showQuickActions && (
-            <div className="grid grid-cols-6 gap-2">
+            <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-2">
               {quickActions.map((action, index) => (
                 <Card
                   key={index}
@@ -79,13 +79,13 @@ const AdminQuickActions: React.FC<AdminQuickActionsProps> = ({
                     <div className="flex-shrink-0 scale-75">{action.icon}</div>
                     <div className="flex-1 min-w-0">
                       <h3
-                        className="text-xs sm:text-sm font-semibold mb-0 leading-tight"
+                        className="text-[10px] sm:text-xs md:text-sm font-semibold mb-0 leading-tight"
                         style={{ color: "var(--primary-text-color)" }}
                       >
                         {action.title}
                       </h3>
                       <p
-                        className="text-[10px] sm:text-xs leading-tight mt-0.5 hidden xl:block"
+                        className="text-[9px] sm:text-[10px] md:text-xs leading-tight mt-0.5 hidden md:block"
                         style={{ color: "var(--secondary-text-color)" }}
                       >
                         {action.description}

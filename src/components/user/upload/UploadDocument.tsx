@@ -441,7 +441,7 @@ const UploadDocument: React.FC<UploadDocumentProps> = ({
         return "WORD";
       case "ppt":
       case "pptx":
-        return "PPT";
+        return "POWERPOINT";
       case "xls":
       case "xlsx":
         return "EXCEL";

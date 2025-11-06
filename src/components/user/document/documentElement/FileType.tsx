@@ -1,11 +1,12 @@
 import React from "react";
-import { FileText } from "lucide-react";
+import { FileText, File, Video, Presentation } from "lucide-react";
 
 type FileTypeProps = {
   fileType: string;
+  rounded?: boolean;
 };
 
-const FileType: React.FC<FileTypeProps> = ({ fileType }) => {
+const FileType: React.FC<FileTypeProps> = ({ fileType, rounded = true }) => {
   // Định nghĩa màu sắc cho từng loại file (chỉ có 5 loại trong FileType constants)
   const getFileTypeColor = (type: string) => {
     switch (type.toUpperCase()) {
@@ -24,14 +25,34 @@ const FileType: React.FC<FileTypeProps> = ({ fileType }) => {
     }
   };
 
+  // Định nghĩa icon cho từng loại file
+  const getFileTypeIcon = (type: string) => {
+    switch (type.toUpperCase()) {
+      case "PDF":
+        return <FileText size={12} />;
+      case "WORD":
+        return <FileText size={12} />;
+      case "EXCEL":
+        return <FileText size={12} />;
+      case "POWERPOINT":
+        return <Presentation size={12} />;
+      case "VIDEO":
+        return <Video size={12} />;
+      default:
+        return <File size={12} />;
+    }
+  };
+
   return (
     <div
-      className={`flex items-center justify-center ${getFileTypeColor(
+      className={`flex items-center justify-center shadow-sm ${getFileTypeColor(
         fileType
-      )} rounded-full px-4 py-[1px] text-[10px] font-bold w-fit mx-auto`}
+      )} ${
+        rounded ? "rounded-full" : "rounded-r-full"
+      } px-2 py-[1px] text-[10px] font-bold w-fit`}
     >
-      <FileText size={12} />
-      <span className="ml-2 align-middle">{fileType}</span>
+      {getFileTypeIcon(fileType)}
+      <span className="ml-1 align-middle">{fileType}</span>
     </div>
   );
 };

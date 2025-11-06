@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import DocumentCard from "../documentCard/DocumentCard";
 import type { Document } from "../../../../models/document";
 
@@ -12,6 +13,31 @@ const DocumentGrid: React.FC<DocumentGridProps> = ({
   documents,
   onViewMore,
 }) => {
+  const [displayCount, setDisplayCount] = useState(6);
+
+  useEffect(() => {
+    const updateDisplayCount = () => {
+      const width = window.innerWidth;
+      if (width >= 1536) {
+        // 2xl
+        setDisplayCount(6);
+      } else if (width >= 1024) {
+        // lg
+        setDisplayCount(5);
+      } else if (width >= 640) {
+        // sm
+        setDisplayCount(3);
+      } else {
+        // mobile
+        setDisplayCount(2);
+      }
+    };
+
+    updateDisplayCount();
+    window.addEventListener("resize", updateDisplayCount);
+    return () => window.removeEventListener("resize", updateDisplayCount);
+  }, []);
+
   return (
     <section className="mb-4 bg-white p-4 rounded-lg border border-[var(--border-color)]">
       <div className="flex justify-between items-center mb-4">
@@ -27,10 +53,10 @@ const DocumentGrid: React.FC<DocumentGridProps> = ({
           </button>
         )}
       </div>
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-2 md:gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 2xl:grid-cols-6 gap-2 md:gap-4">
         {documents
           .filter((doc): doc is Document => doc !== null && doc !== undefined)
-          .slice(0, 5)
+          .slice(0, displayCount)
           .map((doc) => (
             <DocumentCard key={doc._id} document={doc} />
           ))}
