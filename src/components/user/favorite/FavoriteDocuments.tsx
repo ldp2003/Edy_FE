@@ -70,7 +70,7 @@ const FavoriteDocuments: React.FC = () => {
       {viewMode === "grid" ? (
         <Row gutter={[12, 12]} className="mt-4 sm:mt-6">
           {favoriteDocuments.map((document) => (
-            <Col key={document._id} xs={12} sm={8} md={6} lg={6} xl={4} xxl={3}>
+            <Col key={document._id}>
               <DocumentCard document={document} />
             </Col>
           ))}
