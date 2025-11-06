@@ -1,5 +1,6 @@
 import React from "react";
 import LikeCount from "../documentElement/LikeCount";
+import FileType from "../documentElement/FileType";
 import type { Document } from "../../../../models/document";
 
 type SuggestCardProps = {
@@ -33,6 +34,12 @@ const SuggestCard: React.FC<SuggestCardProps> = ({ document }) => {
         {document.intensive && (
           <div className="absolute top-0 left-0 px-1.5 py-0.5 text-[8px] font-bold rounded-br-lg bg-white/95 text-[var(--intensive-color)] border-r border-b border-[var(--intensive-color)]">
             CS
+          </div>
+        )}
+        {/* File Type Badge */}
+        {document.file_type && (
+          <div className="absolute bottom-0 left-0">
+            <FileType fileType={document.file_type} rounded={false} />
           </div>
         )}
       </div>

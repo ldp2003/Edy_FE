@@ -9,6 +9,7 @@ import { message } from "antd";
 import ViewCount from "../documentElement/ViewCount";
 import PageCount from "../documentElement/PageCount";
 import IntensiveMark from "../documentElement/IntensiveMark";
+import FileType from "../documentElement/FileType";
 
 interface DocumentListItemProps {
   document: Document;
@@ -81,6 +82,11 @@ const DocumentListItem: React.FC<DocumentListItemProps> = ({
             {document.page && (
               <span>
                 <PageCount pages={document.page} />
+              </span>
+            )}
+            {document.file_type && (
+              <span>
+                <FileType fileType={document.file_type} />
               </span>
             )}
           </div>

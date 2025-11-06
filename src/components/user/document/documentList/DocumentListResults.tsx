@@ -115,9 +115,11 @@ const DocumentListResults: React.FC<DocumentListResultsProps> = ({
           {/* Grid View */}
           {viewMode === "grid" && (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 2xl:grid-cols-5 gap-4 justify-items-center">
-              {documents.map((document) => (
-                <DocumentCard key={document._id} document={document} />
-              ))}
+              {documents
+                .filter((doc) => doc && doc._id)
+                .map((document) => (
+                  <DocumentCard key={document._id} document={document} />
+                ))}
             </div>
           )}
 
@@ -125,31 +127,34 @@ const DocumentListResults: React.FC<DocumentListResultsProps> = ({
           {viewMode === "list" && (
             <Card>
               <div className="">
-                {documents.map((document) => (
-                  <div
-                    key={document._id}
-                    className="cursor-pointer hover:bg-gray-50 rounded"
-                    onClick={() =>
-                      (window.location.href = `/document-detail/${document._id}`)
-                    }
-                  >
-                    <RecentItem
-                      title={document.title}
-                      views={document.view}
-                      rating={
-                        calculateDocumentRating(
-                          document.like || 0,
-                          document.dislike || 0
-                        ).ratingPercentage
+                {documents
+                  .filter((doc) => doc && doc._id)
+                  .map((document) => (
+                    <div
+                      key={document._id}
+                      className="cursor-pointer hover:bg-gray-50 rounded"
+                      onClick={() =>
+                        (window.location.href = `/document-detail/${document._id}`)
                       }
-                      pages={document.page || 0}
-                      date={new Date(document.createdAt).toLocaleDateString(
-                        "vi-VN"
-                      )}
-                      intensive={document.intensive}
-                    />
-                  </div>
-                ))}
+                    >
+                      <RecentItem
+                        title={document.title}
+                        views={document.view}
+                        rating={
+                          calculateDocumentRating(
+                            document.like || 0,
+                            document.dislike || 0
+                          ).ratingPercentage
+                        }
+                        pages={document.page || 0}
+                        date={new Date(document.createdAt).toLocaleDateString(
+                          "vi-VN"
+                        )}
+                        intensive={document.intensive}
+                        fileType={document.file_type}
+                      />
+                    </div>
+                  ))}
               </div>
             </Card>
           )}

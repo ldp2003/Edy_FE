@@ -5,6 +5,7 @@ import { UserContext } from "../../../../contexts/UserContext";
 import type { Document } from "../../../../models/document";
 import { UserService } from "../../../../utils/UserService";
 import { message } from "antd";
+import FileType from "../documentElement/FileType";
 
 interface DocumentCardProps {
   document: Document;
@@ -78,6 +79,12 @@ const DocumentCard: React.FC<DocumentCardProps> = ({
         {document.intensive && (
           <div className="absolute top-0 left-0 px-2 py-0.5 text-[9px] font-bold rounded-br-lg bg-white/95 text-[var(--intensive-color)] border-r border-b border-[var(--intensive-color)]">
             Chuyên sâu
+          </div>
+        )}
+        {/* File Type Badge */}
+        {document.file_type && (
+          <div className="absolute bottom-0 left-0">
+            <FileType fileType={document.file_type} rounded={false} />
           </div>
         )}
         <button
