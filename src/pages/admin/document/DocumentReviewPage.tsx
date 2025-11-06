@@ -1,11 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useState, useEffect } from "react";
-import {
-  useParams,
-  useNavigate,
-  useSearchParams,
-  useLocation,
-} from "react-router-dom";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { message, Spin, Alert } from "antd";
 import DocumentReview from "../../../components/admin/document/DocumentReview";
 import { DocumentService } from "../../../utils/DocumentService";
@@ -16,8 +11,6 @@ const DocumentReviewPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const location = useLocation();
-  const [searchParams] = useSearchParams();
-  const requestId = searchParams.get("requestId");
   const [document, setDocument] = useState<Document | null>(null);
   const [loading, setLoading] = useState(true);
   const [isEdit, setIsEdit] = useState(false);
@@ -55,13 +48,16 @@ const DocumentReviewPage: React.FC = () => {
             setEditData(editDocData);
 
             // Fetch edit approval data
-            const editApproval = await DocumentService.getEditApprovalByDocumentId(id);
+            const editApproval =
+              await DocumentService.getEditApprovalByDocumentId(id);
             setEditApprovalData(editApproval);
           } catch (editError: any) {
             console.error("Error fetching edit data:", editError);
             // Don't show error if it's just that there's no edit data yet
             if (editError.response?.status !== 404) {
-              message.warning("Không thể tải thông tin chỉnh sửa. Tiếp tục với tài liệu gốc.");
+              message.warning(
+                "Không thể tải thông tin chỉnh sửa. Tiếp tục với tài liệu gốc."
+              );
             }
           }
         } else {
@@ -80,87 +76,6 @@ const DocumentReviewPage: React.FC = () => {
 
     fetchDocument();
   }, [id, navigate]);
-
-  const handleApprove = async (approvalData: {
-    documentRequestId: string;
-    isIntensive: boolean;
-  }) => {
-    try {
-      // If this is an edit request, use edit approval API
-      if (isEdit && editApprovalData) {
-        await DocumentService.handleEditApproval(
-          editApprovalData._id || approvalData.documentRequestId,
-          {
-            action: 'APPROVE',
-          }
-        );
-      } else {
-        // This is a new upload request, use regular approval API
-        await DocumentService.approveDocumentByRequestId(
-          approvalData.documentRequestId,
-          {
-            isIntensive: approvalData.isIntensive,
-          }
-        );
-      }
-
-      message.success("Xử lý thành công!");
-      // Navigate back to documents list
-      setTimeout(() => {
-        navigate("/admin/documents/all");
-      }, 1500);
-    } catch (error) {
-      console.error("Error handling approval:", error);
-      message.error("Có lỗi xảy ra khi xử lý!");
-      throw error;
-    }
-  };
-
-  const handleReject = async (reason: string, reqId?: string) => {
-    const targetRequestId = reqId || requestId;
-    if (!targetRequestId && !editApprovalData) {
-      message.error("Không có thông tin yêu cầu duyệt!");
-      return;
-    }
-
-    try {
-      // If this is an edit request, use edit approval API
-      if (isEdit && editApprovalData) {
-        await DocumentService.handleEditApproval(
-          editApprovalData._id || targetRequestId!,
-          {
-            action: 'REJECT',
-            message: reason,
-          }
-        );
-      } else {
-        // This is a new upload request, use regular rejection API
-        await DocumentService.rejectDocumentByRequestId(targetRequestId!, reason);
-      }
-      message.success("Đã từ chối tài liệu!");
-      setTimeout(() => {
-        navigate("/admin/documents/all");
-      }, 1500);
-    } catch (error) {
-      console.error("Error rejecting document:", error);
-      message.error("Có lỗi xảy ra khi từ chối tài liệu!");
-      throw error;
-    }
-  };
-
-  const handleDelete = async (reason: string) => {
-    try {
-      await DocumentService.deleteDocument(id!, reason);
-      // Message will be shown by child component, delay navigation
-      setTimeout(() => {
-        navigate("/admin/documents/all");
-      }, 2000);
-    } catch (error) {
-      console.error("Error deleting document:", error);
-      message.error("Có lỗi xảy ra khi xóa tài liệu!");
-      throw error;
-    }
-  };
 
   if (loading) {
     return (
@@ -193,7 +108,7 @@ const DocumentReviewPage: React.FC = () => {
   return (
     <div className="w-full text-left mx-auto px-4 sm:px-6 lg:px-8">
       <AdminBreadcrumb items={breadcrumbItems} />
-      
+
       {/* Show duplicate document alert if came from compare page */}
       {duplicateDocument && (
         <Alert
@@ -221,9 +136,6 @@ const DocumentReviewPage: React.FC = () => {
 
       <DocumentReview
         document={document}
-        onApprove={handleApprove}
-        onReject={handleReject}
-        onDelete={handleDelete}
         isEdit={isEdit}
         editData={editData}
         editApprovalData={editApprovalData}

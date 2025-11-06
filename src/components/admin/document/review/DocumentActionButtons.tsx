@@ -10,28 +10,19 @@ const { TextArea } = Input;
 interface DocumentActionButtonsProps {
   documentRequest: PendingRequest | null;
   isIntensive: boolean;
-  processing: boolean;
   documentId: string;
-  documentStatus?: string; // Thêm status của document
-  documentType?: string; // Thêm loại tài liệu
-  onApprove: (approvalData: {
-    documentRequestId: string;
-    isIntensive: boolean;
-  }) => void;
-  onReject: (reason: string, requestId: string) => void;
-  onDelete: (reason: string) => void;
+  documentStatus?: string;
+  documentType?: string;
+  onSuccess?: () => void; // Callback sau khi thực hiện thành công
 }
 
 const DocumentActionButtons: React.FC<DocumentActionButtonsProps> = ({
   documentRequest,
   isIntensive,
-  processing,
   documentId,
   documentStatus,
   documentType,
-  onApprove,
-  onReject,
-  onDelete,
+  onSuccess,
 }) => {
   const navigate = useNavigate();
   const [messageApi, contextHolder] = message.useMessage();
@@ -42,6 +33,7 @@ const DocumentActionButtons: React.FC<DocumentActionButtonsProps> = ({
   const [deleteReason, setDeleteReason] = useState("");
   const [editRequestReason, setEditRequestReason] = useState("");
   const [documentTitle, setDocumentTitle] = useState<string>("");
+  const [processing, setProcessing] = useState(false);
 
   // Fetch document title when component mounts
   useEffect(() => {
@@ -81,12 +73,14 @@ const DocumentActionButtons: React.FC<DocumentActionButtonsProps> = ({
     }
 
     try {
-      const approvalData = {
-        documentRequestId: documentRequest._id,
-        isIntensive,
-      };
+      setProcessing(true);
 
-      await onApprove(approvalData);
+      // Gọi API duyệt tài liệu trực tiếp
+      await DocumentService.approveDocumentByRequestId(
+        documentRequest._id,
+        isIntensive ? { isIntensive: true } : undefined
+      );
+
       messageApi.success("Tài liệu đã được duyệt thành công!");
 
       // Send notification to the document owner
@@ -97,11 +91,23 @@ const DocumentActionButtons: React.FC<DocumentActionButtonsProps> = ({
           documentTitle
         );
       }
+
+      // Gọi callback nếu có
+      if (onSuccess) {
+        onSuccess();
+      }
+
+      // Reload page after 1.5s
+      setTimeout(() => {
+        window.location.reload();
+      }, 1500);
     } catch (error) {
       console.error("Approve error:", error);
       messageApi.error("Có lỗi xảy ra khi duyệt tài liệu!");
+    } finally {
+      setProcessing(false);
     }
-  }, [documentRequest, isIntensive, onApprove, messageApi, documentTitle]);
+  }, [documentRequest, isIntensive, messageApi, documentTitle, onSuccess]);
 
   const handleReject = async () => {
     if (!documentRequest) {
@@ -115,7 +121,14 @@ const DocumentActionButtons: React.FC<DocumentActionButtonsProps> = ({
     }
 
     try {
-      await onReject(rejectReason, documentRequest._id);
+      setProcessing(true);
+
+      // Gọi API từ chối tài liệu trực tiếp
+      await DocumentService.rejectDocumentByRequestId(
+        documentRequest._id,
+        rejectReason
+      );
+
       messageApi.success("Tài liệu đã được từ chối!");
       setRejectModalVisible(false);
       setRejectReason("");
@@ -129,9 +142,21 @@ const DocumentActionButtons: React.FC<DocumentActionButtonsProps> = ({
           rejectReason
         );
       }
+
+      // Gọi callback nếu có
+      if (onSuccess) {
+        onSuccess();
+      }
+
+      // Reload page after 1.5s
+      setTimeout(() => {
+        window.location.reload();
+      }, 1500);
     } catch (error) {
       console.error("Reject error:", error);
       messageApi.error("Có lỗi xảy ra khi từ chối tài liệu!");
+    } finally {
+      setProcessing(false);
     }
   };
 
@@ -142,7 +167,11 @@ const DocumentActionButtons: React.FC<DocumentActionButtonsProps> = ({
     }
 
     try {
-      await onDelete(deleteReason);
+      setProcessing(true);
+
+      // Gọi API xóa tài liệu trực tiếp
+      await DocumentService.deleteDocument(documentId, deleteReason);
+
       messageApi.success("Tài liệu đã được xóa!");
       setDeleteModalVisible(false);
       setDeleteReason("");
@@ -156,9 +185,21 @@ const DocumentActionButtons: React.FC<DocumentActionButtonsProps> = ({
           deleteReason
         );
       }
+
+      // Gọi callback nếu có
+      if (onSuccess) {
+        onSuccess();
+      }
+
+      // Reload page after 1.5s
+      setTimeout(() => {
+        window.location.reload();
+      }, 1500);
     } catch (error) {
       console.error("Delete error:", error);
       messageApi.error("Có lỗi xảy ra khi xóa tài liệu!");
+    } finally {
+      setProcessing(false);
     }
   };
 
@@ -169,22 +210,39 @@ const DocumentActionButtons: React.FC<DocumentActionButtonsProps> = ({
     }
 
     try {
-      await onDelete(editRequestReason);
+      setProcessing(true);
+
+      // Gọi API yêu cầu chỉnh sửa trực tiếp
+      await DocumentService.requestEditDocument(documentId, editRequestReason);
+
       messageApi.success("Đã gửi yêu cầu chỉnh sửa!");
       setEditRequestModalVisible(false);
       setEditRequestReason("");
 
       // Send notification to the document owner
       if (documentRequest?.requester && documentTitle) {
-        await NotificationService.createSystemNotification(
+        await NotificationService.createDocumentHiddenNotification(
           documentRequest.requester,
-          `Quản trị viên yêu cầu chỉnh sửa tài liệu "${documentTitle}". Lý do: ${editRequestReason}`,
-          documentRequest.doc
+          documentRequest.doc,
+          documentTitle,
+          editRequestReason
         );
       }
+
+      // Gọi callback nếu có
+      if (onSuccess) {
+        onSuccess();
+      }
+
+      // Refresh page sau 1.5s để cập nhật trạng thái
+      setTimeout(() => {
+        window.location.reload();
+      }, 1500);
     } catch (error) {
       console.error("Edit request error:", error);
       messageApi.error("Có lỗi xảy ra khi gửi yêu cầu chỉnh sửa!");
+    } finally {
+      setProcessing(false);
     }
   };
 
