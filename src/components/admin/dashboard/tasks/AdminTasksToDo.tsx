@@ -101,18 +101,18 @@ const AdminTasksToDo: React.FC<AdminTasksToDoProps> = ({
   return (
     <div>
       <h2
-        className="text-base xs:text-lg sm:text-xl md:text-2xl font-bold mb-4 w-fit text-left"
+        className="text-base font-bold mb-3 w-fit text-left"
         style={{ color: "var(--primary-text-color)" }}
       >
         Nhiệm vụ cần làm
       </h2>
       <Card
-        className="shadow-sm"
+        className="shadow-md"
         style={{
           borderColor: "var(--border-color)",
           backgroundColor: "var(--primary-background-color)",
         }}
-        bodyStyle={{ padding: "12px" }}
+        bodyStyle={{ padding: "8px" }}
       >
         <List
           loading={loading}
@@ -125,14 +125,14 @@ const AdminTasksToDo: React.FC<AdminTasksToDoProps> = ({
               <List.Item
                 className="cursor-pointer hover:bg-gray-50 transition-colors"
                 style={{
-                  padding: "12px 0",
+                  padding: "8px 0",
                   borderBottom: "1px solid var(--border-color)",
                 }}
                 onClick={() => onTaskClick?.(task)}
                 actions={[
                   <Button
                     size="small"
-                    className="w-full sm:w-auto"
+                    className="w-full sm:w-auto text-xs"
                     onClick={(e) => {
                       e.stopPropagation();
                       onTaskClick?.(task);
@@ -145,7 +145,7 @@ const AdminTasksToDo: React.FC<AdminTasksToDoProps> = ({
                 <List.Item.Meta
                   avatar={
                     <Avatar
-                      size={{ xs: 32, sm: 40 }}
+                      size={{ xs: 28, sm: 32 }}
                       icon={typeInfo.icon}
                       style={{
                         backgroundColor: `var(--${
@@ -165,7 +165,7 @@ const AdminTasksToDo: React.FC<AdminTasksToDoProps> = ({
                     >
                       <Text
                         strong
-                        className="text-xs xs:text-sm sm:text-base"
+                        className="text-xs sm:text-sm"
                         style={{ color: "var(--primary-text-color)" }}
                       >
                         {task.title}
@@ -173,7 +173,7 @@ const AdminTasksToDo: React.FC<AdminTasksToDoProps> = ({
                       <Tag
                         color={priorityInfo.color}
                         icon={priorityInfo.icon}
-                        className="self-start sm:self-auto text-xs"
+                        className="self-start sm:self-auto text-[10px]"
                       >
                         {priorityInfo.text}
                       </Tag>
@@ -183,7 +183,7 @@ const AdminTasksToDo: React.FC<AdminTasksToDoProps> = ({
                     <div style={{ textAlign: "left" }}>
                       <Text
                         style={{ color: "var(--secondary-text-color)" }}
-                        className="block mb-1 text-xs xs:text-xs sm:text-sm"
+                        className="block mb-0.5 text-[10px] sm:text-xs"
                       >
                         {task.description}
                         {task.data.aiChecked && (
@@ -194,13 +194,14 @@ const AdminTasksToDo: React.FC<AdminTasksToDoProps> = ({
                                   ? "orange"
                                   : "red"
                               }
+                              className="text-[9px]"
                             >
                               AI: {task.data.aiViolationLevel}
                             </Tag>
                           </span>
                         )}
                       </Text>
-                      <Text type="secondary" className="text-xs xs:text-xs">
+                      <Text type="secondary" className="text-[9px]">
                         {new Date(task.createdAt).toLocaleString("vi-VN")}
                       </Text>
                     </div>
@@ -210,16 +211,6 @@ const AdminTasksToDo: React.FC<AdminTasksToDoProps> = ({
             );
           }}
         />
-        {tasks.length === 0 && !loading && (
-          <div className="text-center py-8">
-            <Text
-              style={{ color: "var(--secondary-text-color)" }}
-              className="text-xs xs:text-sm"
-            >
-              Không có nhiệm vụ nào cần làm
-            </Text>
-          </div>
-        )}
       </Card>
     </div>
   );

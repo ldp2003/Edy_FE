@@ -60,12 +60,6 @@ const convertUserToUserInfo = (user: User): UserInfo => {
 
 interface DocumentReviewProps {
   document: Document;
-  onApprove: (approvalData: {
-    documentRequestId: string;
-    isIntensive: boolean;
-  }) => void;
-  onReject: (reason: string, requestId?: string) => void;
-  onDelete: (reason: string) => void;
   isEdit?: boolean;
   editData?: any;
   editApprovalData?: any;
@@ -73,9 +67,6 @@ interface DocumentReviewProps {
 
 const DocumentReview: React.FC<DocumentReviewProps> = ({
   document,
-  onApprove,
-  onReject,
-  onDelete,
   isEdit = false,
   editData, // TODO: Use this to show edit changes in UI
   editApprovalData,
@@ -85,7 +76,6 @@ const DocumentReview: React.FC<DocumentReviewProps> = ({
   const [authors, setAuthors] = useState<string[]>([]);
   const [documentViewModalVisible, setDocumentViewModalVisible] =
     useState(false);
-  const [processing] = useState(false);
   const [isIntensive, setIsIntensive] = useState(false);
 
   // New states for handling requests
@@ -280,13 +270,12 @@ const DocumentReview: React.FC<DocumentReviewProps> = ({
             <DocumentActionButtons
               documentRequest={documentRequest}
               isIntensive={isIntensive}
-              processing={processing}
               documentId={document._id}
               documentStatus={document.status}
               documentType={document.file_type}
-              onApprove={onApprove}
-              onReject={onReject}
-              onDelete={onDelete}
+              onSuccess={() => {
+                messageApi.success("Thao tác thành công!");
+              }}
             />
           </div>
         </Form>
