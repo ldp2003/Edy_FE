@@ -27,7 +27,7 @@ export default function HomePage() {
         // Fetch newest documents (for "Tài liệu mới nhất")
         const newestResponse = await DocumentService.fetchNewestDocuments({
           order: -1,
-          limit: 5,
+          limit: 6,
         });
         setNewestDocuments(newestResponse.documents || []);
 
@@ -35,7 +35,7 @@ export default function HomePage() {
         const featuredResponse = await DocumentService.fetchNewestDocuments({
           ordering: "view",
           order: -1,
-          limit: 5,
+          limit: 6,
         });
         setFeaturedDocuments(featuredResponse.documents || []);
 
@@ -43,7 +43,7 @@ export default function HomePage() {
         const relatedResponse = await DocumentService.fetchNewestDocuments({
           ordering: "download_count",
           order: -1,
-          limit: 5,
+          limit: 6,
         });
         setRelatedDocuments(relatedResponse.documents || []);
 

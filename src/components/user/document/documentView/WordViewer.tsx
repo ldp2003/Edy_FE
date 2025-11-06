@@ -71,7 +71,7 @@ const WordViewer: React.FC<WordViewerProps> = ({
   }, [url, onPageChange, isUser]);
 
   return (
-    <div className="w-full max-w-full md:max-w-4xl lg:max-w-5xl xl:max-w-6xl z-0 min-h-[200px]">
+    <div className="w-full max-w-full md:max-w-4xl lg:max-w-5xl xl:max-w-6xl z-0 min-h-[200px] mx-auto word-viewer-wrapper">
       {loading && (
         <div className="flex items-center justify-center py-8 px-4">
           <div className="text-gray-600 text-sm sm:text-base text-center">

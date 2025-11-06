@@ -2,7 +2,8 @@ import React, { useState } from "react";
 
 import WordViewer from "./WordViewer";
 import PDFViewer from "./PDFViewer";
-import ExcelTable from "./ExcelTable";
+import ExcelViewer from "./ExcelViewer";
+import PowerPointViewer from "./PowerPointViewer";
 import DocumentPagination from "./DocumentPagination";
 
 interface DocumentViewerProps {
@@ -27,6 +28,14 @@ const VideoViewer: React.FC<{ url: string; isUser?: boolean }> = ({
   isUser = false,
 }) => {
   const [paused, setPaused] = useState(false);
+  const [previewLimit, setPreviewLimit] = useState<number>(0);
+
+  const handleLoadedMetadata = (e: React.SyntheticEvent<HTMLVideoElement>) => {
+    const video = e.currentTarget;
+    // Set preview limit to 10% of total duration
+    const limit = video.duration * 0.1;
+    setPreviewLimit(limit);
+  };
 
   return (
     <div className="relative w-full">
@@ -36,11 +45,16 @@ const VideoViewer: React.FC<{ url: string; isUser?: boolean }> = ({
         controlsList="nodownload"
         className="w-full max-h-[80vh] bg-black"
         onContextMenu={(e) => e.preventDefault()}
+        onLoadedMetadata={handleLoadedMetadata}
         onTimeUpdate={(e) => {
           const video = e.currentTarget;
-          if (!isUser && video.currentTime >= 60) {
+          if (
+            !isUser &&
+            previewLimit > 0 &&
+            video.currentTime >= previewLimit
+          ) {
             video.pause();
-            video.currentTime = 60;
+            video.currentTime = previewLimit;
             setPaused(true);
           }
         }}
@@ -51,7 +65,7 @@ const VideoViewer: React.FC<{ url: string; isUser?: boolean }> = ({
         <div className="absolute top-0 left-0 w-full h-full bg-black/70 flex flex-col items-center justify-center text-white z-10 px-4">
           <div className="text-center">
             <p className="text-base sm:text-lg font-semibold mb-2">
-              Bạn chỉ được xem trước 1 phút đầu.
+              Bạn chỉ được xem trước 10% thời lượng video.
             </p>
             <p className="text-sm sm:text-base">
               Vui lòng tải xuống để xem toàn bộ video.
@@ -102,15 +116,10 @@ const DocumentViewer: React.FC<DocumentViewerProps> = ({
       );
     }
     if (type === "ppt") {
-      return (
-        <div className="text-center py-10 px-4 text-sm sm:text-base text-gray-600">
-          Chưa hỗ trợ xem trực tiếp PowerPoint. Vui lòng chuyển sang PDF hoặc
-          Excel.
-        </div>
-      );
+      return <PowerPointViewer url={url} zoom={zoom} />;
     }
     if (type === "excel") {
-      return <ExcelTable url={url} zoom={zoom} isUser={isUser} />;
+      return <ExcelViewer url={url} zoom={zoom} />;
     }
     if (type === "video") {
       return <VideoViewer url={url} isUser={isUser} />;
@@ -122,11 +131,10 @@ const DocumentViewer: React.FC<DocumentViewerProps> = ({
     );
   };
 
-  const shouldShowPagination =
-    type === "pdf" || type === "word" || type === "ppt" || type === "excel";
+  const shouldShowPagination = type === "pdf" || type === "word";
 
   return (
-    <div className="w-full relative overflow-hidden">
+    <div className="w-full relative overflow-hidden document-viewer-container">
       {renderViewer()}
       {shouldShowPagination && totalPages && totalPages > 0 && (
         <div className="fixed bottom-0 left-140 right-0 flex justify-center pb-4  z-10">

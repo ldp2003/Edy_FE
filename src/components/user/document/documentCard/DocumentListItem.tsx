@@ -66,7 +66,10 @@ const DocumentListItem: React.FC<DocumentListItemProps> = ({
           <FileText size={20} className="w-4 h-4 sm:w-5 sm:h-5" />
         </div>
         <div className="flex-1 min-w-0">
-          <div className="item-title font-bold text-sm sm:text-base text-gray-800 break-words mb-1 sm:mb-2">
+          <div
+            className="item-title font-bold text-sm sm:text-base text-gray-800 break-words mb-1 sm:mb-2"
+            title={document.title}
+          >
             {document.title}
           </div>
           <div className="flex flex-wrap gap-2 sm:gap-4 text-xs sm:text-sm text-gray-600 mb-1 sm:mb-2">
@@ -83,13 +86,19 @@ const DocumentListItem: React.FC<DocumentListItemProps> = ({
           </div>
           <div className="flex flex-wrap gap-2 sm:gap-3 text-xs text-gray-500">
             {document.subject && (
-              <div className="flex items-center gap-1">
+              <div
+                className="flex items-center gap-1"
+                title={document.subject.name}
+              >
                 <GraduationCap className="w-3 h-3 flex-shrink-0" />
                 <span className="truncate">{document.subject.name}</span>
               </div>
             )}
             {document.user && (
-              <div className="flex items-center gap-1">
+              <div
+                className="flex items-center gap-1"
+                title={`${document.user.first_name} ${document.user.last_name}`}
+              >
                 <User className="w-3 h-3 flex-shrink-0" />
                 <span className="truncate">
                   {document.user.first_name} {document.user.last_name}

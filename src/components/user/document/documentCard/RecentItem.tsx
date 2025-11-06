@@ -30,7 +30,10 @@ const RecentItem: React.FC<RecentItemProps> = ({
           <FileText size={20} className="md:w-6 md:h-6" />
         </div>
         <div className="flex-1 min-w-0">
-          <div className="item-title font-bold text-sm text-gray-800 break-words">
+          <div
+            className="item-title font-bold text-sm text-gray-800 break-words"
+            title={title as string}
+          >
             {title}
           </div>
           <div className="flex flex-wrap gap-2 md:gap-4 text-xs md:text-sm text-gray-600 mt-1">
