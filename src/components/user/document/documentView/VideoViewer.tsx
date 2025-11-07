@@ -91,17 +91,18 @@ const VideoViewer: React.FC<VideoViewerProps> = ({ url, isUser = false }) => {
         src={url}
         controls={!isVideoDisabled}
         controlsList="nodownload"
-        className="w-full max-h-[80vh] bg-black"
+        className={`w-full max-h-[80vh] bg-black ${
+          isVideoDisabled ? "pointer-events-none opacity-50" : ""
+        }`}
         onContextMenu={(e) => e.preventDefault()}
         onTimeUpdate={handleTimeUpdate}
-        style={isVideoDisabled ? { pointerEvents: "none", opacity: 0.5 } : {}}
       >
         Trình duyệt của bạn không hỗ trợ video.
       </video>
 
       {/* Overlay to prevent interaction when limit reached */}
       {isVideoDisabled && (
-        <div className="absolute inset-0 bg-black bg-opacity-70 flex items-center justify-center z-10">
+        <div className="absolute inset-0 bg-black/70 flex items-center justify-center z-10">
           <div className="text-white text-center">
             <p className="text-lg font-semibold">Video đã bị khóa</p>
             <p className="text-sm">Đăng ký tài khoản để xem toàn bộ</p>

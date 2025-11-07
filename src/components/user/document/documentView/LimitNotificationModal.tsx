@@ -26,43 +26,26 @@ const LimitNotificationModal: React.FC<LimitNotificationModalProps> = ({
   if (!visible) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 bg-opacity-50">
-      <div
-        className="border rounded-lg shadow-lg p-6 max-w-md mx-4 w-full"
-        style={{
-          backgroundColor: "var(--primary-background-color)",
-          borderColor: "var(--border-color)",
-        }}
-      >
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+      <div className="border rounded-lg shadow-lg p-6 max-w-md mx-4 w-full bg-[var(--primary-background-color)] border-[var(--border-color)]">
         <div className="text-center space-y-4">
           <div className="text-4xl">{icon}</div>
-          <h3
-            className="text-lg sm:text-xl font-semibold"
-            style={{ color: "var(--primary-text-color)" }}
-          >
+          <h3 className="text-lg sm:text-xl font-semibold text-[var(--primary-text-color)]">
             {title}
           </h3>
-          <p
-            className="text-sm sm:text-base"
-            style={{ color: "var(--secondary-text-color)" }}
-          >
+          <p className="text-sm sm:text-base text-[var(--secondary-text-color)]">
             {message}
           </p>
           <div className="flex gap-3 justify-center mt-6">
             <button
               onClick={onClose}
-              className="px-6 py-2 border rounded hover:bg-gray-50"
-              style={{
-                borderColor: "var(--border-color)",
-                color: "var(--secondary-text-color)",
-              }}
+              className="px-6 py-2 border rounded hover:bg-gray-50 border-[var(--border-color)] text-[var(--secondary-text-color)]"
             >
               Để sau
             </button>
             <button
               onClick={handleRegisterClick}
-              className="px-6 py-2 text-white rounded hover:opacity-90"
-              style={{ backgroundColor: "var(--primary-color)" }}
+              className="px-6 py-2 text-white rounded hover:opacity-90 bg-[var(--primary-color)]"
             >
               Đăng ký ngay
             </button>
