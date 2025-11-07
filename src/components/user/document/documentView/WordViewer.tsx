@@ -1,23 +1,26 @@
 import React, { useEffect, useRef, useState } from "react";
 import { renderAsync } from "docx-preview";
 import "../../../../docx-preview.css";
+import LimitNotificationModal from "./LimitNotificationModal";
+import LimitNotificationBanner from "./LimitNotificationBanner";
 
 interface WordViewerProps {
   url: string;
-  onPageChange?: (currentPage: number, totalPages: number) => void;
   zoom?: number;
   isUser?: boolean; // True if document belongs to current user
 }
 
 const WordViewer: React.FC<WordViewerProps> = ({
   url,
-  onPageChange,
   zoom = 1,
   isUser = false,
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [showLimitModal, setShowLimitModal] = useState(false);
+  const [hasShownModal, setHasShownModal] = useState(false);
+  const [showLimitBanner, setShowLimitBanner] = useState(false);
 
   useEffect(() => {
     const fetchAndRender = async () => {
@@ -45,19 +48,12 @@ const WordViewer: React.FC<WordViewerProps> = ({
             Math.ceil(contentHeight / pageHeight)
           );
 
-          // Limit to 10 pages for non-users
-          const limitedTotalPages = isUser
-            ? calculatedTotalPages
-            : Math.min(calculatedTotalPages, 10);
-
-          if (onPageChange) {
-            onPageChange(1, limitedTotalPages);
-          }
-
-          // Limit content height for non-users
+          // Limit content height for non-users and show banner
           if (!isUser && calculatedTotalPages > 10) {
             containerRef.current.style.maxHeight = `${pageHeight * 10}px`;
             containerRef.current.style.overflow = "hidden";
+            containerRef.current.style.position = "relative";
+            setShowLimitBanner(true);
           }
         }
       } catch (e) {
@@ -68,7 +64,41 @@ const WordViewer: React.FC<WordViewerProps> = ({
     };
 
     fetchAndRender();
-  }, [url, onPageChange, isUser]);
+  }, [url, isUser]);
+
+  // Detect when user scrolls to the bottom of the 10-page limit
+  useEffect(() => {
+    if (isUser || hasShownModal) return;
+
+    const handleScroll = () => {
+      if (!containerRef.current) return;
+
+      const container = containerRef.current;
+      const scrollTop =
+        window.pageYOffset || document.documentElement.scrollTop;
+      const windowHeight = window.innerHeight;
+      const documentHeight = document.documentElement.scrollHeight;
+
+      // Check if user has scrolled near the bottom (within 100px)
+      const isNearBottom = scrollTop + windowHeight >= documentHeight - 100;
+
+      // Check if container has height limit (10 pages)
+      const hasHeightLimit =
+        container.style.maxHeight && container.style.maxHeight !== "none";
+
+      if (isNearBottom && hasHeightLimit && !hasShownModal) {
+        setShowLimitModal(true);
+        setHasShownModal(true);
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [isUser, hasShownModal]);
+
+  const handleModalClose = () => {
+    setShowLimitModal(false);
+  };
 
   return (
     <div className="w-full max-w-full md:max-w-4xl lg:max-w-5xl xl:max-w-6xl z-0 min-h-[200px] mx-auto word-viewer-wrapper">
@@ -96,6 +126,24 @@ const WordViewer: React.FC<WordViewerProps> = ({
           transformOrigin: "top left",
         }}
       ></div>
+
+      {/* Limit notification banner below content for non-users */}
+      {showLimitBanner && (
+        <LimitNotificationBanner
+          title="Bạn đã xem hết 10 trang đầu"
+          message="Đăng ký tài khoản để xem toàn bộ nội dung tài liệu Word"
+          icon="📖"
+        />
+      )}
+
+      {/* Modal thông báo đã xem hết giới hạn */}
+      {showLimitModal && (
+        <LimitNotificationModal
+          visible={showLimitModal}
+          onClose={handleModalClose}
+          message="Bạn đã xem hết giới hạn của tài liệu Word. Để xem toàn bộ nội dung, vui lòng đăng ký tài khoản."
+        />
+      )}
     </div>
   );
 };
