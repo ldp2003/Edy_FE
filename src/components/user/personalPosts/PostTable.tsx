@@ -664,7 +664,10 @@ const PostTable: React.FC<PostTableProps> = ({
               onClick={
                 isRejected || isPendingApproval
                   ? undefined
-                  : () => console.log("Delete action triggered")
+                  : () => {
+                      setSelectedPost(record);
+                      setConfirmModalVisible(true);
+                    }
               }
               title={
                 isRejected

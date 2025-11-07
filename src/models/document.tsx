@@ -118,6 +118,10 @@ export interface Document {
     reviewed_at: string;
     message: string;
   };
+  is_delete_by_admin?: boolean;
+  delete_by_admin_reason?: string;
+  delete_by_admin_at?: string;
+  expiredAt?: string;
 }
 
 export interface DocumentsResponse {
@@ -138,6 +142,10 @@ export interface PendingRequest {
   reviewed_at?: any;
   createdAt: string;
   updatedAt: string;
+  ai_checked: boolean;
+  ai_violation_level: string;
+  ai_action_suggest: string;
+  ai_reason: string;
 }
 
 export interface FetchDocumentsParams {

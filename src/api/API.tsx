@@ -773,6 +773,21 @@ export const DocumentAPI = {
     }
   },
 
+  requestEditDirectDocument: async (documentId: string, reason?: string) => {
+    try {
+      const response = await apiClient.put(
+        `/documents/request-edit-direct/${documentId}`,
+        {
+          reason,
+        }
+      );
+      return response.data;
+    } catch (error) {
+      console.error("Error requesting edit for document:", error);
+      throw error;
+    }
+  },
+
   // Delete a document
   deleteDocument: async (documentId: string, reason?: string) => {
     try {
