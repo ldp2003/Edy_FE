@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, type JSX } from "react";
 import { Form, message, Alert, Input } from "antd";
 import type { Document, PendingRequest } from "../../../models/document";
 import type { User } from "../../../models/user";
@@ -229,10 +229,12 @@ const DocumentReview: React.FC<DocumentReviewProps> = ({
           description={
             <div>
               <p className="mb-1">
-                <strong>Mức độ vi phạm:</strong> {getViolationLevelText(documentRequest.ai_violation_level)}
+                <strong>Mức độ vi phạm:</strong>{" "}
+                {getViolationLevelText(documentRequest.ai_violation_level)}
               </p>
               <p className="mb-1">
-                <strong>Hành động đề xuất:</strong> {getActionSuggestText(documentRequest.ai_action_suggest)}
+                <strong>Hành động đề xuất:</strong>{" "}
+                {getActionSuggestText(documentRequest.ai_action_suggest)}
               </p>
               {documentRequest.ai_reason && (
                 <p>
@@ -257,7 +259,6 @@ const DocumentReview: React.FC<DocumentReviewProps> = ({
           closable
         />
       )}
-
 
       {/* Show edit information alert */}
       {isEdit && editData && (
@@ -288,8 +289,14 @@ const DocumentReview: React.FC<DocumentReviewProps> = ({
           description={
             <div>
               <p className="mb-2">
-                Tài liệu này đã bị xóa khỏi hệ thống và sẽ không thể khôi phục sau 
-                <b>{document.expiredAt ? ` ${new Date(document.expiredAt).toLocaleString('vi-VN')}` : ''}.</b>
+                Tài liệu này đã bị xóa khỏi hệ thống và sẽ không thể khôi phục
+                sau
+                <b>
+                  {document.expiredAt
+                    ? ` ${new Date(document.expiredAt).toLocaleString("vi-VN")}`
+                    : ""}
+                  .
+                </b>
               </p>
               {document.is_delete_by_admin && (
                 <div className="text-sm text-gray-600">
@@ -303,7 +310,10 @@ const DocumentReview: React.FC<DocumentReviewProps> = ({
                   )}
                   {document.delete_by_admin_at && (
                     <p>
-                      <strong>Thời gian xóa:</strong> {new Date(document.delete_by_admin_at).toLocaleString('vi-VN')}
+                      <strong>Thời gian xóa:</strong>{" "}
+                      {new Date(document.delete_by_admin_at).toLocaleString(
+                        "vi-VN"
+                      )}
                     </p>
                   )}
                 </div>
@@ -381,7 +391,7 @@ const DocumentReview: React.FC<DocumentReviewProps> = ({
               documentRequest={documentRequest}
               isIntensive={isIntensive}
               documentId={document._id}
-              documentStatus={document.is_deleted ? 'DELETED' : document.status}
+              documentStatus={document.is_deleted ? "DELETED" : document.status}
               documentType={document.file_type}
               onSuccess={() => {
                 messageApi.success("Thao tác thành công!");

@@ -1,9 +1,10 @@
-import React, { useState } from "react";
+import React from "react";
 
 import WordViewer from "./WordViewer";
 import PDFViewer from "./PDFViewer";
 import ExcelViewer from "./ExcelViewer";
 import PowerPointViewer from "./PowerPointViewer";
+import VideoViewer from "./VideoViewer";
 import DocumentPagination from "./DocumentPagination";
 
 interface DocumentViewerProps {
@@ -22,60 +23,6 @@ interface DocumentViewerProps {
   onZoomIn?: () => void;
   onZoomOut?: () => void;
 }
-
-const VideoViewer: React.FC<{ url: string; isUser?: boolean }> = ({
-  url,
-  isUser = false,
-}) => {
-  const [paused, setPaused] = useState(false);
-  const [previewLimit, setPreviewLimit] = useState<number>(0);
-
-  const handleLoadedMetadata = (e: React.SyntheticEvent<HTMLVideoElement>) => {
-    const video = e.currentTarget;
-    // Set preview limit to 10% of total duration
-    const limit = video.duration * 0.1;
-    setPreviewLimit(limit);
-  };
-
-  return (
-    <div className="relative w-full">
-      <video
-        src={url}
-        controls
-        controlsList="nodownload"
-        className="w-full max-h-[80vh] bg-black"
-        onContextMenu={(e) => e.preventDefault()}
-        onLoadedMetadata={handleLoadedMetadata}
-        onTimeUpdate={(e) => {
-          const video = e.currentTarget;
-          if (
-            !isUser &&
-            previewLimit > 0 &&
-            video.currentTime >= previewLimit
-          ) {
-            video.pause();
-            video.currentTime = previewLimit;
-            setPaused(true);
-          }
-        }}
-      >
-        Trình duyệt của bạn không hỗ trợ video.
-      </video>
-      {paused && !isUser && (
-        <div className="absolute top-0 left-0 w-full h-full bg-black/70 flex flex-col items-center justify-center text-white z-10 px-4">
-          <div className="text-center">
-            <p className="text-base sm:text-lg font-semibold mb-2">
-              Bạn chỉ được xem trước 10% thời lượng video.
-            </p>
-            <p className="text-sm sm:text-base">
-              Vui lòng tải xuống để xem toàn bộ video.
-            </p>
-          </div>
-        </div>
-      )}
-    </div>
-  );
-};
 
 const DocumentViewer: React.FC<DocumentViewerProps> = ({
   url,
@@ -109,10 +56,10 @@ const DocumentViewer: React.FC<DocumentViewerProps> = ({
       return <WordViewer url={url} zoom={zoom} isUser={isUser} />;
     }
     if (type === "ppt") {
-      return <PowerPointViewer url={url} zoom={zoom} />;
+      return <PowerPointViewer url={url} zoom={zoom} isUser={isUser} />;
     }
     if (type === "excel") {
-      return <ExcelViewer url={url} zoom={zoom} />;
+      return <ExcelViewer url={url} zoom={zoom} isUser={isUser} />;
     }
     if (type === "video") {
       return <VideoViewer url={url} isUser={isUser} />;
