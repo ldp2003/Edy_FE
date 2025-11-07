@@ -58,6 +58,34 @@ const convertUserToUserInfo = (user: User): UserInfo => {
 
 // Using PendingRequest from document model
 
+// Helper function to convert AI violation level to Vietnamese text
+const getViolationLevelText = (level: string): string | JSX.Element => {
+  switch (level) {
+    case "LOW":
+      return "Thấp";
+    case "MEDIUM":
+      return <span className="font-bold">Trung bình</span>;
+    case "HIGH":
+      return <span className="font-bold text-red-500">Cao</span>;
+    default:
+      return level;
+  }
+};
+
+// Helper function to convert AI action suggestion to Vietnamese text
+const getActionSuggestText = (action: string): string => {
+  switch (action) {
+    case "AUTO_APPROVE":
+      return "Duyệt tự động";
+    case "REJECT":
+      return "Từ chối";
+    case "MANUAL_REVIEW":
+      return "Xem xét thủ công";
+    default:
+      return action;
+  }
+};
+
 interface DocumentReviewProps {
   document: Document;
   isEdit?: boolean;
@@ -68,7 +96,7 @@ interface DocumentReviewProps {
 const DocumentReview: React.FC<DocumentReviewProps> = ({
   document,
   isEdit = false,
-  editData, // TODO: Use this to show edit changes in UI
+  editData,
   editApprovalData,
 }) => {
   const [form] = Form.useForm();
@@ -101,6 +129,10 @@ const DocumentReview: React.FC<DocumentReviewProps> = ({
             reviewed_at: editApprovalData.reviewed_at,
             createdAt: editApprovalData.createdAt,
             updatedAt: editApprovalData.updatedAt,
+            ai_checked: editApprovalData.ai_checked || false,
+            ai_violation_level: editApprovalData.ai_violation_level || "",
+            ai_action_suggest: editApprovalData.ai_action_suggest || "",
+            ai_reason: editApprovalData.ai_reason || "",
           });
         } else {
           // For new upload requests, fetch from API
@@ -190,6 +222,43 @@ const DocumentReview: React.FC<DocumentReviewProps> = ({
         </span>
       </div>
 
+      {/* Show AI check information alert */}
+      {documentRequest && documentRequest.ai_checked && (
+        <Alert
+          message="Kết quả kiểm tra từ AI"
+          description={
+            <div>
+              <p className="mb-1">
+                <strong>Mức độ vi phạm:</strong> {getViolationLevelText(documentRequest.ai_violation_level)}
+              </p>
+              <p className="mb-1">
+                <strong>Hành động đề xuất:</strong> {getActionSuggestText(documentRequest.ai_action_suggest)}
+              </p>
+              {documentRequest.ai_reason && (
+                <p>
+                  <strong>Lý do:</strong> {documentRequest.ai_reason}
+                </p>
+              )}
+            </div>
+          }
+          type="warning"
+          showIcon
+          className="mb-4"
+          closable
+        />
+      )}
+
+      {documentRequest && !documentRequest.ai_checked && (
+        <Alert
+          message="AI vẫn đang trong quá trình kiểm tra tài liệu này, trong thời gian đó, bạn có thể xem thông tin tài liệu và kiểm duyệt thủ công"
+          type="warning"
+          showIcon
+          className="mb-4"
+          closable
+        />
+      )}
+
+
       {/* Show edit information alert */}
       {isEdit && editData && (
         <Alert
@@ -206,6 +275,47 @@ const DocumentReview: React.FC<DocumentReviewProps> = ({
             </div>
           }
           type="info"
+          showIcon
+          className="mb-4"
+          closable
+        />
+      )}
+
+      {/* Show deletion information alert */}
+      {document.is_deleted && (
+        <Alert
+          message="Tài liệu đã bị xóa"
+          description={
+            <div>
+              <p className="mb-2">
+                Tài liệu này đã bị xóa khỏi hệ thống và sẽ không thể khôi phục sau 
+                <b>{document.expiredAt ? ` ${new Date(document.expiredAt).toLocaleString('vi-VN')}` : ''}.</b>
+              </p>
+              {document.is_delete_by_admin && (
+                <div className="text-sm text-gray-600">
+                  <p className="mb-1">
+                    <strong>Được xóa bởi:</strong> Admin
+                  </p>
+                  {document.delete_by_admin_reason && (
+                    <p className="mb-1">
+                      <strong>Lý do:</strong> {document.delete_by_admin_reason}
+                    </p>
+                  )}
+                  {document.delete_by_admin_at && (
+                    <p>
+                      <strong>Thời gian xóa:</strong> {new Date(document.delete_by_admin_at).toLocaleString('vi-VN')}
+                    </p>
+                  )}
+                </div>
+              )}
+              {!document.is_delete_by_admin && (
+                <p className="text-sm text-gray-600">
+                  Tài liệu được xóa bởi chính chủ sở hữu.
+                </p>
+              )}
+            </div>
+          }
+          type="error"
           showIcon
           className="mb-4"
           closable
@@ -271,7 +381,7 @@ const DocumentReview: React.FC<DocumentReviewProps> = ({
               documentRequest={documentRequest}
               isIntensive={isIntensive}
               documentId={document._id}
-              documentStatus={document.status}
+              documentStatus={document.is_deleted ? 'DELETED' : document.status}
               documentType={document.file_type}
               onSuccess={() => {
                 messageApi.success("Thao tác thành công!");
