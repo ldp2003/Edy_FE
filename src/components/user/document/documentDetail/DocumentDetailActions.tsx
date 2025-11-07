@@ -94,18 +94,19 @@ const DocumentDetailActions: React.FC<DocumentDetailActionsProps> = ({
   };
 
   return (
-    <div className="bg-white border-t border-gray-200 p-4 z-20">
+    <div className="bg-white border-t border-gray-200 p-2 sm:p-4 z-20">
       <div className="flex items-center justify-between max-w-screen-xl mx-auto">
         {/* Nút tải xuống */}
-        <button className="px-4 py-2 bg-[var(--green-button-color)] text-white rounded-lg text-sm font-medium flex items-center gap-2 hover:opacity-90">
-          <Download size={16} />
-          <span>Tải xuống</span>
+        <button className="px-2 sm:px-4 py-1.5 sm:py-2 bg-[var(--green-button-color)] text-white rounded-lg text-xs sm:text-sm font-medium flex items-center gap-1 sm:gap-2 hover:opacity-90">
+          <Download size={14} className="sm:w-4 sm:h-4" />
+          <span className="hidden xs:inline">Tải xuống</span>
+          <span className="xs:hidden">Tải</span>
         </button>
 
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-2 sm:gap-4">
           {/* Nút yêu thích */}
           <button className="text-[var(--primary-text-color)] hover:text-[var(--primary-color)]/80">
-            <Heart size={24} />
+            <Heart size={20} className="sm:w-6 sm:h-6" />
           </button>
 
           {/* Nút xem thông tin người đăng */}
@@ -113,21 +114,21 @@ const DocumentDetailActions: React.FC<DocumentDetailActionsProps> = ({
             onClick={() => setShowAuthorInfo(!showAuthorInfo)}
             className="text-[var(--primary-text-color)] hover:text-[var(--primary-color)]/80"
           >
-            <User size={24} />
+            <User size={20} className="sm:w-6 sm:h-6" />
           </button>
         </div>
       </div>
 
       {/* Panel thông tin người đăng - hiển thị như phần mở rộng của header */}
       {showAuthorInfo && (
-        <div className="border-t border-gray-200 bg-gray-50 p-4 animate-in slide-in-from-top">
+        <div className="border-t border-gray-200 bg-gray-50 p-2 sm:p-4 animate-in slide-in-from-top">
           <div className="max-w-screen-xl mx-auto">
             <AuthorInfo document={document} />
-            <div className="flex items-center justify-center gap-8 mt-4">
+            <div className="flex items-center justify-center gap-4 sm:gap-8 mt-4">
               <button
                 onClick={() => handleReaction("LIKE")}
                 disabled={loading}
-                className={`flex items-center gap-2 ${
+                className={`flex items-center gap-1 sm:gap-2 ${
                   userReaction === "LIKE"
                     ? "text-[var(--green-button-color)]"
                     : "text-[var(--primary-color)]"
@@ -135,13 +136,13 @@ const DocumentDetailActions: React.FC<DocumentDetailActionsProps> = ({
                   loading ? "opacity-50 cursor-not-allowed" : "hover:opacity-80"
                 }`}
               >
-                <ThumbsUp size={20} />
-                <span className="text-sm">Thích</span>
+                <ThumbsUp size={16} className="sm:w-5 sm:h-5" />
+                <span className="text-xs sm:text-sm">Thích</span>
               </button>
               <button
                 onClick={() => handleReaction("DISLIKE")}
                 disabled={loading}
-                className={`flex items-center gap-2 ${
+                className={`flex items-center gap-1 sm:gap-2 ${
                   userReaction === "DISLIKE"
                     ? "text-[var(--red-button-color)]"
                     : "text-[var(--primary-color)]"
@@ -149,8 +150,8 @@ const DocumentDetailActions: React.FC<DocumentDetailActionsProps> = ({
                   loading ? "opacity-50 cursor-not-allowed" : "hover:opacity-80"
                 }`}
               >
-                <ThumbsDown size={20} />
-                <span className="text-sm">Không thích</span>
+                <ThumbsDown size={16} className="sm:w-5 sm:h-5" />
+                <span className="text-xs sm:text-sm">Không thích</span>
               </button>
             </div>
           </div>

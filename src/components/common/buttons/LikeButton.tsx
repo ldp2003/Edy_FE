@@ -111,7 +111,7 @@ const LikeButton: React.FC<LikeButtonProps> = ({
   return (
     <div>
       <button
-        className={`text-xs flex items-center space-x-2 rounded-2xl border px-3 py-1 font-semibold cursor-pointer transition-colors duration-300 ${
+        className={`text-[10px] sm:text-xs flex items-center space-x-1 sm:space-x-2 rounded-2xl border px-2 sm:px-3 py-1 font-semibold cursor-pointer transition-colors duration-300 ${
           isLiked
             ? "bg-[var(--green-button-color)] text-white border-[var(--green-button-color)]"
             : "bg-white border-gray-300 text-[var(--green-button-color)] hover:bg-[#27a743] hover:text-white"
@@ -119,8 +119,8 @@ const LikeButton: React.FC<LikeButtonProps> = ({
         onClick={handleLikeClick}
         disabled={loading}
       >
-        <ThumbsUp size={15} />
-        <span className="text-xs">{likeCount}</span>
+        <ThumbsUp size={14} className="sm:w-[15px] sm:h-[15px]" />
+        <span className="text-[10px] sm:text-xs">{likeCount}</span>
       </button>
     </div>
   );
