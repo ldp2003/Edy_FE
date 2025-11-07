@@ -4,14 +4,12 @@ import "../../../../docx-preview.css";
 
 interface WordViewerProps {
   url: string;
-  onPageChange?: (currentPage: number, totalPages: number) => void;
   zoom?: number;
   isUser?: boolean; // True if document belongs to current user
 }
 
 const WordViewer: React.FC<WordViewerProps> = ({
   url,
-  onPageChange,
   zoom = 1,
   isUser = false,
 }) => {
@@ -45,15 +43,6 @@ const WordViewer: React.FC<WordViewerProps> = ({
             Math.ceil(contentHeight / pageHeight)
           );
 
-          // Limit to 10 pages for non-users
-          const limitedTotalPages = isUser
-            ? calculatedTotalPages
-            : Math.min(calculatedTotalPages, 10);
-
-          if (onPageChange) {
-            onPageChange(1, limitedTotalPages);
-          }
-
           // Limit content height for non-users
           if (!isUser && calculatedTotalPages > 10) {
             containerRef.current.style.maxHeight = `${pageHeight * 10}px`;
@@ -68,7 +57,7 @@ const WordViewer: React.FC<WordViewerProps> = ({
     };
 
     fetchAndRender();
-  }, [url, onPageChange, isUser]);
+  }, [url, isUser]);
 
   return (
     <div className="w-full max-w-full md:max-w-4xl lg:max-w-5xl xl:max-w-6xl z-0 min-h-[200px] mx-auto word-viewer-wrapper">

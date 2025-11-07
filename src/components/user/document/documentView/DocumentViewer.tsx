@@ -106,14 +106,7 @@ const DocumentViewer: React.FC<DocumentViewerProps> = ({
       );
     }
     if (type === "word") {
-      return (
-        <WordViewer
-          url={url}
-          onPageChange={onPageChange}
-          zoom={zoom}
-          isUser={isUser}
-        />
-      );
+      return <WordViewer url={url} zoom={zoom} isUser={isUser} />;
     }
     if (type === "ppt") {
       return <PowerPointViewer url={url} zoom={zoom} />;
@@ -131,7 +124,7 @@ const DocumentViewer: React.FC<DocumentViewerProps> = ({
     );
   };
 
-  const shouldShowPagination = type === "pdf" || type === "word";
+  const shouldShowPagination = type === "pdf";
 
   return (
     <div className="w-full relative overflow-hidden document-viewer-container">
