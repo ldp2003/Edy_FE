@@ -15,6 +15,10 @@ export default function HomePage() {
   const [relatedDocuments, setRelatedDocuments] = useState<Document[]>([]);
   const [subjects, setSubjects] = useState<Subject[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadingFeatured, setLoadingFeatured] = useState(false);
+  const [loadingNewest, setLoadingNewest] = useState(false);
+  const [loadingRelated, setLoadingRelated] = useState(false);
+  const [loadingSubjects, setLoadingSubjects] = useState(false);
   const [messageApi, contextHolder] = message.useMessage();
   const { user, readHistory } = useContext(UserContext);
   const navigate = useNavigate();
@@ -25,30 +29,37 @@ export default function HomePage() {
         setLoading(true);
 
         // Fetch newest documents (for "Tài liệu mới nhất")
+        setLoadingNewest(true);
         const newestResponse = await DocumentService.fetchNewestDocuments({
           order: -1,
           limit: 6,
         });
         setNewestDocuments(newestResponse.documents || []);
+        setLoadingNewest(false);
 
         // Fetch featured documents (documents with highest views)
+        setLoadingFeatured(true);
         const featuredResponse = await DocumentService.fetchNewestDocuments({
           ordering: "view",
           order: -1,
           limit: 6,
         });
         setFeaturedDocuments(featuredResponse.documents || []);
+        setLoadingFeatured(false);
 
         // Fetch related documents (random selection)
+        setLoadingRelated(true);
         const relatedResponse = await DocumentService.fetchNewestDocuments({
           ordering: "download_count",
           order: -1,
           limit: 6,
         });
         setRelatedDocuments(relatedResponse.documents || []);
+        setLoadingRelated(false);
 
         // Fetch subjects by user's organization
         if (user?.organization) {
+          setLoadingSubjects(true);
           const organizationId =
             typeof user.organization === "string"
               ? user.organization
@@ -59,9 +70,14 @@ export default function HomePage() {
               await SubjectService.getSubjectsByOrganization(organizationId);
             setSubjects(subjectsResponse.slice(0, 8) || []); // Limit to 8 subjects
           }
+          setLoadingSubjects(false);
         }
       } catch {
         // Suppress errors for new accounts
+        setLoadingNewest(false);
+        setLoadingFeatured(false);
+        setLoadingRelated(false);
+        setLoadingSubjects(false);
       } finally {
         setLoading(false);
       }
@@ -187,6 +203,7 @@ export default function HomePage() {
                   : "tổ chức"
               }`}
               subjects={subjects}
+              loading={loadingSubjects}
             />
           )}
           {readHistory && readHistory.length > 0 && (
@@ -201,17 +218,20 @@ export default function HomePage() {
             title="Tài liệu nổi bật"
             documents={featuredDocuments}
             onViewMore={handleViewMoreFeatured}
+            loading={loadingFeatured}
           />
           <DocumentGrid
             title="Tài liệu mới nhất"
             documents={newestDocuments}
             onViewMore={handleViewMoreNewest}
+            loading={loadingNewest}
           />
 
           <DocumentGrid
             title="Tài liệu bạn có thể quan tâm"
             documents={relatedDocuments}
             onViewMore={handleViewMoreRelated}
+            loading={loadingRelated}
           />
         </main>
       </div>

@@ -10,6 +10,7 @@ interface OTPModalProps {
   type: "REGISTER" | "RESET_PASSWORD" | "VERIFY_EMAIL";
   title?: string;
   description?: string;
+  loadingRegistering?: boolean;
 }
 
 const OTPModal: React.FC<OTPModalProps> = ({
@@ -20,6 +21,7 @@ const OTPModal: React.FC<OTPModalProps> = ({
   type,
   title,
   description,
+  loadingRegistering = false,
 }) => {
   const [otp, setOtp] = useState("");
   const [loading, setLoading] = useState(false);
@@ -150,6 +152,7 @@ const OTPModal: React.FC<OTPModalProps> = ({
               }}
               onKeyPress={handleKeyPress}
               maxLength={6}
+              disabled={loadingRegistering}
               className="text-center text-lg tracking-widest"
               style={{
                 fontSize: "18px",
@@ -163,7 +166,8 @@ const OTPModal: React.FC<OTPModalProps> = ({
             <Button
               type="primary"
               onClick={handleVerifyOTP}
-              loading={loading}
+              loading={loading || loadingRegistering}
+              disabled={loading || loadingRegistering}
               className="flex-1"
               style={{
                 backgroundColor: "var(--primary-color)",
@@ -173,7 +177,11 @@ const OTPModal: React.FC<OTPModalProps> = ({
               Xác thực
             </Button>
 
-            <Button onClick={onCancel} className="flex-1">
+            <Button
+              onClick={onCancel}
+              className="flex-1"
+              disabled={loadingRegistering}
+            >
               Hủy
             </Button>
           </div>
@@ -183,7 +191,7 @@ const OTPModal: React.FC<OTPModalProps> = ({
               type="link"
               onClick={handleResendOTP}
               loading={resendLoading}
-              disabled={countdown > 0}
+              disabled={countdown > 0 || loadingRegistering}
               className="p-0 h-auto"
             >
               {countdown > 0

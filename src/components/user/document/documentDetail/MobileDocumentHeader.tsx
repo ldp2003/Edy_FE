@@ -112,37 +112,37 @@ const MobileDocumentHeader: React.FC<MobileDocumentHeaderProps> = ({
           className={`fixed top-14 left-0 right-0 z-40 border-t border-[var(--border-color)] bg-white shadow-md transform transition-transform duration-300`}
         >
           {/* Main header info */}
-          <div className="flex items-center justify-between px-4 py-2">
-            <h2 className="text-sm font-medium truncate flex-1 mr-4">
+          <div className="flex items-center justify-between px-2 sm:px-4 py-1.5 sm:py-2">
+            <h2 className="text-xs sm:text-sm font-medium truncate flex-1 mr-2 sm:mr-4">
               {document.title}
             </h2>
-            <div className="flex items-center gap-3">
-              <button className="p-2 hover:bg-gray-100 rounded-full">
-                <Download size={20} className="text-gray-600" />
+            <div className="flex items-center gap-2 sm:gap-3">
+              <button className="p-1.5 sm:p-2 hover:bg-gray-100 rounded-full">
+                <Download size={16} className="text-gray-600 sm:w-5 sm:h-5" />
               </button>
-              <button className="p-2 hover:bg-gray-100 rounded-full">
-                <Bookmark size={20} className="text-gray-600" />
+              <button className="p-1.5 sm:p-2 hover:bg-gray-100 rounded-full">
+                <Bookmark size={16} className="text-gray-600 sm:w-5 sm:h-5" />
               </button>
             </div>
           </div>
 
           {/* User info section - always part of header */}
-          <div className="px-4 pb-2 border-t border-gray-100">
-            <div className="flex items-center gap-2 py-1">
-              <div className="w-6 h-6 bg-gray-300 rounded-full flex items-center justify-center">
-                <span className="text-xs font-medium text-gray-600">
+          <div className="px-2 sm:px-4 pb-1.5 sm:pb-2 border-t border-gray-100">
+            <div className="flex items-center gap-1.5 sm:gap-2 py-1">
+              <div className="w-5 h-5 sm:w-6 sm:h-6 bg-gray-300 rounded-full flex items-center justify-center">
+                <span className="text-[10px] sm:text-xs font-medium text-gray-600">
                   {document.user?.first_name?.[0] || "U"}
                 </span>
               </div>
-              <span className="text-xs text-gray-600">
+              <span className="text-[10px] sm:text-xs text-gray-600">
                 {document.user?.first_name
                   ? `${document.user.first_name} ${
                       document.user.last_name || ""
                     }`
                   : "Người dùng ẩn danh"}
               </span>
-              <span className="text-xs text-gray-400">•</span>
-              <span className="text-xs text-gray-500">
+              <span className="text-[10px] sm:text-xs text-gray-400">•</span>
+              <span className="text-[10px] sm:text-xs text-gray-500">
                 {document.subject?.name || "Chưa có môn học"}
               </span>
             </div>
@@ -152,9 +152,9 @@ const MobileDocumentHeader: React.FC<MobileDocumentHeaderProps> = ({
 
       {/* Original Header Content */}
       <div className="bg-white shadow-lg text-left mobile-document-header">
-        <div className="p-4 space-y-3">
-          <div className="space-y-2">
-            <h1 className="text-sm font-bold text-[var(--primary-text-color)] line-clamp-2">
+        <div className="p-2 sm:p-4 space-y-2 sm:space-y-3">
+          <div className="space-y-1 sm:space-y-2">
+            <h1 className="text-xs sm:text-sm font-bold text-[var(--primary-text-color)] line-clamp-2">
               {document.title}
             </h1>
 
@@ -163,14 +163,16 @@ const MobileDocumentHeader: React.FC<MobileDocumentHeaderProps> = ({
             </div>
           </div>
 
-          <div className="flex flex-col gap-3">
-            <div className="flex flex-col gap-1">
+          <div className="flex flex-col gap-2 sm:gap-3">
+            <div className="flex flex-col gap-0.5 sm:gap-1">
               <div className="flex gap-1 items-center">
-                <School size={15} />
-                <span className="text-sm font-medium">Thuộc:</span>
+                <School size={14} className="sm:w-[15px] sm:h-[15px]" />
+                <span className="text-[10px] sm:text-xs font-medium">
+                  Thuộc:
+                </span>
               </div>
               <span
-                className="font-bold text-xs text-[var(--primary-color)] cursor-pointer line-clamp-1"
+                className="font-bold text-[10px] sm:text-xs text-[var(--primary-color)] cursor-pointer line-clamp-1"
                 onClick={() => {
                   if (document.organization?._id) {
                     window.location.href = `/organization/${document.organization._id}`;
@@ -181,22 +183,24 @@ const MobileDocumentHeader: React.FC<MobileDocumentHeaderProps> = ({
               </span>
             </div>
 
-            <div className="flex flex-col gap-1">
+            <div className="flex flex-col gap-0.5 sm:gap-1">
               <div className="flex gap-1 items-center">
-                <FolderClosed size={15} />
-                <span className="text-sm font-medium">Môn:</span>
+                <FolderClosed size={14} className="sm:w-[15px] sm:h-[15px]" />
+                <span className="text-[10px] sm:text-xs font-medium">Môn:</span>
               </div>
-              <span className="font-bold text-xs text-[var(--primary-color)] line-clamp-1">
+              <span className="font-bold text-[10px] sm:text-xs text-[var(--primary-color)] line-clamp-1">
                 {document.subject?.name}
               </span>
             </div>
 
-            <div className="flex flex-col gap-1">
+            <div className="flex flex-col gap-0.5 sm:gap-1">
               <div className="flex gap-1 items-center">
-                <Backpack size={15} />
-                <span className="text-sm font-medium">Trình độ:</span>
+                <Backpack size={14} className="sm:w-[15px] sm:h-[15px]" />
+                <span className="text-[10px] sm:text-xs font-medium">
+                  Trình độ:
+                </span>
               </div>
-              <span className="font-bold text-xs text-[var(--primary-color)]">
+              <span className="font-bold text-[10px] sm:text-xs text-[var(--primary-color)]">
                 {formatLevel(document.level)}
               </span>
             </div>
@@ -209,7 +213,7 @@ const MobileDocumentHeader: React.FC<MobileDocumentHeaderProps> = ({
           <div className="flex justify-start">
             <button
               onClick={() => setShowDescription(true)}
-              className="flex items-center gap-1 text-[var(--primary-color)] px-4 py-2 rounded-lg border border-[var(--primary-color)] bg-[var(--primary-color)]10 hover:bg-[var(--primary-color)]20 transition-colors"
+              className="flex items-center gap-1 text-[var(--primary-color)] px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg border border-[var(--primary-color)] bg-[var(--primary-color)]10 hover:bg-[var(--primary-color)]20 transition-colors text-[10px] sm:text-xs"
             >
               <span>Xem tóm tắt</span>
             </button>
@@ -219,18 +223,18 @@ const MobileDocumentHeader: React.FC<MobileDocumentHeaderProps> = ({
         {/* Description Modal */}
         {showDescription && (
           <div
-            className="fixed inset-0 bg-black/60 bg-opacity-50 z-[60] flex items-center justify-center p-4"
+            className="fixed inset-0 bg-black/60 bg-opacity-50 z-[60] flex items-center justify-center p-2 sm:p-4"
             onClick={() => setShowDescription(false)}
           >
             <div
               className="bg-white rounded-lg w-full max-w-lg max-h-[80vh] overflow-y-auto"
               onClick={(e) => e.stopPropagation()}
             >
-              <div className="p-4">
+              <div className="p-2 sm:p-4">
                 <Description document={document} isUser={false} />
                 <button
                   onClick={() => setShowDescription(false)}
-                  className="mt-4 w-full py-2 bg-gray-100 text-gray-600 rounded-lg hover:bg-gray-200"
+                  className="mt-3 sm:mt-4 w-full py-1.5 sm:py-2 bg-gray-100 text-gray-600 rounded-lg hover:bg-gray-200 text-xs sm:text-sm"
                 >
                   Đóng
                 </button>

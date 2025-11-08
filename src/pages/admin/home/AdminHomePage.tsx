@@ -88,6 +88,7 @@ interface TaskItem {
       _id: string;
       first_name: string;
       last_name: string;
+      avatar?: string;
     };
     aiChecked: boolean;
     aiViolationLevel: string;
@@ -104,9 +105,14 @@ const AdminHomePage: React.FC = () => {
   useEffect(() => {
     const loadDashboardData = async () => {
       try {
-        const response = await AdminStatisticsService.getDashboardStats();
-        if (response.success && response.data) {
-          setApiData(response.data as unknown as ApiResponse["data"]);
+        const statsResponse = await AdminStatisticsService.getDashboardStats();
+        const tasksResponse = await AdminStatisticsService.getAdminTasks();
+        if (statsResponse.success && statsResponse.data) {
+          setApiData({
+            statistics: statsResponse.data,
+            recent_activities: [], // TODO: implement recent activities
+            tasks: tasksResponse,
+          });
         }
       } catch (error) {
         console.error("Error loading dashboard data:", error);
@@ -144,9 +150,11 @@ const AdminHomePage: React.FC = () => {
                   _id: "68c37e4014c04e538b78c890",
                   first_name: "Lê Đại",
                   last_name: "Phát",
+                  avatar:
+                    "https://res.cloudinary.com/dyd5381vx/image/upload/v1747882904/avatars/vagtcbo6dh4mhawpctae.jpg",
                 },
-                aiChecked: true,
-                aiViolationLevel: "MEDIUM",
+                aiChecked: false,
+                aiViolationLevel: "",
               },
             },
             {
@@ -165,9 +173,11 @@ const AdminHomePage: React.FC = () => {
                   _id: "68f4897b0071159f6786f7f4",
                   first_name: "Lê",
                   last_name: "Đại Phát",
+                  avatar:
+                    "https://res.cloudinary.com/dyd5381vx/image/upload/v1747882904/avatars/vagtcbo6dh4mhawpctae.jpg",
                 },
-                aiChecked: true,
-                aiViolationLevel: "MEDIUM",
+                aiChecked: false,
+                aiViolationLevel: "",
               },
             },
             {
@@ -186,9 +196,11 @@ const AdminHomePage: React.FC = () => {
                   _id: "68f4897b0071159f6786f7f4",
                   first_name: "Lê",
                   last_name: "Đại Phát",
+                  avatar:
+                    "https://res.cloudinary.com/dyd5381vx/image/upload/v1747882904/avatars/vagtcbo6dh4mhawpctae.jpg",
                 },
-                aiChecked: true,
-                aiViolationLevel: "MEDIUM",
+                aiChecked: false,
+                aiViolationLevel: "",
               },
             },
           ],

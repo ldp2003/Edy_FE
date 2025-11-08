@@ -19,7 +19,6 @@ const DocumentSide: React.FC<DocumentSideProps> = ({
       <div className="pl-4 md:pl-8 p-4 md:p-6">
         <DocumentInfo document={document} />
         <Description document={document} isUser={isUser} />
-        <div className="mt-14"></div>
         <Comment documentId={document._id} />
         <RelatedDocument doc_id={document._id} />
       </div>

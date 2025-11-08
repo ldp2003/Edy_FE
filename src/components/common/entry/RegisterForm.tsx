@@ -25,7 +25,9 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
     email: string;
     password: string;
   } | null>(null);
-  
+  const [loadingSendingOTP, setLoadingSendingOTP] = useState(false);
+  const [loadingRegistering, setLoadingRegistering] = useState(false);
+
   const onFinish = async (values: {
     firstname: string;
     lastname: string;
@@ -43,6 +45,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
     });
 
     // Gửi OTP trước
+    setLoadingSendingOTP(true);
     try {
       const otpResult = await createOTP(email, "REGISTER");
       if (otpResult.message === "OTP đã được gửi đến email của bạn") {
@@ -58,12 +61,15 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
       const errorMessage =
         axiosError?.response?.data?.message || "Gửi OTP thất bại!";
       messageApi.error(errorMessage);
+    } finally {
+      setLoadingSendingOTP(false);
     }
   };
 
   const handleOTPVerified = async () => {
     if (!registrationData) return;
 
+    setLoadingRegistering(true);
     try {
       const result = await registerWithOTP({
         ...registrationData,
@@ -103,6 +109,8 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
       const errorMessage =
         axiosError?.response?.data?.message || "Đăng ký thất bại!";
       messageApi.error(errorMessage);
+    } finally {
+      setLoadingRegistering(false);
     }
   };
 
@@ -232,6 +240,8 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
               type="primary"
               htmlType="submit"
               className="w-full"
+              loading={loadingSendingOTP}
+              disabled={loadingSendingOTP}
               style={{
                 backgroundColor: "var(--primary-color)",
                 borderColor: "var(--primary-color)",
@@ -270,6 +280,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
         onSuccess={handleOTPVerified}
         email={registrationData?.email || ""}
         type="REGISTER"
+        loadingRegistering={loadingRegistering}
       />
     </div>
   );

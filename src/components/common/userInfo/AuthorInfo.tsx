@@ -28,9 +28,9 @@ const AuthorInfo: React.FC<AuthorInfoProps> = ({ document }) => {
   };
   return (
     <>
-      <div className="flex text-center md:text-left items-center justify-center md:justify-between p-4 bg-white border-b border-gray-200 rounded-xl mb-6 shadow">
-        <div className="flex flex-col md:flex-row gap-4 items-center justify-center md:justify-start">
-          <Avatar size={80} className="bg-gray-200">
+      <div className="flex flex-col lg:flex-row text-center lg:text-left items-center justify-center lg:justify-between p-4 bg-white border border-[var(--border-color)] rounded-xl mb-6 shadow gap-4">
+        <div className="flex flex-col sm:flex-row gap-4 items-center justify-center sm:justify-start w-full lg:w-auto">
+          <Avatar size={64} className="bg-gray-200 flex-shrink-0">
             {document.user.avatar ? (
               <img
                 src={document.user.avatar}
@@ -47,17 +47,20 @@ const AuthorInfo: React.FC<AuthorInfoProps> = ({ document }) => {
               />
             )}
           </Avatar>
-          <div className="flex flex-col gap-3">
+          <div className="flex flex-col gap-2 items-center sm:items-start">
             <h3
-              className="font-semibold text-base text-[var(--primary-color)] cursor-pointer"
+              className="font-semibold text-sm sm:text-base lg:text-lg text-[var(--primary-color)] cursor-pointer hover:underline"
               onClick={handlerOnclick}
             >
               {document.user.first_name} {document.user.last_name}
             </h3>
             <div className="flex flex-row gap-2 items-center">
-              <School size={16} />
+              <School
+                size={14}
+                className="text-[var(--secondary-text-color)]"
+              />
               <p
-                className="text-sm font-semibold cursor-pointer"
+                className="text-[10px] sm:text-xs lg:text-sm font-medium cursor-pointer hover:underline text-[var(--secondary-text-color)]"
                 onClick={() => {
                   if (document.organization && document.organization._id) {
                     window.location.href = `/organization/${document.organization._id}`;
@@ -70,29 +73,34 @@ const AuthorInfo: React.FC<AuthorInfoProps> = ({ document }) => {
           </div>
         </div>
 
-        <div
-          className="flex flex-col items-center space-y-2"
-          style={{ color: "var(--primary-text-color)" }}
-        >
-          <div className="flex flex-row justify-center md:justify-start space-x-6">
+        <div className="flex flex-col items-center space-y-3 w-full lg:w-auto text-[var(--primary-text-color)]">
+          <div className="flex flex-row justify-center space-x-4 sm:space-x-6">
             <div className="text-center">
-              <div className="font-semibold text-xs">{followerCount}</div>
-              <div className="text-xs">Người theo dõi</div>
+              <div className="font-semibold text-xs sm:text-sm lg:text-base">
+                {followerCount}
+              </div>
+              <div className="text-[10px] sm:text-xs lg:text-sm text-[var(--secondary-text-color)]">
+                Người theo dõi
+              </div>
             </div>
             <div className="text-center">
-              <div className="font-semibold text-xs">
+              <div className="font-semibold text-xs sm:text-sm lg:text-base">
                 {document.user.following?.length || 0}
               </div>
-              <div className="text-xs">Đang theo dõi</div>
+              <div className="text-[10px] sm:text-xs lg:text-sm text-[var(--secondary-text-color)]">
+                Đang theo dõi
+              </div>
             </div>
             <div className="text-center">
-              <div className="font-semibold text-xs">
+              <div className="font-semibold text-xs sm:text-sm lg:text-base">
                 {document.user.doc_count || 0}
               </div>
-              <div className="text-xs">Bài đăng</div>
+              <div className="text-[10px] sm:text-xs lg:text-sm text-[var(--secondary-text-color)]">
+                Bài đăng
+              </div>
             </div>
           </div>
-          <div className="flex justify-center">
+          <div className="flex justify-center w-full sm:w-auto">
             <FollowButton
               user={document.user}
               size="default"
