@@ -34,7 +34,7 @@ export interface OrganizationDetailed {
     is_vip: boolean;
     roles: any[];
   }[];
-  user_count: number;
+  user_count?: number;
   created_by?: User;
   is_checked?: boolean;
   checked_by?: User;
