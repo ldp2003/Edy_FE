@@ -23,7 +23,7 @@ const SubjectItem: React.FC<SubjectItemProps> = ({ subject, onClick }) => {
 
   return (
     <div
-      className="bg-white rounded-lg border border-gray-200 p-4 hover:shadow-md transition-shadow cursor-pointer text-center md:text-left"
+      className="bg-white rounded-lg border border-gray-200 p-4 hover:shadow-md transition-shadow cursor-pointer text-left"
       onClick={handleClick}
     >
       {/* Header với icon và tiêu đề */}
@@ -37,7 +37,7 @@ const SubjectItem: React.FC<SubjectItemProps> = ({ subject, onClick }) => {
       </div>
 
       {/* Tên môn học */}
-      <h3 className="text-sm font-semibold text-gray-900 mb-2 truncate">
+      <h3 className="text-sm font-semibold text-gray-900 mb-2 truncate text-left">
         {subject.name}
       </h3>
 
