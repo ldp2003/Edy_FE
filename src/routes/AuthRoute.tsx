@@ -1,10 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useEffect, useState, useRef } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import {
-  getCurrentUser,
-  hasValidToken,
-} from "../utils/AuthService";
+import { getCurrentUser, hasValidToken } from "../utils/AuthService";
 import { UserProvider } from "../contexts/UserProvider";
 import type { User } from "../models/user";
 import { defaultUser } from "../models/user";
@@ -28,6 +25,8 @@ const AuthRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [user, setUser] = useState<User | null>(defaultUser);
   const [role, setRole] = useState<RoleCode | null>(null);
+  const [roles, setRoles] = useState<string[]>([]);
+  const [permissions, setPermissions] = useState<string[]>([]);
   const [account, setAccount] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [favoriteDocuments, setFavoriteDocuments] = useState<Document[]>([]);
@@ -135,6 +134,9 @@ const AuthRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
           setUser(data.user);
           setRole(data.roles);
           setAccount(data.account);
+          setRoles(data.roles || []);
+          setPermissions(data.user.permissions || []);
+          console.log("Permissions set to:", data.user.permissions || []);
 
           // Extract read history from user data and ensure type safety
           const rawReadHistory = data.user?.read_history || [];
@@ -396,6 +398,8 @@ const AuthRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
       user={user}
       account={account}
       role={role}
+      roles={roles}
+      permissions={permissions}
       favoriteDocuments={favoriteDocuments}
       setFavoriteDocuments={setFavoriteDocuments}
       readHistory={readHistory}

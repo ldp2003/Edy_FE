@@ -39,7 +39,9 @@ export interface User {
     added_at: string;
   }[];
   status?: "ACTIVE" | "INACTIVE" | "BANNED";
-  role?: "USER" | "MODERATOR" | "ADMIN";
+  role?: "USER" | "MODERATOR" | "ADMIN"; // Legacy single role
+  roles?: string[]; // Array of role codes
+  permissions?: string[]; // Mảng các quyền của user
   createdAt?: string;
   updatedAt?: string;
 }

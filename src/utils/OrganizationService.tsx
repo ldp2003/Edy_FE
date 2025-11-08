@@ -55,7 +55,8 @@ export const OrganizationService = {
       const response = await OrganizationAPI.getOrganizationById(
         organizationId
       );
-      return response.data || response;
+      console.log("Fetched organization by ID:", response);
+      return response.organization || response;
     } catch (error) {
       console.error("Failed to fetch organization by ID:", error);
       throw error;

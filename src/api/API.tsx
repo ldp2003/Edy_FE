@@ -457,6 +457,17 @@ export const UserAPI = {
   getPermissionByUserId: async (userId: string) => {
     return await apiClient.get(`/users/${userId}/roles`);
   },
+
+  // Get current user info including permissions
+  getCurrentUser: async () => {
+    try {
+      const response = await apiClient.get("/users/me");
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching current user:", error);
+      throw error;
+    }
+  },
   updateFieldStudy: async (field_of_study: string[]) => {
     return await apiClient.put(`/users/field-of-study`, { field_of_study });
   },
@@ -1818,15 +1829,7 @@ export const UserStatisticsAPI = {
 export const AdminStatisticsAPI = {
   // Get admin dashboard statistics
   getDashboardStats: async (params?: { force_refresh?: boolean }) => {
-    try {
-      const response = await apiClient.get("/admin/statistics", {
-        params,
-      });
-      return response.data;
-    } catch (error) {
-      console.error("Error fetching admin dashboard statistics:", error);
-      throw error;
-    }
+    return await apiClient.get("/admin/statistics", { params });
   },
 
   // Sync admin statistics

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import type { User } from "./user";
 
 export interface OrganizationDetailed {
@@ -10,13 +11,30 @@ export interface OrganizationDetailed {
   website: string;
   logo?: string;
   subjects?: {
-    subject: string;
+    subject: {
+      _id: string;
+      name: string;
+    };
     count: number;
+    _id: string;
   }[];
   content_categories?: {
     doc_type: string;
     document_count: number;
+    _id: string;
   }[];
+  users?: {
+    _id: string;
+    first_name: string;
+    last_name: string;
+    avatar?: string;
+    rank_point: number;
+    strike: number;
+    doc_count: number;
+    is_vip: boolean;
+    roles: any[];
+  }[];
+  user_count: number;
   created_by?: User;
   is_checked?: boolean;
   checked_by?: User;
