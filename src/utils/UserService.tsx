@@ -185,6 +185,17 @@ export const UserService = {
       throw error;
     }
   },
+
+  async getCurrentUser() {
+    try {
+      const user = await UserAPI.getCurrentUser();
+      console.log("Fetched current user:", user);
+      return user;
+    } catch (error) {
+      console.error("Failed to fetch current user:", error);
+      throw error;
+    }
+  },
 };
 
 // Legacy exports for backward compatibility
@@ -202,3 +213,4 @@ export const followUser = UserService.followUser;
 export const unfollowUser = UserService.unfollowUser;
 export const updateFieldOfStudy = UserService.updateFieldOfStudy;
 export const getContributions = UserService.getContributions;
+export const getCurrentUser = UserService.getCurrentUser;

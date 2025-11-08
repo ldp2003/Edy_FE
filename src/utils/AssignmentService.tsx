@@ -1,39 +1,27 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { AssignmentAPI } from "../api/API";
 
 export const AssignmentService = {
   getAllAssignments: async () => {
-    try {
-      const response = await AssignmentAPI.getAllAssignments();
-      return response.data;
-    } catch (error) {
-      throw error;
-    }
+    const response = await AssignmentAPI.getAllAssignments();
+    return response.data;
   },
 
   updateAssignmentStatus: async (assignmentId: string, isActive: boolean) => {
-    try {
-      const response = await AssignmentAPI.updateAssignmentStatus(assignmentId, isActive);
-      return response.data;
-    } catch (error) {
-      throw error;
-    }
+    const response = await AssignmentAPI.updateAssignmentStatus(
+      assignmentId,
+      isActive
+    );
+    return response.data;
   },
 
   createAssignment: async (data: any) => {
-    try {
-      const response = await AssignmentAPI.createAssignment(data);
-      return response.data;
-    } catch (error) {
-      throw error;
-    }
+    const response = await AssignmentAPI.createAssignment(data);
+    return response.data;
   },
 
   updateAssignment: async (assignmentId: string, data: any) => {
-    try {
-      const response = await AssignmentAPI.updateAssignment(assignmentId, data);
-      return response.data;
-    } catch (error) {
-      throw error;
-    }
+    const response = await AssignmentAPI.updateAssignment(assignmentId, data);
+    return response.data;
   },
-}
+};

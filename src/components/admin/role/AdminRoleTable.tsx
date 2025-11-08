@@ -14,7 +14,7 @@ import {
 import { RoleService } from "../../../utils/RoleService";
 import CreateRoleModal from "./CreateRoleModal";
 import EditRoleModal from "./EditRoleModal";
-import { PERMISSIONS } from "../../../constants/PermissionConstants";
+import { PERMISSIONS } from "../../../constants/PermissionConstants.ts";
 
 interface Role {
   _id: string;

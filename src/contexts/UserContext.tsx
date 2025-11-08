@@ -21,7 +21,9 @@ export const UserContext = createContext({
   isLoggedIn: false,
   user: null as User | null,
   account: null as Account | null,
-  role: null as string | null,
+  role: null as string | null, // Legacy
+  roles: [] as string[], // Array of role codes
+  permissions: [] as string[], // Mảng permissions của user
   personalDocuments: [] as Document[],
   setPersonalDocuments: (_docs: Document[]) => {},
 

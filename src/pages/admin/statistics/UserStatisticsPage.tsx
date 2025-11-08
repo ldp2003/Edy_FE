@@ -97,7 +97,7 @@ const UserStatisticsPage: React.FC = () => {
         const usersResponse = await UserService.getAllUsers();
         const usersData = usersResponse;
         console.log("Processing users data:", usersData);
-        setUsersList(usersData || []);
+        setUsersList(Array.isArray(usersData) ? usersData : []);
       } catch (err) {
         console.error("Error fetching user statistics:", err);
         setError("Không thể tải dữ liệu thống kê người dùng");

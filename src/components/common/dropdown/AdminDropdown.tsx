@@ -9,6 +9,7 @@ import {
   Building,
   LogOut,
   LayoutDashboard,
+  Home,
 } from "lucide-react";
 
 const AdminDropdown: React.FC = () => {
@@ -32,6 +33,9 @@ const AdminDropdown: React.FC = () => {
         break;
       case "organizations":
         navigate("/admin/organizations");
+        break;
+      case "home":
+        navigate("/");
         break;
       case "switch-to-user":
         navigate("/");
@@ -109,6 +113,15 @@ const AdminDropdown: React.FC = () => {
               <div className="flex justify-between items-center gap-4 text-gray-700 hover:text-blue-600">
                 <span>Quản lý tổ chức</span>
                 <Building size={16} />
+              </div>
+            ),
+          },
+          {
+            key: "home",
+            label: (
+              <div className="flex justify-between items-center gap-4 text-gray-700 hover:text-blue-600">
+                <span>Trang chủ hệ thống</span>
+                <Home size={16} />
               </div>
             ),
           },

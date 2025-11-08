@@ -1,4 +1,8 @@
 import { AdminStatisticsAPI } from "../api/API";
+import type {
+  ActivityActionType,
+  TargetTypeValue,
+} from "../models/activityLog";
 
 export interface AdminStatsData {
   total_documents: number;
@@ -15,9 +19,35 @@ export interface AdminStatsData {
   total_subjects: number;
 }
 
+export interface RecentActivity {
+  id: string;
+  user: {
+    id: string;
+    name: string;
+    avatar?: string;
+    email: string;
+  };
+  action: ActivityActionType;
+  actionLabel: string;
+  targetType: TargetTypeValue;
+  targetId: string;
+  targetTitle: string;
+  description: string;
+  metadata?: Record<string, unknown>;
+  redirectTo?: string;
+  redirectParams?: Record<string, unknown>;
+  timestamp: string;
+}
+
+export interface AdminDashboardData {
+  statistics: AdminStatsData;
+  recent_activities: RecentActivity[];
+  tasks: unknown[]; // Bỏ qua tasks từ API này
+}
+
 export interface AdminStatsResponse {
   success: boolean;
-  data: AdminStatsData;
+  data: AdminDashboardData;
   cached: boolean;
   last_updated: string;
 }
@@ -122,7 +152,7 @@ const AdminStatisticsService = {
       const response = await AdminStatisticsAPI.getDashboardStats({
         force_refresh: forceRefresh,
       });
-      return response;
+      return response.data; // Trả về data từ response
     } catch (error) {
       console.error(
         "Error in AdminStatisticsService.getDashboardStats:",
