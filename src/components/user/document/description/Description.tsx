@@ -66,7 +66,7 @@ const Description: React.FC<DescriptionProps> = ({
         {!isUser && <DescriptionModal />}
 
         <div className="text-sm text-gray-700 leading-relaxed relative">
-          <div className="p-4">
+          <div className="p-4 min-h-[150px]">
             <p
               className={`line-clamp-4 ${showReadMore ? "cursor-pointer" : ""}`}
               onClick={showReadMore ? () => setShowFullModal(true) : undefined}

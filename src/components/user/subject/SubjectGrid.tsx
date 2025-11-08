@@ -6,12 +6,14 @@ interface SubjectGridProps {
   title: string;
   subjects?: Subject[];
   onSubjectClick?: (subject: Subject) => void;
+  loading?: boolean;
 }
 
 const SubjectGrid: React.FC<SubjectGridProps> = ({
   title,
   subjects,
   onSubjectClick,
+  loading = false,
 }) => {
   const navigate = useNavigate();
   return (
@@ -28,13 +30,23 @@ const SubjectGrid: React.FC<SubjectGridProps> = ({
         </span>
       </div>
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-2 md:gap-4">
-        {(subjects || []).slice(0, 5).map((subject) => (
-          <SubjectItem
-            key={subject._id}
-            subject={subject}
-            onClick={onSubjectClick}
-          />
-        ))}
+        {loading
+          ? // Loading skeleton
+            Array.from({ length: 5 }).map((_, index) => (
+              <div key={index} className="animate-pulse">
+                <div className="bg-gray-200 rounded-lg h-24 mb-2"></div>
+                <div className="bg-gray-200 rounded h-4"></div>
+              </div>
+            ))
+          : (subjects || [])
+              .slice(0, 5)
+              .map((subject) => (
+                <SubjectItem
+                  key={subject._id}
+                  subject={subject}
+                  onClick={onSubjectClick}
+                />
+              ))}
       </div>
     </section>
   );

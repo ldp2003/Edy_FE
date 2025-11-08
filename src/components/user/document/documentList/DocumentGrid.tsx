@@ -6,12 +6,14 @@ interface DocumentGridProps {
   title: string;
   documents: (Document | undefined | null)[]; // Allow undefined or null in the array
   onViewMore?: () => void;
+  loading?: boolean;
 }
 
 const DocumentGrid: React.FC<DocumentGridProps> = ({
   title,
   documents,
   onViewMore,
+  loading = false,
 }) => {
   const [displayCount, setDisplayCount] = useState(6);
 
@@ -54,12 +56,22 @@ const DocumentGrid: React.FC<DocumentGridProps> = ({
         )}
       </div>
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 2xl:grid-cols-6  gap-2 md:gap-4">
-        {documents
-          .filter((doc): doc is Document => doc !== null && doc !== undefined)
-          .slice(0, displayCount)
-          .map((doc) => (
-            <DocumentCard key={doc._id} document={doc} />
-          ))}
+        {loading
+          ? // Loading skeleton
+            Array.from({ length: displayCount }).map((_, index) => (
+              <div key={index} className="animate-pulse">
+                <div className="bg-gray-200 rounded-lg h-48 mb-2"></div>
+                <div className="bg-gray-200 rounded h-4 mb-1"></div>
+                <div className="bg-gray-200 rounded h-3 mb-1"></div>
+                <div className="bg-gray-200 rounded h-3"></div>
+              </div>
+            ))
+          : documents
+              .filter(
+                (doc): doc is Document => doc !== null && doc !== undefined
+              )
+              .slice(0, displayCount)
+              .map((doc) => <DocumentCard key={doc._id} document={doc} />)}
       </div>
     </section>
   );
