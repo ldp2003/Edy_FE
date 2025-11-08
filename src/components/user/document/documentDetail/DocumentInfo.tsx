@@ -7,6 +7,7 @@ import {
   Lock,
   Users,
   Share,
+  Calendar,
 } from "lucide-react";
 import IntensiveMark from "../documentElement/IntensiveMark";
 import type { Document } from "../../../../models/document";
@@ -156,6 +157,32 @@ const DocumentInfo: React.FC<DocumentInfoProps> = ({ document }) => {
           {formatLevel(document.level)}
         </span>
       </div>
+
+      {/* Tác giả */}
+      {document.author && document.author.length > 0 && (
+        <div className="flex flex-col gap-1">
+          <div className="flex gap-1 flex-row items-center">
+            <Users size={15} />
+            <span className="text-sm font-medium">Tác giả:</span>
+          </div>
+          <span className="font-bold text-xs text-[var(--primary-text-color)]">
+            {document.author.join(", ")}
+          </span>
+        </div>
+      )}
+
+      {/* Năm xuất bản */}
+      {document.published_year && (
+        <div className="flex flex-col gap-1">
+          <div className="flex gap-1 flex-row items-center">
+            <Calendar size={15} />
+            <span className="text-sm font-medium">Năm xuất bản:</span>
+          </div>
+          <span className="font-bold text-xs text-[var(--primary-text-color)]">
+            {document.published_year}
+          </span>
+        </div>
+      )}
 
       <div className="flex flex-col gap-1 border-y-1 border-gray-200 py-4 text-[var(--secondary-text-color)]">
         <span className="font-bold text-sm">Đăng tải lúc:</span>

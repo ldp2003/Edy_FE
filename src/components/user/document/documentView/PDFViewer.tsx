@@ -1,9 +1,7 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { Button, Typography, Card } from "antd";
-import { DownloadOutlined } from "@ant-design/icons";
 import * as pdfjsLib from "pdfjs-dist";
-
-const { Text } = Typography;
+import LimitNotificationModal from "./LimitNotificationModal";
+import LimitNotificationBanner from "./LimitNotificationBanner";
 
 // Configure PDF.js worker
 pdfjsLib.GlobalWorkerOptions.workerSrc =
@@ -32,6 +30,8 @@ const PDFViewer: React.FC<PDFViewerProps> = ({
   const [visiblePage, setVisiblePage] = useState(1);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [showLimitModal, setShowLimitModal] = useState(false);
+  const [hasShownModal, setHasShownModal] = useState(false);
 
   const renderPages = useCallback(
     async (pdf: pdfjsLib.PDFDocumentProxy) => {
@@ -196,8 +196,25 @@ const PDFViewer: React.FC<PDFViewerProps> = ({
     return () => window.removeEventListener("scroll", handleScroll);
   }, [visiblePage, onPageUpdate]);
 
+  // Show modal when user reaches page 10
+  useEffect(() => {
+    if (
+      !isUser &&
+      visiblePage >= 10 &&
+      !hasShownModal &&
+      canvases.length >= 10
+    ) {
+      setShowLimitModal(true);
+      setHasShownModal(true);
+    }
+  }, [visiblePage, isUser, hasShownModal, canvases.length]);
+
+  const handleModalClose = () => {
+    setShowLimitModal(false);
+  };
+
   return (
-    <div className="w-full mx-auto z-0">
+    <div className="w-full mx-auto z-0 pdf-viewer-wrapper">
       {loading && (
         <div className="flex flex-col items-center justify-center py-10 sm:py-20">
           <div className="animate-spin rounded-full h-8 w-8 sm:h-12 sm:w-12 border-b-2 border-blue-500 mb-3 sm:mb-4"></div>
@@ -254,44 +271,28 @@ const PDFViewer: React.FC<PDFViewerProps> = ({
                   alt={`Page ${index + 1}`}
                   className="w-full h-auto rounded-lg sm:rounded-2xl hover:shadow-lg transition-shadow duration-300"
                 />
-                {/* Add DescriptionModal overlay for pages after 10 if not user */}
               </div>
             ))}
 
+            {/* Limit notification banner below last page for non-users */}
             {!isUser && canvases.length >= 10 && (
-              <Card className="mx-2 sm:mx-auto border-orange-200 bg-orange-50 text-center max-w-lg">
-                <div className="flex flex-col items-center space-y-2 sm:space-y-3">
-                  <div className="flex items-center space-x-2">
-                    <svg
-                      className="w-4 h-4 sm:w-5 sm:h-5 text-orange-600"
-                      fill="currentColor"
-                      viewBox="0 0 20 20"
-                    >
-                      <path
-                        fillRule="evenodd"
-                        d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
-                        clipRule="evenodd"
-                      />
-                    </svg>
-                    <Text className="text-orange-700 font-medium text-sm sm:text-base">
-                      Bạn đã xem hết 10 trang đầu tiên
-                    </Text>
-                  </div>
-                  <Text className="text-orange-600 text-xs sm:text-sm">
-                    Để xem toàn bộ tài liệu, vui lòng tải xuống
-                  </Text>
-                  <Button
-                    type="primary"
-                    icon={<DownloadOutlined />}
-                    className="bg-orange-500 border-orange-500 hover:bg-orange-600 text-sm sm:text-base"
-                  >
-                    Tải xuống
-                  </Button>
-                </div>
-              </Card>
+              <LimitNotificationBanner
+                title="Bạn đã xem hết 10 trang đầu"
+                message="Đăng ký tài khoản để xem toàn bộ nội dung tài liệu"
+                icon="📖"
+              />
             )}
           </div>
         </>
+      )}
+
+      {/* Modal thông báo đã xem hết 10 trang */}
+      {showLimitModal && (
+        <LimitNotificationModal
+          visible={showLimitModal}
+          onClose={handleModalClose}
+          message="Bạn đã xem hết 10 trang đầu của tài liệu. Để xem toàn bộ nội dung, vui lòng đăng ký tài khoản."
+        />
       )}
     </div>
   );

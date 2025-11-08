@@ -1,5 +1,6 @@
 import React from "react";
 import LikeCount from "../documentElement/LikeCount";
+import FileType from "../documentElement/FileType";
 import type { Document } from "../../../../models/document";
 
 type SuggestCardProps = {
@@ -29,12 +30,30 @@ const SuggestCard: React.FC<SuggestCardProps> = ({ document }) => {
           className="w-full h-full object-cover"
           onError={handleImageError}
         />
+        {/* Badge Chuyên sâu */}
+        {document.intensive && (
+          <div className="absolute top-0 left-0 px-1.5 py-0.5 text-[8px] font-bold rounded-br-lg bg-white/95 text-[var(--intensive-color)] border-r border-b border-[var(--intensive-color)]">
+            CS
+          </div>
+        )}
+        {/* File Type Badge */}
+        {document.file_type && (
+          <div className="absolute bottom-0 left-0">
+            <FileType fileType={document.file_type} rounded={false} />
+          </div>
+        )}
       </div>
       <div className="flex-1 text-[var(--primary-text-color)] min-w-0">
-        <div className="item-title font-bold text-xs line-clamp-2 mb-1">
+        <div
+          className="item-title font-bold text-xs line-clamp-2 mb-1"
+          title={title}
+        >
           {title}
         </div>
-        <p className="text-xs text-[var(--secondary-text-color)] mb-2 line-clamp-1">
+        <p
+          className="text-xs text-[var(--secondary-text-color)] mb-2 line-clamp-1"
+          title={subject?.name || "Chưa có môn"}
+        >
           {subject?.name || <span>Chưa có môn</span>}
         </p>
         <div className="flex items-center justify-between">

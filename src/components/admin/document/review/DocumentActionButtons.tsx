@@ -10,28 +10,19 @@ const { TextArea } = Input;
 interface DocumentActionButtonsProps {
   documentRequest: PendingRequest | null;
   isIntensive: boolean;
-  processing: boolean;
   documentId: string;
-  documentStatus?: string; // Thêm status của document
-  documentType?: string; // Thêm loại tài liệu
-  onApprove: (approvalData: {
-    documentRequestId: string;
-    isIntensive: boolean;
-  }) => void;
-  onReject: (reason: string, requestId: string) => void;
-  onDelete: (reason: string) => void;
+  documentStatus?: string;
+  documentType?: string;
+  onSuccess?: () => void; // Callback sau khi thực hiện thành công
 }
 
 const DocumentActionButtons: React.FC<DocumentActionButtonsProps> = ({
   documentRequest,
   isIntensive,
-  processing,
   documentId,
   documentStatus,
   documentType,
-  onApprove,
-  onReject,
-  onDelete,
+  onSuccess,
 }) => {
   const navigate = useNavigate();
   const [messageApi, contextHolder] = message.useMessage();
@@ -42,6 +33,7 @@ const DocumentActionButtons: React.FC<DocumentActionButtonsProps> = ({
   const [deleteReason, setDeleteReason] = useState("");
   const [editRequestReason, setEditRequestReason] = useState("");
   const [documentTitle, setDocumentTitle] = useState<string>("");
+  const [processing, setProcessing] = useState(false);
 
   // Fetch document title when component mounts
   useEffect(() => {
@@ -69,6 +61,7 @@ const DocumentActionButtons: React.FC<DocumentActionButtonsProps> = ({
     APPROVED: "APPROVED",
     REJECTED: "REJECTED",
     REQUESTED_EDIT: "REQUESTED_EDIT",
+    DELETED: "DELETED",
   } as const;
 
   type DocumentStatusType =
@@ -81,12 +74,21 @@ const DocumentActionButtons: React.FC<DocumentActionButtonsProps> = ({
     }
 
     try {
-      const approvalData = {
-        documentRequestId: documentRequest._id,
-        isIntensive,
-      };
+      setProcessing(true);
 
-      await onApprove(approvalData);
+      // Gọi API duyệt tài liệu trực tiếp
+      if (documentStatus === DOCUMENT_STATUS.PENDING) {
+        await DocumentService.approveDocumentByRequestId(
+          documentRequest._id,
+          isIntensive ? { isIntensive: true } : undefined
+        );
+      } else if (documentStatus === DOCUMENT_STATUS.PENDING_EDIT) {
+        await DocumentService.handleEditApproval(
+          documentRequest._id,
+          { action: "APPROVE"}
+        );
+      }
+
       messageApi.success("Tài liệu đã được duyệt thành công!");
 
       // Send notification to the document owner
@@ -97,11 +99,23 @@ const DocumentActionButtons: React.FC<DocumentActionButtonsProps> = ({
           documentTitle
         );
       }
+
+      // Gọi callback nếu có
+      if (onSuccess) {
+        onSuccess();
+      }
+
+      // Reload page after 1.5s
+      setTimeout(() => {
+        window.location.reload();
+      }, 1500);
     } catch (error) {
       console.error("Approve error:", error);
       messageApi.error("Có lỗi xảy ra khi duyệt tài liệu!");
+    } finally {
+      setProcessing(false);
     }
-  }, [documentRequest, isIntensive, onApprove, messageApi, documentTitle]);
+  }, [documentRequest, isIntensive, messageApi, documentTitle, onSuccess]);
 
   const handleReject = async () => {
     if (!documentRequest) {
@@ -115,7 +129,20 @@ const DocumentActionButtons: React.FC<DocumentActionButtonsProps> = ({
     }
 
     try {
-      await onReject(rejectReason, documentRequest._id);
+      setProcessing(true);
+
+      if (documentStatus === DOCUMENT_STATUS.PENDING) {
+        await DocumentService.rejectDocumentByRequestId(
+          documentRequest._id,
+          rejectReason
+        );
+      } else if (documentStatus === DOCUMENT_STATUS.PENDING_EDIT) {
+        await DocumentService.handleEditApproval(
+          documentRequest._id,
+          { action: "REJECT", message: rejectReason }
+        );
+      }
+
       messageApi.success("Tài liệu đã được từ chối!");
       setRejectModalVisible(false);
       setRejectReason("");
@@ -129,9 +156,21 @@ const DocumentActionButtons: React.FC<DocumentActionButtonsProps> = ({
           rejectReason
         );
       }
+
+      // Gọi callback nếu có
+      if (onSuccess) {
+        onSuccess();
+      }
+
+      // Reload page after 1.5s
+      setTimeout(() => {
+        window.location.reload();
+      }, 1500);
     } catch (error) {
       console.error("Reject error:", error);
       messageApi.error("Có lỗi xảy ra khi từ chối tài liệu!");
+    } finally {
+      setProcessing(false);
     }
   };
 
@@ -142,7 +181,11 @@ const DocumentActionButtons: React.FC<DocumentActionButtonsProps> = ({
     }
 
     try {
-      await onDelete(deleteReason);
+      setProcessing(true);
+
+      // Gọi API xóa tài liệu trực tiếp
+      await DocumentService.deleteDocument(documentId, deleteReason);
+
       messageApi.success("Tài liệu đã được xóa!");
       setDeleteModalVisible(false);
       setDeleteReason("");
@@ -156,35 +199,117 @@ const DocumentActionButtons: React.FC<DocumentActionButtonsProps> = ({
           deleteReason
         );
       }
+
+      // Gọi callback nếu có
+      if (onSuccess) {
+        onSuccess();
+      }
+
+      // Reload page after 1.5s
+      setTimeout(() => {
+        window.location.reload();
+      }, 1500);
     } catch (error) {
       console.error("Delete error:", error);
       messageApi.error("Có lỗi xảy ra khi xóa tài liệu!");
+    } finally {
+      setProcessing(false);
     }
   };
 
   const handleEditRequest = async () => {
+    if (!documentRequest) {
+      messageApi.error("Không tìm thấy request tài liệu!");
+      return;
+    }
+
     if (!editRequestReason.trim()) {
       messageApi.error("Vui lòng nhập lý do yêu cầu chỉnh sửa!");
       return;
     }
 
     try {
-      await onDelete(editRequestReason);
+      setProcessing(true);
+
+      // Gọi API yêu cầu chỉnh sửa trực tiếp
+      await DocumentService.requestEditDocument(documentRequest._id, editRequestReason);
+
       messageApi.success("Đã gửi yêu cầu chỉnh sửa!");
       setEditRequestModalVisible(false);
       setEditRequestReason("");
 
       // Send notification to the document owner
       if (documentRequest?.requester && documentTitle) {
-        await NotificationService.createSystemNotification(
+        await NotificationService.createDocumentHiddenNotification(
           documentRequest.requester,
-          `Quản trị viên yêu cầu chỉnh sửa tài liệu "${documentTitle}". Lý do: ${editRequestReason}`,
-          documentRequest.doc
+          documentRequest.doc,
+          documentTitle,
+          editRequestReason
         );
       }
+
+      // Gọi callback nếu có
+      if (onSuccess) {
+        onSuccess();
+      }
+
+      // Refresh page sau 1.5s để cập nhật trạng thái
+      setTimeout(() => {
+        window.location.reload();
+      }, 1500);
     } catch (error) {
       console.error("Edit request error:", error);
       messageApi.error("Có lỗi xảy ra khi gửi yêu cầu chỉnh sửa!");
+    } finally {
+      setProcessing(false);
+    }
+  };
+
+  const handleEditRequestDocument = async () => {
+    if (!documentId) {
+      messageApi.error("Không tìm thấy tài liệu!");
+      return;
+    }
+
+    if (!editRequestReason.trim()) {
+      messageApi.error("Vui lòng nhập lý do yêu cầu chỉnh sửa!");
+      return;
+    }
+
+    try {
+      setProcessing(true);
+
+      // Gọi API yêu cầu chỉnh sửa trực tiếp
+      await DocumentService.requestEditDirectDocument(documentId, editRequestReason);
+
+      messageApi.success("Đã gửi yêu cầu chỉnh sửa!");
+      setEditRequestModalVisible(false);
+      setEditRequestReason("");
+
+      // Send notification to the document owner
+      if (documentRequest?.requester && documentTitle) {
+        await NotificationService.createDocumentHiddenNotification(
+          documentRequest.requester,
+          documentRequest.doc,
+          documentTitle,
+          editRequestReason
+        );
+      }
+
+      // Gọi callback nếu có
+      if (onSuccess) {
+        onSuccess();
+      }
+
+      // Refresh page sau 1.5s để cập nhật trạng thái
+      setTimeout(() => {
+        window.location.reload();
+      }, 1500);
+    } catch (error) {
+      console.error("Edit request error:", error);
+      messageApi.error("Có lỗi xảy ra khi gửi yêu cầu chỉnh sửa!");
+    } finally {
+      setProcessing(false);
     }
   };
 
@@ -242,9 +367,8 @@ const DocumentActionButtons: React.FC<DocumentActionButtonsProps> = ({
           {
             key: "request-edit",
             text: "Yêu cầu chỉnh sửa",
-            color: "#6b7280",
+            color: "#f59e0b",
             onClick: () => setEditRequestModalVisible(true),
-            disabled: true,
           },
           {
             key: "delete",
@@ -283,6 +407,17 @@ const DocumentActionButtons: React.FC<DocumentActionButtonsProps> = ({
             onClick: () => setDeleteModalVisible(true),
             disabled: true,
           },
+        ],
+      },
+
+      [DOCUMENT_STATUS.DELETED] :{
+        statusBadge: {
+          text: "✗ Đã xóa",
+          color: "text-red-700",
+          bgColor: "bg-red-100",
+          borderColor: "border-red-300",
+        },
+        actionButtons: [
         ],
       },
 
@@ -338,18 +473,6 @@ const DocumentActionButtons: React.FC<DocumentActionButtonsProps> = ({
           borderColor: "border-yellow-300",
         },
         actionButtons: [
-          {
-            key: "approve",
-            text: "Duyệt bài",
-            color: "#22c55e",
-            onClick: handleApprove,
-          },
-          {
-            key: "reject",
-            text: "Từ chối",
-            color: "#ef4444",
-            onClick: () => setRejectModalVisible(true),
-          },
           {
             key: "delete",
             text: "Xóa bài",
@@ -425,7 +548,7 @@ const DocumentActionButtons: React.FC<DocumentActionButtonsProps> = ({
 
       {/* Reject Modal */}
       <Modal
-        title="Từ chối tài liệu"
+        title= {documentStatus === DOCUMENT_STATUS.PENDING_EDIT ? "Từ chối chỉnh sửa" : "Từ chối tài liệu"}
         open={rejectModalVisible}
         onOk={handleReject}
         onCancel={() => {
@@ -497,7 +620,7 @@ const DocumentActionButtons: React.FC<DocumentActionButtonsProps> = ({
       <Modal
         title="Yêu cầu chỉnh sửa"
         open={editRequestModalVisible}
-        onOk={handleEditRequest}
+        onOk={documentStatus === DOCUMENT_STATUS.PENDING ? handleEditRequest : handleEditRequestDocument}
         onCancel={() => {
           setEditRequestModalVisible(false);
           setEditRequestReason("");

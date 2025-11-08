@@ -4,6 +4,7 @@ import ViewCount from "../documentElement/ViewCount";
 import RatingRatio from "../documentElement/RatingRatio";
 import PageCount from "../documentElement/PageCount";
 import IntensiveMark from "../documentElement/IntensiveMark";
+import FileType from "../documentElement/FileType";
 import type { ReactNode } from "react";
 
 type RecentItemProps = {
@@ -13,6 +14,7 @@ type RecentItemProps = {
   pages: number;
   date: Date | string;
   intensive?: boolean;
+  fileType?: string;
 };
 
 const RecentItem: React.FC<RecentItemProps> = ({
@@ -22,6 +24,7 @@ const RecentItem: React.FC<RecentItemProps> = ({
   pages,
   date,
   intensive,
+  fileType,
 }) => {
   return (
     <div className="flex flex-col md:flex-row text-left w-full gap-2 md:gap-4 justify-between px-2 py-1 rounded-lg shadow-md bg-white mb-2 hover:shadow-xl hover:scale-[1.01] transition-all duration-200 cursor-pointer">
@@ -30,7 +33,10 @@ const RecentItem: React.FC<RecentItemProps> = ({
           <FileText size={20} className="md:w-6 md:h-6" />
         </div>
         <div className="flex-1 min-w-0">
-          <div className="item-title font-bold text-sm text-gray-800 break-words">
+          <div
+            className="item-title font-bold text-sm text-gray-800 break-words"
+            title={title as string}
+          >
             {title}
           </div>
           <div className="flex flex-wrap gap-2 md:gap-4 text-xs md:text-sm text-gray-600 mt-1">
@@ -43,6 +49,11 @@ const RecentItem: React.FC<RecentItemProps> = ({
             <span>
               <PageCount pages={pages}></PageCount>
             </span>
+            {fileType && (
+              <span>
+                <FileType fileType={fileType}></FileType>
+              </span>
+            )}
           </div>
         </div>
       </div>

@@ -111,7 +111,7 @@ const DislikeButton: React.FC<DislikeButtonProps> = ({
   return (
     <div>
       <button
-        className={`text-xs flex items-center space-x-2 rounded-2xl border px-3 py-1 font-semibold cursor-pointer transition-colors duration-300 ${
+        className={`text-[10px] sm:text-xs flex items-center space-x-1 sm:space-x-2 rounded-2xl border px-2 sm:px-3 py-1 font-semibold cursor-pointer transition-colors duration-300 ${
           isDisliked
             ? "bg-[var(--red-button-color)] text-white border-[var(--red-button-color)]"
             : "bg-white border-gray-300 text-[var(--red-button-color)] hover:bg-[#d63847] hover:text-white"
@@ -119,8 +119,8 @@ const DislikeButton: React.FC<DislikeButtonProps> = ({
         onClick={handleDislikeClick}
         disabled={loading}
       >
-        <ThumbsDown size={15} />
-        <span className="text-xs">{dislikeCount}</span>
+        <ThumbsDown size={14} className="sm:w-[15px] sm:h-[15px]" />
+        <span className="text-[10px] sm:text-xs">{dislikeCount}</span>
       </button>
     </div>
   );

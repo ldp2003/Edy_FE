@@ -773,6 +773,21 @@ export const DocumentAPI = {
     }
   },
 
+  requestEditDirectDocument: async (documentId: string, reason?: string) => {
+    try {
+      const response = await apiClient.put(
+        `/documents/request-edit-direct/${documentId}`,
+        {
+          reason,
+        }
+      );
+      return response.data;
+    } catch (error) {
+      console.error("Error requesting edit for document:", error);
+      throw error;
+    }
+  },
+
   // Delete a document
   deleteDocument: async (documentId: string, reason?: string) => {
     try {
@@ -1825,18 +1840,13 @@ export const AdminStatisticsAPI = {
     }
   },
 
-  // Get recent activities
-  getRecentActivities: async (params?: { limit?: number }) => {
+  // Get pending tasks for admin
+  getPendingTasks: async () => {
     try {
-      const response = await apiClient.get(
-        "/admin/statistics/recent-activities",
-        {
-          params,
-        }
-      );
+      const response = await apiClient.get("/documents/my-pending");
       return response.data;
     } catch (error) {
-      console.error("Error fetching recent activities:", error);
+      console.error("Error fetching pending tasks:", error);
       throw error;
     }
   },

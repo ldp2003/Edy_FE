@@ -151,6 +151,15 @@ export const DocumentService = {
     }
   },
 
+  async requestEditDirectDocument(documentId: string, reason?: string) {
+    try {
+      return await DocumentAPI.requestEditDirectDocument(documentId, reason);
+    } catch (error) {
+      console.error("Error in DocumentService.requestEditDirectDocument:", error);
+      throw error;
+    }
+  },
+
   async deleteDocument(documentId: string, reason?: string) {
     try {
       return await DocumentAPI.deleteDocument(documentId, reason);
