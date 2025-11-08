@@ -15,7 +15,9 @@ interface UserProviderProps {
   isLoggedIn: boolean;
   user: User | null;
   account: Account | null;
-  role: string | null;
+  role: string | null; // Legacy
+  roles: string[]; // Array of role codes
+  permissions: string[]; // Thêm permissions
   favoriteDocuments: Document[];
   setFavoriteDocuments: (
     docs: Document[] | ((prev: Document[]) => Document[])
@@ -40,6 +42,8 @@ export const UserProvider: React.FC<UserProviderProps> = ({
   user,
   account,
   role,
+  roles, // Thêm roles
+  permissions, // Thêm permissions
   favoriteDocuments,
   setFavoriteDocuments,
   readHistory,
@@ -94,6 +98,8 @@ export const UserProvider: React.FC<UserProviderProps> = ({
     user,
     account,
     role,
+    roles, // Thêm roles
+    permissions, // Thêm permissions
     favoriteDocuments,
     setFavoriteDocuments,
     readHistory,

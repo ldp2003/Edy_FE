@@ -1,13 +1,14 @@
 import React, { useState, useEffect, useCallback } from "react";
+import { useNavigate } from "react-router-dom";
 import { message, Form, Modal, Input } from "antd";
 import { PlusOutlined, SearchOutlined } from "@ant-design/icons";
 import { OrganizationService } from "../../../utils/OrganizationService";
 import type { OrganizationDetailed } from "../../../models/organization";
 import OrganizationTable from "../../../components/admin/organization/OrganizationTable";
 import OrganizationForm from "../../../components/admin/organization/OrganizationForm";
-import OrganizationViewModal from "../../../components/admin/organization/OrganizationViewModal";
 
 const ManageOrganizationsPage: React.FC = () => {
+  const navigate = useNavigate();
   const [organizations, setOrganizations] = useState<OrganizationDetailed[]>(
     []
   );
@@ -16,9 +17,6 @@ const ManageOrganizationsPage: React.FC = () => {
   const [messageApi, contextHolder] = message.useMessage();
   const [editingOrganization, setEditingOrganization] =
     useState<OrganizationDetailed | null>(null);
-  const [viewingOrganization, setViewingOrganization] =
-    useState<OrganizationDetailed | null>(null);
-  const [isViewModalVisible, setIsViewModalVisible] = useState(false);
   const [searchText, setSearchText] = useState("");
   const [form] = Form.useForm();
 
@@ -65,8 +63,7 @@ const ManageOrganizationsPage: React.FC = () => {
   };
 
   const handleView = (organization: OrganizationDetailed) => {
-    setViewingOrganization(organization);
-    setIsViewModalVisible(true);
+    navigate(`/admin/organizations/${organization._id}`);
   };
 
   const handleDelete = async (organizationId: string) => {
@@ -125,11 +122,6 @@ const ManageOrganizationsPage: React.FC = () => {
     form.resetFields();
   };
 
-  const handleViewModalCancel = () => {
-    setIsViewModalVisible(false);
-    setViewingOrganization(null);
-  };
-
   return (
     <div>
       {contextHolder}
@@ -182,12 +174,6 @@ const ManageOrganizationsPage: React.FC = () => {
         onOk={handleModalOk}
         onCancel={handleModalCancel}
         form={form}
-      />
-
-      <OrganizationViewModal
-        visible={isViewModalVisible}
-        organization={viewingOrganization}
-        onCancel={handleViewModalCancel}
       />
     </div>
   );

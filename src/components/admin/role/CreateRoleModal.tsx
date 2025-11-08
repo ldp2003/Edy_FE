@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
-import { Modal, Form, Input, Select, message } from 'antd';
-import { PERMISSIONS } from '../../../constants/PermissionConstants';
-import { RoleService } from '../../../utils/RoleService';
+import React, { useState, useEffect } from "react";
+import { Modal, Form, Input, Select, message } from "antd";
+import { PERMISSIONS } from "../../../constants/PermissionConstants.ts";
+import { RoleService } from "../../../utils/RoleService";
 
 interface CreateRoleModalProps {
   visible: boolean;
@@ -25,7 +25,7 @@ const CreateRoleModal: React.FC<CreateRoleModalProps> = ({
   }, [visible, form]);
 
   const handlePermissionChange = (values: string[]) => {
-    if (values.includes('ALL')) {
+    if (values.includes("ALL")) {
       // Nếu chọn ALL, chọn tất cả permission codes
       const allPermissionCodes = Object.keys(PERMISSIONS);
       setSelectedPermissions(allPermissionCodes);
@@ -43,13 +43,13 @@ const CreateRoleModal: React.FC<CreateRoleModalProps> = ({
         description: values.description,
         permissions: selectedPermissions, // Gửi mã quyền thay vì tên hiển thị
       });
-      
-      message.success('Tạo quyền mới thành công!');
+
+      message.success("Tạo quyền mới thành công!");
       onSuccess();
       onClose();
     } catch (error) {
-      console.error('Error creating role:', error);
-      message.error('Có lỗi xảy ra khi tạo quyền mới!');
+      console.error("Error creating role:", error);
+      message.error("Có lỗi xảy ra khi tạo quyền mới!");
     }
   };
 
@@ -74,8 +74,8 @@ const CreateRoleModal: React.FC<CreateRoleModalProps> = ({
           name="name"
           label="Tên quyền"
           rules={[
-            { required: true, message: 'Vui lòng nhập tên quyền' },
-            { max: 100, message: 'Tên quyền không được quá 100 ký tự' }
+            { required: true, message: "Vui lòng nhập tên quyền" },
+            { max: 100, message: "Tên quyền không được quá 100 ký tự" },
           ]}
         >
           <Input placeholder="Nhập tên quyền" />
@@ -85,21 +85,18 @@ const CreateRoleModal: React.FC<CreateRoleModalProps> = ({
           name="description"
           label="Mô tả"
           rules={[
-            { required: true, message: 'Vui lòng nhập mô tả' },
-            { max: 500, message: 'Mô tả không được quá 500 ký tự' }
+            { required: true, message: "Vui lòng nhập mô tả" },
+            { max: 500, message: "Mô tả không được quá 500 ký tự" },
           ]}
         >
-          <Input.TextArea
-            placeholder="Nhập mô tả cho quyền"
-            rows={4}
-          />
+          <Input.TextArea placeholder="Nhập mô tả cho quyền" rows={4} />
         </Form.Item>
 
         <Form.Item
           name="permissions"
           label="Quyền hạn"
           rules={[
-            { required: true, message: 'Vui lòng chọn ít nhất một quyền' }
+            { required: true, message: "Vui lòng chọn ít nhất một quyền" },
           ]}
         >
           <Select
@@ -107,7 +104,7 @@ const CreateRoleModal: React.FC<CreateRoleModalProps> = ({
             placeholder="Chọn quyền hạn"
             onChange={handlePermissionChange}
             value={selectedPermissions}
-            style={{ width: '100%' }}
+            style={{ width: "100%" }}
             optionFilterProp="label"
           >
             {Object.entries(PERMISSIONS).map(([key, value]) => (

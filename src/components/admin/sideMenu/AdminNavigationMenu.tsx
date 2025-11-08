@@ -14,7 +14,9 @@ import {
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
-import { useState } from "react";
+import { useState, useContext } from "react";
+import { UserContext } from "../../../contexts/UserContext";
+import { PERMISSIONS } from "../../../constants/PermissionConstants";
 
 interface AdminNavigationMenuProps {
   isCompact?: boolean;
@@ -24,12 +26,26 @@ interface MenuItem {
   icon: LucideIcon;
   label: string;
   path?: string;
-  children?: { icon: LucideIcon; label: string; path: string }[];
+  children?: {
+    icon: LucideIcon;
+    label: string;
+    path: string;
+    permission?: string;
+  }[];
+  permission?: string;
 }
 
 export function AdminNavigationMenu({ isCompact }: AdminNavigationMenuProps) {
   const location = useLocation();
   const [expandedItems, setExpandedItems] = useState<string[]>([]);
+  const { permissions } = useContext(UserContext);
+
+  const hasPermission = (permission: string) => {
+    return (
+      permissions?.includes(permission) ||
+      permissions?.includes(PERMISSIONS.ALL)
+    );
+  };
 
   const toggleExpanded = (label: string) => {
     setExpandedItems((prev) =>
@@ -44,27 +60,51 @@ export function AdminNavigationMenu({ isCompact }: AdminNavigationMenuProps) {
     {
       icon: FileText,
       label: "Quản lý nội dung",
+      permission: PERMISSIONS.MANAGE_DOCUMENT ,
       children: [
-        { icon: FileText, label: "Tài liệu", path: "/admin/documents/all" },
-        { icon: BookOpen, label: "Môn học", path: "/admin/subjects" },
+        {
+          icon: FileText,
+          label: "Tài liệu",
+          path: "/admin/documents/all",
+          permission: PERMISSIONS.MANAGE_DOCUMENT,
+        },
+        {
+          icon: BookOpen,
+          label: "Môn học",
+          path: "/admin/subjects",
+          permission: PERMISSIONS.MANAGE_ENTITY,
+        },
       ],
     },
     {
       icon: Users,
       label: "Quản lý người dùng",
+      permission: PERMISSIONS.MANAGE_USER,
       children: [
-        { icon: Users, label: "Tất cả người dùng", path: "/admin/users" },
+        {
+          icon: Users,
+          label: "Tất cả người dùng",
+          path: "/admin/users",
+          permission: PERMISSIONS.MANAGE_USER,
+        },
         {
           icon: Shield,
           label: "Phân quyền",
           path: "/admin/users/assign-roles",
+          permission: PERMISSIONS.MANAGE_ROLE,
         },
         {
           icon: Settings,
           label: "Quản lý quyền",
           path: "/admin/users/manage-roles",
+          permission: PERMISSIONS.MANAGE_ROLE,
         },
-        { icon: Building, label: "Tổ chức", path: "/admin/organizations" },
+        {
+          icon: Building,
+          label: "Tổ chức",
+          path: "/admin/organizations",
+          permission: PERMISSIONS.MANAGE_ENTITY,
+        },
       ],
     },
     {
@@ -75,16 +115,33 @@ export function AdminNavigationMenu({ isCompact }: AdminNavigationMenuProps) {
           icon: BarChart3,
           label: "Thống kê tài liệu",
           path: "/admin/statistics/documents",
+          permission: PERMISSIONS.MANAGE_DOCUMENT,
         },
         {
           icon: PieChart,
           label: "Thống kê người dùng",
           path: "/admin/statistics/users",
+          permission: PERMISSIONS.MANAGE_USER,
         },
-        { icon: Flag, label: "Báo cáo", path: "/admin/reports" },
+        {
+          icon: Flag,
+          label: "Báo cáo",
+          path: "/admin/reports",
+          permission: PERMISSIONS.HANDLE_REPORT,
+        },
       ],
     },
   ];
+
+  const filteredMenuItems = menuItems
+    .filter((item) => !item.permission || hasPermission(item.permission))
+    .map((item) => ({
+      ...item,
+      children: item.children?.filter(
+        (child) => !child.permission || hasPermission(child.permission)
+      ),
+    }))
+    .filter((item) => !item.children || item.children.length > 0);
 
   const isItemActive = (item: MenuItem): boolean => {
     if (item.path) {
@@ -107,7 +164,7 @@ export function AdminNavigationMenu({ isCompact }: AdminNavigationMenuProps) {
           isCompact ? "flex flex-col items-center space-y-4" : ""
         }`}
       >
-        {menuItems.map((item, index) => (
+        {filteredMenuItems.map((item, index) => (
           <li key={index}>
             {item.children ? (
               // Menu item with children (dropdown)

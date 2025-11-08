@@ -109,8 +109,8 @@ const AdminHomePage: React.FC = () => {
         const tasksResponse = await AdminStatisticsService.getAdminTasks();
         if (statsResponse.success && statsResponse.data) {
           setApiData({
-            statistics: statsResponse.data,
-            recent_activities: [], // TODO: implement recent activities
+            statistics: statsResponse.data.statistics,
+            recent_activities: statsResponse.data.recent_activities,
             tasks: tasksResponse,
           });
         }
