@@ -27,6 +27,7 @@ interface TaskItem {
       _id: string;
       first_name: string;
       last_name: string;
+      avatar?: string;
     };
     aiChecked: boolean;
     aiViolationLevel: string;
@@ -153,19 +154,27 @@ const AdminTasksToDo: React.FC<AdminTasksToDoProps> = ({
               >
                 <List.Item.Meta
                   avatar={
-                    <Avatar
-                      size={{ xs: 28, sm: 32 }}
-                      icon={typeInfo.icon}
-                      style={{
-                        backgroundColor: `var(--${
-                          typeInfo.color === "blue"
-                            ? "primary"
-                            : typeInfo.color === "red"
-                            ? "red-button"
-                            : "secondary"
-                        }-color)`,
-                      }}
-                    />
+                    task.data.requester.avatar ? (
+                      <Avatar
+                        size={{ xs: 28, sm: 32 }}
+                        src={task.data.requester.avatar}
+                        alt={`${task.data.requester.first_name} ${task.data.requester.last_name}`}
+                      />
+                    ) : (
+                      <Avatar
+                        size={{ xs: 28, sm: 32 }}
+                        icon={typeInfo.icon}
+                        style={{
+                          backgroundColor: `var(--${
+                            typeInfo.color === "blue"
+                              ? "primary"
+                              : typeInfo.color === "red"
+                              ? "red-button"
+                              : "secondary"
+                          }-color)`,
+                        }}
+                      />
+                    )
                   }
                   title={
                     <div

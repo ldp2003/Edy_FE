@@ -1840,18 +1840,13 @@ export const AdminStatisticsAPI = {
     }
   },
 
-  // Get recent activities
-  getRecentActivities: async (params?: { limit?: number }) => {
+  // Get pending tasks for admin
+  getPendingTasks: async () => {
     try {
-      const response = await apiClient.get(
-        "/admin/statistics/recent-activities",
-        {
-          params,
-        }
-      );
+      const response = await apiClient.get("/documents/my-pending");
       return response.data;
     } catch (error) {
-      console.error("Error fetching recent activities:", error);
+      console.error("Error fetching pending tasks:", error);
       throw error;
     }
   },
