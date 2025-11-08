@@ -221,10 +221,11 @@ export function Header({ onMenuToggle }: HeaderProps) {
               placement="bottomRight"
             >
               <button
-                className="text-sm bg-[var(--primary-color)] hover:bg-white cursor-pointer hover:border-[var(--primary-color)] hover:border-1 hover:text-[var(--primary-color)] text-white px-4 py-2 rounded-md"
+                className="text-sm bg-[var(--primary-color)] hover:bg-white cursor-pointer hover:border-[var(--primary-color)] hover:border-1 hover:text-[var(--primary-color)] text-white px-2 md:px-4 py-2 rounded-md flex items-center gap-2"
                 onClick={() => {}}
               >
-                Đăng nhập
+                <User className="w-5 h-5" />
+                <span className="hidden md:inline">Đăng nhập</span>
               </button>
             </Dropdown>
           )}

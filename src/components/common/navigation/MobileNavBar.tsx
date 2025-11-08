@@ -82,7 +82,7 @@ export const MobileNavBar: React.FC<MobileNavBarProps> = ({
         </button>
 
         <button
-          onClick={() => handleNavigate("/profile")}
+          onClick={() => handleNavigate("/personal-profile")}
           className="flex flex-col items-center text-gray-600 dark:text-gray-400 hover:text-blue-500"
         >
           <svg
@@ -99,7 +99,7 @@ export const MobileNavBar: React.FC<MobileNavBarProps> = ({
               d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
             />
           </svg>
-          <span className="text-xs mt-1">Trang cá nhân</span>
+          <span className="text-xs mt-1">Cá nhân</span>
         </button>
       </div>
     </div>
