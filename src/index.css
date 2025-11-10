@@ -20,6 +20,8 @@
   --secondary-background-color: #f6f7fb;
   --third-background-color: #cce4ff;
   --border-color: #e6ebef;
+  --hover-text-color: #0066cc;
+  --hover-bg-color: #f0f8ff;
 }
 /* src/docx-preview.css */
 .docx-wrapper {
