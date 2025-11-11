@@ -100,8 +100,9 @@ const DocumentReviewPage: React.FC = () => {
     );
   }
   const breadcrumbItems = [
+    { label: "Admin", path: "/admin" },
+    { label: "Quản lý nội dung", path: "/admin/documents/all" },
     { label: "Tài liệu", path: "/admin/documents/all" },
-    { label: "Duyệt tài liệu", path: `/admin/documents/review/${id}` },
     { label: document.title || "Chi tiết tài liệu" },
   ];
 

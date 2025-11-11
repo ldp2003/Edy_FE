@@ -19,14 +19,13 @@ import {
 } from "../../../locales/translationUtils";
 import {
   PublicMode,
-  publicModeLabels,
   type PublicModeType,
   type Document,
   documentTypeLabels,
 } from "../../../models/document";
-import ShareModal from "../share/ShareModal";
 import { DocumentService } from "../../../utils/DocumentService";
 import { calculateDocumentRating } from "../../../utils/CalcRate";
+import VisibilityChangeHandler from "../../common/VisibilityChangeHandler";
 
 interface PostTableProps {
   data: Document[];
@@ -46,13 +45,8 @@ const PostTable: React.FC<PostTableProps> = ({
   const navigate = useNavigate();
   const [messageApi, contextHolder] = message.useMessage();
 
-  // State for visibility management
-  const [visibilityLoading, setVisibilityLoading] = useState<string | null>(
-    null
-  );
-  const [shareModalVisible, setShareModalVisible] = useState(false);
+  // State for delete functionality
   const [confirmModalVisible, setConfirmModalVisible] = useState(false);
-  const [pendingMode, setPendingMode] = useState<PublicModeType | null>(null);
   const [selectedPost, setSelectedPost] = useState<Document | null>(null);
   const [updatedData, setUpdatedData] = useState<Document[]>(data);
 
@@ -105,7 +99,6 @@ const PostTable: React.FC<PostTableProps> = ({
     saveColumnVisibility(newVisibleColumns);
   };
 
-  console.log("PostTable data:", data);
   // Get icon for public mode
 
   const getPublicModeIcon = (mode: string) => {
@@ -123,69 +116,23 @@ const PostTable: React.FC<PostTableProps> = ({
     }
   };
 
-  // Get available options (exclude current mode)
-  const getAvailableOptions = (currentMode: string) => {
-    const options: { mode: PublicModeType; label: string }[] = [];
-
-    if (currentMode !== PublicMode.PUBLIC) {
-      options.push({ mode: PublicMode.PUBLIC, label: "Công khai" });
-    }
-    if (currentMode !== PublicMode.PRIVATE) {
-      if (currentMode !== PublicMode.PRIVATE_SHARED) {
-        options.push({ mode: PublicMode.PRIVATE, label: "Riêng tư" });
-      }
-    }
-    // if (currentMode !== PublicMode.PRIVATE_SHARED) {
-    //   options.push({
-    //     mode: PublicMode.PRIVATE_SHARED,
-    //     label: "Chia sẻ cá nhân",
-    //   });
-    // }
-    if (currentMode !== PublicMode.SHARE_ORGANIZATION) {
-      options.push({
-        mode: PublicMode.SHARE_ORGANIZATION,
-        label: "Chỉ tổ chức",
-      });
-    }
-
-    return options;
-  };
-
-  // Handle visibility change with confirmation
-  const handleVisibilityChange = async (
-    post: Document,
-    newMode: PublicModeType
-  ) => {
-    setSelectedPost(post);
-
-    // Nếu chọn "Chia sẻ cá nhân" thì mở ShareModal
-    if (newMode === PublicMode.PRIVATE_SHARED) {
-      setShareModalVisible(true);
-      return;
-    }
-
-    // Với các chế độ khác: PUBLIC, PRIVATE - hiển thị modal xác nhận
-    setPendingMode(newMode);
-    setConfirmModalVisible(true);
-  };
-
-  // Handle confirm change visibility
-  const handleConfirmChangeVisibility = async () => {
-    if (!pendingMode || !selectedPost) return;
-
+  // Handle cancel modal
+  const handleCancelModal = () => {
     setConfirmModalVisible(false);
-    setVisibilityLoading(selectedPost._id);
+    setSelectedPost(null);
+  };
+
+  // Handle delete document
+  const handleDeleteDocument = async () => {
+    if (!selectedPost) return;
 
     try {
-      // Use _id for API call
-      const documentId = selectedPost._id;
-      await DocumentService.updateDocumentPublicMode(documentId, pendingMode);
+      await DocumentService.deleteDocument(selectedPost._id);
+      messageApi.success("Đã xóa tài liệu thành công!");
 
       // Update local data
-      const newData = updatedData.map((item) =>
-        item._id === selectedPost._id
-          ? { ...item, public_mode: pendingMode }
-          : item
+      const newData = updatedData.filter(
+        (item) => item._id !== selectedPost._id
       );
       setUpdatedData(newData);
 
@@ -193,25 +140,13 @@ const PostTable: React.FC<PostTableProps> = ({
       if (onDataChange) {
         onDataChange(newData);
       }
-
-      messageApi.success(
-        `Đã thay đổi chế độ hiển thị thành "${publicModeLabels[pendingMode]}"!`
-      );
     } catch (error) {
-      console.error("Error changing visibility:", error);
-      messageApi.error("Không thể cập nhật chế độ hiển thị!");
+      console.error("Error deleting document:", error);
+      messageApi.error("Không thể xóa tài liệu!");
     } finally {
-      setVisibilityLoading(null);
-      setPendingMode(null);
+      setConfirmModalVisible(false);
       setSelectedPost(null);
     }
-  };
-
-  // Handle cancel change visibility
-  const handleCancelChangeVisibility = () => {
-    setConfirmModalVisible(false);
-    setPendingMode(null);
-    setSelectedPost(null);
   };
 
   const columns: ColumnsType<Document> = [
@@ -578,21 +513,6 @@ const PostTable: React.FC<PostTableProps> = ({
         const isRejected = record.status === "REJECTED";
         const isPendingApproval =
           record.status === "PENDING" || record.status === "PENDING_EDIT";
-        const isLoading = visibilityLoading === record._id;
-
-        // Create dropdown items for visibility change
-        const dropdownItems = getAvailableOptions(
-          record.public_mode || "PRIVATE"
-        ).map((option) => ({
-          key: option.mode,
-          label: (
-            <div className="flex items-center gap-2">
-              {getPublicModeIcon(option.mode)}
-              <span>{option.label}</span>
-            </div>
-          ),
-          onClick: () => handleVisibilityChange(record, option.mode),
-        }));
 
         return (
           <div className="flex gap-1 justify-center">
@@ -601,7 +521,7 @@ const PostTable: React.FC<PostTableProps> = ({
               className={`p-2 text-xs text-white rounded transition-all duration-300 ${
                 isRejected || isPendingApproval
                   ? "bg-gray-400 cursor-not-allowed"
-                  : "bg-[var(--green-button-color)] hover:bg-blue-600 hover:shadow-lg transform hover:scale-105"
+                  : "bg-[var(--green-button-color)] hover:bg-blue-600 hover:shadow-lg transform hover:scale-105 cursor-pointer"
               }`}
               onClick={
                 isRejected || isPendingApproval
@@ -620,46 +540,114 @@ const PostTable: React.FC<PostTableProps> = ({
               <Edit size={13} />
             </button>
 
-            {/* Visibility Dropdown Button */}
-            <Dropdown
-              menu={{
-                items: dropdownItems,
-                style: { maxHeight: "200px", overflowY: "auto" },
-              }}
-              placement="bottomRight"
-              disabled={isRejected || isLoading || isPendingApproval}
-            >
-              <button
-                className={`p-2 text-xs text-white rounded transition-all duration-300 ${
-                  isRejected || isPendingApproval
-                    ? "bg-gray-400 cursor-not-allowed"
-                    : isLoading
-                    ? "bg-blue-300 cursor-wait"
-                    : "bg-blue-500 hover:bg-blue-600 hover:shadow-lg transform hover:scale-105"
-                }`}
-                title={
-                  isRejected
-                    ? "Không thể thay đổi chế độ hiển thị tài liệu bị từ chối"
-                    : isPendingApproval
-                    ? "Không thể thay đổi chế độ hiển thị tài liệu đang chờ duyệt"
-                    : "Thay đổi chế độ hiển thị"
+            {/* Visibility Change Handler */}
+            <VisibilityChangeHandler
+              document={record}
+              currentMode={record.public_mode || PublicMode.PRIVATE}
+              onModeChange={async (newMode) => {
+                // Update local data
+                const newData = updatedData.map((item) =>
+                  item._id === record._id
+                    ? { ...item, public_mode: newMode }
+                    : item
+                );
+                setUpdatedData(newData);
+
+                // Notify parent component about data change
+                if (onDataChange) {
+                  onDataChange(newData);
                 }
-                disabled={isRejected || isLoading || isPendingApproval}
-              >
-                {isLoading ? (
-                  <Settings size={13} className="animate-spin" />
-                ) : (
-                  getPublicModeIcon(record.public_mode || "PRIVATE")
-                )}
-              </button>
-            </Dropdown>
+              }}
+              renderTrigger={(handleVisibilityChange) => {
+                // Create dropdown items
+                const getAvailableOptions = (currentMode: string) => {
+                  const options: { mode: PublicModeType; label: string }[] = [];
+
+                  // Thêm Công khai nếu không phải mode hiện tại
+                  if (currentMode !== PublicMode.PUBLIC) {
+                    options.push({
+                      mode: PublicMode.PUBLIC,
+                      label: "Công khai",
+                    });
+                  }
+
+                  // Thêm Riêng tư nếu không phải mode hiện tại
+                  if (currentMode !== PublicMode.PRIVATE) {
+                    if (currentMode !== PublicMode.PRIVATE_SHARED) {
+                      options.push({
+                        mode: PublicMode.PRIVATE,
+                        label: "Riêng tư",
+                      });
+                    }
+                  }
+
+                  // Thêm Chia sẻ cá nhân nếu không phải mode hiện tại
+                  if (currentMode !== PublicMode.PRIVATE_SHARED) {
+                    options.push({
+                      mode: PublicMode.PRIVATE_SHARED,
+                      label: "Chia sẻ cá nhân",
+                    });
+                  }
+
+                  // Thêm Chỉ tổ chức nếu không phải mode hiện tại
+                  if (currentMode !== PublicMode.SHARE_ORGANIZATION) {
+                    options.push({
+                      mode: PublicMode.SHARE_ORGANIZATION,
+                      label: "Chỉ tổ chức",
+                    });
+                  }
+
+                  return options;
+                };
+
+                return (
+                  <Dropdown
+                    menu={{
+                      items: getAvailableOptions(
+                        record.public_mode || "PRIVATE"
+                      ).map((option) => ({
+                        key: option.mode,
+                        label: (
+                          <div className="flex items-center gap-2">
+                            {getPublicModeIcon(option.mode)}
+                            <span>{option.label}</span>
+                          </div>
+                        ),
+                        onClick: () => handleVisibilityChange(option.mode),
+                      })),
+                      style: { maxHeight: "200px", overflowY: "auto" },
+                    }}
+                    placement="bottomRight"
+                    disabled={isRejected || isPendingApproval}
+                  >
+                    <button
+                      className={`p-2 text-xs text-white rounded transition-all duration-300 ${
+                        isRejected || isPendingApproval
+                          ? "bg-gray-400 cursor-not-allowed"
+                          : "bg-blue-500 hover:bg-blue-600 hover:shadow-lg transform hover:scale-105 cursor-pointer"
+                      }`}
+                      title={
+                        isRejected
+                          ? "Không thể thay đổi chế độ hiển thị tài liệu bị từ chối"
+                          : isPendingApproval
+                          ? "Không thể thay đổi chế độ hiển thị tài liệu đang chờ duyệt"
+                          : "Thay đổi chế độ hiển thị"
+                      }
+                      disabled={isRejected || isPendingApproval}
+                    >
+                      {getPublicModeIcon(record.public_mode || "PRIVATE")}
+                    </button>
+                  </Dropdown>
+                );
+              }}
+            />
 
             {/* Delete Button */}
             <button
               className={`p-2 text-xs text-white rounded transition-all duration-300 ${
                 isRejected || isPendingApproval
                   ? "bg-gray-400 cursor-not-allowed"
-                  : "bg-[var(--red-button-color)] hover:bg-red-600 hover:shadow-lg transform hover:scale-105"
+                  : "bg-[var(--red-button-color)] hover:bg-red-600 hover:shadow-lg transform hover:scale-105 cursor-pointer"
               }`}
               onClick={
                 isRejected || isPendingApproval
@@ -777,56 +765,27 @@ const PostTable: React.FC<PostTableProps> = ({
         </div>
       </div>
 
-      {/* Confirmation Modal */}
+      {/* Confirmation Modal for Delete */}
       <Modal
-        title="Xác nhận thay đổi chế độ hiển thị"
+        title="Xác nhận xóa tài liệu"
         open={confirmModalVisible}
-        onOk={handleConfirmChangeVisibility}
-        onCancel={handleCancelChangeVisibility}
-        okText="Xác nhận"
+        onOk={handleDeleteDocument}
+        onCancel={handleCancelModal}
+        okText="Xóa"
         cancelText="Hủy"
-        confirmLoading={!!visibilityLoading}
+        okButtonProps={{ danger: true }}
       >
-        {pendingMode && selectedPost && (
+        {selectedPost && (
           <div>
             <p>
-              Bạn có muốn thay đổi chế độ hiển thị của tài liệu "
-              {selectedPost.title}" từ "
-              {publicModeLabels[selectedPost.public_mode as PublicModeType] ||
-                selectedPost.public_mode}
-              " sang "{publicModeLabels[pendingMode]}" không?
+              Bạn có chắc chắn muốn xóa tài liệu "{selectedPost.title}" không?
             </p>
-            {pendingMode === PublicMode.SHARE_ORGANIZATION && (
-              <p className="mt-2 text-orange-600 bg-orange-50 p-2 rounded">
-                ⚠️ Nếu bạn để chế độ này, chỉ có người trong tổ chức mới có thể
-                xem tài liệu.
-              </p>
-            )}
+            <p className="mt-2 text-red-600">
+              Hành động này không thể hoàn tác!
+            </p>
           </div>
         )}
       </Modal>
-
-      {/* ShareModal */}
-      {selectedPost && (
-        <ShareModal
-          visible={shareModalVisible}
-          onClose={() => {
-            setShareModalVisible(false);
-            setSelectedPost(null);
-          }}
-          documentId={selectedPost._id}
-          documentTitle={selectedPost.title}
-          isPublic={selectedPost.public_mode === PublicMode.PUBLIC}
-          isSharedWithOrganization={
-            selectedPost.public_mode === PublicMode.SHARE_ORGANIZATION
-          }
-          isPrivate={selectedPost.public_mode === PublicMode.PRIVATE}
-          isPrivateShared={
-            selectedPost.public_mode === PublicMode.PRIVATE_SHARED
-          }
-          isOwner={true}
-        />
-      )}
     </>
   );
 };

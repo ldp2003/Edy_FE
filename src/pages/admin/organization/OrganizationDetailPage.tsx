@@ -10,6 +10,8 @@ import {
 import { OrganizationService } from "../../../utils/OrganizationService";
 import type { OrganizationDetailed } from "../../../models/organization";
 import type { ColumnsType } from "antd/es/table";
+import { AdminBreadcrumb } from "../../../components/admin/common/AdminBreadcrumb";
+import AdminSubjectCard from "../../../components/admin/subject/AdminSubjectCard";
 
 const OrganizationDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -41,6 +43,10 @@ const OrganizationDetailPage: React.FC = () => {
 
   const handleUserClick = (userId: string) => {
     navigate(`/admin/users/detail/${userId}`);
+  };
+
+  const handleSubjectClick = (subjectId: string) => {
+    navigate(`/admin/subjects/${subjectId}`);
   };
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -105,171 +111,175 @@ const OrganizationDetailPage: React.FC = () => {
   return (
     <div>
       {contextHolder}
-      <div className="mb-4">
-        <Button
-          type="link"
-          icon={<ArrowLeftOutlined />}
-          onClick={() => navigate("/admin/organizations")}
-          className="mb-4 text-base sm:text-sm xs:text-xs"
-        >
-          Quay lại danh sách
-        </Button>
-        <h1 className="text-xl sm:text-lg xs:text-base font-bold text-[var(--primary-text-color)] mb-4 text-left">
-          {organization.name}
-        </h1>
-      </div>
+      <AdminBreadcrumb
+        items={[
+          { label: "Admin", path: "/admin" },
+          { label: "Quản lý người dùng", path: "/admin/organizations" },
+          { label: "Tổ chức", path: "/admin/organizations" },
+          { label: organization.name },
+        ]}
+      />
+      <div className="mt-4">
+        <div className="mb-4">
+          <Button
+            type="link"
+            icon={<ArrowLeftOutlined />}
+            onClick={() => navigate("/admin/organizations")}
+            className="mb-4 text-base sm:text-sm xs:text-xs"
+          >
+            Quay lại danh sách
+          </Button>
+          <h1 className="text-xl sm:text-lg xs:text-base font-bold text-[var(--primary-text-color)] mb-4 text-left">
+            {organization.name}
+          </h1>
+        </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-        <Card title="Thông tin cơ bản" className="shadow-sm">
-          <div className="space-y-3 text-left">
-            <div>
-              <strong className="text-[var(--primary-text-color)] text-left text-base sm:text-sm xs:text-xs">
-                Mã tổ chức:
-              </strong>
-              <p className="text-left text-base sm:text-sm xs:text-xs">
-                {organization.code}
-              </p>
-            </div>
-            <div>
-              <strong className="text-[var(--primary-text-color)] text-left text-base sm:text-sm xs:text-xs">
-                Quốc gia:
-              </strong>
-              <p className="text-left text-base sm:text-sm xs:text-xs">
-                {organization.country}
-              </p>
-            </div>
-            <div>
-              <strong className="text-[var(--primary-text-color)] text-left text-base sm:text-sm xs:text-xs">
-                Địa chỉ:
-              </strong>
-              <p className="text-left text-base sm:text-sm xs:text-xs flex items-start gap-2">
-                <EnvironmentOutlined className="mt-1" />
-                {organization.address}
-              </p>
-            </div>
-            {organization.website && (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+          <Card title="Thông tin cơ bản" className="shadow-sm">
+            <div className="space-y-3 text-left">
               <div>
                 <strong className="text-[var(--primary-text-color)] text-left text-base sm:text-sm xs:text-xs">
-                  Website:
+                  Mã tổ chức:
                 </strong>
                 <p className="text-left text-base sm:text-sm xs:text-xs">
-                  <a
-                    href={
-                      organization.website.startsWith("http")
-                        ? organization.website
-                        : `https://${organization.website}`
-                    }
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-[var(--link-color)] hover:underline flex items-center gap-2"
-                  >
-                    <GlobalOutlined />
-                    {organization.website}
-                  </a>
+                  {organization.code}
                 </p>
               </div>
-            )}
-            {organization.created_by && (
               <div>
                 <strong className="text-[var(--primary-text-color)] text-left text-base sm:text-sm xs:text-xs">
-                  Người tạo:
+                  Quốc gia:
                 </strong>
                 <p className="text-left text-base sm:text-sm xs:text-xs">
-                  {organization.created_by.first_name}{" "}
-                  {organization.created_by.last_name}
+                  {organization.country}
                 </p>
               </div>
-            )}
-          </div>
-        </Card>
-
-        <Card title="Thống kê" className="shadow-sm">
-          <div className="space-y-3 text-left">
-            <div>
-              <strong className="text-[var(--primary-text-color)] text-left text-base sm:text-sm xs:text-xs">
-                Số người dùng:
-              </strong>
-              <p className="text-left text-base sm:text-sm xs:text-xs">
-                {organization.user_count}
-              </p>
-            </div>
-            <div>
-              <strong className="text-[var(--primary-text-color)] text-left text-base sm:text-sm xs:text-xs">
-                Số môn học:
-              </strong>
-              <p className="text-left text-base sm:text-sm xs:text-xs">
-                {organization.subjects?.length || 0}
-              </p>
-            </div>
-            <div>
-              <strong className="text-[var(--primary-text-color)] text-left text-base sm:text-sm xs:text-xs">
-                Danh mục nội dung:
-              </strong>
-              <p className="text-left text-base sm:text-sm xs:text-xs">
-                {organization.content_categories?.length || 0}
-              </p>
-            </div>
-          </div>
-        </Card>
-      </div>
-
-      {organization.subjects && organization.subjects.length > 0 && (
-        <Card title="Môn học" className="mb-6 shadow-sm">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {organization.subjects.map((subject, index) => (
-              <div
-                key={index}
-                className="p-3 bg-[var(--card-background-color)] rounded-md"
-              >
-                <h4 className="font-medium text-[var(--primary-text-color)] text-left text-base sm:text-sm xs:text-xs">
-                  {subject.subject.name}
-                </h4>
-                <p className="text-[var(--secondary-text-color)] text-left text-base sm:text-sm xs:text-xs">
-                  {subject.count} tài liệu
+              <div>
+                <strong className="text-[var(--primary-text-color)] text-left text-base sm:text-sm xs:text-xs">
+                  Địa chỉ:
+                </strong>
+                <p className="text-left text-base sm:text-sm xs:text-xs flex items-start gap-2">
+                  <EnvironmentOutlined className="mt-1" />
+                  {organization.address}
                 </p>
               </div>
-            ))}
-          </div>
-        </Card>
-      )}
-
-      {organization.content_categories &&
-        organization.content_categories.length > 0 && (
-          <Card title="Danh mục nội dung" className="mb-6 shadow-sm">
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              {organization.content_categories.map((category, index) => (
-                <div
-                  key={index}
-                  className="p-3 bg-[var(--card-background-color)] rounded-md"
-                >
-                  <h4 className="font-medium text-[var(--primary-text-color)] text-left text-base sm:text-sm xs:text-xs">
-                    {category.doc_type}
-                  </h4>
-                  <p className="text-[var(--secondary-text-color)] text-left text-base sm:text-sm xs:text-xs">
-                    {category.document_count} tài liệu
+              {organization.website && (
+                <div>
+                  <strong className="text-[var(--primary-text-color)] text-left text-base sm:text-sm xs:text-xs">
+                    Website:
+                  </strong>
+                  <p className="text-left text-base sm:text-sm xs:text-xs">
+                    <a
+                      href={
+                        organization.website.startsWith("http")
+                          ? organization.website
+                          : `https://${organization.website}`
+                      }
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-[var(--link-color)] hover:underline flex items-center gap-2"
+                    >
+                      <GlobalOutlined />
+                      {organization.website}
+                    </a>
                   </p>
                 </div>
+              )}
+              {organization.created_by && (
+                <div>
+                  <strong className="text-[var(--primary-text-color)] text-left text-base sm:text-sm xs:text-xs">
+                    Người tạo:
+                  </strong>
+                  <p className="text-left text-base sm:text-sm xs:text-xs">
+                    {organization.created_by.first_name}{" "}
+                    {organization.created_by.last_name}
+                  </p>
+                </div>
+              )}
+            </div>
+          </Card>
+
+          <Card title="Thống kê" className="shadow-sm">
+            <div className="space-y-3 text-left">
+              <div>
+                <strong className="text-[var(--primary-text-color)] text-left text-base sm:text-sm xs:text-xs">
+                  Số người dùng:
+                </strong>
+                <p className="text-left text-base sm:text-sm xs:text-xs">
+                  {organization.user_count}
+                </p>
+              </div>
+              <div>
+                <strong className="text-[var(--primary-text-color)] text-left text-base sm:text-sm xs:text-xs">
+                  Số môn học:
+                </strong>
+                <p className="text-left text-base sm:text-sm xs:text-xs">
+                  {organization.subjects?.length || 0}
+                </p>
+              </div>
+              <div>
+                <strong className="text-[var(--primary-text-color)] text-left text-base sm:text-sm xs:text-xs">
+                  Danh mục nội dung:
+                </strong>
+                <p className="text-left text-base sm:text-sm xs:text-xs">
+                  {organization.content_categories?.length || 0}
+                </p>
+              </div>
+            </div>
+          </Card>
+        </div>
+
+        {organization.subjects && organization.subjects.length > 0 && (
+          <Card title="Môn học" className="mb-6 shadow-sm">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {organization.subjects.map((subject, index) => (
+                <AdminSubjectCard
+                  key={index}
+                  subject={subject}
+                  onClick={handleSubjectClick}
+                />
               ))}
             </div>
           </Card>
         )}
 
-      {organization.users && organization.users.length > 0 && (
-        <Card title="Người dùng" className="shadow-sm">
-          <Table
-            columns={userColumns}
-            dataSource={organization.users}
-            rowKey="_id"
-            pagination={{
-              showSizeChanger: true,
-              showQuickJumper: true,
-              showTotal: (total, range) =>
-                `${range[0]}-${range[1]} của ${total} người dùng`,
-            }}
-            className="min-w-full"
-          />
-        </Card>
-      )}
+        {organization.content_categories &&
+          organization.content_categories.length > 0 && (
+            <Card title="Danh mục nội dung" className="mb-6 shadow-sm">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                {organization.content_categories.map((category, index) => (
+                  <div
+                    key={index}
+                    className="p-3 bg-[var(--card-background-color)] rounded-md"
+                  >
+                    <h4 className="font-medium text-[var(--primary-text-color)] text-left text-base sm:text-sm xs:text-xs">
+                      {category.doc_type}
+                    </h4>
+                    <p className="text-[var(--secondary-text-color)] text-left text-base sm:text-sm xs:text-xs">
+                      {category.document_count} tài liệu
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </Card>
+          )}
+
+        {organization.users && organization.users.length > 0 && (
+          <Card title="Người dùng" className="shadow-sm">
+            <Table
+              columns={userColumns}
+              dataSource={organization.users}
+              rowKey="_id"
+              pagination={{
+                showSizeChanger: true,
+                showQuickJumper: true,
+                showTotal: (total, range) =>
+                  `${range[0]}-${range[1]} của ${total} người dùng`,
+              }}
+              className="min-w-full"
+            />
+          </Card>
+        )}
+      </div>
     </div>
   );
 };

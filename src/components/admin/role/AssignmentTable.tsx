@@ -5,7 +5,6 @@ import {
   Button,
   message,
   Popconfirm,
-  Tag,
   Avatar,
   Card,
   Space,
@@ -16,6 +15,7 @@ import type { ColumnsType } from "antd/es/table";
 import { Edit, Lock, Unlock, Plus } from "lucide-react";
 import { AssignmentService } from "../../../utils/AssignmentService";
 import { ROLE_DISPLAY_NAMES } from "../../../constants/RoleConstants";
+import { getStatusStyle } from "../../../utils/AdminTableStyles";
 import AssignRoleModal from "./AssignRoleModal";
 import EditAssignmentModel from "./EditAssigmentModel";
 import { Input } from "antd";
@@ -175,9 +175,12 @@ const AssignmentTable: React.FC = () => {
       align: "center",
       render: (_, record) => {
         return (
-          <Tag color={record.is_active ? "success" : "error"}>
+          <span
+            className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium"
+            style={getStatusStyle(record.is_active ? "active" : "banned")}
+          >
             {record.is_active ? "Đang hoạt động" : "Đã vô hiệu"}
-          </Tag>
+          </span>
         );
       },
     },

@@ -4,14 +4,18 @@ import { AdminBreadcrumb } from "../../../components/admin/common/AdminBreadcrum
 
 const ManageRolesPage: React.FC = () => {
   const breadcrumbItems = [
-    { label: "Người dùng" },
+    { label: "Admin", path: "/admin" },
+    { label: "Quản lý người dùng", path: "/admin/users" },
     { label: "Quản lý quyền" },
   ];
 
   return (
-    <div className="p-6 h-full">
+    <div className="h-full">
       <AdminBreadcrumb items={breadcrumbItems} />
-      <AdminRoleTable />
+
+      <div className="mt-4">
+        <AdminRoleTable />
+      </div>
     </div>
   );
 };

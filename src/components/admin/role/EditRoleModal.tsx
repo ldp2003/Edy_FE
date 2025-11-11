@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { Modal, Form, Input, Select, message } from "antd";
-import { PERMISSIONS } from "../../../constants/PermissionConstants.ts";
+import {
+  PERMISSIONS,
+  PERMISSION_LABELS,
+} from "../../../constants/PermissionConstants.ts";
 import { RoleService } from "../../../utils/RoleService";
 
 interface EditRoleModalProps {
@@ -117,8 +120,17 @@ const EditRoleModal: React.FC<EditRoleModalProps> = ({
               optionFilterProp="label"
             >
               {Object.entries(PERMISSIONS).map(([key, value]) => (
-                <Select.Option key={key} value={key} label={value}>
-                  {value}
+                <Select.Option
+                  key={key}
+                  value={key}
+                  label={
+                    PERMISSION_LABELS[
+                      value as keyof typeof PERMISSION_LABELS
+                    ] || value
+                  }
+                >
+                  {PERMISSION_LABELS[value as keyof typeof PERMISSION_LABELS] ||
+                    value}
                 </Select.Option>
               ))}
             </Select>

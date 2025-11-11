@@ -157,65 +157,68 @@ const ReportsPage: React.FC = () => {
   };
 
   const breadcrumbItems = [
-    { label: "Trang chủ", path: "/admin" },
-    { label: "Quản lý báo cáo" },
+    { label: "Admin", path: "/admin" },
+    { label: "Giám sát", path: "/admin/reports" },
+    { label: "Báo cáo" },
   ];
 
   return (
     <div>
       <AdminBreadcrumb items={breadcrumbItems} />
 
-      <div className="p-6 bg-white rounded shadow">
-        <div className="flex justify-between items-center mb-6">
-          <h1 className="text-sm font-bold text-[var(--primary-text-color)]">
-            Quản lý báo cáo
-          </h1>
-          <div className="text-sm text-gray-500">Tổng: {total} báo cáo</div>
-        </div>
-
-        <AdminReportFilterSearch
-          onFilterChange={handleFilterChange}
-          loading={loading}
-          initialFilters={filters}
-        />
-
-        <AdminReportTable
-          reports={reports}
-          loading={loading}
-          onResolve={openResolveModal} // mở modal duyệt
-        />
-
-        {total > 0 && (
-          <div className="mt-4 flex justify-between items-center">
-            <div className="text-sm text-gray-500">
-              Hiển thị {(currentPage - 1) * pageSize + 1}-
-              {Math.min(currentPage * pageSize, total)} trong {total} báo cáo
-            </div>
-            <Pagination
-              current={currentPage}
-              total={total}
-              pageSize={pageSize}
-              onChange={handlePageChange}
-              onShowSizeChange={handlePageChange}
-              showSizeChanger={true}
-              pageSizeOptions={["5", "10", "20", "50"]}
-              showQuickJumper
-              showTotal={(total) =>
-                `Trang ${currentPage} / ${Math.ceil(total / pageSize)}`
-              }
-            />
+      <div className="mt-4">
+        <div className="p-6 bg-white rounded shadow">
+          <div className="flex justify-between items-center mb-6">
+            <h1 className="text-sm font-bold text-[var(--primary-text-color)]">
+              Quản lý báo cáo
+            </h1>
+            <div className="text-sm text-gray-500">Tổng: {total} báo cáo</div>
           </div>
-        )}
 
-        <AdminReportDetailModal
-          report={selectedReport}
-          visible={resolveModalVisible}
-          onClose={() => {
-            setResolveModalVisible(false);
-            setSelectedReport(null);
-          }}
-          onResolve={handleSubmitResolution} // nhận validTypes, action, resolveReason từ form
-        />
+          <AdminReportFilterSearch
+            onFilterChange={handleFilterChange}
+            loading={loading}
+            initialFilters={filters}
+          />
+
+          <AdminReportTable
+            reports={reports}
+            loading={loading}
+            onResolve={openResolveModal} // mở modal duyệt
+          />
+
+          {total > 0 && (
+            <div className="mt-4 flex justify-between items-center">
+              <div className="text-sm text-gray-500">
+                Hiển thị {(currentPage - 1) * pageSize + 1}-
+                {Math.min(currentPage * pageSize, total)} trong {total} báo cáo
+              </div>
+              <Pagination
+                current={currentPage}
+                total={total}
+                pageSize={pageSize}
+                onChange={handlePageChange}
+                onShowSizeChange={handlePageChange}
+                showSizeChanger={true}
+                pageSizeOptions={["5", "10", "20", "50"]}
+                showQuickJumper
+                showTotal={(total) =>
+                  `Trang ${currentPage} / ${Math.ceil(total / pageSize)}`
+                }
+              />
+            </div>
+          )}
+
+          <AdminReportDetailModal
+            report={selectedReport}
+            visible={resolveModalVisible}
+            onClose={() => {
+              setResolveModalVisible(false);
+              setSelectedReport(null);
+            }}
+            onResolve={handleSubmitResolution} // nhận validTypes, action, resolveReason từ form
+          />
+        </div>
       </div>
     </div>
   );

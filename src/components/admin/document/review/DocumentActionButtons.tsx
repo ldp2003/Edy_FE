@@ -83,10 +83,9 @@ const DocumentActionButtons: React.FC<DocumentActionButtonsProps> = ({
           isIntensive ? { isIntensive: true } : undefined
         );
       } else if (documentStatus === DOCUMENT_STATUS.PENDING_EDIT) {
-        await DocumentService.handleEditApproval(
-          documentRequest._id,
-          { action: "APPROVE"}
-        );
+        await DocumentService.handleEditApproval(documentRequest._id, {
+          action: "APPROVE",
+        });
       }
 
       messageApi.success("Tài liệu đã được duyệt thành công!");
@@ -137,10 +136,10 @@ const DocumentActionButtons: React.FC<DocumentActionButtonsProps> = ({
           rejectReason
         );
       } else if (documentStatus === DOCUMENT_STATUS.PENDING_EDIT) {
-        await DocumentService.handleEditApproval(
-          documentRequest._id,
-          { action: "REJECT", message: rejectReason }
-        );
+        await DocumentService.handleEditApproval(documentRequest._id, {
+          action: "REJECT",
+          message: rejectReason,
+        });
       }
 
       messageApi.success("Tài liệu đã được từ chối!");
@@ -232,7 +231,10 @@ const DocumentActionButtons: React.FC<DocumentActionButtonsProps> = ({
       setProcessing(true);
 
       // Gọi API yêu cầu chỉnh sửa trực tiếp
-      await DocumentService.requestEditDocument(documentRequest._id, editRequestReason);
+      await DocumentService.requestEditDocument(
+        documentRequest._id,
+        editRequestReason
+      );
 
       messageApi.success("Đã gửi yêu cầu chỉnh sửa!");
       setEditRequestModalVisible(false);
@@ -240,7 +242,7 @@ const DocumentActionButtons: React.FC<DocumentActionButtonsProps> = ({
 
       // Send notification to the document owner
       if (documentRequest?.requester && documentTitle) {
-        await NotificationService.createDocumentHiddenNotification(
+        await NotificationService.createDocumentEditRequestedNotification(
           documentRequest.requester,
           documentRequest.doc,
           documentTitle,
@@ -280,7 +282,10 @@ const DocumentActionButtons: React.FC<DocumentActionButtonsProps> = ({
       setProcessing(true);
 
       // Gọi API yêu cầu chỉnh sửa trực tiếp
-      await DocumentService.requestEditDirectDocument(documentId, editRequestReason);
+      await DocumentService.requestEditDirectDocument(
+        documentId,
+        editRequestReason
+      );
 
       messageApi.success("Đã gửi yêu cầu chỉnh sửa!");
       setEditRequestModalVisible(false);
@@ -288,7 +293,7 @@ const DocumentActionButtons: React.FC<DocumentActionButtonsProps> = ({
 
       // Send notification to the document owner
       if (documentRequest?.requester && documentTitle) {
-        await NotificationService.createDocumentHiddenNotification(
+        await NotificationService.createDocumentEditRequestedNotification(
           documentRequest.requester,
           documentRequest.doc,
           documentTitle,
@@ -410,15 +415,14 @@ const DocumentActionButtons: React.FC<DocumentActionButtonsProps> = ({
         ],
       },
 
-      [DOCUMENT_STATUS.DELETED] :{
+      [DOCUMENT_STATUS.DELETED]: {
         statusBadge: {
           text: "✗ Đã xóa",
           color: "text-red-700",
           bgColor: "bg-red-100",
           borderColor: "border-red-300",
         },
-        actionButtons: [
-        ],
+        actionButtons: [],
       },
 
       [DOCUMENT_STATUS.APPROVED]: {
@@ -548,7 +552,11 @@ const DocumentActionButtons: React.FC<DocumentActionButtonsProps> = ({
 
       {/* Reject Modal */}
       <Modal
-        title= {documentStatus === DOCUMENT_STATUS.PENDING_EDIT ? "Từ chối chỉnh sửa" : "Từ chối tài liệu"}
+        title={
+          documentStatus === DOCUMENT_STATUS.PENDING_EDIT
+            ? "Từ chối chỉnh sửa"
+            : "Từ chối tài liệu"
+        }
         open={rejectModalVisible}
         onOk={handleReject}
         onCancel={() => {
@@ -620,7 +628,11 @@ const DocumentActionButtons: React.FC<DocumentActionButtonsProps> = ({
       <Modal
         title="Yêu cầu chỉnh sửa"
         open={editRequestModalVisible}
-        onOk={documentStatus === DOCUMENT_STATUS.PENDING ? handleEditRequest : handleEditRequestDocument}
+        onOk={
+          documentStatus === DOCUMENT_STATUS.PENDING
+            ? handleEditRequest
+            : handleEditRequestDocument
+        }
         onCancel={() => {
           setEditRequestModalVisible(false);
           setEditRequestReason("");

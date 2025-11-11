@@ -21,7 +21,7 @@ const PostGridView: React.FC<PostGridViewProps> = ({ data, loading }) => {
 
   return (
     <div className="w-full">
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-4">
         {displayData.map((document) => {
           const isRejected = document.status === "REJECTED";
           return (
