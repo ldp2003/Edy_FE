@@ -6,6 +6,7 @@ import { DocumentService } from "../../../utils/DocumentService";
 import type { Document } from "../../../models/document";
 import DocumentViewer from "../../../components/admin/document/compare/DocumentViewer";
 import DocumentListPanel from "../../../components/admin/document/compare/DocumentListPanel";
+import { AdminBreadcrumb } from "../../../components/admin/common/AdminBreadcrumb";
 
 const DocumentComparePage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -76,6 +77,15 @@ const DocumentComparePage: React.FC = () => {
       {/* Header */}
       <div className="bg-white shadow-sm flex-shrink-0">
         <div className="px-2 py-2">
+          <AdminBreadcrumb
+            items={[
+              { label: "Admin", path: "/admin" },
+              { label: "Quản lý nội dung", path: "/admin/documents/all" },
+              { label: "Tài liệu", path: "/admin/documents/all" },
+              { label: "So sánh tài liệu" },
+            ]}
+          />
+
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <Button

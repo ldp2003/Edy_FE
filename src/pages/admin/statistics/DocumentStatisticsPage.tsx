@@ -23,6 +23,7 @@ import { useNavigate } from "react-router-dom";
 import { message } from "antd";
 import { documentStatisticsService } from "../../../utils/DocumentStatisticsService";
 import type { DocumentStatistics } from "../../../models/documentStatistics";
+import { AdminBreadcrumb } from "../../../components/admin/common/AdminBreadcrumb";
 
 ChartJS.register(
   CategoryScale,
@@ -723,157 +724,385 @@ const DocumentStatisticsPage: React.FC = () => {
       ) : (
         <>
           {/* Breadcrumb */}
-          <div className="text-sm text-[var(--third-text-color)] text-left">
-            Thống kê <span className="text-gray-400">›</span> Thống kê tài liệu
-          </div>
+          <AdminBreadcrumb
+            items={[
+              { label: "Admin", path: "/admin" },
+              { label: "Giám sát", path: "/admin/statistics/documents" },
+              { label: "Thống kê tài liệu" },
+            ]}
+          />
 
-          {/* Sync Buttons */}
-          <div className="flex gap-4 mb-4">
-            <button
-              disabled={syncAllLoading}
-              onClick={handleSyncAllStatistics}
-              className="px-4 py-2 bg-[var(--primary-color)] text-white rounded hover:bg-[var(--secondary-color)] cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {syncAllLoading ? "Đang tải..." : "Tải lại"}
-            </button>
-          </div>
-
-          {/* Stat Cards */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-            <div className="bg-gray-200 rounded-lg p-3 sm:p-4 text-center">
-              <div
-                className="text-2xl sm:text-3xl font-bold"
-                style={{ color: "var(--primary-text-color)" }}
-              >
-                {statisticsData?.stats?.totalDocuments || 0}
-              </div>
-              <div className="text-sm text-[var(--third-text-color)] mt-2">
-                Tài liệu
-              </div>
-            </div>
-            <div className="bg-cyan-400 rounded-lg p-3 sm:p-4 text-center">
-              <div className="text-2xl sm:text-3xl font-bold text-white">
-                {statisticsData?.stats?.totalViews || 0}
-              </div>
-              <div className="text-sm text-white mt-2">Tổng lượt xem</div>
-            </div>
-            <div className="bg-yellow-300 rounded-lg p-3 sm:p-4 text-center">
-              <div
-                className="text-2xl sm:text-3xl font-bold"
-                style={{ color: "var(--primary-text-color)" }}
-              >
-                {statisticsData?.stats?.totalDownloads || 0}
-              </div>
-              <div
-                className="text-sm mt-2"
-                style={{ color: "var(--primary-text-color)" }}
-              >
-                Tổng lượt tải
-              </div>
-            </div>
-            <div className="bg-white border border-gray-300 rounded-lg p-3 sm:p-4 text-center">
-              <div className="flex gap-2 mb-1.5">
-                <select
-                  value={selectedMonth}
-                  onChange={(e) => setSelectedMonth(e.target.value)}
-                  className="flex-1 text-sm border border-gray-300 rounded cursor-pointer px-2 py-1"
-                >
-                  {months.map((month) => (
-                    <option key={month.value} value={month.value}>
-                      {month.label}
-                    </option>
-                  ))}
-                </select>
-                <select
-                  value={selectedYear}
-                  onChange={(e) => setSelectedYear(e.target.value)}
-                  className="flex-1 text-sm border border-gray-300 cursor-pointer rounded px-2 py-1"
-                >
-                  {years.map((year) => (
-                    <option key={year} value={year}>
-                      {year}
-                    </option>
-                  ))}
-                </select>
-              </div>
+          <div className="mt-4">
+            {/* Sync Buttons */}
+            <div className="flex gap-4 mb-4">
               <button
-                disabled={syncMonthLoading}
-                onClick={handleSyncMonthStatistics}
-                className="w-full mt-2 px-3 py-2 border border-[var(--primary-color)] text-[var(--primary-color)] rounded hover:border-[var(--secondary-color)] hover:text-[var(--secondary-color)] cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                disabled={syncAllLoading}
+                onClick={handleSyncAllStatistics}
+                className="px-4 py-2 bg-[var(--primary-color)] text-white rounded hover:bg-[var(--secondary-color)] cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {syncMonthLoading ? "Đang tải..." : "Tải lại"}
+                {syncAllLoading ? "Đang tải..." : "Tải lại"}
               </button>
             </div>
-          </div>
 
-          {/* Charts */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-            {/* Bar Chart */}
-            <div className="bg-white rounded-lg p-3 sm:p-4 border border-gray-200">
-              <div className="flex justify-between items-center mb-3">
-                <h3
-                  className="text-base sm:text-lg font-semibold text-left"
+            {/* Stat Cards */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+              <div className="bg-gray-200 rounded-lg p-3 sm:p-4 text-center">
+                <div
+                  className="text-2xl sm:text-3xl font-bold"
                   style={{ color: "var(--primary-text-color)" }}
                 >
-                  Biểu đồ thống kê theo loại tài liệu
-                </h3>
-                <select
-                  value={documentChartType}
-                  onChange={(e) => setDocumentChartType(e.target.value)}
-                  className="text-sm border border-gray-300 rounded px-2 py-1"
-                >
-                  <option value="bar">Biểu đồ cột</option>
-                  <option value="horizontal">Biểu đồ cột ngang</option>
-                  <option value="area">Biểu đồ miền (Area)</option>
-                  <option value="line">Biểu đồ đường</option>
-                  <option value="pie">Biểu đồ tròn</option>
-                  <option value="doughnut">Biểu đồ vòng</option>
-                  <option value="polarArea">Biểu đồ miền</option>
-                </select>
+                  {statisticsData?.stats?.totalDocuments || 0}
+                </div>
+                <div className="text-sm text-[var(--third-text-color)] mt-2">
+                  Tài liệu
+                </div>
               </div>
-              <div className="h-64">
-                {["bar", "horizontal", "area", "line"].includes(
-                  documentChartType
-                ) ? (
-                  <canvas ref={barChartRef}></canvas>
-                ) : (
-                  <canvas ref={pieChartRef}></canvas>
-                )}
+              <div className="bg-cyan-400 rounded-lg p-3 sm:p-4 text-center">
+                <div className="text-2xl sm:text-3xl font-bold text-white">
+                  {statisticsData?.stats?.totalViews || 0}
+                </div>
+                <div className="text-sm text-white mt-2">Tổng lượt xem</div>
+              </div>
+              <div className="bg-yellow-300 rounded-lg p-3 sm:p-4 text-center">
+                <div
+                  className="text-2xl sm:text-3xl font-bold"
+                  style={{ color: "var(--primary-text-color)" }}
+                >
+                  {statisticsData?.stats?.totalDownloads || 0}
+                </div>
+                <div
+                  className="text-sm mt-2"
+                  style={{ color: "var(--primary-text-color)" }}
+                >
+                  Tổng lượt tải
+                </div>
+              </div>
+              <div className="bg-white border border-gray-300 rounded-lg p-3 sm:p-4 text-center">
+                <div className="flex gap-2 mb-1.5">
+                  <select
+                    value={selectedMonth}
+                    onChange={(e) => setSelectedMonth(e.target.value)}
+                    className="flex-1 text-sm border border-gray-300 rounded cursor-pointer px-2 py-1"
+                  >
+                    {months.map((month) => (
+                      <option key={month.value} value={month.value}>
+                        {month.label}
+                      </option>
+                    ))}
+                  </select>
+                  <select
+                    value={selectedYear}
+                    onChange={(e) => setSelectedYear(e.target.value)}
+                    className="flex-1 text-sm border border-gray-300 cursor-pointer rounded px-2 py-1"
+                  >
+                    {years.map((year) => (
+                      <option key={year} value={year}>
+                        {year}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <button
+                  disabled={syncMonthLoading}
+                  onClick={handleSyncMonthStatistics}
+                  className="w-full mt-2 px-3 py-2 border border-[var(--primary-color)] text-[var(--primary-color)] rounded hover:border-[var(--secondary-color)] hover:text-[var(--secondary-color)] cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {syncMonthLoading ? "Đang tải..." : "Tải lại"}
+                </button>
               </div>
             </div>
 
-            {/* Top Documents Table */}
-            <div className="bg-white rounded-lg p-3 sm:p-4 border border-gray-200">
-              <h3
-                className="text-base sm:text-lg font-semibold mb-3 text-left"
-                style={{ color: "var(--primary-text-color)" }}
-              >
-                Top 5 tài liệu phổ biến nhất
-              </h3>
-              <div className="overflow-x-auto">
-                <table className="w-full text-xs sm:text-sm">
-                  <thead>
-                    <tr className="border-b border-gray-200">
-                      <th className="text-left py-1.5 px-1 sm:px-1.5 text-[var(--third-text-color)] font-medium">
-                        STT
-                      </th>
-                      <th className="text-left py-1.5 px-1 sm:px-1.5 text-[var(--third-text-color)] font-medium">
-                        Tên tài liệu
-                      </th>
-                      <th className="text-center py-1.5 px-1 sm:px-1.5 text-[var(--third-text-color)] font-medium">
-                        Lượt xem
-                      </th>
-                      <th className="text-center py-1.5 px-1 sm:px-1.5 text-[var(--third-text-color)] font-medium">
-                        Lượt tải
-                      </th>
-                      <th className="text-center py-1.5 px-1 sm:px-1.5 text-[var(--third-text-color)] font-medium">
-                        Đánh giá
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {(statisticsData?.topDocuments || []).map(
-                      (doc: any, index: number) => (
+            {/* Charts */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+              {/* Bar Chart */}
+              <div className="bg-white rounded-lg p-3 sm:p-4 border border-gray-200">
+                <div className="flex justify-between items-center mb-3">
+                  <h3
+                    className="text-base sm:text-lg font-semibold text-left"
+                    style={{ color: "var(--primary-text-color)" }}
+                  >
+                    Biểu đồ thống kê theo loại tài liệu
+                  </h3>
+                  <select
+                    value={documentChartType}
+                    onChange={(e) => setDocumentChartType(e.target.value)}
+                    className="text-sm border border-gray-300 rounded px-2 py-1"
+                  >
+                    <option value="bar">Biểu đồ cột</option>
+                    <option value="horizontal">Biểu đồ cột ngang</option>
+                    <option value="area">Biểu đồ miền (Area)</option>
+                    <option value="line">Biểu đồ đường</option>
+                    <option value="pie">Biểu đồ tròn</option>
+                    <option value="doughnut">Biểu đồ vòng</option>
+                    <option value="polarArea">Biểu đồ miền</option>
+                  </select>
+                </div>
+                <div className="h-64">
+                  {["bar", "horizontal", "area", "line"].includes(
+                    documentChartType
+                  ) ? (
+                    <canvas ref={barChartRef}></canvas>
+                  ) : (
+                    <canvas ref={pieChartRef}></canvas>
+                  )}
+                </div>
+              </div>
+
+              {/* Top Documents Table */}
+              <div className="bg-white rounded-lg p-3 sm:p-4 border border-gray-200">
+                <h3
+                  className="text-base sm:text-lg font-semibold mb-3 text-left"
+                  style={{ color: "var(--primary-text-color)" }}
+                >
+                  Top 5 tài liệu phổ biến nhất
+                </h3>
+                <div className="overflow-x-auto">
+                  <table className="w-full text-xs sm:text-sm">
+                    <thead>
+                      <tr className="border-b border-gray-200">
+                        <th className="text-left py-1.5 px-1 sm:px-1.5 text-[var(--third-text-color)] font-medium">
+                          STT
+                        </th>
+                        <th className="text-left py-1.5 px-1 sm:px-1.5 text-[var(--third-text-color)] font-medium">
+                          Tên tài liệu
+                        </th>
+                        <th className="text-center py-1.5 px-1 sm:px-1.5 text-[var(--third-text-color)] font-medium">
+                          Lượt xem
+                        </th>
+                        <th className="text-center py-1.5 px-1 sm:px-1.5 text-[var(--third-text-color)] font-medium">
+                          Lượt tải
+                        </th>
+                        <th className="text-center py-1.5 px-1 sm:px-1.5 text-[var(--third-text-color)] font-medium">
+                          Đánh giá
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {(statisticsData?.topDocuments || []).map(
+                        (doc: any, index: number) => (
+                          <tr
+                            key={doc.document || doc._id || index}
+                            className="border-b border-gray-100 hover:bg-gray-50 cursor-pointer"
+                            onClick={() =>
+                              handleDocumentClick(
+                                doc.document || doc._id || doc.id
+                              )
+                            }
+                          >
+                            <td
+                              className="py-2 px-1 sm:px-1.5"
+                              style={{ color: "var(--third-text-color)" }}
+                            >
+                              {index + 1}
+                            </td>
+                            <td className="py-2 px-1 sm:px-1.5 text-xs text-left text-[var(--primary-text-color)]">
+                              {doc.title}
+                            </td>
+                            <td
+                              className="py-2 px-1 sm:px-1.5 text-center"
+                              style={{ color: "var(--third-text-color)" }}
+                            >
+                              {doc.views}
+                            </td>
+                            <td
+                              className="py-2 px-1 sm:px-1.5 text-center"
+                              style={{ color: "var(--third-text-color)" }}
+                            >
+                              {doc.downloads}
+                            </td>
+                            <td
+                              className="py-2 px-1 sm:px-1.5 text-center"
+                              style={{ color: "var(--third-text-color)" }}
+                            >
+                              {doc.rating}
+                            </td>
+                          </tr>
+                        )
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+
+            {/* Line Chart and Approved Documents */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+              {/* Line Chart */}
+              <div className="bg-white rounded-lg p-3 sm:p-4 border border-gray-200">
+                <div className="flex justify-between items-center mb-3">
+                  <h3
+                    className="text-base sm:text-lg font-semibold text-left"
+                    style={{ color: "var(--primary-text-color)" }}
+                  >
+                    Thống kê lượt xem và tải tài liệu trên toàn hệ thống
+                  </h3>
+                  <div className="flex gap-2">
+                    <select
+                      value={chartType}
+                      onChange={(e) => setChartType(e.target.value)}
+                      className="text-sm border border-gray-300 rounded px-2 py-1"
+                    >
+                      <option value="line">Biểu đồ đường</option>
+                      <option value="bar">Biểu đồ cột</option>
+                      <option value="table">Bảng</option>
+                    </select>
+                  </div>
+                </div>
+                {chartType === "table" ? (
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-xs sm:text-sm">
+                      <thead>
+                        <tr className="border-b border-gray-200">
+                          <th className="text-left py-1.5 px-1 sm:px-1.5 text-[var(--third-text-color)] font-medium">
+                            {selectedMonth ? "Ngày" : "Tháng"}
+                          </th>
+                          <th className="text-center py-1.5 px-1 sm:px-1.5 text-[var(--third-text-color)] font-medium">
+                            Lượt xem
+                          </th>
+                          <th className="text-center py-1.5 px-1 sm:px-1.5 text-[var(--third-text-color)] font-medium">
+                            Lượt tải
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {lineChartData.map((item, index) => (
+                          <tr
+                            key={index}
+                            className="border-b border-gray-100 hover:bg-gray-50"
+                          >
+                            <td
+                              className="py-2 px-1 sm:px-1.5"
+                              style={{ color: "var(--third-text-color)" }}
+                            >
+                              {selectedMonth
+                                ? (item as any).day
+                                : (item as any).month}
+                            </td>
+                            <td
+                              className="py-2 px-1 sm:px-1.5 text-center"
+                              style={{ color: "var(--third-text-color)" }}
+                            >
+                              {item.views}
+                            </td>
+                            <td
+                              className="py-2 px-1 sm:px-1.5 text-center"
+                              style={{ color: "var(--third-text-color)" }}
+                            >
+                              {item.downloads}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                ) : chartType === "bar" ? (
+                  <div className="h-64 flex items-center justify-center">
+                    {lineChartData.length > 0 ? (
+                      <canvas ref={monthlyBarChartRef}></canvas>
+                    ) : (
+                      <div className="text-gray-500 text-lg">
+                        Không có dữ liệu
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <div className="h-64 flex items-center justify-center">
+                    {lineChartData.length > 0 ? (
+                      <canvas ref={lineChartRef}></canvas>
+                    ) : (
+                      <div className="text-gray-500 text-lg">
+                        Không có dữ liệu
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+
+              {/* Approved Documents Statistics */}
+              <div className="bg-white rounded-lg p-3 sm:p-4 border border-gray-200">
+                <div className="flex justify-between items-center mb-3">
+                  <h3
+                    className="text-base sm:text-lg font-semibold text-left"
+                    style={{ color: "var(--primary-text-color)" }}
+                  >
+                    Thống kê tài liệu đã duyệt
+                  </h3>
+                  <div className="text-sm text-[var(--third-text-color)]">
+                    Tổng số: {filteredApprovedDocuments.length}
+                  </div>
+                </div>
+
+                {/* Filters */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-3">
+                  <input
+                    type="text"
+                    placeholder="Người đăng"
+                    value={approvedFilter.author}
+                    onChange={(e) =>
+                      setApprovedFilter({
+                        ...approvedFilter,
+                        author: e.target.value,
+                      })
+                    }
+                    className="px-2 py-1 border border-gray-300 rounded text-sm"
+                  />
+                  <input
+                    type="text"
+                    placeholder="Chủ đề"
+                    value={approvedFilter.subject}
+                    onChange={(e) =>
+                      setApprovedFilter({
+                        ...approvedFilter,
+                        subject: e.target.value,
+                      })
+                    }
+                    className="px-2 py-1 border border-gray-300 rounded text-sm"
+                  />
+                  <input
+                    type="date"
+                    value={approvedFilter.dateFrom}
+                    onChange={(e) =>
+                      setApprovedFilter({
+                        ...approvedFilter,
+                        dateFrom: e.target.value,
+                      })
+                    }
+                    className="px-2 py-1 border border-gray-300 rounded text-sm"
+                  />
+                  <input
+                    type="date"
+                    value={approvedFilter.dateTo}
+                    onChange={(e) =>
+                      setApprovedFilter({
+                        ...approvedFilter,
+                        dateTo: e.target.value,
+                      })
+                    }
+                    className="px-2 py-1 border border-gray-300 rounded text-sm"
+                  />
+                </div>
+
+                {/* Approved Documents Table */}
+                <div className="overflow-x-auto max-h-48">
+                  <table className="w-full text-xs">
+                    <thead>
+                      <tr className="border-b border-gray-200">
+                        <th className="text-left py-1 px-1 text-[var(--third-text-color)] font-medium">
+                          STT
+                        </th>
+                        <th className="text-left py-1 px-1 text-[var(--third-text-color)] font-medium">
+                          Tên tài liệu
+                        </th>
+                        <th className="text-left py-1 px-1 text-[var(--third-text-color)] font-medium">
+                          Người duyệt
+                        </th>
+                        <th className="text-left py-1 px-1 text-[var(--third-text-color)] font-medium">
+                          Ngày duyệt
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {filteredApprovedDocuments.map((doc, index) => (
                         <tr
                           key={doc.document || doc._id || index}
                           className="border-b border-gray-100 hover:bg-gray-50 cursor-pointer"
@@ -883,259 +1112,39 @@ const DocumentStatisticsPage: React.FC = () => {
                             )
                           }
                         >
-                          <td
-                            className="py-2 px-1 sm:px-1.5"
-                            style={{ color: "var(--third-text-color)" }}
-                          >
-                            {index + 1}
-                          </td>
-                          <td className="py-2 px-1 sm:px-1.5 text-xs text-left text-[var(--primary-text-color)]">
-                            {doc.title}
-                          </td>
-                          <td
-                            className="py-2 px-1 sm:px-1.5 text-center"
-                            style={{ color: "var(--third-text-color)" }}
-                          >
-                            {doc.views}
+                          <td>
+                            <div
+                              className="py-1 px-1 text-center"
+                              style={{ color: "var(--third-text-color)" }}
+                            >
+                              {index + 1}
+                            </div>
                           </td>
                           <td
-                            className="py-2 px-1 sm:px-1.5 text-center"
+                            className="py-1 px-1 text-xs text-left"
                             style={{ color: "var(--third-text-color)" }}
                           >
-                            {doc.downloads}
+                            {doc.title.length > 30
+                              ? doc.title.substring(0, 30) + "..."
+                              : doc.title}
                           </td>
                           <td
-                            className="py-2 px-1 sm:px-1.5 text-center"
+                            className="py-1 px-1"
                             style={{ color: "var(--third-text-color)" }}
                           >
-                            {doc.rating}
-                          </td>
-                        </tr>
-                      )
-                    )}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          </div>
-
-          {/* Line Chart and Approved Documents */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-            {/* Line Chart */}
-            <div className="bg-white rounded-lg p-3 sm:p-4 border border-gray-200">
-              <div className="flex justify-between items-center mb-3">
-                <h3
-                  className="text-base sm:text-lg font-semibold text-left"
-                  style={{ color: "var(--primary-text-color)" }}
-                >
-                  Thống kê lượt xem và tải tài liệu trên toàn hệ thống
-                </h3>
-                <div className="flex gap-2">
-                  <select
-                    value={chartType}
-                    onChange={(e) => setChartType(e.target.value)}
-                    className="text-sm border border-gray-300 rounded px-2 py-1"
-                  >
-                    <option value="line">Biểu đồ đường</option>
-                    <option value="bar">Biểu đồ cột</option>
-                    <option value="table">Bảng</option>
-                  </select>
-                </div>
-              </div>
-              {chartType === "table" ? (
-                <div className="overflow-x-auto">
-                  <table className="w-full text-xs sm:text-sm">
-                    <thead>
-                      <tr className="border-b border-gray-200">
-                        <th className="text-left py-1.5 px-1 sm:px-1.5 text-[var(--third-text-color)] font-medium">
-                          {selectedMonth ? "Ngày" : "Tháng"}
-                        </th>
-                        <th className="text-center py-1.5 px-1 sm:px-1.5 text-[var(--third-text-color)] font-medium">
-                          Lượt xem
-                        </th>
-                        <th className="text-center py-1.5 px-1 sm:px-1.5 text-[var(--third-text-color)] font-medium">
-                          Lượt tải
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {lineChartData.map((item, index) => (
-                        <tr
-                          key={index}
-                          className="border-b border-gray-100 hover:bg-gray-50"
-                        >
-                          <td
-                            className="py-2 px-1 sm:px-1.5"
-                            style={{ color: "var(--third-text-color)" }}
-                          >
-                            {selectedMonth
-                              ? (item as any).day
-                              : (item as any).month}
+                            {doc.approvedBy}
                           </td>
                           <td
-                            className="py-2 px-1 sm:px-1.5 text-center"
+                            className="py-1 px-1"
                             style={{ color: "var(--third-text-color)" }}
                           >
-                            {item.views}
-                          </td>
-                          <td
-                            className="py-2 px-1 sm:px-1.5 text-center"
-                            style={{ color: "var(--third-text-color)" }}
-                          >
-                            {item.downloads}
+                            {doc.approvedDate}
                           </td>
                         </tr>
                       ))}
                     </tbody>
                   </table>
                 </div>
-              ) : chartType === "bar" ? (
-                <div className="h-64 flex items-center justify-center">
-                  {lineChartData.length > 0 ? (
-                    <canvas ref={monthlyBarChartRef}></canvas>
-                  ) : (
-                    <div className="text-gray-500 text-lg">
-                      Không có dữ liệu
-                    </div>
-                  )}
-                </div>
-              ) : (
-                <div className="h-64 flex items-center justify-center">
-                  {lineChartData.length > 0 ? (
-                    <canvas ref={lineChartRef}></canvas>
-                  ) : (
-                    <div className="text-gray-500 text-lg">
-                      Không có dữ liệu
-                    </div>
-                  )}
-                </div>
-              )}
-            </div>
-
-            {/* Approved Documents Statistics */}
-            <div className="bg-white rounded-lg p-3 sm:p-4 border border-gray-200">
-              <div className="flex justify-between items-center mb-3">
-                <h3
-                  className="text-base sm:text-lg font-semibold text-left"
-                  style={{ color: "var(--primary-text-color)" }}
-                >
-                  Thống kê tài liệu đã duyệt
-                </h3>
-                <div className="text-sm text-[var(--third-text-color)]">
-                  Tổng số: {filteredApprovedDocuments.length}
-                </div>
-              </div>
-
-              {/* Filters */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-3">
-                <input
-                  type="text"
-                  placeholder="Người đăng"
-                  value={approvedFilter.author}
-                  onChange={(e) =>
-                    setApprovedFilter({
-                      ...approvedFilter,
-                      author: e.target.value,
-                    })
-                  }
-                  className="px-2 py-1 border border-gray-300 rounded text-sm"
-                />
-                <input
-                  type="text"
-                  placeholder="Chủ đề"
-                  value={approvedFilter.subject}
-                  onChange={(e) =>
-                    setApprovedFilter({
-                      ...approvedFilter,
-                      subject: e.target.value,
-                    })
-                  }
-                  className="px-2 py-1 border border-gray-300 rounded text-sm"
-                />
-                <input
-                  type="date"
-                  value={approvedFilter.dateFrom}
-                  onChange={(e) =>
-                    setApprovedFilter({
-                      ...approvedFilter,
-                      dateFrom: e.target.value,
-                    })
-                  }
-                  className="px-2 py-1 border border-gray-300 rounded text-sm"
-                />
-                <input
-                  type="date"
-                  value={approvedFilter.dateTo}
-                  onChange={(e) =>
-                    setApprovedFilter({
-                      ...approvedFilter,
-                      dateTo: e.target.value,
-                    })
-                  }
-                  className="px-2 py-1 border border-gray-300 rounded text-sm"
-                />
-              </div>
-
-              {/* Approved Documents Table */}
-              <div className="overflow-x-auto max-h-48">
-                <table className="w-full text-xs">
-                  <thead>
-                    <tr className="border-b border-gray-200">
-                      <th className="text-left py-1 px-1 text-[var(--third-text-color)] font-medium">
-                        STT
-                      </th>
-                      <th className="text-left py-1 px-1 text-[var(--third-text-color)] font-medium">
-                        Tên tài liệu
-                      </th>
-                      <th className="text-left py-1 px-1 text-[var(--third-text-color)] font-medium">
-                        Người duyệt
-                      </th>
-                      <th className="text-left py-1 px-1 text-[var(--third-text-color)] font-medium">
-                        Ngày duyệt
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {filteredApprovedDocuments.map((doc, index) => (
-                      <tr
-                        key={doc.document || doc._id || index}
-                        className="border-b border-gray-100 hover:bg-gray-50 cursor-pointer"
-                        onClick={() =>
-                          handleDocumentClick(doc.document || doc._id || doc.id)
-                        }
-                      >
-                        <td>
-                          <div
-                            className="py-1 px-1 text-center"
-                            style={{ color: "var(--third-text-color)" }}
-                          >
-                            {index + 1}
-                          </div>
-                        </td>
-                        <td
-                          className="py-1 px-1 text-xs text-left"
-                          style={{ color: "var(--third-text-color)" }}
-                        >
-                          {doc.title.length > 30
-                            ? doc.title.substring(0, 30) + "..."
-                            : doc.title}
-                        </td>
-                        <td
-                          className="py-1 px-1"
-                          style={{ color: "var(--third-text-color)" }}
-                        >
-                          {doc.approvedBy}
-                        </td>
-                        <td
-                          className="py-1 px-1"
-                          style={{ color: "var(--third-text-color)" }}
-                        >
-                          {doc.approvedDate}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
               </div>
             </div>
           </div>

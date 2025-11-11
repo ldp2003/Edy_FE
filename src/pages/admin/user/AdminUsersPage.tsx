@@ -4,16 +4,19 @@ import { AdminBreadcrumb } from "../../../components/admin/common/AdminBreadcrum
 
 const AdminUsersPage: React.FC = () => {
   const breadcrumbItems = [
-    { label: "Người dùng" },
+    { label: "Admin", path: "/admin" },
+    { label: "Quản lý người dùng", path: "/admin/users" },
     { label: "Tất cả người dùng" },
   ];
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="max-w-[95%] mx-auto px-2 sm:px-4 lg:px-6 py-6">
+      <div className="">
         <AdminBreadcrumb items={breadcrumbItems} />
-        <div className="mt-6">
-          <AdminUserTable />
+        <div className="mt-4">
+          <div className="mt-6">
+            <AdminUserTable />
+          </div>
         </div>
       </div>
     </div>

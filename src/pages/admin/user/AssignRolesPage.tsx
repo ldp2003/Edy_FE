@@ -4,14 +4,18 @@ import AssignmentTable from "../../../components/admin/role/AssignmentTable";
 
 const AssignRolesPage: React.FC = () => {
   const breadcrumbItems = [
-    { label: "Người dùng" },
+    { label: "Admin", path: "/admin" },
+    { label: "Quản lý người dùng", path: "/admin/users" },
     { label: "Phân quyền" },
   ];
 
   return (
-    <div className="p-6 h-full">
+    <div className="h-full">
       <AdminBreadcrumb items={breadcrumbItems} />
-      <AssignmentTable />
+
+      <div className="mt-4">
+        <AssignmentTable />
+      </div>
     </div>
   );
 };

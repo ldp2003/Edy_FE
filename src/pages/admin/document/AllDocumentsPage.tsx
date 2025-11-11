@@ -4,20 +4,23 @@ import AdminDocumentTable from "../../../components/admin/document/AdminDocument
 
 const AllDocumentsPage: React.FC = () => {
   const breadcrumbItems = [
-    { label: "Tài liệu", path: "/admin" },
-    { label: "Tất cả tài liệu" },
+    { label: "Admin", path: "/admin" },
+    { label: "Quản lý nội dung", path: "/admin/documents/all" },
+    { label: "Tài liệu" },
   ];
 
   return (
-    <div className="p-6">
+    <div>
       <AdminBreadcrumb items={breadcrumbItems} />
 
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-        <h1 className="text-base text-left font-bold text-[var(--primary-text-color)] mb-6">
-          Tất cả tài liệu
-        </h1>
+      <div className="mt-4">
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+          <h1 className="text-base text-left font-bold text-[var(--primary-text-color)] mb-6">
+            Tất cả tài liệu
+          </h1>
 
-        <AdminDocumentTable />
+          <AdminDocumentTable />
+        </div>
       </div>
     </div>
   );

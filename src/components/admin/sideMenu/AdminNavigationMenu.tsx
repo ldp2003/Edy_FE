@@ -14,7 +14,7 @@ import {
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
-import { useState, useContext } from "react";
+import { useState, useContext, useEffect } from "react";
 import { UserContext } from "../../../contexts/UserContext";
 import { PERMISSIONS } from "../../../constants/PermissionConstants";
 
@@ -37,8 +37,26 @@ interface MenuItem {
 
 export function AdminNavigationMenu({ isCompact }: AdminNavigationMenuProps) {
   const location = useLocation();
-  const [expandedItems, setExpandedItems] = useState<string[]>([]);
   const { permissions } = useContext(UserContext);
+
+  const [expandedItems, setExpandedItems] = useState<string[]>([]);
+
+  // Auto-expand items when location changes
+  useEffect(() => {
+    const expanded: string[] = [];
+    menuItems.forEach((item) => {
+      if (item.children) {
+        const hasActiveChild = item.children.some(
+          (child) => location.pathname === child.path
+        );
+        if (hasActiveChild) {
+          expanded.push(item.label);
+        }
+      }
+    });
+    setExpandedItems(expanded);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [location.pathname]);
 
   const hasPermission = (permission: string) => {
     return (
@@ -60,7 +78,7 @@ export function AdminNavigationMenu({ isCompact }: AdminNavigationMenuProps) {
     {
       icon: FileText,
       label: "Quản lý nội dung",
-      permission: PERMISSIONS.MANAGE_DOCUMENT ,
+      permission: PERMISSIONS.MANAGE_DOCUMENT,
       children: [
         {
           icon: FileText,

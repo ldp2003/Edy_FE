@@ -17,6 +17,7 @@ import AdminTasksToDo from "../../../components/admin/dashboard/tasks/AdminTasks
 import AdminStatsGrid from "../../../components/admin/dashboard/stats/AdminStatsGrid";
 import AdminQuickActions from "../../../components/admin/dashboard/actions/AdminQuickActions";
 import AdminRecentActivities from "../../../components/admin/dashboard/activities/AdminRecentActivities";
+import { AdminBreadcrumb } from "../../../components/admin/common/AdminBreadcrumb";
 import type {
   ActivityActionType,
   TargetTypeValue,
@@ -425,18 +426,22 @@ const AdminHomePage: React.FC = () => {
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="mb-4 sm:mb-6 md:mb-8">
-          <h1
-            className="text-lg xs:text-lg sm:text-lg md:text-lg font-bold mb-2 w-fit text-left"
-            style={{ color: "var(--primary-text-color)" }}
-          >
-            Trang chủ Admin
-          </h1>
-          <p
-            className="text-xs xs:text-xs sm:text-xs md:text-xs w-fit text-left"
-            style={{ color: "var(--secondary-text-color)" }}
-          >
-            Tổng quan hệ thống quản lý chia sẻ tài liệu
-          </p>
+          <AdminBreadcrumb items={[{ label: "Admin" }]} />
+
+          <div className="mt-4">
+            <h1
+              className="text-lg xs:text-lg sm:text-lg md:text-lg font-bold mb-2 w-fit text-left"
+              style={{ color: "var(--primary-text-color)" }}
+            >
+              Trang chủ Admin
+            </h1>
+            <p
+              className="text-xs xs:text-xs sm:text-xs md:text-xs w-fit text-left"
+              style={{ color: "var(--secondary-text-color)" }}
+            >
+              Tổng quan hệ thống quản lý chia sẻ tài liệu
+            </p>
+          </div>
         </div>
 
         {/* Stats Grid */}

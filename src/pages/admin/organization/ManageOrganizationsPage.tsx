@@ -6,6 +6,7 @@ import { OrganizationService } from "../../../utils/OrganizationService";
 import type { OrganizationDetailed } from "../../../models/organization";
 import OrganizationTable from "../../../components/admin/organization/OrganizationTable";
 import OrganizationForm from "../../../components/admin/organization/OrganizationForm";
+import { AdminBreadcrumb } from "../../../components/admin/common/AdminBreadcrumb";
 
 const ManageOrganizationsPage: React.FC = () => {
   const navigate = useNavigate();
@@ -125,56 +126,65 @@ const ManageOrganizationsPage: React.FC = () => {
   return (
     <div>
       {contextHolder}
-      <div className="mb-4">
-        <h1 className="text-xl sm:text-lg xs:text-base font-bold text-[var(--primary-text-color)] mb-4 text-left">
-          Quản lý tổ chức
-        </h1>
+      <AdminBreadcrumb
+        items={[
+          { label: "Admin", path: "/admin" },
+          { label: "Quản lý người dùng", path: "/admin/organizations" },
+          { label: "Tổ chức" },
+        ]}
+      />
+      <div className="mt-4">
+        <div className="mb-4">
+          <h1 className="text-xl sm:text-lg xs:text-base font-bold text-[var(--primary-text-color)] mb-4 text-left">
+            Quản lý tổ chức
+          </h1>
 
-        <div className="mb-3 flex flex-col sm:flex-row gap-3">
-          <div className="flex-1 flex gap-2">
-            <Input
-              placeholder="Tìm kiếm tổ chức theo tên hoặc mã..."
-              prefix={<SearchOutlined />}
-              value={searchText}
-              onChange={(e) => setSearchText(e.target.value)}
-              allowClear
-              className="text-sm sm:text-sm xs:text-xs"
-            />
-            <button
-              onClick={loadOrganizations}
-              className="inline-flex items-center px-3 py-1.5 text-xs sm:text-xs xs:text-xs font-medium rounded-md text-white bg-[var(--primary-color)] hover:bg-[var(--secondary-color)] focus:ring-2 focus:ring-[var(--primary-color)] focus:ring-offset-2 transition-colors duration-200"
-            >
-              <SearchOutlined className="mr-1.5" />
-              Tìm kiếm
-            </button>
-          </div>
-          <div className="flex justify-start">
-            <button
-              onClick={handleAdd}
-              className="inline-flex items-center px-3 py-1.5 text-xs sm:text-xs xs:text-xs font-medium rounded-md text-white bg-[var(--primary-color)] hover:bg-[var(--secondary-color)] focus:ring-2 focus:ring-[var(--primary-color)] focus:ring-offset-2 transition-colors duration-200"
-            >
-              <PlusOutlined className="mr-1.5" />
-              Thêm tổ chức
-            </button>
+          <div className="mb-3 flex flex-col sm:flex-row gap-3">
+            <div className="flex-1 flex gap-2">
+              <Input
+                placeholder="Tìm kiếm tổ chức theo tên hoặc mã..."
+                prefix={<SearchOutlined />}
+                value={searchText}
+                onChange={(e) => setSearchText(e.target.value)}
+                allowClear
+                className="text-sm sm:text-sm xs:text-xs"
+              />
+              <button
+                onClick={loadOrganizations}
+                className="inline-flex items-center px-3 py-1.5 text-xs sm:text-xs xs:text-xs font-medium rounded-md text-white bg-[var(--primary-color)] hover:bg-[var(--secondary-color)] focus:ring-2 focus:ring-[var(--primary-color)] focus:ring-offset-2 transition-colors duration-200"
+              >
+                <SearchOutlined className="mr-1.5" />
+                Tìm kiếm
+              </button>
+            </div>
+            <div className="flex justify-start">
+              <button
+                onClick={handleAdd}
+                className="inline-flex items-center px-3 py-1.5 text-xs sm:text-xs xs:text-xs font-medium rounded-md text-white bg-[var(--primary-color)] hover:bg-[var(--secondary-color)] focus:ring-2 focus:ring-[var(--primary-color)] focus:ring-offset-2 transition-colors duration-200"
+              >
+                <PlusOutlined className="mr-1.5" />
+                Thêm tổ chức
+              </button>
+            </div>
           </div>
         </div>
+
+        <OrganizationTable
+          organizations={organizations}
+          loading={loading}
+          onEdit={handleEdit}
+          onDelete={handleDelete}
+          onView={handleView}
+        />
+
+        <OrganizationForm
+          visible={isModalVisible}
+          editingOrganization={editingOrganization}
+          onOk={handleModalOk}
+          onCancel={handleModalCancel}
+          form={form}
+        />
       </div>
-
-      <OrganizationTable
-        organizations={organizations}
-        loading={loading}
-        onEdit={handleEdit}
-        onDelete={handleDelete}
-        onView={handleView}
-      />
-
-      <OrganizationForm
-        visible={isModalVisible}
-        editingOrganization={editingOrganization}
-        onOk={handleModalOk}
-        onCancel={handleModalCancel}
-        form={form}
-      />
     </div>
   );
 };

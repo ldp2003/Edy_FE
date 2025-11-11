@@ -7,6 +7,7 @@ import UserDetailHeader from "../../../components/admin/user/UserDetailHeader";
 import UserProfileCard from "../../../components/admin/user/UserProfileCard";
 import UserStatsCard from "../../../components/admin/user/UserStatsCard";
 import UserDetailInfo from "../../../components/admin/user/UserDetailInfo";
+import { AdminBreadcrumb } from "../../../components/admin/common/AdminBreadcrumb";
 
 const UserDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -117,35 +118,49 @@ const UserDetailPage: React.FC = () => {
 
   return (
     <div className="p-6 max-w-6xl mx-auto">
-      {/* Header */}
-      <UserDetailHeader
-        user={user}
-        onBack={() => navigate("/admin/users")}
-        onEdit={() => navigate(`/admin/users/edit/${id}`)}
-        onToggleStatus={handleToggleStatus}
+      <AdminBreadcrumb
+        items={[
+          { label: "Admin", path: "/admin" },
+          { label: "Quản lý người dùng", path: "/admin/users" },
+          {
+            label:
+              `${user.first_name || ""} ${user.last_name || ""}`.trim() ||
+              "Chi tiết người dùng",
+          },
+        ]}
       />
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* User Profile and Stats */}
-        <div className="lg:col-span-1 shadow-sm border border-gray-200 rounded-lg bg-white">
-          <UserProfileCard
-            user={user}
-            getStatusColor={getStatusColor}
-            getStatusText={getStatusText}
-            formatDate={formatDate}
-          />
+      <div className="mt-4">
+        {/* Header */}
+        <UserDetailHeader
+          user={user}
+          onBack={() => navigate("/admin/users")}
+          onEdit={() => navigate(`/admin/users/edit/${id}`)}
+          onToggleStatus={handleToggleStatus}
+        />
 
-          <UserStatsCard user={user} />
-        </div>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* User Profile and Stats */}
+          <div className="lg:col-span-1 shadow-sm border border-gray-200 rounded-lg bg-white">
+            <UserProfileCard
+              user={user}
+              getStatusColor={getStatusColor}
+              getStatusText={getStatusText}
+              formatDate={formatDate}
+            />
 
-        {/* Detailed Info */}
-        <div className="lg:col-span-2 shadow-sm border border-gray-200 rounded-lg bg-white">
-          <UserDetailInfo
-            user={user}
-            getStatusColor={getStatusColor}
-            getStatusText={getStatusText}
-            formatDate={formatDate}
-          />
+            <UserStatsCard user={user} />
+          </div>
+
+          {/* Detailed Info */}
+          <div className="lg:col-span-2 shadow-sm border border-gray-200 rounded-lg bg-white">
+            <UserDetailInfo
+              user={user}
+              getStatusColor={getStatusColor}
+              getStatusText={getStatusText}
+              formatDate={formatDate}
+            />
+          </div>
         </div>
       </div>
     </div>
