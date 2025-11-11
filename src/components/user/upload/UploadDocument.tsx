@@ -376,12 +376,8 @@ const UploadDocument: React.FC<UploadDocumentProps> = ({
         try {
           console.log("Uploading Word thumbnail to Cloudinary...");
 
-          // Convert data URL to blob
-          const response = await fetch(wordThumbnail);
-          const blob = await response.blob();
-
           const thumbnailFormData = new FormData();
-          thumbnailFormData.append("file", blob);
+          thumbnailFormData.append("file", wordThumbnail); // Upload base64 data URL directly
           thumbnailFormData.append("upload_preset", preset || "");
           thumbnailFormData.append("resource_type", "image");
           thumbnailFormData.append(

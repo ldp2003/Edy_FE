@@ -23,37 +23,117 @@
   --hover-text-color: #0066cc;
   --hover-bg-color: #f0f8ff;
 }
-/* src/docx-preview.css */
-.docx-wrapper {
+/* Mammoth Word Viewer Styles */
+.mammoth-wrapper {
   background: white;
   color: black;
   line-height: 1.5;
+  font-family: "Times New Roman", serif;
+  font-size: 14px;
 }
 
-.docx-wrapper section {
-  margin-bottom: 1rem;
+.mammoth-wrapper p,
+.mammoth-wrapper div,
+.mammoth-wrapper span {
+  text-align: left !important;
+  margin-bottom: 0.5rem;
 }
 
-.docx-preview-content {
-  margin: 0 !important;
-  margin-bottom: 1rem !important;
-  width: 100% !important;
-  margin: 10px;
+.mammoth-wrapper h1,
+.mammoth-wrapper h2,
+.mammoth-wrapper h3,
+.mammoth-wrapper h4,
+.mammoth-wrapper h5,
+.mammoth-wrapper h6 {
+  text-align: left !important;
+  margin-top: 1rem;
+  margin-bottom: 0.5rem;
+  font-weight: bold;
 }
 
-/* Document Viewer Centering */
-.document-viewer-container {
-  display: flex;
-  justify-content: center;
-  align-items: flex-start;
+.mammoth-wrapper ul,
+.mammoth-wrapper ol {
+  text-align: left !important;
+  padding-left: 2rem;
+  margin-bottom: 0.5rem;
+}
+
+.mammoth-wrapper li {
+  text-align: left !important;
+  margin-bottom: 0.25rem;
+}
+
+.mammoth-wrapper table {
   width: 100%;
+  border-collapse: collapse;
+  margin: 1rem 0;
 }
 
-.pdf-viewer-wrapper,
-.word-viewer-wrapper,
-.excel-viewer-wrapper,
-.ppt-viewer-wrapper {
-  max-width: 1200px;
-  margin: 0 auto;
-  width: 100%;
+.mammoth-wrapper td,
+.mammoth-wrapper th {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: left;
+}
+
+.mammoth-wrapper .table-bordered {
+  border: 1px solid #ddd;
+}
+
+/* Word document styling */
+.mammoth-wrapper {
+  /* Prevent elements from breaking across pages */
+  page-break-inside: avoid;
+}
+
+/* Override ALL text alignment including inline styles */
+.mammoth-wrapper * {
+  text-align: left !important;
+}
+
+/* Exception for tables - center content in cells if needed */
+.mammoth-wrapper td[align="center"],
+.mammoth-wrapper th[align="center"] {
+  text-align: center !important;
+}
+
+.mammoth-wrapper td[align="right"],
+.mammoth-wrapper th[align="right"] {
+  text-align: right !important;
+}
+
+.mammoth-wrapper p,
+.mammoth-wrapper h1,
+.mammoth-wrapper h2,
+.mammoth-wrapper h3,
+.mammoth-wrapper h4,
+.mammoth-wrapper h5,
+.mammoth-wrapper h6,
+.mammoth-wrapper table,
+.mammoth-wrapper ul,
+.mammoth-wrapper ol {
+  page-break-inside: avoid;
+  break-inside: avoid;
+  orphans: 3;
+  widows: 3;
+}
+
+.mammoth-wrapper h1,
+.mammoth-wrapper h2,
+.mammoth-wrapper h3,
+.mammoth-wrapper h4,
+.mammoth-wrapper h5,
+.mammoth-wrapper h6 {
+  page-break-after: avoid;
+  break-after: avoid;
+}
+
+.mammoth-wrapper table {
+  page-break-inside: auto;
+  break-inside: auto;
+}
+
+.mammoth-wrapper tr {
+  page-break-inside: avoid;
+  break-inside: avoid;
 }
