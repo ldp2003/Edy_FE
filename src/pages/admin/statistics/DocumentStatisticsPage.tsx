@@ -734,7 +734,7 @@ const DocumentStatisticsPage: React.FC = () => {
 
           <div className="mt-4">
             {/* Sync Buttons */}
-            <div className="flex gap-4 mb-4">
+            <div className="flex gap-4 mb-6">
               <button
                 disabled={syncAllLoading}
                 onClick={handleSyncAllStatistics}
@@ -745,7 +745,7 @@ const DocumentStatisticsPage: React.FC = () => {
             </div>
 
             {/* Stat Cards */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
               <div className="bg-gray-200 rounded-lg p-3 sm:p-4 text-center">
                 <div
                   className="text-2xl sm:text-3xl font-bold"
@@ -813,7 +813,7 @@ const DocumentStatisticsPage: React.FC = () => {
             </div>
 
             {/* Charts */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
               {/* Bar Chart */}
               <div className="bg-white rounded-lg p-3 sm:p-4 border border-gray-200">
                 <div className="flex justify-between items-center mb-3">
@@ -926,7 +926,7 @@ const DocumentStatisticsPage: React.FC = () => {
             </div>
 
             {/* Line Chart and Approved Documents */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
               {/* Line Chart */}
               <div className="bg-white rounded-lg p-3 sm:p-4 border border-gray-200">
                 <div className="flex justify-between items-center mb-3">

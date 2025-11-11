@@ -28,6 +28,7 @@ import {
 } from "lucide-react";
 import type { User } from "../../../models/user";
 import { UserService } from "../../../utils/UserService";
+import { getStatusStyle } from "../../../utils/AdminTableStyles";
 import { getRoleDisplayName } from "../../../constants/RoleConstants";
 import UserFilterModal from "./UserFilterModal";
 import UserItem from "./UserItem";
@@ -676,38 +677,17 @@ const AdminUserTable: React.FC = () => {
       align: "center",
       width: 90,
       render: (status?: string) => {
-        const getStatusDisplay = (status?: string) => {
-          switch (status) {
-            case "ACTIVE":
-              return {
-                text: "Hoạt động",
-                color: "text-green-600",
-                bg: "bg-green-50",
-              };
-            case "BANNED":
-              return {
-                text: "Bị khóa",
-                color: "text-red-600",
-                bg: "bg-red-50",
-              };
-            case "INACTIVE":
-              return {
-                text: "Không hoạt động",
-                color: "text-gray-600",
-                bg: "bg-gray-50",
-              };
-            default:
-              return {
-                text: "N/A",
-                color: "text-gray-600",
-                bg: "bg-gray-50",
-              };
-          }
+        const statusLabels: { [key: string]: string } = {
+          ACTIVE: "Hoạt động",
+          BANNED: "Bị khóa",
+          INACTIVE: "Không hoạt động",
         };
-
-        const { text, color, bg } = getStatusDisplay(status);
+        const text = statusLabels[status || ""] || "N/A";
         return (
-          <span className={`px-1 py-0.5 rounded text-xs ${color} ${bg}`}>
+          <span
+            className="px-1 py-0.5 rounded text-xs"
+            style={getStatusStyle(status?.toLowerCase() || "inactive")}
+          >
             {text}
           </span>
         );

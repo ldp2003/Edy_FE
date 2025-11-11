@@ -145,7 +145,7 @@ export function AdminNavigationMenu({ isCompact }: AdminNavigationMenuProps) {
           icon: Flag,
           label: "Báo cáo",
           path: "/admin/reports",
-          permission: PERMISSIONS.HANDLE_REPORT,
+          permission: PERMISSIONS.HANDLE_DOCUMENT_REPORT,
         },
       ],
     },
