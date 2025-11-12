@@ -24,4 +24,9 @@ export const AssignmentService = {
     const response = await AssignmentAPI.updateAssignment(assignmentId, data);
     return response.data;
   },
+
+  revokeAllRoles: async (accountId: string) => {
+    const response = await AssignmentAPI.revokeAllRoles(accountId);
+    return response.data;
+  },
 };

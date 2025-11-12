@@ -1707,6 +1707,17 @@ export const AssignmentAPI = {
       throw error;
     }
   },
+
+  // Revoke all roles from a user
+  revokeAllRoles: async (accountId: string) => {
+    try {
+      const response = await apiClient.delete(`/admin/roles/user/${accountId}`);
+      return response.data;
+    } catch (error) {
+      console.error("Error revoking all roles:", error);
+      throw error;
+    }
+  },
 };
 
 export const PointTransactionAPI = {

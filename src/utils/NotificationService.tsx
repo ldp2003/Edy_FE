@@ -658,7 +658,7 @@ export class NotificationService {
         cmtId,
         type: "SYSTEM",
         message,
-        redirectTo: "NONE",
+        redirectTo: "SYSTEM",
       });
 
       return {

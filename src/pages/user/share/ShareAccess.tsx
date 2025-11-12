@@ -127,9 +127,27 @@ const ShareAccess: React.FC = () => {
       if (!linkId) {
         throw new Error("Link không hợp lệ");
       }
+
+      // Create access request
       await AccessRequestService.createAccessRequest(linkId, {
         content: requestContent,
       });
+
+      // TODO: Send notification to document owner
+      // Currently no API available to get document owner ID from share link
+      // Need backend API to get document owner from share link ID or document ID
+      // await NotificationService.createSystemNotification(
+      //   documentOwnerId,
+      //   `Bạn có yêu cầu truy cập mới cho tài liệu "${documentTitle}". Vui lòng xem xét và phê duyệt.`,
+      //   documentId
+      // );
+
+      // TODO: Send notification to current user confirming request was sent
+      // await NotificationService.createSystemNotification(
+      //   currentUserId,
+      //   `Yêu cầu truy cập của bạn cho tài liệu "${documentTitle}" đã được gửi thành công.`,
+      //   documentId
+      // );
 
       // Simulate API call for now
       await new Promise((resolve) => setTimeout(resolve, 500));
