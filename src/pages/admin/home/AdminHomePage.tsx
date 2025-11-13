@@ -416,13 +416,7 @@ const AdminHomePage: React.FC = () => {
   ];
 
   return (
-    <div
-      className="p-4 md:p-6 lg:p-8"
-      style={{
-        backgroundColor: "var(--secondary-background-color)",
-        minHeight: "100vh",
-      }}
-    >
+    <div className="bg-[var(--secondary-background-color)] min-h-screen">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="mb-4 sm:mb-6 md:mb-8">
