@@ -119,20 +119,24 @@ const AdminHomePage: React.FC = () => {
         if (statsResponse.success && statsResponse.data) {
           // Transform recent activities to match AdminRecentActivities interface
           const transformedActivities =
-            statsResponse.data.recent_activities.map((activity) => ({
-              ...activity,
-              user: {
-                _id: activity.user.id,
-                first_name: activity.user.name.split(" ")[0] || "",
-                last_name:
-                  activity.user.name.split(" ").slice(1).join(" ") || "",
-                avatar: activity.user.avatar,
-                contact_email: activity.user.email,
-              },
-              target_type: activity.targetType,
-              target_id: activity.targetId,
-              target_title: activity.targetTitle,
-            }));
+            statsResponse.data.recent_activities.map((activity) => {
+              const nameParts = activity.user.name
+                ? activity.user.name.split(" ")
+                : ["", ""];
+              return {
+                ...activity,
+                user: {
+                  _id: activity.user.id,
+                  first_name: nameParts[0] || "",
+                  last_name: nameParts.slice(1).join(" ") || "",
+                  avatar: activity.user.avatar,
+                  contact_email: activity.user.email,
+                },
+                target_type: activity.targetType,
+                target_id: activity.targetId,
+                target_title: activity.targetTitle,
+              };
+            });
 
           setApiData({
             statistics: statsResponse.data.statistics,

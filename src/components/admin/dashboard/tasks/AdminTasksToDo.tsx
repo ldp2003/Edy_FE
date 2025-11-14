@@ -113,7 +113,7 @@ const AdminTasksToDo: React.FC<AdminTasksToDoProps> = ({
           borderColor: "var(--border-color)",
           backgroundColor: "var(--primary-background-color)",
         }}
-        bodyStyle={{ padding: "8px" }}
+        styles={{ body: { padding: "8px" } }}
       >
         <List
           loading={loading}

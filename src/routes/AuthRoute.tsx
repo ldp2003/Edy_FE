@@ -138,6 +138,16 @@ const AuthRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
           setPermissions(data.user.permissions || []);
           console.log("Permissions set to:", data.user.permissions || []);
 
+          // Check if user is banned
+          if (data.user.status === "BANNED") {
+            console.log("🚫 User is banned, redirecting to banned page");
+            navigate("/banned");
+            setIsLoading(false);
+            return; // Exit early to prevent further processing
+          }
+
+          setIsBanned(false);
+
           // Extract read history from user data and ensure type safety
           const rawReadHistory = data.user?.read_history || [];
           const userReadHistory: ReadHistoryItem[] = rawReadHistory.map(
@@ -313,6 +323,18 @@ const AuthRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
                 navigate("/account-activation");
                 return; // Exit early to avoid further processing
               }
+            }
+
+            // Check if user is banned
+            if (
+              errorData?.message?.includes("banned") ||
+              errorData?.message?.includes("BANNED") ||
+              errorData?.code === "ACCOUNT_BANNED"
+            ) {
+              console.log("🚫 Account is banned - redirecting to banned page");
+              navigate("/banned");
+              setIsLoading(false);
+              return; // Exit early to avoid further processing
             }
 
             // Clear any stored tokens/cookies here if needed
