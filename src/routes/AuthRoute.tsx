@@ -146,8 +146,6 @@ const AuthRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
             return; // Exit early to prevent further processing
           }
 
-          setIsBanned(false);
-
           // Extract read history from user data and ensure type safety
           const rawReadHistory = data.user?.read_history || [];
           const userReadHistory: ReadHistoryItem[] = rawReadHistory.map(
