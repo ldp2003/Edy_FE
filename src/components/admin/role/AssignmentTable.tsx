@@ -12,13 +12,14 @@ import {
   // Form,
 } from "antd";
 import type { ColumnsType } from "antd/es/table";
-import { Edit, Lock, Unlock, Plus } from "lucide-react";
+import { Edit, Lock, Unlock, Plus, UserX } from "lucide-react";
 import { AssignmentService } from "../../../utils/AssignmentService";
 import { ROLE_DISPLAY_NAMES } from "../../../constants/RoleConstants";
 import { getStatusStyle } from "../../../utils/AdminTableStyles";
 import AssignRoleModal from "./AssignRoleModal";
 import EditAssignmentModel from "./EditAssigmentModel";
 import { Input } from "antd";
+import { NotificationService } from "../../../utils/NotificationService";
 const { Search } = Input;
 
 interface Assignment {
@@ -26,6 +27,7 @@ interface Assignment {
   account: {
     _id: string;
     user: {
+      _id: string;
       fullname: string;
       avatar: string;
     };
@@ -96,12 +98,68 @@ const AssignmentTable: React.FC = () => {
         assignmentId,
         !currentStatus
       );
+
+      // Send notification to user
+      const assignment = assignments.find((a) => a._id === assignmentId);
+      if (assignment) {
+        const userId = assignment.account.user._id;
+        if (userId) {
+          const messageText = currentStatus
+            ? "Vai trò của bạn đã bị vô hiệu hóa."
+            : "Vai trò của bạn đã được kích hoạt lại.";
+          try {
+            await NotificationService.createSystemNotification(
+              userId,
+              messageText
+            );
+          } catch (notifError) {
+            console.error("Error sending notification:", notifError);
+            // Don't fail the whole operation if notification fails
+          }
+        }
+      }
+
       messageApi.success("Cập nhật trạng thái thành công");
       fetchAssignments();
     } catch (error: any) {
       messageApi.error(
         error.response?.data?.message || "Không thể cập nhật trạng thái"
       );
+    }
+  };
+
+  const handleRevokeAllRoles = async (
+    accountId: string,
+    userId: string,
+    userName: string
+  ) => {
+    console.log("assignment.account:", { accountId, userId, userName });
+    try {
+      setLoading(true);
+      await AssignmentService.revokeAllRoles(accountId);
+
+      // Send notification to user
+      if (userId) {
+        try {
+          await NotificationService.createSystemNotification(
+            userId,
+            "Tất cả quyền quản trị của bạn đã bị thu hồi. Nếu bạn cho rằng đây là một sai lầm, vui lòng liên hệ với quản trị viên."
+          );
+        } catch (notifError) {
+          console.error("Error sending notification:", notifError);
+          // Don't fail the whole operation if notification fails
+        }
+      }
+
+      messageApi.success(`Đã thu hồi toàn bộ quyền quản trị của ${userName}`);
+      fetchAssignments();
+    } catch (error: any) {
+      console.error("Error revoking all roles:", error);
+      messageApi.error(
+        error.response?.data?.message || "Không thể thu hồi quyền"
+      );
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -265,40 +323,67 @@ const AssignmentTable: React.FC = () => {
         </div>
 
         <div className="grid gap-4">
-          {filteredAssignments.map((assignment: any) => (
-            <Card key={assignment.account._id} className="text-left w-full">
-              <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center gap-4">
-                  <Avatar size={50} src={assignment.account.user.avatar} />
-                  <div>
-                    <h2 className="text-sm font-bold text-[var(--primary-text-color)] ">
-                      {assignment.account.user.fullname}
-                    </h2>
-                    <span className="text-gray-500">
-                      ID: {assignment.account._id}
-                    </span>
+          {filteredAssignments.map((assignment: any) => {
+            console.log("assignment.account:", assignment.account);
+            return (
+              <Card key={assignment.account._id} className="text-left w-full">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center gap-4">
+                    <Avatar size={50} src={assignment.account.user.avatar} />
+                    <div>
+                      <h2 className="text-sm font-bold text-[var(--primary-text-color)] ">
+                        {assignment.account.user.fullname}
+                      </h2>
+                      <span className="text-gray-500">
+                        ID: {assignment.account._id}
+                      </span>
+                    </div>
                   </div>
+                  <Space>
+                    <Popconfirm
+                      title="Thu hồi toàn bộ quyền quản trị"
+                      description={`Bạn có chắc chắn muốn thu hồi toàn bộ quyền quản trị của ${assignment.account.user._id}? Người dùng sẽ nhận được thông báo về hành động này.`}
+                      onConfirm={() =>
+                        handleRevokeAllRoles(
+                          assignment.account._id,
+                          assignment.account.user.id,
+                          assignment.account.user.fullname
+                        )
+                      }
+                      okText="Xác nhận"
+                      cancelText="Hủy"
+                      okButtonProps={{ danger: true }}
+                    >
+                      <Button
+                        danger
+                        icon={<UserX size={16} />}
+                        loading={loading}
+                      >
+                        Tước quyền admin
+                      </Button>
+                    </Popconfirm>
+                    <Button
+                      type="primary"
+                      icon={<Plus size={16} />}
+                      onClick={() => {
+                        setSelectedAccount(assignment.account);
+                        setIsAssignModalVisible(true);
+                      }}
+                    >
+                      Thêm vai trò
+                    </Button>
+                  </Space>
                 </div>
-                <Button
-                  type="primary"
-                  icon={<Plus size={16} />}
-                  onClick={() => {
-                    setSelectedAccount(assignment.account);
-                    setIsAssignModalVisible(true);
-                  }}
-                >
-                  Thêm vai trò
-                </Button>
-              </div>
-              <Table
-                columns={columns}
-                dataSource={assignment.assignments}
-                rowKey={(record) => record._id}
-                loading={loading}
-                pagination={false}
-              />
-            </Card>
-          ))}
+                <Table
+                  columns={columns}
+                  dataSource={assignment.assignments}
+                  rowKey={(record) => record._id}
+                  loading={loading}
+                  pagination={false}
+                />
+              </Card>
+            );
+          })}
         </div>
 
         <EditAssignmentModel

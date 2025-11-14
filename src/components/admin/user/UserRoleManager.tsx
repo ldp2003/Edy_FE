@@ -143,6 +143,7 @@ const UserRoleManager: React.FC<UserRoleManagerProps> = ({ userId }) => {
   const assignment = selectedRoleForEdit
     ? {
         _id: selectedRoleForEdit._id,
+        account: { user: { _id: userId } },
         role: { _id: selectedRoleForEdit._id, name: selectedRoleForEdit.name },
       }
     : null;

@@ -5,6 +5,7 @@ import { RoleService } from "../../../utils/RoleService";
 import { ROLE_DISPLAY_NAMES } from "../../../constants/RoleConstants";
 import { AssignmentService } from "../../../utils/AssignmentService";
 import { OrganizationService } from "../../../utils/OrganizationService";
+import { NotificationService } from "../../../utils/NotificationService";
 
 interface EditRoleModalProps {
   visible: boolean;
@@ -12,6 +13,11 @@ interface EditRoleModalProps {
   onSuccess: () => void;
   assignment: {
     _id: string;
+    account: {
+      user: {
+        _id: string;
+      };
+    };
     role: {
       _id: string;
       name: string;
@@ -47,7 +53,7 @@ const EditRoleModal: React.FC<EditRoleModalProps> = ({
         organization: assignment.organization?._id,
       });
     }
-  }, [visible, assignment]);
+  }, [visible, assignment, form]);
 
   const fetchData = async () => {
     try {
@@ -63,7 +69,7 @@ const EditRoleModal: React.FC<EditRoleModalProps> = ({
       const orgsResponse = await OrganizationService.getOrganizations();
       setOrganizations(orgsResponse);
     } catch (error) {
-      console.error('Error fetching data:', error);
+      console.error("Error fetching data:", error);
     }
   };
 
@@ -74,12 +80,33 @@ const EditRoleModal: React.FC<EditRoleModalProps> = ({
         subject: values.subject,
         organization: values.organization,
       });
+
+      // Send notification to user
+      const userId = assignment.account.user._id;
+      if (userId) {
+        const role = roles.find((r) => r._id === values.role);
+        const roleName = role
+          ? ROLE_DISPLAY_NAMES[role.name] || role.name
+          : "không xác định";
+        try {
+          await NotificationService.createSystemNotification(
+            userId,
+            `Vai trò của bạn đã được cập nhật thành ${roleName}.`
+          );
+        } catch (notifError) {
+          console.error("Error sending notification:", notifError);
+          // Don't fail the whole operation if notification fails
+        }
+      }
+
       messageApi.success("Cập nhật phân quyền thành công");
       onSuccess();
       form.resetFields();
     } catch (error: any) {
-      console.error('Error updating assignment:', error);
-      messageApi.error(error.response?.data?.message || "Không thể cập nhật phân quyền");
+      console.error("Error updating assignment:", error);
+      messageApi.error(
+        error.response?.data?.message || "Không thể cập nhật phân quyền"
+      );
     }
   };
 
@@ -94,11 +121,7 @@ const EditRoleModal: React.FC<EditRoleModalProps> = ({
         okText="Lưu"
         cancelText="Hủy"
       >
-        <Form
-          form={form}
-          layout="vertical"
-          onFinish={handleSubmit}
-        >
+        <Form form={form} layout="vertical" onFinish={handleSubmit}>
           <Form.Item
             name="role"
             label="Vai trò"
@@ -109,7 +132,7 @@ const EditRoleModal: React.FC<EditRoleModalProps> = ({
               placeholder="Chọn vai trò"
               optionFilterProp="label"
             >
-              {roles.map(role => (
+              {roles.map((role) => (
                 <Select.Option
                   key={role._id}
                   value={role._id}
@@ -143,22 +166,15 @@ const EditRoleModal: React.FC<EditRoleModalProps> = ({
             </Select>
           </Form.Item> */}
 
-          <Form.Item
-            name="organization"
-            label="Tổ chức"
-          >
+          <Form.Item name="organization" label="Tổ chức">
             <Select
               showSearch
               placeholder="Chọn tổ chức"
               optionFilterProp="label"
               allowClear
             >
-              {organizations.map(org => (
-                <Select.Option
-                  key={org._id}
-                  value={org._id}
-                  label={org.name}
-                >
+              {organizations.map((org) => (
+                <Select.Option key={org._id} value={org._id} label={org.name}>
                   {org.name}
                 </Select.Option>
               ))}

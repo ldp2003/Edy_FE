@@ -58,6 +58,7 @@ const ShareModal: React.FC<ShareModalProps> = ({
   const [copied, setCopied] = useState(false);
   const [activeTab, setActiveTab] = useState("create");
   const [loading, setLoading] = useState(false);
+  const [isCopying, setIsCopying] = useState(false);
   const [messageApi, contextHolder] = message.useMessage();
 
   // Form states for creating new link
@@ -140,7 +141,10 @@ const ShareModal: React.FC<ShareModalProps> = ({
   }, [visible, isPrivate, isPrivateShared, isOwner, fetchShareLinks]);
 
   const handleCopyLink = async (linkOrUrl: string) => {
+    if (isCopying) return; // Prevent double copying
+
     try {
+      setIsCopying(true);
       const fullUrl = linkOrUrl.startsWith("http")
         ? linkOrUrl
         : `${window.location.origin}${linkOrUrl}`;
@@ -150,9 +154,11 @@ const ShareModal: React.FC<ShareModalProps> = ({
 
       setTimeout(() => {
         setCopied(false);
+        setIsCopying(false);
       }, 2000);
     } catch {
       messageApi.error("Không thể sao chép link!");
+      setIsCopying(false);
     }
   };
 

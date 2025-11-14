@@ -10,22 +10,30 @@ const { Text } = Typography;
 interface RecentActivity {
   id: string;
   user: {
-    id: string;
-    name: string;
+    _id: string;
+    first_name: string;
+    last_name: string;
     avatar?: string;
-    email: string;
+    contact_email: string;
   };
   action: ActivityActionType;
   actionLabel: string;
-  targetType: TargetTypeValue;
-  targetId: string;
-  targetTitle: string;
+  target_type: TargetTypeValue;
+  target_id: string;
+  target_title: string;
   description: string;
   metadata?: {
     requestId?: string;
     requesterId?: string;
     isIntensive?: boolean;
     pointsEarned?: number;
+    documentId?: string;
+    documentTitle?: string;
+  };
+  redirectTo?: string;
+  redirectParams?: {
+    requestId?: string;
+    documentId?: string;
   };
   timestamp: string;
 }
@@ -73,14 +81,14 @@ const AdminRecentActivities: React.FC<AdminRecentActivitiesProps> = ({
                 {/* User Avatar */}
                 <Avatar
                   src={activity.user.avatar}
-                  alt={activity.user.name}
+                  alt={`${activity.user.first_name} ${activity.user.last_name}`}
                   size={24}
                   style={{
                     backgroundColor: "var(--primary-color)",
                     flexShrink: 0,
                   }}
                 >
-                  {activity.user.name.charAt(0).toUpperCase()}
+                  {activity.user.first_name?.charAt(0)?.toUpperCase() || "?"}
                 </Avatar>
 
                 {/* Activity Content */}
@@ -92,18 +100,21 @@ const AdminRecentActivities: React.FC<AdminRecentActivitiesProps> = ({
                       className="text-[10px] sm:text-xs"
                       style={{ color: "var(--primary-text-color)" }}
                     >
-                      {activity.user.name}
+                      {`${activity.user.first_name} ${activity.user.last_name}`.trim() ||
+                        "Người dùng"}
                     </Text>
                     <Text
                       className="text-[9px] whitespace-nowrap"
                       style={{ color: "var(--secondary-text-color)" }}
                     >
-                      {new Date(activity.timestamp).toLocaleString("vi-VN", {
-                        hour: "2-digit",
-                        minute: "2-digit",
-                        day: "2-digit",
-                        month: "2-digit",
-                      })}
+                      {activity.timestamp
+                        ? new Date(activity.timestamp).toLocaleString("vi-VN", {
+                            hour: "2-digit",
+                            minute: "2-digit",
+                            day: "2-digit",
+                            month: "2-digit",
+                          })
+                        : "N/A"}
                     </Text>
                   </div>
 
@@ -113,7 +124,7 @@ const AdminRecentActivities: React.FC<AdminRecentActivitiesProps> = ({
                       className="text-[10px] text-left truncate flex-1"
                       style={{ color: "var(--secondary-text-color)" }}
                     >
-                      {activity.description}
+                      {activity.description || "Không có mô tả"}
                     </Text>
                     {activity.metadata?.pointsEarned && (
                       <Text

@@ -37,7 +37,17 @@ const processQueue = (error: unknown, token: string | null = null) => {
 
 // Response interceptor to handle 401 errors
 apiClient.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    // Check if user is banned in successful responses
+    if (response.data?.user?.status === "BANNED") {
+      console.log("🚫 User is banned - detected in API response");
+      // Force logout and redirect
+      if (typeof window !== "undefined") {
+        window.location.href = "/banned";
+      }
+    }
+    return response;
+  },
   async (error) => {
     const originalRequest = error.config;
 
@@ -1704,6 +1714,17 @@ export const AssignmentAPI = {
       return response.data;
     } catch (error) {
       console.error("Error updating assignment:", error);
+      throw error;
+    }
+  },
+
+  // Revoke all roles from a user
+  revokeAllRoles: async (accountId: string) => {
+    try {
+      const response = await apiClient.delete(`/admin/roles/user/${accountId}`);
+      return response.data;
+    } catch (error) {
+      console.error("Error revoking all roles:", error);
       throw error;
     }
   },

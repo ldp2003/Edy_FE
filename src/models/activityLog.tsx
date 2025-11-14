@@ -28,6 +28,7 @@ export const ActivityAction = {
   ORGANIZATION_UPDATED: "ORGANIZATION_UPDATED",
   SUBJECT_CREATED: "SUBJECT_CREATED",
   SUBJECT_UPDATED: "SUBJECT_UPDATED",
+  USER_STATUS_CHANGED: "USER_STATUS_CHANGED",
 } as const;
 
 export type ActivityActionType =
@@ -104,6 +105,7 @@ export const activityActionLabels: Record<ActivityActionType, string> = {
   [ActivityAction.ORGANIZATION_UPDATED]: "Cập nhật tổ chức",
   [ActivityAction.SUBJECT_CREATED]: "Tạo môn học",
   [ActivityAction.SUBJECT_UPDATED]: "Cập nhật môn học",
+  [ActivityAction.USER_STATUS_CHANGED]: "Thay đổi trạng thái người dùng",
 };
 
 // Target type labels in Vietnamese

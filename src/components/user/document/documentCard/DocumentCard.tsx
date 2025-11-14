@@ -62,7 +62,7 @@ const DocumentCard: React.FC<DocumentCardProps> = ({
 
   return (
     <div
-      className="bg-white text-center md:text-left rounded-lg shadow-sm border border-gray-200 overflow-hidden cursor-pointer hover:shadow-md transition-shadow duration-200 w-full max-w-[160px] md:max-w-[180px] flex-shrink-0"
+      className="bg-white text-center md:text-left rounded-lg shadow-sm border border-gray-200 overflow-hidden cursor-pointer transform transition-all duration-200 hover:shadow-xl hover:-translate-y-1 w-full max-w-[160px] md:max-w-[180px] flex-shrink-0"
       onClick={handleCardClick}
     >
       {contextHolder}
@@ -71,7 +71,7 @@ const DocumentCard: React.FC<DocumentCardProps> = ({
         <img
           src={document.cover_page || "/image/default_cover.png"}
           alt={document.title}
-          className="w-full h-full object-contain bg-[var(--secondary-background-color)]"
+          className="w-full h-full object-contain bg-[var(--secondary-background-color)] transform transition-transform duration-200 hover:scale-[1.05]"
           loading="lazy"
           onError={handleImageError}
         />

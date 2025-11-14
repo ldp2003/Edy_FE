@@ -61,7 +61,7 @@ const UserInfoHeaderDesktop: React.FC = () => {
           </div>
           <div
             className="text-center cursor-pointer hover:text-[var(--hover-text-color)] hover:bg-[var(--hover-bg-color)] px-2 py-1 rounded transition-colors duration-200"
-            onClick={() => navigate("/followers")}
+            onClick={() => navigate("/follower")}
           >
             <div className="font-bold text-lg">
               {isLoading ? (

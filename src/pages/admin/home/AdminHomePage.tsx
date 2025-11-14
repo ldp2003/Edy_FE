@@ -52,22 +52,30 @@ interface ApiResponse {
 interface RecentActivity {
   id: string;
   user: {
-    id: string;
-    name: string;
+    _id: string;
+    first_name: string;
+    last_name: string;
     avatar?: string;
-    email: string;
+    contact_email: string;
   };
   action: ActivityActionType;
   actionLabel: string;
-  targetType: TargetTypeValue;
-  targetId: string;
-  targetTitle: string;
+  target_type: TargetTypeValue;
+  target_id: string;
+  target_title: string;
   description: string;
   metadata?: {
     requestId?: string;
     requesterId?: string;
     isIntensive?: boolean;
     pointsEarned?: number;
+    documentId?: string;
+    documentTitle?: string;
+  };
+  redirectTo?: string;
+  redirectParams?: {
+    requestId?: string;
+    documentId?: string;
   };
   timestamp: string;
 }
@@ -109,9 +117,30 @@ const AdminHomePage: React.FC = () => {
         const statsResponse = await AdminStatisticsService.getDashboardStats();
         const tasksResponse = await AdminStatisticsService.getAdminTasks();
         if (statsResponse.success && statsResponse.data) {
+          // Transform recent activities to match AdminRecentActivities interface
+          const transformedActivities =
+            statsResponse.data.recent_activities.map((activity) => {
+              const nameParts = activity.user.name
+                ? activity.user.name.split(" ")
+                : ["", ""];
+              return {
+                ...activity,
+                user: {
+                  _id: activity.user.id,
+                  first_name: nameParts[0] || "",
+                  last_name: nameParts.slice(1).join(" ") || "",
+                  avatar: activity.user.avatar,
+                  contact_email: activity.user.email,
+                },
+                target_type: activity.targetType,
+                target_id: activity.targetId,
+                target_title: activity.targetTitle,
+              };
+            });
+
           setApiData({
             statistics: statsResponse.data.statistics,
-            recent_activities: statsResponse.data.recent_activities,
+            recent_activities: transformedActivities,
             tasks: tasksResponse,
           });
         }
@@ -241,9 +270,9 @@ const AdminHomePage: React.FC = () => {
 
   // Handle activity click - navigate based on targetType
   const handleActivityClick = (activity: RecentActivity) => {
-    switch (activity.targetType) {
+    switch (activity.target_type) {
       case "Document":
-        navigate(`/admin/documents/review/${activity.targetId}`);
+        navigate(`/admin/documents/review/${activity.target_id}`);
         break;
       case "User":
         navigate(`/admin/users`);
@@ -416,13 +445,7 @@ const AdminHomePage: React.FC = () => {
   ];
 
   return (
-    <div
-      className="p-4 md:p-6 lg:p-8"
-      style={{
-        backgroundColor: "var(--secondary-background-color)",
-        minHeight: "100vh",
-      }}
-    >
+    <div className="bg-[var(--secondary-background-color)] min-h-screen">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="mb-4 sm:mb-6 md:mb-8">
