@@ -165,7 +165,7 @@ const UploadPage: React.FC = () => {
       <div className="border-b border-gray-200">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="max-w-4xl mx-auto">
-            <h1 className="text-xl sm:text-2xl font-bold text-[var(--primary-text-color)] mb-4 text-center md:text-left">
+            <h1 className="text-base sm:text-base font-bold text-[var(--primary-text-color)] mb-4 text-center md:text-left">
               Đăng tải tài liệu
             </h1>
             <Steps
@@ -182,7 +182,7 @@ const UploadPage: React.FC = () => {
         <div className="max-w-4xl mx-auto space-y-6">
           {/* Upload Section */}
           <div className="bg-white p-4 sm:p-6 rounded-lg border border-gray-200 shadow-sm">
-            <h1 className="text-lg sm:text-xl text-gray-900 font-bold mb-4 text-center md:text-left">
+            <h1 className="text-base sm:text-base text-[var(--primary-text-color)] font-bold mb-4 text-center md:text-left">
               Tải lên tài liệu
             </h1>
             <UploadDocument

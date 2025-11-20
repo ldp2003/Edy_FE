@@ -363,7 +363,7 @@ const InformationForm = ({
 
   return (
     <div className="bg-white p-4 sm:p-6 rounded-lg border border-gray-200 shadow-sm">
-      <div className="font-bold text-lg sm:text-xl mb-6 text-gray-900 text-center md:text-left">
+      <div className="font-semibold text-base sm:text-base mb-6 text-[var(--primary-text-color)] text-center md:text-left">
         Nhập thông tin
         {isUploading && (
           <span className="ml-2 text-sm text-orange-500 font-normal">
@@ -409,15 +409,16 @@ const InformationForm = ({
               <Form.Item
                 style={{ marginBottom: 5 }}
                 name="public_mode"
-                label={<span className="text-xs">Chế độ công khai</span>}
+                label={
+                  <span className="text-xs font-semibold">
+                    Chế độ công khai
+                  </span>
+                }
                 rules={[
                   { required: true, message: "Vui lòng chọn quyền riêng tư!" },
                 ]}
               >
-                <Select
-                  disabled={isUploading}
-                  className="text-left"
-                >
+                <Select disabled={isUploading} className="text-left">
                   <Option value="PUBLIC">Công khai</Option>
                   <Option value="PRIVATE">Riêng tư</Option>
                 </Select>
@@ -429,7 +430,9 @@ const InformationForm = ({
               <Form.Item
                 style={{ marginBottom: 13.5 }}
                 name="documentName"
-                label={<span className="text-xs">Tên tài liệu</span>}
+                label={
+                  <span className="text-xs font-semibold">Tên tài liệu</span>
+                }
                 rules={[
                   { required: true, message: "Vui lòng nhập tên tài liệu!" },
                 ]}
@@ -440,7 +443,7 @@ const InformationForm = ({
               <Form.Item
                 style={{ marginBottom: 13.5 }}
                 name="subject"
-                label={<span className="text-xs">Môn học</span>}
+                label={<span className="text-xs font-semibold">Môn học</span>}
                 rules={[{ required: true, message: "Vui lòng chọn môn học!" }]}
               >
                 <div className="flex gap-2  text-left">
@@ -483,7 +486,7 @@ const InformationForm = ({
               <Form.Item
                 style={{ marginBottom: 13.5 }}
                 name="organization"
-                label={<span className="text-xs">Tổ chức</span>}
+                label={<span className="text-xs font-semibold">Tổ chức</span>}
                 rules={[{ required: true, message: "Vui lòng chọn tổ chức!" }]}
               >
                 <Select
@@ -504,7 +507,9 @@ const InformationForm = ({
                 style={{ marginBottom: 13.5 }}
                 name="documentType"
                 className="text-left"
-                label={<span className="text-xs">Loại tài liệu</span>}
+                label={
+                  <span className="text-xs font-semibold">Loại tài liệu</span>
+                }
                 rules={[
                   { required: true, message: "Vui lòng chọn loại tài liệu!" },
                 ]}
@@ -532,7 +537,9 @@ const InformationForm = ({
                 <Form.Item
                   style={{ marginBottom: 13.5 }}
                   name="pageCount"
-                  label={<span className="text-xs">Số trang</span>}
+                  label={
+                    <span className="text-xs font-semibold">Số trang</span>
+                  }
                 >
                   <InputNumber
                     min={1}
@@ -546,7 +553,9 @@ const InformationForm = ({
                 <Form.Item
                   style={{ marginBottom: 13.5 }}
                   name="level"
-                  label={<span className="text-xs">Trình độ</span>}
+                  label={
+                    <span className="text-xs font-semibold">Trình độ</span>
+                  }
                   rules={[
                     { required: true, message: "Vui lòng chọn trình độ!" },
                   ]}
@@ -571,7 +580,7 @@ const InformationForm = ({
               <Form.Item
                 style={{ marginBottom: 5 }}
                 name="summary"
-                label={<span className="text-xs">Tóm tắt</span>}
+                label={<span className="text-xs font-semibold">Tóm tắt</span>}
                 rules={[{ required: true, message: "Vui lòng nhập tóm tắt!" }]}
               >
                 <TextArea
@@ -585,8 +594,8 @@ const InformationForm = ({
           </div>
 
           {/* Thông tin khác */}
-          <div className="mt-8 pt-6 border-t border-gray-200">
-            <div className="font-semibold text-lg mb-4 text-gray-800 text-center md:text-left">
+          <div className="pt-6 border-t border-gray-200">
+            <div className="font-semibold text-base mb-2 text-[var(--primary-text-color)] text-center md:text-left">
               Thông tin khác
             </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -595,7 +604,11 @@ const InformationForm = ({
                   <Form.Item
                     style={{ marginBottom: 5 }}
                     name="publisher"
-                    label="Nhà xuất bản"
+                    label={
+                      <span className="text-xs font-semibold">
+                        Nhà xuất bản
+                      </span>
+                    }
                   >
                     <Input placeholder="Nhà xuất bản" disabled={isUploading} />
                   </Form.Item>
@@ -603,14 +616,18 @@ const InformationForm = ({
                   <Form.Item
                     style={{ marginBottom: 5 }}
                     name="publishYear"
-                    label="Năm xuất bản"
+                    label={
+                      <span className="text-xs font-semibold">
+                        Năm xuất bản
+                      </span>
+                    }
                   >
                     <Input placeholder="Năm xuất bản" disabled={isUploading} />
                   </Form.Item>
                 </div>
 
                 <div>
-                  <label className="block text-sm text-left  text-black mb-2">
+                  <label className="block text-sm font-semibold text-left text-black mb-2">
                     Tác giả tài liệu
                   </label>
                   {authors.map((author, idx) => (
@@ -649,7 +666,7 @@ const InformationForm = ({
                 <Form.Item
                   style={{ marginBottom: 5 }}
                   name="keywords"
-                  label={<span className="text-xs">Từ khóa</span>}
+                  label={<span className="text-xs font-semibold">Từ khóa</span>}
                   rules={[
                     { required: true, message: "Vui lòng nhập từ khóa!" },
                   ]}

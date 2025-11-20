@@ -89,7 +89,7 @@ const DocumentCard: React.FC<DocumentCardProps> = ({
         )}
         <button
           onClick={handleFavoriteClick}
-          className={`absolute top-2 right-2 p-1.5 rounded-full ${
+          className={`absolute top-2 right-2 p-1.5 rounded-full cursor-pointer ${
             isFavorite
               ? "bg-red-500 text-white"
               : "bg-white/80 text-[var(--secondary-text-color)] hover:bg-white"

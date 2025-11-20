@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import DescriptionModal from "./DescriptionModal";
 import type { Document } from "../../../../models/document";
+import { UserContext } from "../../../../contexts/UserContext";
 
 interface DescriptionProps {
   document: Document;
@@ -13,6 +14,7 @@ const Description: React.FC<DescriptionProps> = ({
 }) => {
   const [activeTab, setActiveTab] = useState<"original" | "ai">("original");
   const [showFullModal, setShowFullModal] = useState(false);
+  const { account } = React.useContext(UserContext);
 
   // Function to check if text exceeds 5 lines
   const shouldShowReadMore = (text: string): boolean => {
@@ -63,7 +65,7 @@ const Description: React.FC<DescriptionProps> = ({
             Bản AI
           </button>
         </div>
-        {!isUser && <DescriptionModal />}
+        {!isUser && !account?.is_vip && <DescriptionModal />}
 
         <div className="text-sm text-gray-700 leading-relaxed relative">
           <div className="p-4 min-h-[150px]">
