@@ -681,7 +681,60 @@ export const DocumentAPI = {
       throw error;
     }
   },
-
+  fetchFeaturedDocuments: async (params: {
+    search?: string;
+    ordering?: string;
+    order?: 1 | -1;
+    page?: number;
+    limit?: number;
+    organization?: string;
+    publisher?: string;
+    published_year?: number;
+    intensive?: boolean;
+    author?: string | string[];
+    user?: string;
+    keyword?: string | string[];
+    doc_type?: string;
+    level?: string;
+    subject?: string;
+    status?: string;
+    public_mode?: string;
+  }) => {
+    try {
+      const response = await apiClient.get("/documents/featured", { params });
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching featured documents:", error);
+      throw error;
+    }
+  },
+  fetchRecommendedDocuments: async (params: {
+    search?: string;
+    ordering?: string;
+    order?: 1 | -1;
+    page?: number;
+    limit?: number;
+    organization?: string;
+    publisher?: string;
+    published_year?: number;
+    intensive?: boolean;
+    author?: string | string[];
+    user?: string;
+    keyword?: string | string[];
+    doc_type?: string;
+    level?: string;
+    subject?: string;
+    status?: string;
+    public_mode?: string;
+  }) => {
+    try {
+      const response = await apiClient.get("/documents/recommended", { params });
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching recommended documents:", error);
+      throw error;
+    }
+  },
   addViewCount: async (documentId: string) => {
     return await apiClient.post(`/documents/${documentId}/view`);
   },

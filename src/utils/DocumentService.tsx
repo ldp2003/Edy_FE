@@ -61,7 +61,58 @@ export const DocumentService = {
       throw error;
     }
   },
-
+  async fetchRecommendedDocuments(params: {
+    search?: string;
+    ordering?: string;
+    order?: 1 | -1;
+    page?: number;
+    limit?: number;
+    organization?: string;
+    publisher?: string;
+    published_year?: number;
+    intensive?: boolean;
+    author?: string | string[];
+    user?: string;
+    keyword?: string | string[];
+    doc_type?: string;
+    level?: string;
+    subject?: string;
+    status?: string;
+    public_mode?: string;
+  }) {
+    try {
+      return await DocumentAPI.fetchRecommendedDocuments(params);
+    } catch (error) {
+      console.error("Error in DocumentService.fetchRecommendedDocuments:", error);
+      throw error;
+    }
+  },
+  async fetchFeaturedDocuments(params: {
+    search?: string;
+    ordering?: string;
+    order?: 1 | -1;
+    page?: number;
+    limit?: number;
+    organization?: string;
+    publisher?: string;
+    published_year?: number;
+    intensive?: boolean;
+    author?: string | string[];
+    user?: string;
+    keyword?: string | string[];
+    doc_type?: string;
+    level?: string;
+    subject?: string;
+    status?: string;
+    public_mode?: string;
+  }) {
+    try {
+      return await DocumentAPI.fetchFeaturedDocuments(params);
+    } catch (error) {
+      console.error("Error in DocumentService.fetchFeaturedDocuments:", error);
+      throw error;
+    }
+  },
   async getMyDocuments(params?: {
     search?: string;
     ordering?: string;

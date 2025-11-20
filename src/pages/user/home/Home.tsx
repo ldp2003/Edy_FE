@@ -39,9 +39,7 @@ export default function HomePage() {
 
         // Fetch featured documents (documents with highest views)
         setLoadingFeatured(true);
-        const featuredResponse = await DocumentService.fetchNewestDocuments({
-          ordering: "view",
-          order: -1,
+        const featuredResponse = await DocumentService.fetchFeaturedDocuments({
           limit: 6,
         });
         setFeaturedDocuments(featuredResponse.documents || []);
@@ -49,9 +47,7 @@ export default function HomePage() {
 
         // Fetch related documents (random selection)
         setLoadingRelated(true);
-        const relatedResponse = await DocumentService.fetchNewestDocuments({
-          ordering: "download_count",
-          order: -1,
+        const relatedResponse = await DocumentService.fetchRecommendedDocuments({
           limit: 6,
         });
         setRelatedDocuments(relatedResponse.documents || []);
@@ -89,9 +85,7 @@ export default function HomePage() {
   // Handler functions for "View More" buttons
   const handleViewMoreFeatured = async () => {
     try {
-      const featuredResponse = await DocumentService.fetchNewestDocuments({
-        ordering: "view",
-        order: -1,
+      const featuredResponse = await DocumentService.fetchFeaturedDocuments({
         limit: 50, // Fetch more documents for the list page
       });
       navigate("/documents", {
@@ -142,10 +136,8 @@ export default function HomePage() {
 
   const handleViewMoreRelated = async () => {
     try {
-      const relatedResponse = await DocumentService.fetchNewestDocuments({
-        ordering: "download_count",
-        order: -1,
-        limit: 50, // Fetch more documents for the list page
+      const relatedResponse = await DocumentService.fetchRecommendedDocuments({
+        limit: 50,
       });
       navigate("/documents", {
         state: {
