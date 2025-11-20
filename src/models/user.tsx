@@ -42,6 +42,7 @@ export interface User {
   role?: "USER" | "MODERATOR" | "ADMIN"; // Legacy single role
   roles?: string[]; // Array of role codes
   permissions?: string[]; // Mảng các quyền của user
+  has_been_vip?: boolean;
   createdAt?: string;
   updatedAt?: string;
 }
@@ -65,6 +66,7 @@ export const defaultUser: User = {
   favorites: [],
   status: "ACTIVE",
   role: "USER",
+  has_been_vip: false,
   createdAt: "",
   updatedAt: "",
   organization: {
