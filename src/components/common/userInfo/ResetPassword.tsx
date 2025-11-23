@@ -4,6 +4,10 @@ import type { MessageInstance } from "antd/es/message/interface";
 import { changePassword } from "../../../utils/UserService";
 import { UserContext } from "../../../contexts/UserContext";
 import OTPModal from "../OTPModal";
+import {
+  validatePassword,
+  validatePasswordConfirm,
+} from "../../../utils/ValidationUtils";
 
 interface ResetPasswordProps {
   messageApi: MessageInstance;
@@ -17,6 +21,8 @@ const ResetPassword: React.FC<ResetPasswordProps> = ({ messageApi }) => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
+  const [newPasswordError, setNewPasswordError] = useState("");
+  const [confirmPasswordError, setConfirmPasswordError] = useState("");
 
   // Check if required fields are filled
   const isRequiredFieldsFilled =
@@ -73,6 +79,8 @@ const ResetPassword: React.FC<ResetPasswordProps> = ({ messageApi }) => {
       setOldPassword("");
       setNewPassword("");
       setConfirmPassword("");
+      setNewPasswordError("");
+      setConfirmPasswordError("");
     }
   };
 
@@ -119,9 +127,25 @@ const ResetPassword: React.FC<ResetPasswordProps> = ({ messageApi }) => {
             id="new-password"
             type="password"
             value={newPassword}
-            onChange={(e) => setNewPassword(e.target.value)}
+            onChange={(e) => {
+              const value = e.target.value;
+              setNewPassword(value);
+              const validation = validatePassword(value);
+              setNewPasswordError(validation.isValid ? "" : validation.message);
+              // Re-validate confirm password
+              const confirmValidation = validatePasswordConfirm(
+                value,
+                confirmPassword
+              );
+              setConfirmPasswordError(
+                confirmValidation.isValid ? "" : confirmValidation.message
+              );
+            }}
             disabled={!isEditMode}
           />
+          {newPasswordError && (
+            <div className="text-red-500 text-xs">{newPasswordError}</div>
+          )}
         </div>
 
         <div>
@@ -132,9 +156,19 @@ const ResetPassword: React.FC<ResetPasswordProps> = ({ messageApi }) => {
             id="confirm-password"
             type="password"
             value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
+            onChange={(e) => {
+              const value = e.target.value;
+              setConfirmPassword(value);
+              const validation = validatePasswordConfirm(newPassword, value);
+              setConfirmPasswordError(
+                validation.isValid ? "" : validation.message
+              );
+            }}
             disabled={!isEditMode}
           />
+          {confirmPasswordError && (
+            <div className="text-red-500 text-xs">{confirmPasswordError}</div>
+          )}
         </div>
       </div>
 
@@ -142,20 +176,38 @@ const ResetPassword: React.FC<ResetPasswordProps> = ({ messageApi }) => {
         <Button
           type="primary"
           size="small"
-          disabled={!isRequiredFieldsFilled || !passwordsMatch || !isEditMode}
+          disabled={
+            !isRequiredFieldsFilled ||
+            !passwordsMatch ||
+            newPasswordError !== "" ||
+            confirmPasswordError !== "" ||
+            !isEditMode
+          }
           onClick={() => setOtpModalVisible(true)}
           loading={loading}
           style={{
             backgroundColor:
-              isRequiredFieldsFilled && passwordsMatch && isEditMode
+              isRequiredFieldsFilled &&
+              passwordsMatch &&
+              newPasswordError === "" &&
+              confirmPasswordError === "" &&
+              isEditMode
                 ? "var(--primary-color)"
                 : undefined,
             borderColor:
-              isRequiredFieldsFilled && passwordsMatch && isEditMode
+              isRequiredFieldsFilled &&
+              passwordsMatch &&
+              newPasswordError === "" &&
+              confirmPasswordError === "" &&
+              isEditMode
                 ? "var(--primary-color)"
                 : undefined,
             color:
-              isRequiredFieldsFilled && passwordsMatch && isEditMode
+              isRequiredFieldsFilled &&
+              passwordsMatch &&
+              newPasswordError === "" &&
+              confirmPasswordError === "" &&
+              isEditMode
                 ? "white"
                 : undefined,
           }}

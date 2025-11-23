@@ -14,6 +14,7 @@ import ReportsPage from "../pages/admin/report/ReportsPage";
 import ManageRolesPage from "../pages/admin/user/ManageRolesPage";
 import AssignRolesPage from "../pages/admin/user/AssignRolesPage";
 import ManageSubjectsPage from "../pages/admin/subject/ManageSubjectsPage";
+import SubjectDetailPage from "../pages/admin/subject/SubjectDetailPage";
 import ManageOrganizationsPage from "../pages/admin/organization/ManageOrganizationsPage";
 import OrganizationDetailPage from "../pages/admin/organization/OrganizationDetailPage";
 import DocumentStatisticsPage from "../pages/admin/statistics/DocumentStatisticsPage";
@@ -52,6 +53,7 @@ const AdminRoute: React.FC = () => {
 
           {/* Subject management routes */}
           <Route path="subjects" element={<ManageSubjectsPage />} />
+          <Route path="subjects/:id" element={<SubjectDetailPage />} />
 
           {/* Organization management routes */}
           <Route path="organizations" element={<ManageOrganizationsPage />} />

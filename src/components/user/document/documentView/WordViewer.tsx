@@ -1,25 +1,23 @@
-import React, { useEffect, useRef, useState } from "react";
-import { renderAsync } from "docx-preview";
-import "../../../../docx-preview.css";
+import React, { useEffect, useState } from "react";
+import mammoth from "mammoth";
 import LimitNotificationModal from "./LimitNotificationModal";
 import LimitNotificationBanner from "./LimitNotificationBanner";
 
 interface WordViewerProps {
   url: string;
-  zoom?: number;
   isUser?: boolean; // True if document belongs to current user
+  zoom?: number; // Zoom level for the document
 }
 
 const WordViewer: React.FC<WordViewerProps> = ({
   url,
-  zoom = 1,
   isUser = false,
+  zoom,
 }) => {
-  const containerRef = useRef<HTMLDivElement>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [pages, setPages] = useState<string[]>([]);
   const [showLimitModal, setShowLimitModal] = useState(false);
-  const [hasShownModal, setHasShownModal] = useState(false);
   const [showLimitBanner, setShowLimitBanner] = useState(false);
 
   useEffect(() => {
@@ -29,32 +27,123 @@ const WordViewer: React.FC<WordViewerProps> = ({
       try {
         const res = await fetch(url);
         if (!res.ok) throw new Error("Không thể tải file Word");
-        const blob = await res.blob();
+        const arrayBuffer = await res.arrayBuffer();
 
-        if (containerRef.current) {
-          containerRef.current.innerHTML = "";
-          // render file .docx vào container
-          await renderAsync(blob, containerRef.current, undefined, {
-            className: "docx-preview-content",
-            inWrapper: false,
-          });
-
-          // Calculate pages based on content height
-          // Assuming a standard page height of 800px for pagination
-          const contentHeight = containerRef.current.scrollHeight;
-          const pageHeight = 800; // Approximate height of one page in pixels
-          const calculatedTotalPages = Math.max(
-            1,
-            Math.ceil(contentHeight / pageHeight)
-          );
-
-          // Limit content height for non-users and show banner
-          if (!isUser && calculatedTotalPages > 10) {
-            containerRef.current.style.maxHeight = `${pageHeight * 10}px`;
-            containerRef.current.style.overflow = "hidden";
-            containerRef.current.style.position = "relative";
-            setShowLimitBanner(true);
+        const result = await mammoth.convertToHtml(
+          { arrayBuffer },
+          {
+            styleMap: [
+              "p[style-name='Heading 1'] => h1:fresh",
+              "p[style-name='Heading 2'] => h2:fresh",
+              "p[style-name='Heading 3'] => h3:fresh",
+              "r[style-name='Strong'] => strong",
+              "r[style-name='Emphasis'] => em",
+              "table => table.table.table-bordered",
+              "tr => tr",
+              "td => td",
+              "th => th",
+            ],
           }
+        );
+
+        // Create temporary div to parse HTML
+        const tempDiv = document.createElement("div");
+        tempDiv.innerHTML = result.value;
+        document.body.appendChild(tempDiv);
+
+        // Exact measurements matching final render
+        const contentWidth = 690; // 850px - 160px (80px left + 80px right padding)
+        const pageContentHeight = 960; // 1100px - 140px (60px top + 80px bottom padding)
+
+        const elements = Array.from(tempDiv.children) as HTMLElement[];
+        const pagesHtml: string[] = [];
+        let currentPageHtml = "";
+        let currentPageHeight = 0;
+
+        // Create measure div with exact styling as final render
+        const measureDiv = document.createElement("div");
+        measureDiv.style.cssText = `
+          position: absolute;
+          left: -9999px;
+          top: -9999px;
+          width: ${contentWidth}px;
+          font-size: 14px;
+          line-height: 1.6;
+          visibility: hidden;
+        `;
+        document.body.appendChild(measureDiv);
+
+        for (let i = 0; i < elements.length; i++) {
+          const element = elements[i] as HTMLElement;
+
+          // Clone and measure element
+          const clonedElement = element.cloneNode(true) as HTMLElement;
+          measureDiv.innerHTML = "";
+          measureDiv.appendChild(clonedElement);
+
+          // Force reflow for accurate measurement
+          void measureDiv.offsetHeight;
+          const elementHeight = measureDiv.scrollHeight;
+
+          // Special handling for tables, images, and headings - keep them on same page if possible
+          const isTable = element.tagName.toLowerCase() === "table";
+          const isHeading = /^h[1-6]$/i.test(element.tagName);
+          const isLargeElement = elementHeight > pageContentHeight * 0.5; // More than 50% of page
+
+          // Check if adding this element would exceed page height
+          const wouldExceedPage =
+            currentPageHeight + elementHeight > pageContentHeight;
+
+          // Prevent orphaned headings - if heading at bottom of page, move to next page
+          const hasNextElement = i < elements.length - 1;
+          const isOrphanedHeading =
+            isHeading && wouldExceedPage && hasNextElement;
+
+          if (wouldExceedPage && currentPageHtml) {
+            // Always start new page if current is full
+            pagesHtml.push(currentPageHtml);
+            currentPageHtml = element.outerHTML;
+            currentPageHeight = elementHeight;
+          } else if (
+            isOrphanedHeading &&
+            currentPageHeight > pageContentHeight * 0.2
+          ) {
+            // Prevent heading at very bottom - move to next page if current page has enough content
+            pagesHtml.push(currentPageHtml);
+            currentPageHtml = element.outerHTML;
+            currentPageHeight = elementHeight;
+          } else if (isLargeElement && !isTable) {
+            // Large non-table elements: if can't fit on current page, give it own page
+            if (currentPageHtml && currentPageHeight > 0) {
+              pagesHtml.push(currentPageHtml);
+              currentPageHtml = element.outerHTML;
+              currentPageHeight = elementHeight;
+            } else {
+              currentPageHtml = element.outerHTML;
+              currentPageHeight = elementHeight;
+            }
+          } else {
+            // Normal case: add to current page
+            currentPageHtml += element.outerHTML;
+            currentPageHeight += elementHeight;
+          }
+        }
+
+        // Add final page if it has content
+        if (currentPageHtml) {
+          pagesHtml.push(currentPageHtml);
+        }
+
+        // Cleanup
+        document.body.removeChild(measureDiv);
+        document.body.removeChild(tempDiv);
+
+        // Limit to 10 pages
+        const limitedPages = isUser ? pagesHtml : pagesHtml.slice(0, 10);
+        setPages(limitedPages);
+
+        if (!isUser && pagesHtml.length > 10) {
+          setShowLimitBanner(true);
         }
       } catch (e) {
         console.error(e);
@@ -65,36 +154,6 @@ const WordViewer: React.FC<WordViewerProps> = ({
 
     fetchAndRender();
   }, [url, isUser]);
-
-  // Detect when user scrolls to the bottom of the 10-page limit
-  useEffect(() => {
-    if (isUser || hasShownModal) return;
-
-    const handleScroll = () => {
-      if (!containerRef.current) return;
-
-      const container = containerRef.current;
-      const scrollTop =
-        window.pageYOffset || document.documentElement.scrollTop;
-      const windowHeight = window.innerHeight;
-      const documentHeight = document.documentElement.scrollHeight;
-
-      // Check if user has scrolled near the bottom (within 100px)
-      const isNearBottom = scrollTop + windowHeight >= documentHeight - 100;
-
-      // Check if container has height limit (10 pages)
-      const hasHeightLimit =
-        container.style.maxHeight && container.style.maxHeight !== "none";
-
-      if (isNearBottom && hasHeightLimit && !hasShownModal) {
-        setShowLimitModal(true);
-        setHasShownModal(true);
-      }
-    };
-
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, [isUser, hasShownModal]);
 
   const handleModalClose = () => {
     setShowLimitModal(false);
@@ -115,17 +174,56 @@ const WordViewer: React.FC<WordViewerProps> = ({
         </div>
       )}
       <div
-        ref={containerRef}
-        className="docx-wrapper px-1 sm:px-2 md:px-4 relative"
+        className="px-1 sm:px-2 md:px-4 relative"
         style={{
-          width: "100%",
-          overflowX: "auto",
-          fontSize: `${14 * zoom}px`,
-          lineHeight: "1.4",
-          transform: `scale(${zoom})`,
-          transformOrigin: "top left",
+          transform: `scale(${zoom || 1})`,
+          transformOrigin: "top center",
+          transition: "transform 0.2s ease-in-out",
         }}
-      ></div>
+      >
+        {pages.map((pageHtml, index) => (
+          <div
+            key={index}
+            className="relative mb-8 bg-white rounded-lg shadow-lg mx-auto"
+            style={{
+              width: "100%",
+              maxWidth: "850px",
+              minHeight: "1100px",
+              boxShadow:
+                "0 4px 12px rgba(0,0,0,0.08), 0 2px 4px rgba(0,0,0,0.06)",
+              border: "1px solid #e5e7eb",
+              padding: "60px 80px 80px 80px",
+              pageBreakAfter: "always",
+              pageBreakInside: "avoid",
+            }}
+          >
+            <div
+              className="mammoth-wrapper"
+              dangerouslySetInnerHTML={{ __html: pageHtml }}
+              style={{
+                width: "100%",
+                lineHeight: "1.6",
+                fontSize: "14px",
+                color: "#000",
+              }}
+            />
+            {/* Số trang ở góc dưới phải */}
+            <div
+              style={{
+                position: "absolute",
+                bottom: "40px",
+                right: "80px",
+                fontSize: "11px",
+                color: "#666",
+                fontFamily: "Arial, sans-serif",
+                userSelect: "none",
+              }}
+            >
+              {index + 1}
+            </div>
+          </div>
+        ))}
+      </div>
 
       {/* Limit notification banner below content for non-users */}
       {showLimitBanner && (

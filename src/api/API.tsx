@@ -37,7 +37,17 @@ const processQueue = (error: unknown, token: string | null = null) => {
 
 // Response interceptor to handle 401 errors
 apiClient.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    // Check if user is banned in successful responses
+    if (response.data?.user?.status === "BANNED") {
+      console.log("🚫 User is banned - detected in API response");
+      // Force logout and redirect
+      if (typeof window !== "undefined") {
+        window.location.href = "/banned";
+      }
+    }
+    return response;
+  },
   async (error) => {
     const originalRequest = error.config;
 
@@ -671,7 +681,60 @@ export const DocumentAPI = {
       throw error;
     }
   },
-
+  fetchFeaturedDocuments: async (params: {
+    search?: string;
+    ordering?: string;
+    order?: 1 | -1;
+    page?: number;
+    limit?: number;
+    organization?: string;
+    publisher?: string;
+    published_year?: number;
+    intensive?: boolean;
+    author?: string | string[];
+    user?: string;
+    keyword?: string | string[];
+    doc_type?: string;
+    level?: string;
+    subject?: string;
+    status?: string;
+    public_mode?: string;
+  }) => {
+    try {
+      const response = await apiClient.get("/documents/featured", { params });
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching featured documents:", error);
+      throw error;
+    }
+  },
+  fetchRecommendedDocuments: async (params: {
+    search?: string;
+    ordering?: string;
+    order?: 1 | -1;
+    page?: number;
+    limit?: number;
+    organization?: string;
+    publisher?: string;
+    published_year?: number;
+    intensive?: boolean;
+    author?: string | string[];
+    user?: string;
+    keyword?: string | string[];
+    doc_type?: string;
+    level?: string;
+    subject?: string;
+    status?: string;
+    public_mode?: string;
+  }) => {
+    try {
+      const response = await apiClient.get("/documents/recommended", { params });
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching recommended documents:", error);
+      throw error;
+    }
+  },
   addViewCount: async (documentId: string) => {
     return await apiClient.post(`/documents/${documentId}/view`);
   },
@@ -1704,6 +1767,17 @@ export const AssignmentAPI = {
       return response.data;
     } catch (error) {
       console.error("Error updating assignment:", error);
+      throw error;
+    }
+  },
+
+  // Revoke all roles from a user
+  revokeAllRoles: async (accountId: string) => {
+    try {
+      const response = await apiClient.delete(`/admin/roles/user/${accountId}`);
+      return response.data;
+    } catch (error) {
+      console.error("Error revoking all roles:", error);
       throw error;
     }
   },

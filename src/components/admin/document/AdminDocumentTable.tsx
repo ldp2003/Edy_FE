@@ -1,4 +1,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import {
+  getDocumentTypeStyle,
+  getFileTypeStyle,
+  getLevelStyle,
+  getStatusStyle,
+  getWarningStyle,
+} from "../../../utils/AdminTableStyles";
 import React, { useState, useEffect, useCallback } from "react";
 import { Table, Select, message, Dropdown, Checkbox } from "antd";
 import { useNavigate, useSearchParams } from "react-router-dom";
@@ -301,41 +308,24 @@ const AdminDocumentTable: React.FC = () => {
       key: "doc_type",
       align: "center",
       render: (type: string) => {
-        const typeConfig: { [key: string]: { text: string; color: string } } = {
-          RESEARCH_REPORT: {
-            text: "Nghiên cứu",
-            color: "bg-blue-100 text-blue-800",
-          },
-          VIDEO: { text: "Video", color: "bg-red-100 text-red-800" },
-          STUDY_GUIDE: {
-            text: "Đề cương",
-            color: "bg-green-100 text-green-800",
-          },
-          TEXTBOOK: {
-            text: "Giáo trình",
-            color: "bg-purple-100 text-purple-800",
-          },
-          ESSAY: { text: "Tiểu luận", color: "bg-yellow-100 text-yellow-800" },
-          SOLUTION_SET: {
-            text: "Bài giải",
-            color: "bg-orange-100 text-orange-800",
-          },
-          THESIS: { text: "Luận văn", color: "bg-pink-100 text-pink-800" },
-          LECTURE: {
-            text: "Bài giảng",
-            color: "bg-indigo-100 text-indigo-800",
-          },
-          OTHER: { text: "Khác", color: "bg-gray-100 text-gray-800" },
+        const typeLabels: { [key: string]: string } = {
+          RESEARCH_REPORT: "Nghiên cứu",
+          VIDEO: "Video",
+          STUDY_GUIDE: "Đề cương",
+          TEXTBOOK: "Giáo trình",
+          ESSAY: "Tiểu luận",
+          SOLUTION_SET: "Bài giải",
+          THESIS: "Luận văn",
+          LECTURE: "Bài giảng",
+          OTHER: "Khác",
         };
-        const config = typeConfig[type] || {
-          text: type,
-          color: "bg-gray-100 text-gray-800",
-        };
+        const text = typeLabels[type] || type;
         return (
           <span
-            className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${config.color}`}
+            className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium"
+            style={getDocumentTypeStyle(type)}
           >
-            {config.text}
+            {text}
           </span>
         );
       },
@@ -346,24 +336,20 @@ const AdminDocumentTable: React.FC = () => {
       key: "file_type",
       align: "center",
       render: (file_type: string) => {
-        const fileTypeConfig: {
-          [key: string]: { text: string; color: string };
-        } = {
-          PDF: { text: "PDF", color: "bg-red-100 text-red-700" },
-          WORD: { text: "Word", color: "bg-blue-100 text-blue-700" },
-          EXCEL: { text: "Excel", color: "bg-green-100 text-green-700" },
-          POWERPOINT: { text: "PPT", color: "bg-orange-100 text-orange-700" },
-          VIDEO: { text: "Video", color: "bg-purple-100 text-purple-700" },
+        const fileTypeLabels: { [key: string]: string } = {
+          PDF: "PDF",
+          WORD: "Word",
+          EXCEL: "Excel",
+          POWERPOINT: "PPT",
+          VIDEO: "Video",
         };
-        const config = fileTypeConfig[file_type] || {
-          text: file_type,
-          color: "bg-gray-100 text-gray-700",
-        };
+        const text = fileTypeLabels[file_type] || file_type;
         return (
           <span
-            className={`inline-flex items-center px-2 py-1 rounded text-xs font-medium ${config.color}`}
+            className="inline-flex items-center px-2 py-1 rounded text-xs font-medium"
+            style={getFileTypeStyle(file_type)}
           >
-            {config.text}
+            {text}
           </span>
         );
       },
@@ -374,29 +360,20 @@ const AdminDocumentTable: React.FC = () => {
       key: "level",
       align: "center",
       render: (level: string) => {
-        const levelConfig: { [key: string]: { text: string; color: string } } =
-          {
-            STUDENT: { text: "Học sinh", color: "bg-cyan-100 text-cyan-800" },
-            UNIVERSITY: { text: "Đại học", color: "bg-blue-100 text-blue-800" },
-            LECTURER: {
-              text: "Giảng viên",
-              color: "bg-green-100 text-green-800",
-            },
-            RESEARCHER: {
-              text: "Nghiên cứu sinh",
-              color: "bg-purple-100 text-purple-800",
-            },
-            OTHER: { text: "Khác", color: "bg-gray-100 text-gray-800" },
-          };
-        const config = levelConfig[level] || {
-          text: level,
-          color: "bg-gray-100 text-gray-800",
+        const levelLabels: { [key: string]: string } = {
+          STUDENT: "Học sinh",
+          UNIVERSITY: "Đại học",
+          LECTURER: "Giảng viên",
+          RESEARCHER: "Nghiên cứu sinh",
+          OTHER: "Khác",
         };
+        const text = levelLabels[level] || level;
         return (
           <span
-            className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${config.color}`}
+            className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium"
+            style={getLevelStyle(level)}
           >
-            {config.text}
+            {text}
           </span>
         );
       },
@@ -408,11 +385,8 @@ const AdminDocumentTable: React.FC = () => {
       align: "center",
       render: (intensive: boolean) => (
         <span
-          className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
-            intensive
-              ? "bg-green-100 text-green-800"
-              : "bg-red-100 text-red-800"
-          }`}
+          className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium"
+          style={intensive ? getStatusStyle("approved") : getWarningStyle()}
         >
           {intensive ? "Có" : "Không"}
         </span>
@@ -522,19 +496,17 @@ const AdminDocumentTable: React.FC = () => {
       key: "public_mode",
       align: "center",
       render: (mode: string) => {
-        const modeConfig: { [key: string]: { text: string; color: string } } = {
-          PUBLIC: { text: "Công khai", color: "bg-green-100 text-green-800" },
-          PRIVATE: { text: "Riêng tư", color: "bg-red-100 text-red-800" },
+        const modeLabels: { [key: string]: string } = {
+          PUBLIC: "Công khai",
+          PRIVATE: "Riêng tư",
         };
-        const config = modeConfig[mode] || {
-          text: mode,
-          color: "bg-gray-100 text-gray-800",
-        };
+        const text = modeLabels[mode] || mode;
         return (
           <span
-            className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${config.color}`}
+            className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium"
+            style={getStatusStyle(mode.toLowerCase())}
           >
-            {config.text}
+            {text}
           </span>
         );
       },
@@ -546,35 +518,20 @@ const AdminDocumentTable: React.FC = () => {
       align: "center",
       fixed: "right",
       render: (status: string) => {
-        const statusConfig: { [key: string]: { text: string; color: string } } =
-          {
-            PENDING: {
-              text: "Chờ duyệt",
-              color: "bg-yellow-100 text-yellow-800",
-            },
-            APPROVED: {
-              text: "Đã duyệt",
-              color: "bg-green-100 text-green-800",
-            },
-            REJECTED: { text: "Đã từ chối", color: "bg-red-100 text-red-800" },
-            REQUESTED_EDIT: {
-              text: "Chờ chỉnh sửa",
-              color: "bg-orange-100 text-orange-800",
-            },
-            PENDING_EDIT: {
-              text: "Chờ duyệt chỉnh sửa",
-              color: "bg-orange-100 text-orange-800",
-            },
-          };
-        const config = statusConfig[status] || {
-          text: status,
-          color: "bg-gray-100 text-gray-800",
+        const statusLabels: { [key: string]: string } = {
+          PENDING: "Chờ duyệt",
+          APPROVED: "Đã duyệt",
+          REJECTED: "Đã từ chối",
+          REQUESTED_EDIT: "Chờ chỉnh sửa",
+          PENDING_EDIT: "Chờ duyệt chỉnh sửa",
         };
+        const text = statusLabels[status] || status;
         return (
           <span
-            className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${config.color}`}
+            className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium"
+            style={getStatusStyle(status.toLowerCase())}
           >
-            {config.text}
+            {text}
           </span>
         );
       },

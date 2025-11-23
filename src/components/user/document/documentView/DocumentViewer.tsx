@@ -5,7 +5,6 @@ import PDFViewer from "./PDFViewer";
 import ExcelViewer from "./ExcelViewer";
 import PowerPointViewer from "./PowerPointViewer";
 import VideoViewer from "./VideoViewer";
-import DocumentPagination from "./DocumentPagination";
 
 interface DocumentViewerProps {
   url: string;
@@ -15,13 +14,6 @@ interface DocumentViewerProps {
   onPageUpdate?: (page: number) => void;
   zoom?: number;
   isUser?: boolean; // True if document belongs to current user (no limitations)
-  // Pagination props
-  totalPages?: number;
-  onPrevPage?: () => void;
-  onNextPage?: () => void;
-  onGoToPage?: (page: number) => void;
-  onZoomIn?: () => void;
-  onZoomOut?: () => void;
 }
 
 const DocumentViewer: React.FC<DocumentViewerProps> = ({
@@ -32,12 +24,6 @@ const DocumentViewer: React.FC<DocumentViewerProps> = ({
   onPageUpdate,
   zoom,
   isUser = false,
-  totalPages,
-  onPrevPage,
-  onNextPage,
-  onGoToPage,
-  onZoomIn,
-  onZoomOut,
 }) => {
   const renderViewer = () => {
     if (type === "pdf") {
@@ -71,25 +57,9 @@ const DocumentViewer: React.FC<DocumentViewerProps> = ({
     );
   };
 
-  const shouldShowPagination = type === "pdf";
-
   return (
     <div className="w-full relative overflow-hidden document-viewer-container">
       {renderViewer()}
-      {shouldShowPagination && totalPages && totalPages > 0 && (
-        <div className="fixed bottom-0 left-140 right-0 flex justify-center pb-4  z-10">
-          <DocumentPagination
-            currentPage={currentPage || 1}
-            totalPages={totalPages}
-            onPrevPage={onPrevPage}
-            onNextPage={onNextPage}
-            onGoToPage={onGoToPage}
-            onZoomIn={onZoomIn}
-            onZoomOut={onZoomOut}
-            zoom={zoom}
-          />
-        </div>
-      )}
     </div>
   );
 };

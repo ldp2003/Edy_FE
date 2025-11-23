@@ -376,12 +376,8 @@ const UploadDocument: React.FC<UploadDocumentProps> = ({
         try {
           console.log("Uploading Word thumbnail to Cloudinary...");
 
-          // Convert data URL to blob
-          const response = await fetch(wordThumbnail);
-          const blob = await response.blob();
-
           const thumbnailFormData = new FormData();
-          thumbnailFormData.append("file", blob);
+          thumbnailFormData.append("file", wordThumbnail); // Upload base64 data URL directly
           thumbnailFormData.append("upload_preset", preset || "");
           thumbnailFormData.append("resource_type", "image");
           thumbnailFormData.append(
@@ -516,7 +512,7 @@ const UploadDocument: React.FC<UploadDocumentProps> = ({
   return (
     <div>
       <Card
-        className="mb-6"
+        className="mb-2"
         style={{ backgroundColor: "var(--field-background-color)" }}
         size="small"
       >
@@ -541,25 +537,25 @@ const UploadDocument: React.FC<UploadDocumentProps> = ({
             return true;
           }}
         >
-          <div className="flex flex-col items-center text-center p-4 sm:p-6">
+          <div className="flex flex-col items-center text-center p-2 sm:p-3">
             <CloudUpload
-              size={window.innerWidth < 640 ? 60 : 80}
+              size={window.innerWidth < 640 ? 40 : 50}
               color={uploading ? "#d1d5db" : "var(--primary-color)"}
-              className={`${uploading ? "animate-pulse" : ""} mb-4`}
+              className={`${uploading ? "animate-pulse" : ""} mb-2`}
             />
-            <p className="text-sm sm:text-base font-bold mb-2">
+            <p className="text-xs sm:text-sm font-bold mb-1">
               {uploading
                 ? "Đang tải lên..."
                 : "Kéo thả hoặc tải file tài liệu lên"}
             </p>
-            <p className="text-xs sm:text-sm text-gray-500 italic px-2">
+            <p className="text-xs text-gray-500 italic px-1">
               Các file có thể đăng tải lên hệ thống bao gồm: doc, docx, pdf,
               ppt, pptx, xls, xlsx, mp4, avi, mov, wmv, flv, mkv, webm tối đa
               10MB
             </p>
 
             {uploading && (
-              <div className="mt-4 w-full max-w-xs sm:max-w-sm">
+              <div className="mt-2 w-full max-w-xs">
                 <Progress
                   percent={uploadProgress}
                   size="small"
@@ -569,7 +565,7 @@ const UploadDocument: React.FC<UploadDocumentProps> = ({
                     "100%": "#87d068",
                   }}
                 />
-                <p className="text-xs sm:text-sm text-gray-500 mt-1">
+                <p className="text-xs text-gray-500 mt-0.5">
                   Đang tải lên... {uploadProgress}%
                 </p>
               </div>

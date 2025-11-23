@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
+import { useNavigate } from "react-router-dom";
 import { Select, message, Modal, Form, Input } from "antd";
 import { PlusOutlined, SyncOutlined, SearchOutlined } from "@ant-design/icons";
 import SubjectService from "../../../utils/SubjectService";
@@ -7,11 +8,12 @@ import type { Subject } from "../../../models/subject";
 import type { OrganizationDetailed } from "../../../models/organization";
 import SubjectTable from "../../../components/admin/subject/SubjectTable";
 import SubjectForm from "../../../components/admin/subject/SubjectForm";
-import SubjectViewModal from "../../../components/admin/subject/SubjectViewModal";
+import { AdminBreadcrumb } from "../../../components/admin/common/AdminBreadcrumb";
 
 const { Option } = Select;
 
 const ManageSubjectsPage: React.FC = () => {
+  const navigate = useNavigate();
   const [subjects, setSubjects] = useState<Subject[]>([]);
   const [organizations, setOrganizations] = useState<OrganizationDetailed[]>(
     []
@@ -20,8 +22,6 @@ const ManageSubjectsPage: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [editingSubject, setEditingSubject] = useState<Subject | null>(null);
-  const [viewingSubject, setViewingSubject] = useState<Subject | null>(null);
-  const [isViewModalVisible, setIsViewModalVisible] = useState(false);
   const [syncAllLoading, setSyncAllLoading] = useState(false);
   const [syncingSubjects, setSyncingSubjects] = useState<Set<string>>(
     new Set()
@@ -104,8 +104,7 @@ const ManageSubjectsPage: React.FC = () => {
   };
 
   const handleView = (subject: Subject) => {
-    setViewingSubject(subject);
-    setIsViewModalVisible(true);
+    navigate(`/admin/subjects/${subject._id}`);
   };
 
   const handleDelete = async (subjectId: string) => {
@@ -160,11 +159,6 @@ const ManageSubjectsPage: React.FC = () => {
     form.resetFields();
   };
 
-  const handleViewModalCancel = () => {
-    setIsViewModalVisible(false);
-    setViewingSubject(null);
-  };
-
   const handleSync = async (subjectId: string) => {
     // Add to syncing set
     setSyncingSubjects((prev) => new Set(prev).add(subjectId));
@@ -210,115 +204,118 @@ const ManageSubjectsPage: React.FC = () => {
 
   return (
     <div>
-      <div className="mb-4">
-        <h1 className="text-xl sm:text-lg xs:text-base font-bold text-[var(--primary-text-color)] mb-4 text-left">
-          Quản lý môn học
-        </h1>
+      <AdminBreadcrumb
+        items={[
+          { label: "Admin", path: "/admin" },
+          { label: "Quản lý nội dung", path: "/admin/subjects" },
+          { label: "Môn học" },
+        ]}
+      />
+      <div className="mt-4">
+        <div className="mb-4">
+          <h1 className="text-xl sm:text-lg xs:text-base font-bold text-[var(--primary-text-color)] mb-4 text-left">
+            Quản lý môn học
+          </h1>
 
-        <div className="flex flex-col gap-3 mb-3">
-          <div className="flex-1 flex gap-2">
-            <Input
-              placeholder="Tìm kiếm môn học theo tên hoặc mã..."
-              prefix={<SearchOutlined />}
-              value={searchText}
-              onChange={(e) => setSearchText(e.target.value)}
-              allowClear
-              className="text-sm sm:text-sm xs:text-xs"
-            />
-            <button
-              onClick={loadSubjects}
-              className="inline-flex items-center px-3 py-1.5 text-xs sm:text-xs xs:text-xs font-medium rounded-md text-white bg-[var(--primary-color)] hover:bg-[var(--secondary-color)] focus:ring-2 focus:ring-[var(--primary-color)] focus:ring-offset-2 transition-colors duration-200"
-            >
-              <SearchOutlined className="mr-1.5" />
-              Tìm kiếm
-            </button>
-          </div>
+          <div className="flex flex-col gap-3 mb-3">
+            <div className="flex-1 flex gap-2">
+              <Input
+                placeholder="Tìm kiếm môn học theo tên hoặc mã..."
+                prefix={<SearchOutlined />}
+                value={searchText}
+                onChange={(e) => setSearchText(e.target.value)}
+                allowClear
+                className="text-sm sm:text-sm xs:text-xs"
+              />
+              <button
+                onClick={loadSubjects}
+                className="inline-flex items-center px-3 py-1.5 text-xs sm:text-xs xs:text-xs font-medium rounded-md text-white bg-[var(--primary-color)] hover:bg-[var(--secondary-color)] focus:ring-2 focus:ring-[var(--primary-color)] focus:ring-offset-2 transition-colors duration-200"
+              >
+                <SearchOutlined className="mr-1.5" />
+                Tìm kiếm
+              </button>
+            </div>
 
-          {!searchText.trim() && (
-            <div className="flex flex-col sm:flex-row gap-3">
-              <div className="sm:w-1/3">
-                <div>
-                  <label className="block text-left font-medium text-[var(--primary-text-color)] mb-2 text-sm sm:text-sm xs:text-xs">
-                    Chọn tổ chức
-                  </label>
-                  <Select
-                    placeholder="Chọn tổ chức"
-                    style={{ width: "100%" }}
-                    value={selectedOrganization}
-                    onChange={setSelectedOrganization}
-                    className="text-base sm:text-sm xs:text-xs"
+            {!searchText.trim() && (
+              <div className="flex flex-col sm:flex-row gap-3">
+                <div className="sm:w-1/3">
+                  <div>
+                    <label className="block text-left font-medium text-[var(--primary-text-color)] mb-2 text-sm sm:text-sm xs:text-xs">
+                      Chọn tổ chức
+                    </label>
+                    <Select
+                      placeholder="Chọn tổ chức"
+                      style={{ width: "100%" }}
+                      value={selectedOrganization}
+                      onChange={setSelectedOrganization}
+                      className="text-base sm:text-sm xs:text-xs"
+                    >
+                      {organizations.map((org) => (
+                        <Option key={org._id} value={org._id}>
+                          {org.name}
+                        </Option>
+                      ))}
+                    </Select>
+                  </div>
+                </div>
+                <div className="sm:w-2/3 flex items-end justify-start gap-2">
+                  <button
+                    onClick={handleAdd}
+                    disabled={!selectedOrganization}
+                    className={`inline-flex items-center px-3 py-1.5 text-xs sm:text-xs xs:text-xs font-medium rounded-md text-white ${
+                      selectedOrganization
+                        ? "bg-[var(--primary-color)] hover:bg-[var(--secondary-color)] focus:ring-2 focus:ring-[var(--primary-color)] focus:ring-offset-2"
+                        : "bg-[var(--third-color)] cursor-not-allowed"
+                    } transition-colors duration-200`}
                   >
-                    {organizations.map((org) => (
-                      <Option key={org._id} value={org._id}>
-                        {org.name}
-                      </Option>
-                    ))}
-                  </Select>
+                    <PlusOutlined className="mr-1.5" />
+                    Thêm môn học
+                  </button>
+                  <button
+                    onClick={handleSyncAll}
+                    disabled={!selectedOrganization || syncAllLoading}
+                    className={`inline-flex items-center px-3 py-1.5 text-xs sm:text-xs xs:text-xs font-medium rounded-md text-white ${
+                      selectedOrganization && !syncAllLoading
+                        ? "bg-[var(--green-button-color)] hover:bg-[var(--green-button-color)] focus:ring-2 focus:ring-[var(--green-button-color)] focus:ring-offset-2"
+                        : "bg-[var(--third-color)] cursor-not-allowed"
+                    } transition-colors duration-200`}
+                  >
+                    {syncAllLoading ? (
+                      <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-white mr-1.5"></div>
+                    ) : (
+                      <SyncOutlined className="mr-1.5" />
+                    )}
+                    {syncAllLoading ? "Đang đồng bộ..." : "Đồng bộ tất cả"}
+                  </button>
                 </div>
               </div>
-              <div className="sm:w-2/3 flex items-end justify-start gap-2">
-                <button
-                  onClick={handleAdd}
-                  disabled={!selectedOrganization}
-                  className={`inline-flex items-center px-3 py-1.5 text-xs sm:text-xs xs:text-xs font-medium rounded-md text-white ${
-                    selectedOrganization
-                      ? "bg-[var(--primary-color)] hover:bg-[var(--secondary-color)] focus:ring-2 focus:ring-[var(--primary-color)] focus:ring-offset-2"
-                      : "bg-[var(--third-color)] cursor-not-allowed"
-                  } transition-colors duration-200`}
-                >
-                  <PlusOutlined className="mr-1.5" />
-                  Thêm môn học
-                </button>
-                <button
-                  onClick={handleSyncAll}
-                  disabled={!selectedOrganization || syncAllLoading}
-                  className={`inline-flex items-center px-3 py-1.5 text-xs sm:text-xs xs:text-xs font-medium rounded-md text-white ${
-                    selectedOrganization && !syncAllLoading
-                      ? "bg-[var(--green-button-color)] hover:bg-[var(--green-button-color)] focus:ring-2 focus:ring-[var(--green-button-color)] focus:ring-offset-2"
-                      : "bg-[var(--third-color)] cursor-not-allowed"
-                  } transition-colors duration-200`}
-                >
-                  {syncAllLoading ? (
-                    <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-white mr-1.5"></div>
-                  ) : (
-                    <SyncOutlined className="mr-1.5" />
-                  )}
-                  {syncAllLoading ? "Đang đồng bộ..." : "Đồng bộ tất cả"}
-                </button>
+            )}
+
+            {searchText.trim() && (
+              <div className="text-sm text-[var(--secondary-text-color)]">
+                Hiển thị kết quả tìm kiếm cho: <strong>"{searchText}"</strong>
               </div>
-            </div>
-          )}
-
-          {searchText.trim() && (
-            <div className="text-sm text-[var(--secondary-text-color)]">
-              Hiển thị kết quả tìm kiếm cho: <strong>"{searchText}"</strong>
-            </div>
-          )}
+            )}
+          </div>
         </div>
+
+        <SubjectTable
+          subjects={subjects}
+          loading={loading}
+          onEdit={handleEdit}
+          onDelete={handleDelete}
+          onView={handleView}
+          onSync={handleSync}
+          syncingSubjects={syncingSubjects}
+        />
+
+        <SubjectForm
+          visible={isModalVisible}
+          editingSubject={editingSubject}
+          onOk={handleModalOk}
+          onCancel={handleModalCancel}
+        />
       </div>
-
-      <SubjectTable
-        subjects={subjects}
-        loading={loading}
-        onEdit={handleEdit}
-        onDelete={handleDelete}
-        onView={handleView}
-        onSync={handleSync}
-        syncingSubjects={syncingSubjects}
-      />
-
-      <SubjectForm
-        visible={isModalVisible}
-        editingSubject={editingSubject}
-        onOk={handleModalOk}
-        onCancel={handleModalCancel}
-      />
-
-      <SubjectViewModal
-        visible={isViewModalVisible}
-        subject={viewingSubject}
-        onCancel={handleViewModalCancel}
-      />
     </div>
   );
 };

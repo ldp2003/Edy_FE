@@ -556,6 +556,43 @@ export class NotificationService {
   }
 
   /**
+   * Tạo thông báo yêu cầu chỉnh sửa tài liệu
+   */
+  static async createDocumentEditRequestedNotification(
+    documentOwnerId: string,
+    documentId: string,
+    documentTitle: string,
+    reason?: string
+  ): Promise<{
+    success: boolean;
+    message: string;
+    notification: Notification;
+  }> {
+    try {
+      const message = reason
+        ? `Quản trị viên yêu cầu chỉnh sửa tài liệu "${documentTitle}". Lý do: ${reason}`
+        : `Quản trị viên yêu cầu chỉnh sửa tài liệu "${documentTitle}".`;
+
+      const response = await this.createNotification({
+        userId: documentOwnerId,
+        docId: documentId,
+        type: "SYSTEM",
+        message,
+        redirectTo: "DOCUMENT",
+      });
+
+      return {
+        success: response.success,
+        message: response.message,
+        notification: response.notification,
+      };
+    } catch (error) {
+      console.error("Error in createDocumentEditRequestedNotification:", error);
+      throw new Error("Không thể tạo thông báo yêu cầu chỉnh sửa tài liệu");
+    }
+  }
+
+  /**
    * Tạo thông báo reaction (thích/không thích) trên tài liệu
    */
   static async createReactionNotification(
@@ -621,7 +658,7 @@ export class NotificationService {
         cmtId,
         type: "SYSTEM",
         message,
-        redirectTo: "NONE",
+        redirectTo: "SYSTEM",
       });
 
       return {

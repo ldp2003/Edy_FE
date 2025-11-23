@@ -14,7 +14,11 @@ import {
 import { RoleService } from "../../../utils/RoleService";
 import CreateRoleModal from "./CreateRoleModal";
 import EditRoleModal from "./EditRoleModal";
-import { PERMISSIONS } from "../../../constants/PermissionConstants.ts";
+import { PERMISSION_LABELS } from "../../../constants/PermissionConstants.ts";
+import {
+  getPermissionStyle,
+  getStatusStyle,
+} from "../../../utils/AdminTableStyles";
 
 interface Role {
   _id: string;
@@ -141,18 +145,16 @@ const AdminRoleTable: React.FC = () => {
         <div className="flex flex-wrap gap-1">
           {record.permissions.map((permission, index) => {
             const isAllPermission = permission === "ALL";
+            const label =
+              PERMISSION_LABELS[permission as keyof typeof PERMISSION_LABELS] ||
+              permission;
             return (
               <Tag
                 key={index}
-                className={`text-xs ${
-                  isAllPermission
-                    ? "bg-blue-100 text-blue-800 border-blue-300 font-semibold"
-                    : ""
-                }`}
-                color={isAllPermission ? "blue" : undefined}
+                className={`text-xs ${isAllPermission ? "font-semibold" : ""}`}
+                style={getPermissionStyle(permission)}
               >
-                {PERMISSIONS[permission as keyof typeof PERMISSIONS] ||
-                  permission}
+                {label}
               </Tag>
             );
           })}
@@ -167,9 +169,8 @@ const AdminRoleTable: React.FC = () => {
       width: 100,
       render: (isActive: boolean) => (
         <span
-          className={`px-2 py-1 rounded text-xs ${
-            isActive ? "text-green-600 bg-green-50" : "text-red-600 bg-red-50"
-          }`}
+          className="px-2 py-1 rounded text-xs"
+          style={getStatusStyle(isActive ? "active" : "inactive")}
         >
           {isActive ? "Hoạt động" : "Vô hiệu"}
         </span>

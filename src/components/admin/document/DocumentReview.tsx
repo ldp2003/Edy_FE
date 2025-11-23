@@ -393,9 +393,6 @@ const DocumentReview: React.FC<DocumentReviewProps> = ({
               documentId={document._id}
               documentStatus={document.is_deleted ? "DELETED" : document.status}
               documentType={document.file_type}
-              onSuccess={() => {
-                messageApi.success("Thao tác thành công!");
-              }}
             />
           </div>
         </Form>

@@ -35,8 +35,6 @@ const DocumentDetail: React.FC = () => {
 
   // State for pagination
   const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(0);
-  const [zoom, setZoom] = useState(1);
 
   // Fetch document data
   const fetchDocument = useCallback(async () => {
@@ -84,46 +82,14 @@ const DocumentDetail: React.FC = () => {
   }, [fetchDocument]);
 
   // Handle page change from document viewer
-  const handlePageChange = useCallback((current: number, total: number) => {
+  const handlePageChange = useCallback((current: number) => {
     setCurrentPage(current);
-    setTotalPages(total);
   }, []);
 
   // Handle page update from scroll
   const handlePageUpdate = useCallback((page: number) => {
     setCurrentPage(page);
   }, []);
-
-  // Navigation functions
-  const handlePrevPage = () => {
-    if (currentPage > 1) {
-      setCurrentPage(currentPage - 1);
-    }
-  };
-
-  const handleNextPage = () => {
-    if (currentPage < totalPages) {
-      setCurrentPage(currentPage + 1);
-    }
-  };
-
-  const handleGoToPage = (page: number) => {
-    if (page >= 1 && page <= totalPages) {
-      setCurrentPage(page);
-    }
-  };
-
-  const handleZoomIn = () => {
-    if (zoom < 3) {
-      setZoom(zoom + 0.25);
-    }
-  };
-
-  const handleZoomOut = () => {
-    if (zoom > 0.5) {
-      setZoom(zoom - 0.25);
-    }
-  };
 
   // Map file type from backend to viewer expected format
   const getViewerFileType = (
@@ -198,14 +164,7 @@ const DocumentDetail: React.FC = () => {
             onPageChange={handlePageChange}
             currentPage={currentPage}
             onPageUpdate={handlePageUpdate}
-            zoom={zoom}
             isUser={isUserOwner}
-            totalPages={totalPages}
-            onPrevPage={handlePrevPage}
-            onNextPage={handleNextPage}
-            onGoToPage={handleGoToPage}
-            onZoomIn={handleZoomIn}
-            onZoomOut={handleZoomOut}
           />
         </div>
       </div>

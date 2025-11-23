@@ -58,6 +58,7 @@ const ShareModal: React.FC<ShareModalProps> = ({
   const [copied, setCopied] = useState(false);
   const [activeTab, setActiveTab] = useState("create");
   const [loading, setLoading] = useState(false);
+  const [isCopying, setIsCopying] = useState(false);
   const [messageApi, contextHolder] = message.useMessage();
 
   // Form states for creating new link
@@ -140,7 +141,10 @@ const ShareModal: React.FC<ShareModalProps> = ({
   }, [visible, isPrivate, isPrivateShared, isOwner, fetchShareLinks]);
 
   const handleCopyLink = async (linkOrUrl: string) => {
+    if (isCopying) return; // Prevent double copying
+
     try {
+      setIsCopying(true);
       const fullUrl = linkOrUrl.startsWith("http")
         ? linkOrUrl
         : `${window.location.origin}${linkOrUrl}`;
@@ -150,9 +154,11 @@ const ShareModal: React.FC<ShareModalProps> = ({
 
       setTimeout(() => {
         setCopied(false);
+        setIsCopying(false);
       }, 2000);
     } catch {
       messageApi.error("Không thể sao chép link!");
+      setIsCopying(false);
     }
   };
 
@@ -411,8 +417,8 @@ const ShareModal: React.FC<ShareModalProps> = ({
                   onClick={() => handleCopyLink(shareUrl)}
                   className={`flex items-center space-x-1 px-4 py-3 rounded-lg font-medium text-sm transition-all duration-200 cursor-pointer ${
                     copied
-                      ? "bg-green-100 text-green-700 border border-green-300 hover:bg-green-200 hover:border-green-400"
-                      : "bg-blue-600 text-white hover:bg-blue-700 hover:shadow-md transform hover:scale-105"
+                      ? "bg-green-100 text-green-700 border border-green-300 hover:bg-green-300 hover:border-green-400"
+                      : "bg-blue-600 text-white hover:bg-blue-800 hover:shadow-md transform hover:scale-105"
                   }`}
                 >
                   {copied ? (

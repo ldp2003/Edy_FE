@@ -204,7 +204,12 @@ export function Header({ onMenuToggle }: HeaderProps) {
                           Admin
                         </span>
                       )}
-                      {account?.is_vip && (
+                      {!account?.is_admin && !account?.is_vip && (
+                        <span className="text-xs bg-gray-100 text-gray-700 px-1 rounded font-medium">
+                          Người dùng
+                        </span>
+                      )}
+                      {account?.is_vip && !account?.is_admin && (
                         <span className="text-xs bg-yellow-100 text-yellow-700 px-1 rounded font-medium">
                           VIP
                         </span>

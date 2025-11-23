@@ -1,9 +1,11 @@
 import React, { useContext } from "react";
+import { useNavigate } from "react-router-dom";
 import PostsPointBox from "../../common/point/PostsPointBox";
 import { UserContext } from "../../../contexts/UserContext";
 
 const UserInfoHeaderDesktop: React.FC = () => {
   const { user, account } = useContext(UserContext);
+  const navigate = useNavigate();
 
   const organizationName =
     typeof user?.organization === "object" && user?.organization !== null
@@ -44,8 +46,11 @@ const UserInfoHeaderDesktop: React.FC = () => {
         </div>
 
         <div className="flex gap-8 text-[var(--primary-text-color)]">
-          <div className="text-center">
-            <div className="">
+          <div
+            className="text-center cursor-pointer hover:text-[var(--hover-text-color)] hover:bg-[var(--hover-bg-color)] px-2 py-1 rounded transition-colors duration-200"
+            onClick={() => navigate("/following")}
+          >
+            <div className="font-bold text-lg">
               {isLoading ? (
                 <span className="animate-pulse bg-gray-200 rounded w-8 h-4 inline-block"></span>
               ) : (
@@ -54,8 +59,11 @@ const UserInfoHeaderDesktop: React.FC = () => {
             </div>
             <div className="text-[10px]">Đang theo dõi</div>
           </div>
-          <div className="text-center">
-            <div className="">
+          <div
+            className="text-center cursor-pointer hover:text-[var(--hover-text-color)] hover:bg-[var(--hover-bg-color)] px-2 py-1 rounded transition-colors duration-200"
+            onClick={() => navigate("/follower")}
+          >
+            <div className="font-bold text-lg">
               {isLoading ? (
                 <span className="animate-pulse bg-gray-200 rounded w-8 h-4 inline-block"></span>
               ) : (
@@ -64,8 +72,11 @@ const UserInfoHeaderDesktop: React.FC = () => {
             </div>
             <div className="text-[10px]">Người theo dõi</div>
           </div>
-          <div className="text-center">
-            <div className="">
+          <div
+            className="text-center cursor-pointer hover:text-[var(--hover-text-color)] hover:bg-[var(--hover-bg-color)] px-2 py-1 rounded transition-colors duration-200"
+            onClick={() => navigate("/personal-posts")}
+          >
+            <div className="font-bold text-lg">
               {isLoading ? (
                 <span className="animate-pulse bg-gray-200 rounded w-8 h-4 inline-block"></span>
               ) : (

@@ -26,7 +26,7 @@ const DocumentActions: React.FC<DocumentActionsProps> = ({
   isUser = false,
 }) => {
   const [isFixed, setIsFixed] = useState(false);
-  const { user } = React.useContext(UserContext);
+  const { user, account } = React.useContext(UserContext);
   const [reactionData, setReactionData] = useState<ReactionData>({
     likes: 0,
     dislikes: 0,
@@ -179,7 +179,15 @@ const DocumentActions: React.FC<DocumentActionsProps> = ({
       }`}
     >
       <DownloadButton
-        point={document.intensive ? 6 : 4}
+        point={
+          account?.is_vip
+            ? document.intensive
+              ? 5
+              : 3
+            : document.intensive
+            ? 6
+            : 4
+        }
         documentId={document._id}
         documentTitle={document.title}
       />

@@ -20,38 +20,305 @@
   --secondary-background-color: #f6f7fb;
   --third-background-color: #cce4ff;
   --border-color: #e6ebef;
+  --hover-text-color: #0066cc;
+  /* Common Color Groups */
+  --color-success-bg: #f0fdf4;
+  --color-success-text: #166534;
+  --color-success-border: #bbf7d0;
+
+  --color-warning-bg: #fef3c7;
+  --color-warning-text: #92400e;
+  --color-warning-border: #fde68a;
+
+  --color-error-bg: #fef2f2;
+  --color-error-text: #991b1b;
+  --color-error-border: #fecaca;
+
+  --color-info-bg: #eff6ff;
+  --color-info-text: #1e40af;
+  --color-info-border: #bfdbfe;
+
+  --color-purple-bg: #faf5ff;
+  --color-purple-text: #7c3aed;
+  --color-purple-border: #d8b4fe;
+
+  --color-orange-bg: #fff7ed;
+  --color-orange-text: #9a3412;
+  --color-orange-border: #fed7aa;
+
+  --color-pink-bg: #fce7f3;
+  --color-pink-text: #be185d;
+  --color-pink-border: #f9a8d4;
+
+  --color-gray-bg: #f9fafb;
+  --color-gray-text: #374151;
+  --color-gray-border: #e5e7eb;
+
+  /* Permission Colors - using common colors */
+  --permission-manage-document-bg: var(--color-info-bg);
+  --permission-manage-document-text: var(--color-info-text);
+  --permission-manage-document-border: var(--color-info-border);
+
+  --permission-handle-report-bg: var(--color-warning-bg);
+  --permission-handle-report-text: var(--color-warning-text);
+  --permission-handle-report-border: var(--color-warning-border);
+
+  --permission-handle-comment-report-bg: var(--color-error-bg);
+  --permission-handle-comment-report-text: var(--color-error-text);
+  --permission-handle-comment-report-border: var(--color-error-border);
+
+  --permission-manage-user-bg: var(--color-purple-bg);
+  --permission-manage-user-text: var(--color-purple-text);
+  --permission-manage-user-border: var(--color-purple-border);
+
+  --permission-manage-comment-bg: var(--color-success-bg);
+  --permission-manage-comment-text: var(--color-success-text);
+  --permission-manage-comment-border: var(--color-success-border);
+
+  --permission-manage-server-bg: var(--color-warning-bg);
+  --permission-manage-server-text: var(--color-warning-text);
+  --permission-manage-server-border: var(--color-warning-border);
+
+  --permission-manage-entity-bg: var(--color-success-bg);
+  --permission-manage-entity-text: var(--color-success-text);
+  --permission-manage-entity-border: var(--color-success-border);
+
+  --permission-manage-role-bg: var(--color-purple-bg);
+  --permission-manage-role-text: var(--color-purple-text);
+  --permission-manage-role-border: var(--color-purple-border);
+
+  --permission-all-bg: var(--color-error-bg);
+  --permission-all-text: var(--color-error-text);
+  --permission-all-border: var(--color-error-border);
+
+  /* Status Colors - using common colors */
+  --status-active-bg: var(--color-success-bg);
+  --status-active-text: var(--color-success-text);
+  --status-active-border: var(--color-success-border);
+
+  --status-approved-bg: var(--color-success-bg);
+  --status-approved-text: var(--color-success-text);
+  --status-approved-border: var(--color-success-border);
+
+  --status-inactive-bg: var(--color-warning-bg);
+  --status-inactive-text: var(--color-warning-text);
+  --status-inactive-border: var(--color-warning-border);
+
+  --status-banned-bg: var(--color-error-bg);
+  --status-banned-text: var(--color-error-text);
+  --status-banned-border: var(--color-error-border);
+
+  --status-pending-bg: var(--color-warning-bg);
+  --status-pending-text: var(--color-warning-text);
+  --status-pending-border: var(--color-warning-border);
+
+  --status-rejected-bg: var(--color-error-bg);
+  --status-rejected-text: var(--color-error-text);
+  --status-rejected-border: var(--color-error-border);
+
+  --status-public-bg: var(--color-success-bg);
+  --status-public-text: var(--color-success-text);
+  --status-public-border: var(--color-success-border);
+
+  --status-private-bg: var(--color-error-bg);
+  --status-private-text: var(--color-error-text);
+  --status-private-border: var(--color-error-border);
+
+  /* Document Type Colors - using common colors */
+  --doc-type-research-report-bg: var(--color-info-bg);
+  --doc-type-research-report-text: var(--color-info-text);
+  --doc-type-research-report-border: var(--color-info-border);
+
+  --doc-type-video-bg: var(--color-error-bg);
+  --doc-type-video-text: var(--color-error-text);
+  --doc-type-video-border: var(--color-error-border);
+
+  --doc-type-study-guide-bg: var(--color-success-bg);
+  --doc-type-study-guide-text: var(--color-success-text);
+  --doc-type-study-guide-border: var(--color-success-border);
+
+  --doc-type-textbook-bg: var(--color-purple-bg);
+  --doc-type-textbook-text: var(--color-purple-text);
+  --doc-type-textbook-border: var(--color-purple-border);
+
+  --doc-type-essay-bg: var(--color-warning-bg);
+  --doc-type-essay-text: var(--color-warning-text);
+  --doc-type-essay-border: var(--color-warning-border);
+
+  --doc-type-solution-set-bg: var(--color-orange-bg);
+  --doc-type-solution-set-text: var(--color-orange-text);
+  --doc-type-solution-set-border: var(--color-orange-border);
+
+  --doc-type-thesis-bg: var(--color-pink-bg);
+  --doc-type-thesis-text: var(--color-pink-text);
+  --doc-type-thesis-border: var(--color-pink-border);
+
+  --doc-type-lecture-bg: var(--color-info-bg);
+  --doc-type-lecture-text: var(--color-info-text);
+  --doc-type-lecture-border: var(--color-info-border);
+
+  --doc-type-other-bg: var(--color-gray-bg);
+  --doc-type-other-text: var(--color-gray-text);
+  --doc-type-other-border: var(--color-gray-border);
+
+  /* File Type Colors - using common colors */
+  --file-type-pdf-bg: var(--color-error-bg);
+  --file-type-pdf-text: var(--color-error-text);
+  --file-type-pdf-border: var(--color-error-border);
+
+  --file-type-word-bg: var(--color-info-bg);
+  --file-type-word-text: var(--color-info-text);
+  --file-type-word-border: var(--color-info-border);
+
+  --file-type-excel-bg: var(--color-success-bg);
+  --file-type-excel-text: var(--color-success-text);
+  --file-type-excel-border: var(--color-success-border);
+
+  --file-type-powerpoint-bg: var(--color-orange-bg);
+  --file-type-powerpoint-text: var(--color-orange-text);
+  --file-type-powerpoint-border: var(--color-orange-border);
+
+  --file-type-video-bg: var(--color-purple-bg);
+  --file-type-video-text: var(--color-purple-text);
+  --file-type-video-border: var(--color-purple-border);
+
+  /* Level Colors - using common colors */
+  --level-student-bg: var(--color-success-bg);
+  --level-student-text: var(--color-success-text);
+  --level-student-border: var(--color-success-border);
+
+  --level-university-bg: var(--color-info-bg);
+  --level-university-text: var(--color-info-text);
+  --level-university-border: var(--color-info-border);
+
+  --level-lecturer-bg: var(--color-success-bg);
+  --level-lecturer-text: var(--color-success-text);
+  --level-lecturer-border: var(--color-success-border);
+
+  --level-researcher-bg: var(--color-purple-bg);
+  --level-researcher-text: var(--color-purple-text);
+  --level-researcher-border: var(--color-purple-border);
+
+  --level-other-bg: var(--color-gray-bg);
+  --level-other-text: var(--color-gray-text);
+  --level-other-border: var(--color-gray-border);
+
+  /* Warning Colors */
+  --warning-bg: var(--color-error-bg);
+  --warning-text: var(--color-error-text);
+  --warning-border: var(--color-error-border);
 }
-/* src/docx-preview.css */
-.docx-wrapper {
+/* Mammoth Word Viewer Styles */
+.mammoth-wrapper {
   background: white;
   color: black;
   line-height: 1.5;
+  font-family: "Times New Roman", serif;
+  font-size: 14px;
 }
 
-.docx-wrapper section {
-  margin-bottom: 1rem;
+.mammoth-wrapper p,
+.mammoth-wrapper div,
+.mammoth-wrapper span {
+  text-align: left !important;
+  margin-bottom: 0.5rem;
 }
 
-.docx-preview-content {
-  margin: 0 !important;
-  margin-bottom: 1rem !important;
-  width: 100% !important;
-  margin: 10px;
+.mammoth-wrapper h1,
+.mammoth-wrapper h2,
+.mammoth-wrapper h3,
+.mammoth-wrapper h4,
+.mammoth-wrapper h5,
+.mammoth-wrapper h6 {
+  text-align: left !important;
+  margin-top: 1rem;
+  margin-bottom: 0.5rem;
+  font-weight: bold;
 }
 
-/* Document Viewer Centering */
-.document-viewer-container {
-  display: flex;
-  justify-content: center;
-  align-items: flex-start;
+.mammoth-wrapper ul,
+.mammoth-wrapper ol {
+  text-align: left !important;
+  padding-left: 2rem;
+  margin-bottom: 0.5rem;
+}
+
+.mammoth-wrapper li {
+  text-align: left !important;
+  margin-bottom: 0.25rem;
+}
+
+.mammoth-wrapper table {
   width: 100%;
+  border-collapse: collapse;
+  margin: 1rem 0;
 }
 
-.pdf-viewer-wrapper,
-.word-viewer-wrapper,
-.excel-viewer-wrapper,
-.ppt-viewer-wrapper {
-  max-width: 1200px;
-  margin: 0 auto;
-  width: 100%;
+.mammoth-wrapper td,
+.mammoth-wrapper th {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: left;
+}
+
+.mammoth-wrapper .table-bordered {
+  border: 1px solid #ddd;
+}
+
+/* Word document styling */
+.mammoth-wrapper {
+  /* Prevent elements from breaking across pages */
+  page-break-inside: avoid;
+}
+
+/* Override ALL text alignment including inline styles */
+.mammoth-wrapper * {
+  text-align: left !important;
+}
+
+/* Exception for tables - center content in cells if needed */
+.mammoth-wrapper td[align="center"],
+.mammoth-wrapper th[align="center"] {
+  text-align: center !important;
+}
+
+.mammoth-wrapper td[align="right"],
+.mammoth-wrapper th[align="right"] {
+  text-align: right !important;
+}
+
+.mammoth-wrapper p,
+.mammoth-wrapper h1,
+.mammoth-wrapper h2,
+.mammoth-wrapper h3,
+.mammoth-wrapper h4,
+.mammoth-wrapper h5,
+.mammoth-wrapper h6,
+.mammoth-wrapper table,
+.mammoth-wrapper ul,
+.mammoth-wrapper ol {
+  page-break-inside: avoid;
+  break-inside: avoid;
+  orphans: 3;
+  widows: 3;
+}
+
+.mammoth-wrapper h1,
+.mammoth-wrapper h2,
+.mammoth-wrapper h3,
+.mammoth-wrapper h4,
+.mammoth-wrapper h5,
+.mammoth-wrapper h6 {
+  page-break-after: avoid;
+  break-after: avoid;
+}
+
+.mammoth-wrapper table {
+  page-break-inside: auto;
+  break-inside: auto;
+}
+
+.mammoth-wrapper tr {
+  page-break-inside: avoid;
+  break-inside: avoid;
 }
