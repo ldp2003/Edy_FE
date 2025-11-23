@@ -36,6 +36,8 @@ export type TabMode = "all" | "subjects";
 const SearchPage: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [documents, setDocuments] = useState<Document[]>([]);
+
+  const [isShowingFallback, setIsShowingFallback] = useState(false);
   const [subjects, setSubjects] = useState<Subject[]>([]);
   const [loading, setLoading] = useState(false);
   const [totalDocuments, setTotalDocuments] = useState(0);
@@ -138,12 +140,117 @@ const SearchPage: React.FC = () => {
       setDocuments(response.documents || []);
       setSubjects(subRes || []);
       setTotalDocuments(response.total || 0);
+      setIsShowingFallback(false);
+
+      // If no documents found and we're on all tab, fetch recommended documents
+      if ((response.documents || []).length === 0 && currentTab === "all") {
+        let fallbackDocuments: Document[] = [];
+        try {
+          const recommendedParams = {
+            ...filters,
+            limit: 6, // Limit recommended documents to 6
+            status: "APPROVED",
+          };
+          const recommendedResponse =
+            await DocumentService.fetchRecommendedDocuments(recommendedParams);
+          fallbackDocuments = recommendedResponse.documents || [];
+
+          // If no recommended documents, fetch newest documents
+          if (fallbackDocuments.length === 0) {
+            const newestParams = {
+              limit: 6,
+              status: "APPROVED",
+            };
+            const newestResponse = await DocumentService.fetchNewestDocuments(
+              newestParams
+            );
+            fallbackDocuments = newestResponse.documents || [];
+          }
+        } catch (error) {
+          console.error("Error fetching recommended documents:", error);
+          // Fallback to newest documents if recommended fails
+          try {
+            const newestParams = {
+              limit: 6,
+              status: "APPROVED",
+            };
+            const newestResponse = await DocumentService.fetchNewestDocuments(
+              newestParams
+            );
+            fallbackDocuments = newestResponse.documents || [];
+          } catch (newestError) {
+            console.error("Error fetching newest documents:", newestError);
+            fallbackDocuments = [];
+          }
+        }
+
+        // setRecommendedDocuments(fallbackDocuments);
+        if (fallbackDocuments.length > 0) {
+          setDocuments(fallbackDocuments);
+          setTotalDocuments(fallbackDocuments.length);
+          setIsShowingFallback(true);
+        }
+      } else {
+        // setRecommendedDocuments([]);
+      }
     } catch (error) {
       console.error("Error fetching documents:", error);
       message.error("Có lỗi xảy ra khi tìm kiếm tài liệu");
       setDocuments([]);
       setSubjects([]);
       setTotalDocuments(0);
+
+      // Even on error, try to show recommended/newest documents
+      if (currentTab === "all") {
+        let fallbackDocuments: Document[] = [];
+        try {
+          const recommendedParams = {
+            ...filters,
+            limit: 6,
+            status: "APPROVED",
+          };
+          const recommendedResponse =
+            await DocumentService.fetchRecommendedDocuments(recommendedParams);
+          fallbackDocuments = recommendedResponse.documents || [];
+
+          // If no recommended documents, fetch newest documents
+          if (fallbackDocuments.length === 0) {
+            const newestParams = {
+              limit: 6,
+              status: "APPROVED",
+            };
+            const newestResponse = await DocumentService.fetchNewestDocuments(
+              newestParams
+            );
+            fallbackDocuments = newestResponse.documents || [];
+          }
+        } catch (fallbackError) {
+          console.error("Error fetching fallback documents:", fallbackError);
+          // Fallback to newest documents if recommended fails
+          try {
+            const newestParams = {
+              limit: 6,
+              status: "APPROVED",
+            };
+            const newestResponse = await DocumentService.fetchNewestDocuments(
+              newestParams
+            );
+            fallbackDocuments = newestResponse.documents || [];
+          } catch (newestError) {
+            console.error("Error fetching newest documents:", newestError);
+            fallbackDocuments = [];
+          }
+        }
+
+        // setRecommendedDocuments(fallbackDocuments);
+        if (fallbackDocuments.length > 0) {
+          setDocuments(fallbackDocuments);
+          setTotalDocuments(fallbackDocuments.length);
+          setIsShowingFallback(true);
+        }
+      } else {
+        // setRecommendedDocuments([]);
+      }
     } finally {
       setLoading(false);
     }
@@ -216,6 +323,8 @@ const SearchPage: React.FC = () => {
     isUpdatingFromCode.current = true;
     setFilters(newFilters);
     setCurrentPage(1);
+    // setRecommendedDocuments([]); // Reset recommended documents when filters change
+    setIsShowingFallback(false); // Reset fallback flag
     updateURL(newFilters, 1);
   };
 
@@ -242,6 +351,8 @@ const SearchPage: React.FC = () => {
     setCurrentPage(1);
     // Reset data when switching tabs to avoid showing old data
     setDocuments([]);
+    // setRecommendedDocuments([]);
+    setIsShowingFallback(false);
     setSubjects([]);
 
     // Update URL with new tab
@@ -347,6 +458,7 @@ const SearchPage: React.FC = () => {
                 onSortChange={handleSortChange}
                 searchQuery={filters.search || ""}
                 currentTab={currentTab}
+                isShowingFallback={isShowingFallback}
               />
             </div>
           </div>

@@ -21,6 +21,7 @@ interface SearchResultsProps {
   viewMode: ViewMode;
   searchQuery: string;
   currentTab: TabMode;
+  isShowingFallback?: boolean;
   onPageChange: (page: number) => void;
   onViewModeChange: (mode: ViewMode) => void;
   onSortChange: (ordering: string, order: 1 | -1) => void;
@@ -36,6 +37,7 @@ const SearchResults: React.FC<SearchResultsProps> = ({
   viewMode,
   searchQuery,
   currentTab,
+  isShowingFallback = false,
   onPageChange,
   onViewModeChange,
   onSortChange,
@@ -48,12 +50,17 @@ const SearchResults: React.FC<SearchResultsProps> = ({
 
   return (
     <div className="space-y-4">
-      {/* Header Title - Top Left */}
       <div className="text-center md:text-left">
-        <h2 className="text-lg font-semibold text-gray-800 mb-1 text-center md:text-left">
-          {currentTab === "subjects" ? "Danh sách môn học" : "Kết quả tìm kiếm"}
-          {searchQuery && currentTab === "all" && (
-            <span className="text-blue-600 ml-2">"{searchQuery}"</span>
+        <h2 className="text-lg font-semibold text-[var(--primary-text-color)] mb-1 text-center md:text-left">
+          {currentTab === "subjects"
+            ? "Danh sách môn học"
+            : isShowingFallback
+            ? `Không tìm thấy tài liệu này với từ khóa "${searchQuery}". Dưới đây là đề xuất cho bạn:`
+            : "Kết quả tìm kiếm"}
+          {searchQuery && currentTab === "all" && !isShowingFallback && (
+            <span className="text-[var(--primary-color)] ml-2">
+              "{searchQuery}"
+            </span>
           )}
         </h2>
       </div>
@@ -75,40 +82,42 @@ const SearchResults: React.FC<SearchResultsProps> = ({
             }}
           />
         ) : (
-          <Card>
-            <Empty
-              description={
-                <div className="text-center">
-                  <p className="text-gray-500 mb-2">
-                    Không tìm thấy môn học nào phù hợp
-                  </p>
-                  <p className="text-sm text-gray-400">
-                    Thử thay đổi từ khóa tìm kiếm
-                  </p>
-                </div>
-              }
-              className="py-12"
-            />
-          </Card>
+          <Empty
+            description={
+              <div className="text-center">
+                <p className="text-[var(--color-gray-text)] mb-2">
+                  Không tìm thấy môn học nào phù hợp
+                </p>
+                <p className="text-sm text-[var(--third-text-color)]">
+                  Thử thay đổi từ khóa tìm kiếm
+                </p>
+              </div>
+            }
+            className="py-12"
+          />
         )
       ) : (
         <>
           {/* Subject Grid for All tab */}
-          <SubjectGrid
-            title="Môn học"
-            subjects={subjects}
-            onSubjectClick={(subject) => {
-              // Navigate to subject documents page
-              window.location.href = `/subject/${subject._id}/documents`;
-            }}
-          />
+          {subjects && subjects.length > 0 && (
+            <SubjectGrid
+              title="Môn học"
+              subjects={subjects}
+              onSubjectClick={(subject) => {
+                // Navigate to subject documents page
+                window.location.href = `/subject/${subject._id}/documents`;
+              }}
+            />
+          )}
           {/* Controls */}
-          <div className="bg-white">
+          <div className="bg-[var(--primary-background-color)]">
             <div className="flex flex-col sm:flex-row justify-start items-start sm:items-center gap-4">
               <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
                 {/* Sort Dropdown */}
                 <div className="flex items-center gap-2">
-                  <span className="text-sm text-gray-600">Sắp xếp:</span>
+                  <span className="text-sm text-[var(--secondary-text-color)]">
+                    Sắp xếp:
+                  </span>
                   <Select
                     placeholder="Chọn cách sắp xếp"
                     onChange={handleSortChange}
@@ -127,8 +136,10 @@ const SearchResults: React.FC<SearchResultsProps> = ({
 
                 {/* View Mode Toggle */}
                 <div className="flex items-center gap-2">
-                  <span className="text-sm text-gray-600">Hiển thị:</span>
-                  <div className="flex border border-gray-300 rounded">
+                  <span className="text-sm text-[var(--secondary-text-color)]">
+                    Hiển thị:
+                  </span>
+                  <div className="flex border border-[var(--border-color)] rounded">
                     <Button
                       type={viewMode === "grid" ? "primary" : "default"}
                       size="small"
@@ -162,12 +173,21 @@ const SearchResults: React.FC<SearchResultsProps> = ({
               <Empty
                 description={
                   <div className="text-center">
-                    <p className="text-gray-500 mb-2">
-                      Không tìm thấy tài liệu nào phù hợp
+                    <p className="text-[var(--color-gray-text)] mb-2">
+                      {isShowingFallback
+                        ? `Không tìm thấy tài liệu này với từ khóa "${searchQuery}"`
+                        : "Không tìm thấy tài liệu nào phù hợp"}
                     </p>
-                    <p className="text-sm text-gray-400">
-                      Thử thay đổi từ khóa tìm kiếm hoặc bộ lọc
-                    </p>
+                    {isShowingFallback && (
+                      <p className="text-sm text-[var(--third-text-color)]">
+                        Dưới đây là đề xuất cho bạn
+                      </p>
+                    )}
+                    {!isShowingFallback && (
+                      <p className="text-sm text-[var(--third-text-color)]">
+                        Thử thay đổi từ khóa tìm kiếm hoặc bộ lọc
+                      </p>
+                    )}
                   </div>
                 }
                 className="py-12"
@@ -191,7 +211,7 @@ const SearchResults: React.FC<SearchResultsProps> = ({
                     {documents.map((document) => (
                       <div
                         key={document._id}
-                        className="cursor-pointer hover:bg-gray-50 rounded"
+                        className="cursor-pointer hover:bg-[var(--secondary-background-color)] rounded"
                         onClick={() =>
                           (window.location.href = `/document-detail/${document._id}`)
                         }
