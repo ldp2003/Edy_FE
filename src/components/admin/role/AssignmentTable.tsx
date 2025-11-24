@@ -342,7 +342,7 @@ const AssignmentTable: React.FC = () => {
                   <Space>
                     <Popconfirm
                       title="Thu hồi toàn bộ quyền quản trị"
-                      description={`Bạn có chắc chắn muốn thu hồi toàn bộ quyền quản trị của ${assignment.account.user._id}? Người dùng sẽ nhận được thông báo về hành động này.`}
+                      description={`Bạn có chắc chắn muốn thu hồi toàn bộ quyền quản trị của ${assignment.account.user.fullname}? Người dùng sẽ nhận được thông báo về hành động này.`}
                       onConfirm={() =>
                         handleRevokeAllRoles(
                           assignment.account._id,

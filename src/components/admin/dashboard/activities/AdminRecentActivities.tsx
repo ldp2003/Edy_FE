@@ -1,42 +1,8 @@
 import React from "react";
 import { Card, Avatar, Typography, Empty, Spin } from "antd";
-import type {
-  ActivityActionType,
-  TargetTypeValue,
-} from "../../../../models/activityLog";
+import type { RecentActivity } from "../../../../models/AdminStatisticsModel";
 
 const { Text } = Typography;
-
-interface RecentActivity {
-  id: string;
-  user: {
-    _id: string;
-    first_name: string;
-    last_name: string;
-    avatar?: string;
-    contact_email: string;
-  };
-  action: ActivityActionType;
-  actionLabel: string;
-  target_type: TargetTypeValue;
-  target_id: string;
-  target_title: string;
-  description: string;
-  metadata?: {
-    requestId?: string;
-    requesterId?: string;
-    isIntensive?: boolean;
-    pointsEarned?: number;
-    documentId?: string;
-    documentTitle?: string;
-  };
-  redirectTo?: string;
-  redirectParams?: {
-    requestId?: string;
-    documentId?: string;
-  };
-  timestamp: string;
-}
 
 interface AdminRecentActivitiesProps {
   activities: RecentActivity[] | undefined;
@@ -71,7 +37,7 @@ const AdminRecentActivities: React.FC<AdminRecentActivitiesProps> = ({
             <Spin size="small" />
           </div>
         ) : activities && activities.length > 0 ? (
-          <div className="space-y-0.5">
+          <div className="space-y-0.5 max-h-96 overflow-y-auto">
             {activities.map((activity) => (
               <div
                 key={activity.id}
@@ -126,14 +92,15 @@ const AdminRecentActivities: React.FC<AdminRecentActivitiesProps> = ({
                     >
                       {activity.description || "Không có mô tả"}
                     </Text>
-                    {activity.metadata?.pointsEarned && (
-                      <Text
-                        className="text-[9px] whitespace-nowrap"
-                        style={{ color: "var(--green-button-color)" }}
-                      >
-                        +{activity.metadata.pointsEarned} điểm
-                      </Text>
-                    )}
+                    {typeof activity.metadata?.pointsEarned === "number" &&
+                      activity.metadata.pointsEarned > 0 && (
+                        <Text
+                          className="text-[9px] whitespace-nowrap"
+                          style={{ color: "var(--green-button-color)" }}
+                        >
+                          +{activity.metadata.pointsEarned} điểm
+                        </Text>
+                      )}
                   </div>
                 </div>
               </div>

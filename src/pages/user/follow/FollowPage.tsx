@@ -13,19 +13,31 @@ const FollowPage: React.FC = () => {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
+  const [followingList, setFollowingList] = useState<User[]>([]);
+
+  useEffect(() => {
+    const initialFollowingList: User[] = (user?.following || []).map(
+      (following) => {
+        if (typeof following === "string") {
+          return { _id: following } as User; // Minimal User object
+        }
+        return following;
+      }
+    );
+    setFollowingList(initialFollowingList);
+  }, [user?.following]);
+
+  const updateFollowingList = (add: boolean, targetUser: User) => {
+    setFollowingList((prev) =>
+      add ? [...prev, targetUser] : prev.filter((u) => u._id !== targetUser._id)
+    );
+  };
 
   const followerList: User[] = (user?.follower || []).map((follower) => {
     if (typeof follower === "string") {
       return { _id: follower } as User; // Minimal User object
     }
     return follower;
-  });
-
-  const followingList: User[] = (user?.following || []).map((following) => {
-    if (typeof following === "string") {
-      return { _id: following } as User; // Minimal User object
-    }
-    return following;
   });
 
   const filteredFollowerList = followerList.filter(
@@ -108,7 +120,11 @@ const FollowPage: React.FC = () => {
         <Tabs.TabPane tab="Người theo dõi" key="1">
           {filteredFollowerList.length > 0 ? (
             filteredFollowerList.map((follower) => (
-              <FollowItem key={follower._id} user={follower} />
+              <FollowItem
+                key={follower._id}
+                user={follower}
+                onUpdateFollowing={updateFollowingList}
+              />
             ))
           ) : (
             <div>Không có người theo dõi nào.</div>
@@ -117,7 +133,11 @@ const FollowPage: React.FC = () => {
         <Tabs.TabPane tab="Đang theo dõi" key="2">
           {filteredFollowingList.length > 0 ? (
             filteredFollowingList.map((following) => (
-              <FollowItem key={following._id} user={following} />
+              <FollowItem
+                key={following._id}
+                user={following}
+                onUpdateFollowing={updateFollowingList}
+              />
             ))
           ) : (
             <div>Không theo dõi ai.</div>

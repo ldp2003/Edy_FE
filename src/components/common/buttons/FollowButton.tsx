@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React from "react";
-import { Button, message } from "antd";
+import { Button, message, Popconfirm } from "antd";
 import { UserPlus, UserMinus } from "lucide-react";
 import type { User } from "../../../models/user";
 import { useContext, useState, useEffect, useCallback } from "react";
@@ -12,12 +12,14 @@ interface FollowButtonProps {
   user: User;
   size?: "small" | "default";
   onFollowerCountChange?: (increment: boolean) => void;
+  onUpdateFollowing?: (add: boolean, targetUser: User) => void;
 }
 
 const FollowButton: React.FC<FollowButtonProps> = ({
   user,
   size = "default",
   onFollowerCountChange,
+  onUpdateFollowing,
 }) => {
   const { user: currentUser } = useContext(UserContext);
   const [isFollowing, setIsFollowing] = useState(false);
@@ -48,6 +50,7 @@ const FollowButton: React.FC<FollowButtonProps> = ({
         );
         setIsFollowing(true);
         onFollowerCountChange?.(true);
+        onUpdateFollowing?.(true, user);
         messageApi.success("Theo dõi thành công!");
       }
     } catch (error) {
@@ -60,25 +63,22 @@ const FollowButton: React.FC<FollowButtonProps> = ({
     currentUser?._id,
     messageApi,
     onFollowerCountChange,
-    user._id,
+    onUpdateFollowing,
+    user,
   ]);
 
   const handleUnfollow = useCallback(async () => {
     try {
-      const confirmUnfollow = window.confirm(
-        "Bạn có chắc chắn muốn bỏ theo dõi người dùng này không?"
-      );
-      if (!confirmUnfollow) return;
-
       await UserService.unfollowUser(user._id);
       setIsFollowing(false);
       onFollowerCountChange?.(false);
+      onUpdateFollowing?.(false, user);
       messageApi.success("Bỏ theo dõi thành công!");
     } catch (error) {
       console.error("Error unfollowing user:", error);
       messageApi.error("Bỏ theo dõi thất bại. Vui lòng thử lại sau.");
     }
-  }, [messageApi, onFollowerCountChange, user._id]);
+  }, [messageApi, onFollowerCountChange, onUpdateFollowing, user]);
 
   // Style cho size small (như trong FollowItem)
   const smallButtonStyle = {
@@ -111,16 +111,22 @@ const FollowButton: React.FC<FollowButtonProps> = ({
     <>
       {contextHolder}
       {isFollowing ? (
-        <Button
-          type={size === "small" ? "primary" : "default"}
-          danger={size === "small"}
-          size={buttonSize}
-          onClick={handleUnfollow}
-          style={buttonStyle}
+        <Popconfirm
+          title="Bạn có chắc chắn muốn bỏ theo dõi người dùng này không?"
+          onConfirm={handleUnfollow}
+          okText="Có"
+          cancelText="Không"
         >
-          {size === "default" && <UserMinus className="w-4 h-4 mr-2" />}
-          Bỏ theo dõi
-        </Button>
+          <Button
+            type={size === "small" ? "primary" : "default"}
+            danger={size === "small"}
+            size={buttonSize}
+            style={buttonStyle}
+          >
+            {size === "default" && <UserMinus className="w-4 h-4 mr-2" />}
+            Bỏ theo dõi
+          </Button>
+        </Popconfirm>
       ) : (
         <Button
           type="primary"
