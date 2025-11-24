@@ -12,6 +12,7 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import type { ColumnsType } from "antd/es/table";
 // import { Download, Printer } from "lucide-react";
 import type { Document } from "../../../models/document";
+import { publicModeLabels } from "../../../models/document";
 import AdminDocumentFilterSearch, {
   type AdminFilterSearchParams,
 } from "./AdminDocumentFilterSearch";
@@ -496,15 +497,27 @@ const AdminDocumentTable: React.FC = () => {
       key: "public_mode",
       align: "center",
       render: (mode: string) => {
-        const modeLabels: { [key: string]: string } = {
-          PUBLIC: "Công khai",
-          PRIVATE: "Riêng tư",
-        };
-        const text = modeLabels[mode] || mode;
+        const text =
+          publicModeLabels[mode as keyof typeof publicModeLabels] || mode;
+        let color = "var(--secondary-color)"; // default
+        switch (mode) {
+          case "PUBLIC":
+            color = "var(--green-button-color)"; // xanh lá
+            break;
+          case "PRIVATE":
+            color = "var(--red-button-color)"; // đỏ
+            break;
+          case "PRIVATE_SHARED":
+            color = "var(--primary-color)"; // xanh dương
+            break;
+          case "SHARE_ORGANIZATION":
+            color = "var(--favorite-color)"; // vàng
+            break;
+        }
         return (
           <span
             className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium"
-            style={getStatusStyle(mode.toLowerCase())}
+            style={{ backgroundColor: color, color: "white" }}
           >
             {text}
           </span>

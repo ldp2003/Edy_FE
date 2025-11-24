@@ -13,100 +13,20 @@ import {
   BarChart3,
 } from "lucide-react";
 import AdminStatisticsService from "../../../utils/AdminStatisticsService";
+import type {
+  TaskItem,
+  AdminDashboardData,
+  RecentActivity,
+} from "../../../models/AdminStatisticsModel";
 import AdminTasksToDo from "../../../components/admin/dashboard/tasks/AdminTasksToDo";
 import AdminStatsGrid from "../../../components/admin/dashboard/stats/AdminStatsGrid";
 import AdminQuickActions from "../../../components/admin/dashboard/actions/AdminQuickActions";
 import AdminRecentActivities from "../../../components/admin/dashboard/activities/AdminRecentActivities";
 import { AdminBreadcrumb } from "../../../components/admin/common/AdminBreadcrumb";
-import type {
-  ActivityActionType,
-  TargetTypeValue,
-} from "../../../models/activityLog";
-
-// API Response interfaces
-interface ApiResponse {
-  success: boolean;
-  data: {
-    statistics: {
-      total_documents: number;
-      pending_documents: number;
-      total_users: number;
-      total_downloads: number;
-      total_views: number;
-      total_organizations: number;
-      total_reports: number;
-      banned_users: number;
-      approved_documents: number;
-      active_users: number;
-      pending_reports: number;
-      total_subjects: number;
-    };
-    recent_activities: RecentActivity[];
-    tasks: TaskItem[];
-  };
-  cached: boolean;
-  last_updated: string;
-}
-
-// Recent Activity interface
-interface RecentActivity {
-  id: string;
-  user: {
-    _id: string;
-    first_name: string;
-    last_name: string;
-    avatar?: string;
-    contact_email: string;
-  };
-  action: ActivityActionType;
-  actionLabel: string;
-  target_type: TargetTypeValue;
-  target_id: string;
-  target_title: string;
-  description: string;
-  metadata?: {
-    requestId?: string;
-    requesterId?: string;
-    isIntensive?: boolean;
-    pointsEarned?: number;
-    documentId?: string;
-    documentTitle?: string;
-  };
-  redirectTo?: string;
-  redirectParams?: {
-    requestId?: string;
-    documentId?: string;
-  };
-  timestamp: string;
-}
-
-// Task interface matching API response
-interface TaskItem {
-  id: string;
-  type: string;
-  title: string;
-  description: string;
-  priority: "low" | "medium" | "high" | "urgent";
-  status: "pending" | "in_progress" | "completed";
-  createdAt: string;
-  data: {
-    requestId: string;
-    documentId: string;
-    documentTitle: string;
-    requester: {
-      _id: string;
-      first_name: string;
-      last_name: string;
-      avatar?: string;
-    };
-    aiChecked: boolean;
-    aiViolationLevel: string;
-  };
-}
 
 const AdminHomePage: React.FC = () => {
   const navigate = useNavigate();
-  const [apiData, setApiData] = useState<ApiResponse["data"] | null>(null);
+  const [apiData, setApiData] = useState<AdminDashboardData | null>(null);
   const [loading, setLoading] = useState(true);
   const [showQuickActions, setShowQuickActions] = useState(true);
 
@@ -117,124 +37,14 @@ const AdminHomePage: React.FC = () => {
         const statsResponse = await AdminStatisticsService.getDashboardStats();
         const tasksResponse = await AdminStatisticsService.getAdminTasks();
         if (statsResponse.success && statsResponse.data) {
-          // Transform recent activities to match AdminRecentActivities interface
-          const transformedActivities =
-            statsResponse.data.recent_activities.map((activity) => {
-              const nameParts = activity.user.name
-                ? activity.user.name.split(" ")
-                : ["", ""];
-              return {
-                ...activity,
-                user: {
-                  _id: activity.user.id,
-                  first_name: nameParts[0] || "",
-                  last_name: nameParts.slice(1).join(" ") || "",
-                  avatar: activity.user.avatar,
-                  contact_email: activity.user.email,
-                },
-                target_type: activity.targetType,
-                target_id: activity.targetId,
-                target_title: activity.targetTitle,
-              };
-            });
-
           setApiData({
             statistics: statsResponse.data.statistics,
-            recent_activities: transformedActivities,
+            recent_activities: statsResponse.data.recent_activities,
             tasks: tasksResponse,
           });
         }
       } catch (error) {
         console.error("Error loading dashboard data:", error);
-        // Keep fallback data
-        setApiData({
-          statistics: {
-            total_documents: 32,
-            pending_documents: 9,
-            total_users: 8,
-            total_downloads: 35,
-            total_views: 23,
-            total_organizations: 4,
-            total_reports: 0,
-            banned_users: 0,
-            approved_documents: 23,
-            active_users: 8,
-            pending_reports: 0,
-            total_subjects: 19,
-          },
-          recent_activities: [],
-          tasks: [
-            {
-              id: "690975ed1c07d5a1f5224d57",
-              type: "approval_request",
-              title: "Duyệt tài liệu: Câu chuyện xảy ra vào năm 1925",
-              description: "Yêu cầu duyệt từ Lê Đại Phát",
-              priority: "high",
-              status: "pending",
-              createdAt: "2025-11-04T03:41:33.229Z",
-              data: {
-                requestId: "690975ed1c07d5a1f5224d57",
-                documentId: "690975ec1c07d5a1f5224d35",
-                documentTitle: "Câu chuyện xảy ra vào năm 1925",
-                requester: {
-                  _id: "68c37e4014c04e538b78c890",
-                  first_name: "Lê Đại",
-                  last_name: "Phát",
-                  avatar:
-                    "https://res.cloudinary.com/dyd5381vx/image/upload/v1747882904/avatars/vagtcbo6dh4mhawpctae.jpg",
-                },
-                aiChecked: false,
-                aiViolationLevel: "",
-              },
-            },
-            {
-              id: "6908fd32565449aba21cc6bf",
-              type: "approval_request",
-              title: "Duyệt tài liệu: Câu chuyện xảy ra vào năm 1925",
-              description: "Yêu cầu duyệt từ Lê Đại Phát",
-              priority: "high",
-              status: "pending",
-              createdAt: "2025-11-03T19:06:26.611Z",
-              data: {
-                requestId: "6908fd32565449aba21cc6bf",
-                documentId: "6908fd32565449aba21cc6ad",
-                documentTitle: "Câu chuyện xảy ra vào năm 1925",
-                requester: {
-                  _id: "68f4897b0071159f6786f7f4",
-                  first_name: "Lê",
-                  last_name: "Đại Phát",
-                  avatar:
-                    "https://res.cloudinary.com/dyd5381vx/image/upload/v1747882904/avatars/vagtcbo6dh4mhawpctae.jpg",
-                },
-                aiChecked: false,
-                aiViolationLevel: "",
-              },
-            },
-            {
-              id: "6908fbde32bf2254a975b00b",
-              type: "approval_request",
-              title: "Duyệt tài liệu: Câu chuyện xảy ra vào năm 1925",
-              description: "Yêu cầu duyệt từ Lê Đại Phát",
-              priority: "high",
-              status: "pending",
-              createdAt: "2025-11-03T19:00:46.611Z",
-              data: {
-                requestId: "6908fbde32bf2254a975b00b",
-                documentId: "6908fbde32bf2254a975aff9",
-                documentTitle: "Câu chuyện xảy ra vào năm 1925",
-                requester: {
-                  _id: "68f4897b0071159f6786f7f4",
-                  first_name: "Lê",
-                  last_name: "Đại Phát",
-                  avatar:
-                    "https://res.cloudinary.com/dyd5381vx/image/upload/v1747882904/avatars/vagtcbo6dh4mhawpctae.jpg",
-                },
-                aiChecked: false,
-                aiViolationLevel: "",
-              },
-            },
-          ],
-        });
       } finally {
         setLoading(false);
       }
@@ -245,21 +55,21 @@ const AdminHomePage: React.FC = () => {
 
   // Extract data from API response
   const statsData = apiData?.statistics || {
-    total_documents: 32,
-    pending_documents: 9,
-    total_users: 8,
-    total_downloads: 35,
-    total_views: 23,
-    total_organizations: 4,
+    total_documents: 0,
+    pending_documents: 0,
+    total_users: 0,
+    total_downloads: 0,
+    total_views: 0,
+    total_organizations: 0,
     total_reports: 0,
     banned_users: 0,
-    approved_documents: 23,
-    active_users: 8,
+    approved_documents: 0,
+    active_users: 0,
     pending_reports: 0,
-    total_subjects: 19,
+    total_subjects: 0,
   };
 
-  const tasks = apiData?.tasks || [];
+  const tasks = (apiData?.tasks as TaskItem[]) || [];
 
   // Handle task click - navigate to document review page
   const handleTaskClick = (task: TaskItem) => {
@@ -270,9 +80,9 @@ const AdminHomePage: React.FC = () => {
 
   // Handle activity click - navigate based on targetType
   const handleActivityClick = (activity: RecentActivity) => {
-    switch (activity.target_type) {
+    switch (activity.targetType) {
       case "Document":
-        navigate(`/admin/documents/review/${activity.target_id}`);
+        navigate(`/admin/documents/review/${activity.targetId}`);
         break;
       case "User":
         navigate(`/admin/users`);
@@ -329,19 +139,16 @@ const AdminHomePage: React.FC = () => {
     {
       title: "Lượt tải xuống",
       value: statsData.total_downloads,
-      icon: (
-        <Download
-          className="w-6 h-6"
-          style={{ color: "var(--secondary-color)" }}
-        />
-      ),
-      color: "var(--secondary-color)",
+      icon: <Download className="w-6 h-6" style={{ color: "#ffa500" }} />,
+      color: "#ffa500",
     },
     {
       title: "Lượt xem",
       value: statsData.total_views,
-      icon: <Eye className="w-6 h-6" style={{ color: "var(--third-color)" }} />,
-      color: "var(--third-color)",
+      icon: (
+        <Eye className="w-6 h-6" style={{ color: "var(--secondary-color)" }} />
+      ),
+      color: "var(--secondary-color)",
     },
     {
       title: "Số lượng tổ chức",
@@ -358,12 +165,9 @@ const AdminHomePage: React.FC = () => {
       title: "Lượt báo cáo",
       value: statsData.total_reports,
       icon: (
-        <Flag
-          className="w-6 h-6"
-          style={{ color: "var(--red-button-color)" }}
-        />
+        <Flag className="w-6 h-6" style={{ color: "var(--favorite-color)" }} />
       ),
-      color: "var(--red-button-color)",
+      color: "var(--favorite-color)",
     },
     {
       title: "Môn học",
@@ -371,10 +175,10 @@ const AdminHomePage: React.FC = () => {
       icon: (
         <BookOpen
           className="w-6 h-6"
-          style={{ color: "var(--secondary-color)" }}
+          style={{ color: "var(--primary-color)" }}
         />
       ),
-      color: "var(--secondary-color)",
+      color: "var(--primary-color)",
     },
   ];
 
