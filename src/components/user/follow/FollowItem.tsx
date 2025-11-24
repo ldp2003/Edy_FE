@@ -5,20 +5,23 @@ import FollowButton from "../../common/buttons/FollowButton";
 
 interface FollowItemProps {
   user: User;
+  onUpdateFollowing?: (add: boolean, targetUser: User) => void;
 }
 
-const FollowItem: React.FC<FollowItemProps> = ({ user }) => {
+const FollowItem: React.FC<FollowItemProps> = ({ user, onUpdateFollowing }) => {
   const handlerOnclick = () => {
     window.location.href = `/user/${user._id}`;
   };
 
   return (
-    <div
-      className="cursor-pointer hover:bg-gray-100 hover:rounded-2xl flex text-left items-center p-4 border-b border-gray-200"
-      onClick={handlerOnclick}
-    >
-      <Avatar size={48} src={user.avatar} />
-      <div className="ml-4 flex-1">
+    <div className="flex text-left items-center p-4 border-b border-gray-200">
+      <Avatar
+        size={48}
+        src={user.avatar}
+        onClick={handlerOnclick}
+        className="cursor-pointer"
+      />
+      <div className="ml-4 flex-1 cursor-pointer" onClick={handlerOnclick}>
         <h3 className="font-semibold text-base text-[var(--primary-text-color)]">
           {user.first_name} {user.last_name}
         </h3>
@@ -44,7 +47,11 @@ const FollowItem: React.FC<FollowItemProps> = ({ user }) => {
           </p>
         </div>
       </div>
-      <FollowButton user={user} size="small" />
+      <FollowButton
+        user={user}
+        size="small"
+        onUpdateFollowing={onUpdateFollowing}
+      />
     </div>
   );
 };
