@@ -18,6 +18,7 @@ import { DocumentService } from "../utils/DocumentService";
 import { NotificationService } from "../utils/NotificationService";
 import type { Notification } from "../models/notification";
 import LoginRequiredModal from "../components/common/LoginRequiredModal";
+import LoadingScreen from "../components/common/LoadingScreen";
 
 const AuthRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const navigate = useNavigate();
@@ -28,7 +29,7 @@ const AuthRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [roles, setRoles] = useState<string[]>([]);
   const [permissions, setPermissions] = useState<string[]>([]);
   const [account, setAccount] = useState(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(true); // Tạm thời set true để test loading screen
   const [favoriteDocuments, setFavoriteDocuments] = useState<Document[]>([]);
   const [readHistory, setReadHistory] = useState<ReadHistoryItem[]>([]);
   const [personalDocuments, setPersonalDocuments] = useState<Document[]>([]);
@@ -405,11 +406,7 @@ const AuthRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 
   // Show loading only during initial authentication check
   if (isLoading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-lg">Đang tải...</div>
-      </div>
-    );
+    return <LoadingScreen />;
   }
 
   return (
