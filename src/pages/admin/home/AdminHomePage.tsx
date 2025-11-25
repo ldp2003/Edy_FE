@@ -14,9 +14,9 @@ import {
 } from "lucide-react";
 import AdminStatisticsService from "../../../utils/AdminStatisticsService";
 import type {
-  TaskItem,
   AdminDashboardData,
   RecentActivity,
+  PendingDocument,
 } from "../../../models/AdminStatisticsModel";
 import AdminTasksToDo from "../../../components/admin/dashboard/tasks/AdminTasksToDo";
 import AdminStatsGrid from "../../../components/admin/dashboard/stats/AdminStatsGrid";
@@ -69,13 +69,11 @@ const AdminHomePage: React.FC = () => {
     total_subjects: 0,
   };
 
-  const tasks = (apiData?.tasks as TaskItem[]) || [];
+  const tasks = (apiData?.tasks as PendingDocument[]) || [];
 
   // Handle task click - navigate to document review page
-  const handleTaskClick = (task: TaskItem) => {
-    if (task.type === "approval_request") {
-      navigate(`/admin/documents/review/${task.data.documentId}`);
-    }
+  const handleTaskClick = (task: PendingDocument) => {
+    navigate(`/admin/documents/review/${task._id}`);
   };
 
   // Handle activity click - navigate based on targetType

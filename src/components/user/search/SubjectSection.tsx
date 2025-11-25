@@ -94,7 +94,7 @@ const SubjectSection: React.FC = () => {
           {subjects.map((subject) => (
             <div
               key={subject._id}
-              className="border border-gray-100 rounded p-2 hover:border-blue-300 transition-colors"
+              className="border border-[var(--border-color)] rounded p-2 hover:border-[var(--primary-color)] transition-colors"
             >
               <SubjectItem
                 subject={subject as Subject}
@@ -105,9 +105,9 @@ const SubjectSection: React.FC = () => {
         </div>
       )}
 
-      <div className="mt-4 pt-4 border-t border-gray-100">
+      <div className="mt-4 pt-4 border-t border-[var(--border-color)]">
         <button
-          className="w-full text-blue-600 hover:text-blue-800 text-sm font-medium"
+          className="w-full text-[var(--primary-color)] hover:text-[var(--secondary-color)] text-sm font-medium"
           onClick={() => (window.location.href = "/subjects")}
         >
           Xem tất cả môn học →

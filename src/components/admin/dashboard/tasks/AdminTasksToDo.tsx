@@ -1,43 +1,15 @@
 import React from "react";
 import { Card, List, Tag, Button, Avatar, Typography, Empty } from "antd";
-import {
-  CheckCircleOutlined,
-  ClockCircleOutlined,
-  AlertOutlined,
-  FileTextOutlined,
-  FlagOutlined,
-} from "@ant-design/icons";
+import { FileTextOutlined } from "@ant-design/icons";
+import type { PendingDocument } from "../../../../models/AdminStatisticsModel";
 
 const { Text } = Typography;
 
 // Simple task interface matching API response
-interface TaskItem {
-  id: string;
-  type: string;
-  title: string;
-  description: string;
-  priority: "low" | "medium" | "high" | "urgent";
-  status: "pending" | "in_progress" | "completed";
-  createdAt: string;
-  data: {
-    requestId: string;
-    documentId: string;
-    documentTitle: string;
-    requester: {
-      _id: string;
-      first_name: string;
-      last_name: string;
-      avatar?: string;
-    };
-    aiChecked: boolean;
-    aiViolationLevel: string;
-  };
-}
-
 interface AdminTasksToDoProps {
-  tasks: TaskItem[];
+  tasks: PendingDocument[];
   loading?: boolean;
-  onTaskClick?: (task: TaskItem) => void;
+  onTaskClick?: (task: PendingDocument) => void;
 }
 
 const AdminTasksToDo: React.FC<AdminTasksToDoProps> = ({
@@ -45,57 +17,40 @@ const AdminTasksToDo: React.FC<AdminTasksToDoProps> = ({
   loading = false,
   onTaskClick,
 }) => {
-  // Helper function to get priority color and icon
-  const getPriorityInfo = (priority: TaskItem["priority"]) => {
-    switch (priority) {
-      case "urgent":
-        return { color: "red", icon: <AlertOutlined />, text: "Khẩn cấp" };
-      case "high":
-        return { color: "orange", icon: <FlagOutlined />, text: "Cao" };
-      case "medium":
-        return {
-          color: "blue",
-          icon: <ClockCircleOutlined />,
-          text: "Trung bình",
-        };
-      case "low":
-        return { color: "green", icon: <CheckCircleOutlined />, text: "Thấp" };
+  // Helper function to get task type info (hardcoded for approval requests)
+  const getTaskTypeInfo = () => {
+    return {
+      icon: <FileTextOutlined />,
+      color: "blue",
+      text: "Yêu cầu duyệt tài liệu",
+    };
+  };
+
+  // Helper function to get AI violation level text
+  const getAiViolationText = (level: string) => {
+    switch (level) {
+      case "LOW":
+        return "Thấp";
+      case "MEDIUM":
+        return "Trung bình";
+      case "HIGH":
+        return "Cao";
       default:
-        return {
-          color: "default",
-          icon: <ClockCircleOutlined />,
-          text: "Không xác định",
-        };
+        return level;
     }
   };
 
-  // Helper function to get task type icon and color
-  const getTaskTypeInfo = (type: TaskItem["type"]) => {
-    switch (type) {
-      case "approval_request":
-        return {
-          icon: <FileTextOutlined />,
-          color: "blue",
-          text: "Yêu cầu duyệt tài liệu",
-        };
-      case "document":
-        return {
-          icon: <FileTextOutlined />,
-          color: "blue",
-          text: "Tài liệu chờ duyệt",
-        };
-      case "report":
-        return {
-          icon: <FlagOutlined />,
-          color: "red",
-          text: "Báo cáo chờ xử lý",
-        };
+  // Helper function to get AI violation level color
+  const getAiViolationColor = (level: string) => {
+    switch (level) {
+      case "LOW":
+        return "green";
+      case "MEDIUM":
+        return "orange";
+      case "HIGH":
+        return "red";
       default:
-        return {
-          icon: <FileTextOutlined />,
-          color: "default",
-          text: "Công việc khác",
-        };
+        return "default";
     }
   };
 
@@ -128,8 +83,7 @@ const AdminTasksToDo: React.FC<AdminTasksToDoProps> = ({
             ),
           }}
           renderItem={(task) => {
-            const priorityInfo = getPriorityInfo(task.priority);
-            const typeInfo = getTaskTypeInfo(task.type);
+            const typeInfo = getTaskTypeInfo();
 
             return (
               <List.Item
@@ -154,11 +108,11 @@ const AdminTasksToDo: React.FC<AdminTasksToDoProps> = ({
               >
                 <List.Item.Meta
                   avatar={
-                    task.data.requester.avatar ? (
+                    task.user.avatar ? (
                       <Avatar
                         size={{ xs: 28, sm: 32 }}
-                        src={task.data.requester.avatar}
-                        alt={`${task.data.requester.first_name} ${task.data.requester.last_name}`}
+                        src={task.user.avatar}
+                        alt={`${task.user.first_name} ${task.user.last_name}`}
                       />
                     ) : (
                       <Avatar
@@ -188,13 +142,6 @@ const AdminTasksToDo: React.FC<AdminTasksToDoProps> = ({
                       >
                         {task.title}
                       </Text>
-                      <Tag
-                        color={priorityInfo.color}
-                        icon={priorityInfo.icon}
-                        className="self-start sm:self-auto text-[10px]"
-                      >
-                        {priorityInfo.text}
-                      </Tag>
                     </div>
                   }
                   description={
@@ -203,18 +150,16 @@ const AdminTasksToDo: React.FC<AdminTasksToDoProps> = ({
                         style={{ color: "var(--secondary-text-color)" }}
                         className="block mb-0.5 text-[10px] sm:text-xs"
                       >
-                        {task.description}
-                        {task.data.aiChecked && (
+                        {`${task.user.first_name} ${task.user.last_name} • ${task.subject.name} • ${task.organization.name} • ${task.level} • ${task.file_type} • ${task.page} trang`}
+                        {task.ai_violation_level && (
                           <span className="ml-2">
                             <Tag
-                              color={
-                                task.data.aiViolationLevel === "MEDIUM"
-                                  ? "orange"
-                                  : "red"
-                              }
+                              color={getAiViolationColor(
+                                task.ai_violation_level
+                              )}
                               className="text-[9px]"
                             >
-                              AI: {task.data.aiViolationLevel}
+                              {getAiViolationText(task.ai_violation_level)}
                             </Tag>
                           </span>
                         )}

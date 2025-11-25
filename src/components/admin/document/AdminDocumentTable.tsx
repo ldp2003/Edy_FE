@@ -76,6 +76,8 @@ const AdminDocumentTable: React.FC = () => {
       "user",
       "public_mode",
       "status",
+      "subject",
+      "organization",
     ])
   );
 
@@ -277,6 +279,7 @@ const AdminDocumentTable: React.FC = () => {
       key: "index",
       align: "center",
       fixed: "left",
+      onHeaderCell: () => ({ style: { textAlign: "center" } }),
     },
     {
       title: "Tên tài liệu",
@@ -286,6 +289,7 @@ const AdminDocumentTable: React.FC = () => {
       width: 200,
       sorter: true,
       sortDirections: ["ascend", "descend"],
+      onHeaderCell: () => ({ style: { textAlign: "center" } }),
       render: (text: string, record: DocumentDisplay) => (
         <span
           onClick={() => handleRowClick(record)}
@@ -308,6 +312,7 @@ const AdminDocumentTable: React.FC = () => {
       dataIndex: "doc_type",
       key: "doc_type",
       align: "center",
+      onHeaderCell: () => ({ style: { textAlign: "center" } }),
       render: (type: string) => {
         const typeLabels: { [key: string]: string } = {
           RESEARCH_REPORT: "Nghiên cứu",
@@ -336,6 +341,7 @@ const AdminDocumentTable: React.FC = () => {
       dataIndex: "file_type",
       key: "file_type",
       align: "center",
+      onHeaderCell: () => ({ style: { textAlign: "center" } }),
       render: (file_type: string) => {
         const fileTypeLabels: { [key: string]: string } = {
           PDF: "PDF",
@@ -360,6 +366,7 @@ const AdminDocumentTable: React.FC = () => {
       dataIndex: "level",
       key: "level",
       align: "center",
+      onHeaderCell: () => ({ style: { textAlign: "center" } }),
       render: (level: string) => {
         const levelLabels: { [key: string]: string } = {
           STUDENT: "Học sinh",
@@ -384,6 +391,7 @@ const AdminDocumentTable: React.FC = () => {
       dataIndex: "intensive",
       key: "intensive",
       align: "center",
+      onHeaderCell: () => ({ style: { textAlign: "center" } }),
       render: (intensive: boolean) => (
         <span
           className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium"
@@ -400,6 +408,7 @@ const AdminDocumentTable: React.FC = () => {
       align: "center",
       sorter: true,
       sortDirections: ["ascend", "descend"],
+      onHeaderCell: () => ({ style: { textAlign: "center" } }),
     },
     {
       title: "Bình luận",
@@ -408,6 +417,7 @@ const AdminDocumentTable: React.FC = () => {
       align: "center",
       sorter: true,
       sortDirections: ["ascend", "descend"],
+      onHeaderCell: () => ({ style: { textAlign: "center" } }),
     },
     {
       title: "Đánh giá",
@@ -415,6 +425,7 @@ const AdminDocumentTable: React.FC = () => {
       align: "center",
       sorter: true,
       sortDirections: ["ascend", "descend"],
+      onHeaderCell: () => ({ style: { textAlign: "center" } }),
       render: (_, record: DocumentDisplay) => {
         const rating = calculateDocumentRating(
           record.like || 0,
@@ -446,6 +457,7 @@ const AdminDocumentTable: React.FC = () => {
       align: "center",
       sorter: true,
       sortDirections: ["ascend", "descend"],
+      onHeaderCell: () => ({ style: { textAlign: "center" } }),
     },
     {
       title: "Ngày tạo",
@@ -453,6 +465,7 @@ const AdminDocumentTable: React.FC = () => {
       key: "createdAt",
       sorter: true,
       sortDirections: ["ascend", "descend"],
+      onHeaderCell: () => ({ style: { textAlign: "center" } }),
       render: (text: string) => {
         const date = new Date(text);
         return date.toLocaleDateString("vi-VN", {
@@ -471,6 +484,7 @@ const AdminDocumentTable: React.FC = () => {
       dataIndex: "user",
       key: "user",
       align: "center",
+      onHeaderCell: () => ({ style: { textAlign: "center" } }),
       render: (user: {
         avatar: string;
         first_name: string;
@@ -496,6 +510,7 @@ const AdminDocumentTable: React.FC = () => {
       dataIndex: "public_mode",
       key: "public_mode",
       align: "center",
+      onHeaderCell: () => ({ style: { textAlign: "center" } }),
       render: (mode: string) => {
         const text =
           publicModeLabels[mode as keyof typeof publicModeLabels] || mode;
@@ -524,12 +539,44 @@ const AdminDocumentTable: React.FC = () => {
         );
       },
     },
+
+    {
+      title: "Môn học",
+      dataIndex: "subject",
+      key: "subject",
+      align: "left",
+      onHeaderCell: () => ({ style: { textAlign: "center" } }),
+      render: (subject: { name: string }) => {
+        if (!subject) return "N/A";
+        return (
+          <span className="text-sm text-left" title={subject.name}>
+            {subject.name}
+          </span>
+        );
+      },
+    },
+    {
+      title: "Tổ chức",
+      dataIndex: "organization",
+      key: "organization",
+      align: "left",
+      onHeaderCell: () => ({ style: { textAlign: "center" } }),
+      render: (organization: { name: string }) => {
+        if (!organization) return "N/A";
+        return (
+          <span className="text-sm" title={organization.name}>
+            {organization.name}
+          </span>
+        );
+      },
+    },
     {
       title: "Trạng thái",
       dataIndex: "status",
       key: "status",
       align: "center",
       fixed: "right",
+      onHeaderCell: () => ({ style: { textAlign: "center" } }),
       render: (status: string) => {
         const statusLabels: { [key: string]: string } = {
           PENDING: "Chờ duyệt",
@@ -631,22 +678,41 @@ const AdminDocumentTable: React.FC = () => {
     { key: "user", label: "Người đăng tải" },
     { key: "public_mode", label: "Chế độ" },
     { key: "status", label: "Trạng thái", disabled: true },
+    { key: "subject", label: "Môn học" },
+    { key: "organization", label: "Tổ chức" },
   ];
 
   // Dropdown menu for column visibility
   const columnVisibilityMenu = {
-    items: columnOptions.map((option) => ({
-      key: option.key,
-      label: (
-        <Checkbox
-          checked={visibleColumns.has(option.key)}
-          disabled={option.disabled}
-          onChange={(e) => toggleColumnVisibility(option.key, e.target.checked)}
-        >
-          {option.label}
-        </Checkbox>
-      ),
-    })),
+    items: [
+      {
+        key: "column-grid",
+        label: (
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "1fr 1fr",
+              gap: "8px",
+              width: "300px",
+            }}
+          >
+            {columnOptions.map((option) => (
+              <Checkbox
+                key={option.key}
+                checked={visibleColumns.has(option.key)}
+                disabled={option.disabled}
+                onChange={(e) =>
+                  toggleColumnVisibility(option.key, e.target.checked)
+                }
+                onClick={(e) => e.stopPropagation()}
+              >
+                {option.label}
+              </Checkbox>
+            ))}
+          </div>
+        ),
+      },
+    ],
   };
 
   return (

@@ -72,7 +72,7 @@ const SearchDocumentCard: React.FC<SearchDocumentCardProps> = ({
         <img
           src={document.cover_page || "/public/image/default_cover.png"}
           alt={document.title}
-          className="h-40 m-3 w-full object-fill rounded-md bg-white"
+          className="h-40 m-3 w-full object-fill rounded-md bg-[var(--primary-background-color)]"
           onError={handleImageError}
         />
       </div>
@@ -82,19 +82,21 @@ const SearchDocumentCard: React.FC<SearchDocumentCardProps> = ({
           <h3 className="font-bold lg:text-xs mb-2 line-clamp-2 min-h-8">
             {document.title}
           </h3>
-          <p className="text-xs mb-3 truncate">
+          <p className="text-xs mb-3 truncate text-[var(--secondary-text-color)]">
             {document.page || 0} trang • {document.view || 0} lượt xem •{" "}
             {document.download_count || 0} lượt tải
           </p>
         </div>
         <button
-          className="w-full flex bg-white items-center justify-center gap-2 px-3 py-1 font-bold text-xs border border-gray-300 rounded-md cursor-pointer hover:bg-gray-50 transition-colors"
+          className="w-full flex bg-[var(--primary-background-color)] items-center justify-center gap-2 px-3 py-1 font-bold text-xs border border-[var(--border-color)] rounded-md cursor-pointer hover:bg-[var(--secondary-background-color)] transition-colors"
           style={{ color: "var(--secondary-text-color)" }}
           onClick={handleSaveClick}
         >
           <Heart
             className={`w-3 h-3 ${
-              isFavorite ? "fill-red-500 text-red-500" : ""
+              isFavorite
+                ? "fill-[var(--red-button-color)] text-[var(--red-button-color)]"
+                : ""
             }`}
           />
           {isFavorite ? "Đã lưu" : "Lưu"}

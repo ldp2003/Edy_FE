@@ -178,19 +178,21 @@ const DocumentActions: React.FC<DocumentActionsProps> = ({
           : ""
       }`}
     >
-      <DownloadButton
-        point={
-          account?.is_vip
-            ? document.intensive
-              ? 5
-              : 3
-            : document.intensive
-            ? 6
-            : 4
-        }
-        documentId={document._id}
-        documentTitle={document.title}
-      />
+      {!isUser && (
+        <DownloadButton
+          point={
+            account?.is_vip
+              ? document.intensive
+                ? 5
+                : 3
+              : document.intensive
+              ? 6
+              : 4
+          }
+          documentId={document._id}
+          documentTitle={document.title}
+        />
+      )}
 
       <div className="flex items-center space-x-4">
         {!isUser && (

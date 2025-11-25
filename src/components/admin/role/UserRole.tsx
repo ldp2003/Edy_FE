@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import type { Role } from "../../../models/role";
 import { USER_ROLES } from "../../../constants/RoleConstants";
+import LoadingScreen from "../../common/LoadingScreen";
 
 const UserRole: React.FC = () => {
   const [roles, setRoles] = useState<Role[]>([]);
@@ -26,11 +27,7 @@ const UserRole: React.FC = () => {
   }, []);
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center p-8">
-        <div className="text-lg">Đang tải...</div>
-      </div>
-    );
+    return <LoadingScreen />;
   }
 
   return (
