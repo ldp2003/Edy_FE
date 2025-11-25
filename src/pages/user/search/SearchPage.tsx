@@ -46,6 +46,7 @@ const SearchPage: React.FC = () => {
   const [viewMode, setViewMode] = useState<ViewMode>("grid");
   const [currentTab, setCurrentTab] = useState<TabMode>("all");
   const isUpdatingFromCode = useRef(false);
+  const [lastSubjectsQuery, setLastSubjectsQuery] = useState<string>("");
 
   // Extract filters from URL
   const getFiltersFromURL = useCallback((): SearchFilters => {
@@ -105,6 +106,11 @@ const SearchPage: React.FC = () => {
 
     // Skip fetching documents for subjects tab, only show subjects
     if (currentTab === "subjects") {
+      // If subjects are already fetched for the current query, skip fetching
+      if (lastSubjectsQuery === filters.search && subjects.length > 0) {
+        setLoading(false);
+        return;
+      }
       setLoading(true);
       try {
         const subRes = await SubjectService.searchSubjects(
@@ -112,6 +118,7 @@ const SearchPage: React.FC = () => {
         );
         console.log("Fetched subjects:", subRes);
         setSubjects(subRes || []);
+        setLastSubjectsQuery(filters.search || "");
         setTotalDocuments(6); // Mock count for subjects
       } catch (error) {
         console.error("Error fetching subjects:", error);
@@ -139,6 +146,7 @@ const SearchPage: React.FC = () => {
       console.log("Fetched subjects:", subRes);
       setDocuments(response.documents || []);
       setSubjects(subRes || []);
+      setLastSubjectsQuery(filters.search || "");
       setTotalDocuments(response.total || 0);
       setIsShowingFallback(false);
 
@@ -254,7 +262,14 @@ const SearchPage: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  }, [filters, currentPage, pageSize, currentTab]);
+  }, [
+    filters,
+    currentPage,
+    pageSize,
+    currentTab,
+    lastSubjectsQuery,
+    subjects.length,
+  ]);
 
   // Update URL when filters change
   const updateURL = (newFilters: SearchFilters, newPage?: number) => {
@@ -297,9 +312,6 @@ const SearchPage: React.FC = () => {
       newSearchParams.set("ordering", newFilters.ordering);
     if (newFilters.order)
       newSearchParams.set("order", newFilters.order.toString());
-
-    // Add current tab to URL
-    if (currentTab !== "all") newSearchParams.set("tab", currentTab);
 
     const pageToSet = newPage || currentPage;
     if (pageToSet > 1) newSearchParams.set("page", pageToSet.toString());
@@ -355,13 +367,9 @@ const SearchPage: React.FC = () => {
     setIsShowingFallback(false);
     setSubjects([]);
 
-    // Update URL with new tab
+    // Remove tab from URL to avoid URL changes
     const newSearchParams = new URLSearchParams(searchParams);
-    if (tab !== "all") {
-      newSearchParams.set("tab", tab);
-    } else {
-      newSearchParams.delete("tab");
-    }
+    newSearchParams.delete("tab");
     newSearchParams.delete("page"); // Reset page to 1
     setSearchParams(newSearchParams);
   };
@@ -392,15 +400,14 @@ const SearchPage: React.FC = () => {
     }
   }, [searchParams, getFiltersFromURL, filters]);
 
-  // Handle tab state from URL
+  // Remove tab from URL on mount if present
   useEffect(() => {
-    const tabFromURL = searchParams.get("tab") as TabMode;
-    if (tabFromURL && tabFromURL !== currentTab) {
-      setCurrentTab(tabFromURL);
-    } else if (!tabFromURL && currentTab !== "all") {
-      setCurrentTab("all");
+    const newSearchParams = new URLSearchParams(searchParams);
+    if (newSearchParams.has("tab")) {
+      newSearchParams.delete("tab");
+      setSearchParams(newSearchParams);
     }
-  }, [searchParams, currentTab]);
+  }, [searchParams, setSearchParams]);
 
   return (
     <div className="min-h-screen">

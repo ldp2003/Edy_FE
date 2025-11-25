@@ -642,6 +642,7 @@ const AdminDocumentTable: React.FC = () => {
           checked={visibleColumns.has(option.key)}
           disabled={option.disabled}
           onChange={(e) => toggleColumnVisibility(option.key, e.target.checked)}
+          onClick={(e) => e.stopPropagation()}
         >
           {option.label}
         </Checkbox>

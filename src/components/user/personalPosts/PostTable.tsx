@@ -712,6 +712,7 @@ const PostTable: React.FC<PostTableProps> = ({
           checked={visibleColumns.has(option.key)}
           disabled={option.disabled}
           onChange={(e) => toggleColumnVisibility(option.key, e.target.checked)}
+          onClick={(e) => e.stopPropagation()}
         >
           {option.label}
         </Checkbox>
@@ -761,6 +762,9 @@ const PostTable: React.FC<PostTableProps> = ({
             scroll={{ x: 1200, y: 600 }}
             bordered
             sticky={{ offsetHeader: 0 }}
+            onRow={(record) => ({
+              title: record.title,
+            })}
           />
         </div>
       </div>
