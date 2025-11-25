@@ -182,7 +182,7 @@ const PointMechanism: React.FC<PointMechanismProps> = ({ onViewMore }) => {
         {/* Cơ chế cảnh cáo (Strike) */}
         <div>
           <h4 className="text-xs md:text-sm font-semibold text-orange-600 mb-2">
-            Cơ chế cảnh cáo (Strike)
+            Cơ chế cảnh cáo
           </h4>
 
           <div className="mb-4 p-3 bg-orange-50 border border-orange-200 rounded-md">
@@ -194,12 +194,11 @@ const PointMechanism: React.FC<PointMechanismProps> = ({ onViewMore }) => {
               <li>Đăng tài liệu vi phạm bản quyền</li>
               <li>Đăng nội dung không phù hợp (bạo lực, spam)</li>
               <li>Spam tài liệu rác để câu điểm/like</li>
-              <li>Báo cáo sai sự thật nhiều lần (false report)</li>
+              <li>Báo cáo sai sự thật nhiều lần</li>
             </ul>
             <p className="text-xs md:text-sm text-[var(--third-text-color)] mt-2">
-              ⇒ Quản trị viên có thể gửi cảnh cáo và trừ điểm hạng (rank_point),
-              tăng cảnh cáo lên (strike). Tùy vào strike, tài khoản có thể bị
-              hạn chế.
+              ⇒ Quản trị viên có thể gửi cảnh cáo và trừ điểm hạng, tăng cảnh
+              cáo lên. Tùy vào số lần cảnh cáo, tài khoản có thể bị hạn chế.
             </p>
           </div>
 
@@ -254,7 +253,7 @@ const PointMechanism: React.FC<PointMechanismProps> = ({ onViewMore }) => {
             <p className="text-xs md:text-sm text-blue-800">
               <strong>Lưu ý:</strong> Sau 60 ngày không phát hiện vi phạm, tài
               khoản còn hoạt động và không bị khóa tạm thời sẽ được giảm 1
-              strike.
+              cảnh cáo.
             </p>
           </div>
         </div>

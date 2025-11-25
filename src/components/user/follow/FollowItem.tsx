@@ -33,7 +33,7 @@ const FollowItem: React.FC<FollowItemProps> = ({ user, onUpdateFollowing }) => {
           </p>
           <span className="text-[var(--third-text-color)] text-xl">•</span>
           <p>
-            Bài đăng:{" "}
+            Tài liệu:{" "}
             <span className="font-semibold text-[var(--secondary-text-color)]">
               {user.doc_count}
             </span>

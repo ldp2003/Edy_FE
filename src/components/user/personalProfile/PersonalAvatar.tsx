@@ -45,7 +45,7 @@ const PersonalAvatar: React.FC = () => {
           onClick={handlePostsClick}
         >
           <div className="font-bold">{user?.doc_count}</div>
-          <div className="text-gray-500">Bài đăng</div>
+          <div className="text-gray-500">Tài liệu</div>
         </div>
       </div>
     </div>

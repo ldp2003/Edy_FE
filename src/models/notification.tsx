@@ -19,6 +19,12 @@ export const NotificationType = {
   SYSTEM: "SYSTEM",
   COMMENT: "COMMENT",
   REPLY: "REPLY",
+  ACCESS_REQUEST: "ACCESS_REQUEST",
+  ACCESS_GRANTED: "ACCESS_GRANTED",
+  ACCESS_DENIED: "ACCESS_DENIED",
+  POINTS_EARNED: "POINTS_EARNED",
+  POINTS_DEDUCTED: "POINTS_DEDUCTED",
+  USER_BANNED: "USER_BANNED",
 } as const;
 
 export type NotificationType =
@@ -29,6 +35,7 @@ export const RedirectToType = {
   COMMENT: "COMMENT",
   USER: "USER",
   SYSTEM: "SYSTEM",
+  POINT: "POINT",
   NONE: "NONE",
 } as const;
 

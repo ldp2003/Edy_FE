@@ -24,12 +24,15 @@ const PostGridView: React.FC<PostGridViewProps> = ({ data, loading }) => {
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-4">
         {displayData.map((document) => {
           const isRejected = document.status === "REJECTED";
+          const isDeleted = document.is_deleted;
+          const isDisabled = isRejected || isDeleted;
+
           return (
             <div
               key={document._id}
-              className={isRejected ? "cursor-not-allowed opacity-60" : ""}
+              className={isDisabled ? "cursor-not-allowed opacity-60" : ""}
               onClick={(e) => {
-                if (isRejected) {
+                if (isDisabled) {
                   e.preventDefault();
                   e.stopPropagation();
                 }
@@ -38,11 +41,11 @@ const PostGridView: React.FC<PostGridViewProps> = ({ data, loading }) => {
               <DocumentCard
                 document={document}
                 navigationPath={
-                  isRejected
+                  isDisabled
                     ? undefined
                     : `/personal-posts/document-detail/${document._id}`
                 }
-                disableClick={!!isRejected}
+                disableClick={isDisabled}
               />
             </div>
           );

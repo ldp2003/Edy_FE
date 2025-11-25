@@ -118,6 +118,10 @@ export interface Document {
     reviewed_at: string;
     message: string;
   };
+  
+  
+  
+  
   is_delete_by_admin?: boolean;
   delete_by_admin_reason?: string;
   delete_by_admin_at?: string;
