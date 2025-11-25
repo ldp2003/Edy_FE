@@ -5,7 +5,8 @@ import { UserService } from "../../../utils/UserService";
 import DocumentCard from "../document/documentCard/DocumentCard";
 import DocumentListItem from "../document/documentCard/DocumentListItem";
 import FavoriteHeader from "./FavoriteHeader";
-import { FavoriteLoading, FavoriteEmpty } from "./FavoriteStates";
+import { FavoriteEmpty } from "./FavoriteStates";
+import LoadingScreen from "../../common/LoadingScreen";
 
 const FavoriteDocuments: React.FC = () => {
   const { favoriteDocuments, setFavoriteDocuments } = useContext(UserContext);
@@ -49,7 +50,7 @@ const FavoriteDocuments: React.FC = () => {
 
   // Show loading state
   if (loading) {
-    return <FavoriteLoading loading={loading} />;
+    return <LoadingScreen />;
   }
 
   // Show empty state

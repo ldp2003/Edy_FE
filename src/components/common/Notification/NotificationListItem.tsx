@@ -34,11 +34,46 @@ const NotificationListItem: React.FC<NotificationListItemProps> = ({
     }
 
     const docId = notification?.doc?._id;
-    const targetPath = isAdminRole
-      ? `/admin/documents/review/${docId ?? ""}`
-      : `/personal-posts/document-detail/${docId ?? ""}`;
+    const cmtId = notification?.cmt?._id;
+    let targetPath = "";
 
-    if (docId) {
+    if (notification.type === "ACCESS_DENIED") {
+      targetPath = "/personal-posts";
+    } else if (notification.type === "ACCESS_GRANTED" && docId) {
+      targetPath = `/personal-posts/document-detail/${docId}`;
+    } else {
+      switch (notification.redirectTo) {
+        case "DOCUMENT":
+          if (isAdminRole) {
+            targetPath = `/admin/documents/review/${docId ?? ""}`;
+          } else {
+            targetPath = `/personal-posts/document-detail/${docId ?? ""}`;
+          }
+          break;
+        case "COMMENT":
+          targetPath = `/personal-posts/document-detail/${
+            docId ?? ""
+          }?comment=${cmtId}`;
+          break;
+        case "USER":
+          const userId =
+            typeof notification.user === "string"
+              ? notification.user
+              : notification.user._id;
+          targetPath = `/user/${userId}`;
+          break;
+        case "POINT":
+          targetPath = "/point-management?showHistory=true";
+          break;
+        case "SYSTEM":
+        case "NONE":
+        default:
+          // Không điều hướng
+          return;
+      }
+    }
+
+    if (targetPath) {
       navigate(targetPath);
     }
   };
