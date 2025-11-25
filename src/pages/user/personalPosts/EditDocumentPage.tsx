@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { message, Spin } from "antd";
+import { message } from "antd";
 import { DocumentService } from "../../../utils/DocumentService";
 import type { Document } from "../../../models/document";
 import EditInformationForm from "../../../components/user/personalPosts/EditInformationForm";
