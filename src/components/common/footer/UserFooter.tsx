@@ -48,7 +48,7 @@ const UserFooter: React.FC = () => {
                   to="/personal-posts"
                   className="text-xs md:text-sm hover:text-blue-400 transition-colors"
                 >
-                  Bài đăng của tôi
+                  Tài liệu của tôi
                 </Link>
               </li>
               <li>

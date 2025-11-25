@@ -89,7 +89,7 @@ export function UserProfile({ isCompact }: UserProfileProps) {
             <div className="text-xs font-bold hover:text-[var(--primary-color)]">
               {user?.doc_count}
             </div>
-            <div className="text-[10px]">Bài đăng</div>
+            <div className="text-[10px]">Tài liệu</div>
           </div>
         </div>
       )}

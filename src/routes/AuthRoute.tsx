@@ -101,7 +101,7 @@ const AuthRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     ];
 
     // Kiểm tra các trang động
-    if (pathname.startsWith("/document-detail/")) return true; // chi tiết bài đăng
+    if (pathname.startsWith("/document-detail/")) return true; // chi tiết Tài liệu
     if (pathname.startsWith("/organization/")) return true; // chi tiết tổ chức
     if (pathname.startsWith("/subject/")) return true; // môn học
 

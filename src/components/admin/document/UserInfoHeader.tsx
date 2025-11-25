@@ -89,7 +89,7 @@ const UserInfoHeader: React.FC<UserInfoHeaderProps> = ({ user }) => {
               {(user.doc_count || 0).toLocaleString()}
             </div>
             <div className="text-xs text-[var(--primary-text-color)]">
-              Bài đăng
+              Tài liệu
             </div>
           </div>
           <div className="text-center">
@@ -188,7 +188,7 @@ const UserInfoHeader: React.FC<UserInfoHeaderProps> = ({ user }) => {
               {(user.doc_count || 0).toLocaleString()}
             </div>
             <div className="text-xs text-[var(--primary-text-color)]">
-              Bài đăng
+              Tài liệu
             </div>
           </div>
 
