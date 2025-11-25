@@ -8,6 +8,7 @@ import { UserContext } from "../../../contexts/UserContext";
 import type { Document } from "../../../models/document";
 import type { Subject } from "../../../models/subject";
 import { message } from "antd";
+import LoadingScreen from "../../../components/common/LoadingScreen";
 
 export default function HomePage() {
   const [featuredDocuments, setFeaturedDocuments] = useState<Document[]>([]);
@@ -47,9 +48,11 @@ export default function HomePage() {
 
         // Fetch related documents (random selection)
         setLoadingRelated(true);
-        const relatedResponse = await DocumentService.fetchRecommendedDocuments({
-          limit: 6,
-        });
+        const relatedResponse = await DocumentService.fetchRecommendedDocuments(
+          {
+            limit: 6,
+          }
+        );
         setRelatedDocuments(relatedResponse.documents || []);
         setLoadingRelated(false);
 
@@ -171,14 +174,7 @@ export default function HomePage() {
   };
 
   if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Đang tải dữ liệu...</p>
-        </div>
-      </div>
-    );
+    return <LoadingScreen />;
   }
 
   return (

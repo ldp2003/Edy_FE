@@ -86,18 +86,10 @@ const UserFooter: React.FC = () => {
             <ul className="space-y-1 md:space-y-2">
               <li>
                 <Link
-                  to="/upload"
+                  to="/upload-document"
                   className="text-xs md:text-sm hover:text-blue-400 transition-colors"
                 >
                   Đăng tài liệu
-                </Link>
-              </li>
-              <li>
-                <Link
-                  to="/subjects"
-                  className="text-xs md:text-sm hover:text-blue-400 transition-colors"
-                >
-                  Môn học
                 </Link>
               </li>
               <li>
@@ -110,7 +102,7 @@ const UserFooter: React.FC = () => {
               </li>
               <li>
                 <Link
-                  to="/profile"
+                  to="/personal-profile"
                   className="text-xs md:text-sm hover:text-blue-400 transition-colors"
                 >
                   Hồ sơ của tôi

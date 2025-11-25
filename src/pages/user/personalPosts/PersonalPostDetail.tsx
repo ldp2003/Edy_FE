@@ -8,6 +8,7 @@ import DocumentActions from "../../../components/user/document/documentDetail/Do
 import DocumentViewer from "../../../components/user/document/documentView/DocumentViewer";
 import { DocumentService } from "../../../utils/DocumentService";
 import type { Document } from "../../../models/document";
+import LoadingScreen from "../../../components/common/LoadingScreen";
 
 const PersonalPostDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -135,14 +136,7 @@ const PersonalPostDetail: React.FC = () => {
   };
 
   if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Đang tải tài liệu...</p>
-        </div>
-      </div>
-    );
+    return <LoadingScreen />;
   }
 
   if (!document) {
