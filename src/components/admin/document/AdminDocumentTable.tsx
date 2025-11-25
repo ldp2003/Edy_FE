@@ -76,6 +76,10 @@ const AdminDocumentTable: React.FC = () => {
       "user",
       "public_mode",
       "status",
+      "organization",
+      "subject",
+      "page",
+      "updatedAt",
     ])
   );
 
@@ -549,6 +553,152 @@ const AdminDocumentTable: React.FC = () => {
         );
       },
     },
+    {
+      title: "Tác giả",
+      dataIndex: "author",
+      key: "author",
+      align: "center",
+      render: (author: string[]) => {
+        if (!author || author.length === 0) return "N/A";
+        return (
+          <span className="text-sm" title={author.join(", ")}>
+            {author.join(", ")}
+          </span>
+        );
+      },
+    },
+    {
+      title: "Bìa",
+      dataIndex: "cover_page",
+      key: "cover_page",
+      align: "center",
+      render: (cover_page: string) => {
+        if (!cover_page) return "N/A";
+        return (
+          <img
+            src={cover_page}
+            alt="Cover"
+            className="w-12 h-12 object-cover rounded"
+          />
+        );
+      },
+    },
+    {
+      title: "Không thích",
+      dataIndex: "dislike",
+      key: "dislike",
+      align: "center",
+      sorter: true,
+      sortDirections: ["ascend", "descend"],
+    },
+    {
+      title: "Ngày duyệt cuối",
+      dataIndex: "last_approved_at",
+      key: "last_approved_at",
+      align: "center",
+      sorter: true,
+      sortDirections: ["ascend", "descend"],
+      render: (text: string) => {
+        if (!text) return "N/A";
+        const date = new Date(text);
+        return date.toLocaleDateString("vi-VN", {
+          day: "2-digit",
+          month: "2-digit",
+          year: "numeric",
+          hour: "2-digit",
+          minute: "2-digit",
+        });
+      },
+    },
+    {
+      title: "Tổ chức",
+      dataIndex: "organization",
+      key: "organization",
+      align: "center",
+      render: (organization: { name: string }) => {
+        if (!organization) return "N/A";
+        return (
+          <span className="text-sm" title={organization.name}>
+            {organization.name}
+          </span>
+        );
+      },
+    },
+    {
+      title: "Số trang",
+      dataIndex: "page",
+      key: "page",
+      align: "center",
+      sorter: true,
+      sortDirections: ["ascend", "descend"],
+    },
+    {
+      title: "Năm xuất bản",
+      dataIndex: "published_year",
+      key: "published_year",
+      align: "center",
+      sorter: true,
+      sortDirections: ["ascend", "descend"],
+      render: (year: number) => year || "N/A",
+    },
+    {
+      title: "Nhà xuất bản",
+      dataIndex: "publisher",
+      key: "publisher",
+      align: "center",
+      render: (publisher: string) => publisher || "N/A",
+    },
+    {
+      title: "Môn học",
+      dataIndex: "subject",
+      key: "subject",
+      align: "center",
+      render: (subject: { name: string }) => {
+        if (!subject) return "N/A";
+        return (
+          <span className="text-sm" title={subject.name}>
+            {subject.name}
+          </span>
+        );
+      },
+    },
+    {
+      title: "Ngày cập nhật",
+      dataIndex: "updatedAt",
+      key: "updatedAt",
+      align: "center",
+      sorter: true,
+      sortDirections: ["ascend", "descend"],
+      render: (text: string) => {
+        const date = new Date(text);
+        return date.toLocaleDateString("vi-VN", {
+          day: "2-digit",
+          month: "2-digit",
+          year: "numeric",
+          hour: "2-digit",
+          minute: "2-digit",
+        });
+      },
+    },
+    {
+      title: "Liên kết file",
+      dataIndex: "url",
+      key: "url",
+      align: "center",
+      render: (url: string) => {
+        if (!url) return "N/A";
+        return (
+          <a
+            href={url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-blue-600 hover:text-blue-800 underline text-sm"
+          >
+            Xem file
+          </a>
+        );
+      },
+    },
   ];
 
   // Transform API data to display format
@@ -631,6 +781,17 @@ const AdminDocumentTable: React.FC = () => {
     { key: "user", label: "Người đăng tải" },
     { key: "public_mode", label: "Chế độ" },
     { key: "status", label: "Trạng thái", disabled: true },
+    { key: "author", label: "Tác giả" },
+    { key: "cover_page", label: "Bìa" },
+    { key: "dislike", label: "Không thích" },
+    { key: "last_approved_at", label: "Ngày duyệt cuối" },
+    { key: "organization", label: "Tổ chức" },
+    { key: "page", label: "Số trang" },
+    { key: "published_year", label: "Năm xuất bản" },
+    { key: "publisher", label: "Nhà xuất bản" },
+    { key: "subject", label: "Môn học" },
+    { key: "updatedAt", label: "Ngày cập nhật" },
+    { key: "url", label: "Liên kết file" },
   ];
 
   // Dropdown menu for column visibility
