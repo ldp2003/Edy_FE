@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { Card, Spin, message, Empty, Pagination } from "antd";
+import { Spin, message, Empty, Pagination } from "antd";
 import SubjectService from "../../../utils/SubjectService";
 import DocumentCard from "../../user/document/documentCard/DocumentCard";
 import type { Document } from "../../../models/document";
@@ -23,7 +23,10 @@ const SubjectDocumentsList: React.FC<SubjectDocumentsListProps> = ({
   const loadDocuments = useCallback(async () => {
     try {
       setLoading(true);
-      const response = await SubjectService.getDocumentsBySubject(subjectId);
+      const response = await SubjectService.getDocumentsBySubject(
+        subjectId,
+        true
+      );
 
       // Assuming the response has documents array and pagination info
       if (response && Array.isArray(response)) {
@@ -61,25 +64,27 @@ const SubjectDocumentsList: React.FC<SubjectDocumentsListProps> = ({
 
   if (loading) {
     return (
-      <Card title={`Tài liệu môn ${subjectName}`}>
+      <div className="bg-white p-6 rounded-lg shadow-sm border border-[color:var(--border-color)]">
         <div className="flex justify-center items-center py-12">
           <Spin size="large" />
         </div>
-      </Card>
+      </div>
     );
   }
 
   return (
     <>
       {contextHolder}
-      <Card
-        title={`Tài liệu môn ${subjectName}`}
-        extra={
-          <span className="text-sm text-[var(--secondary-text-color)]">
+      <div className="bg-white p-6 rounded-lg shadow-sm border border-[color:var(--border-color)]">
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-xl font-bold text-[var(--primary-text-color)]">
+            Tài liệu môn {subjectName}
+          </h2>
+          <div className="text-sm text-[var(--secondary-text-color)] bg-gray-100 px-3 py-1 rounded">
             Tổng cộng: {totalDocuments} tài liệu
-          </span>
-        }
-      >
+          </div>
+        </div>
+
         {documents.length === 0 ? (
           <Empty
             description="Chưa có tài liệu nào cho môn học này"
@@ -110,7 +115,7 @@ const SubjectDocumentsList: React.FC<SubjectDocumentsListProps> = ({
             )}
           </>
         )}
-      </Card>
+      </div>
     </>
   );
 };
