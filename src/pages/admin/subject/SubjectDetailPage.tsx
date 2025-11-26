@@ -86,63 +86,94 @@ const SubjectDetailPage: React.FC = () => {
       <div className="mt-4">
         {/* Header */}
         <div className="mb-6">
-          <Button
-            icon={<ArrowLeftOutlined />}
-            onClick={handleBack}
-            className="mb-4"
-          >
-            Quay lại danh sách môn học
-          </Button>
+          <div className="flex justify-start mb-4">
+            <Button
+              icon={<ArrowLeftOutlined />}
+              onClick={handleBack}
+              style={{
+                backgroundColor: "var(--primary-color)",
+                borderColor: "var(--primary-color)",
+                color: "white",
+              }}
+            >
+              Quay lại danh sách môn học
+            </Button>
+          </div>
 
-          <div className="bg-white p-6 rounded-md shadow-sm border">
-            <h1 className="text-2xl font-bold text-[var(--primary-text-color)] mb-2">
-              {subject.name}
-            </h1>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-              <div>
-                <span className="font-medium text-[var(--secondary-text-color)]">
-                  Mã môn học:
-                </span>
-                <span className="ml-2 text-[var(--primary-text-color)]">
-                  {subject.code}
-                </span>
+          <div className="bg-white p-6 rounded-lg shadow-sm border border-[color:var(--border-color)]">
+            <div className="flex items-center justify-between mb-6">
+              <h1 className="text-2xl font-bold text-[var(--primary-text-color)]">
+                {subject.name}
+              </h1>
+              <div className="text-sm text-[var(--secondary-text-color)] bg-gray-100 px-3 py-1 rounded">
+                Mã: {subject.code}
               </div>
+            </div>
 
-              <div>
-                <span className="font-medium text-[var(--secondary-text-color)]">
-                  Tổ chức:
-                </span>
-                <span className="ml-2 text-[var(--primary-text-color)]">
-                  {organization?.name || "N/A"}
-                </span>
-              </div>
-
-              <div>
-                <span className="font-medium text-[var(--secondary-text-color)]">
-                  Số tài liệu:
-                </span>
-                <span className="ml-2 text-[var(--primary-text-color)]">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+              <div className="bg-gray-50 p-4 rounded border border-[color:var(--border-color)]">
+                <div className="text-sm font-medium text-[var(--secondary-text-color)] mb-1">
+                  Số tài liệu
+                </div>
+                <div className="text-sm font-bold text-[var(--primary-text-color)]">
                   {subject.doc_count || 0}
-                </span>
+                </div>
               </div>
 
-              <div>
-                <span className="font-medium text-[var(--secondary-text-color)]">
-                  Ngày tạo:
-                </span>
-                <span className="ml-2 text-[var(--primary-text-color)]">
+              <div className="bg-gray-50 p-4 rounded border border-[color:var(--border-color)]">
+                <div className="text-sm font-medium text-[var(--secondary-text-color)] mb-1">
+                  Tổ chức
+                </div>
+                <div className="text-sm font-semibold text-[var(--primary-text-color)]">
+                  {organization?.name || "N/A"}
+                </div>
+              </div>
+
+              <div className="bg-gray-50 p-4 rounded border border-[color:var(--border-color)]">
+                <div className="text-sm font-medium text-[var(--secondary-text-color)] mb-1">
+                  Ngày tạo
+                </div>
+                <div className="text-sm font-medium text-[var(--primary-text-color)]">
                   {new Date(subject.createdAt).toLocaleDateString("vi-VN")}
-                </span>
+                </div>
+              </div>
+
+              <div className="bg-gray-50 p-4 rounded border border-[color:var(--border-color)]">
+                <div className="text-sm font-medium text-[var(--secondary-text-color)] mb-1">
+                  Trạng thái
+                </div>
+                <div className="text-sm font-semibold text-green-600">
+                  Hoạt động
+                </div>
+              </div>
+
+              <div className="bg-gray-50 p-4 rounded border border-[color:var(--border-color)]">
+                <div className="text-sm font-medium text-[var(--secondary-text-color)] mb-1">
+                  Người tạo
+                </div>
+                <div className="text-sm font-medium text-[var(--primary-text-color)]">
+                  {subject.created_by
+                    ? `${subject.created_by.first_name} ${subject.created_by.last_name}`
+                    : "N/A"}
+                </div>
+              </div>
+
+              <div className="bg-gray-50 p-4 rounded border border-[color:var(--border-color)]">
+                <div className="text-sm font-medium text-[var(--secondary-text-color)] mb-1">
+                  Cập nhật lần cuối
+                </div>
+                <div className="text-sm font-medium text-[var(--primary-text-color)]">
+                  {new Date(subject.updatedAt).toLocaleDateString("vi-VN")}
+                </div>
               </div>
             </div>
 
             {subject.description && (
-              <div className="mt-4">
-                <span className="font-medium text-[var(--secondary-text-color)]">
-                  Mô tả:
-                </span>
-                <p className="mt-1 text-[var(--third-text-color)]">
+              <div className="mt-4 p-4 bg-gray-50 rounded border border-[color:var(--border-color)]">
+                <h3 className="text-lg font-semibold text-[var(--primary-text-color)] mb-2">
+                  Mô tả môn học
+                </h3>
+                <p className="text-[var(--third-text-color)] leading-relaxed">
                   {subject.description}
                 </p>
               </div>
