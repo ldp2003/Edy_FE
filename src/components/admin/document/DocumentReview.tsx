@@ -332,7 +332,7 @@ const DocumentReview: React.FC<DocumentReviewProps> = ({
         />
       )}
 
-      <div className="mx-auto bg-white rounded-lg shadow-sm p-3 sm:p-6">
+      <div className="mx-auto bg-white rounded-lg shadow-sm my-3 p-3 sm:p-6">
         <Form
           form={form}
           layout="vertical"
