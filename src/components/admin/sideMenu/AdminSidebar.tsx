@@ -1,6 +1,6 @@
 import { AdminNavigationMenu } from "./AdminNavigationMenu";
 import { PanelLeftClose, PanelLeftOpen } from "lucide-react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useEffect, useContext } from "react";
 import { UserContext } from "../../../contexts/UserContext";
 import { roleTranslations } from "../../../locales/documentEnums";
@@ -12,6 +12,7 @@ interface AdminSidebarProps {
 
 export function AdminSidebar({ isVisible, setIsVisible }: AdminSidebarProps) {
   const location = useLocation();
+  const navigate = useNavigate();
 
   useEffect(() => {
     // Keep sidebar visible by default for admin pages
@@ -20,9 +21,13 @@ export function AdminSidebar({ isVisible, setIsVisible }: AdminSidebarProps) {
 
   const { user, role } = useContext(UserContext);
 
+  const handleUserInfoClick = () => {
+    navigate("/personal-profile");
+  };
+
   return (
     <aside
-      className={`border-r border-gray-200 bg-white transition-all duration-300 flex flex-col relative ${
+      className={`border-r border-gray-200 bg-white transition-all h-full duration-300 flex flex-col relative ${
         isVisible ? "w-64 flex-shrink-0" : "w-16 flex-shrink-0"
       }`}
       style={{ minHeight: "calc(100vh - 80px)" }}
@@ -46,7 +51,10 @@ export function AdminSidebar({ isVisible, setIsVisible }: AdminSidebarProps) {
 
       {/* Admin info section - dynamic from context */}
       <div
-        className={`p-4 border-b border-gray-200 ${!isVisible ? "px-2" : ""}`}
+        className={`p-4 border-b border-gray-200 cursor-pointer hover:bg-gray-50 transition-colors ${
+          !isVisible ? "px-2" : ""
+        }`}
+        onClick={handleUserInfoClick}
       >
         <div
           className={`flex items-center gap-3 ${
@@ -61,13 +69,19 @@ export function AdminSidebar({ isVisible, setIsVisible }: AdminSidebarProps) {
             />
           </div>
           {isVisible && (
-            <div>
-              <p className="text-sm font-medium text-gray-900">
+            <div className="text-left">
+              <p
+                className="text-sm font-medium"
+                style={{ color: "var(--primary-text-color)" }}
+              >
                 {user?.first_name && user?.last_name
                   ? `${user.first_name} ${user.last_name}`
                   : "Admin"}
               </p>
-              <p className="text-xs text-gray-500">
+              <p
+                className="text-xs"
+                style={{ color: "var(--secondary-text-color)" }}
+              >
                 {roleTranslations[role as keyof typeof roleTranslations] ||
                   "Quản trị viên"}
               </p>

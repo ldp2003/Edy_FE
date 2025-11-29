@@ -111,11 +111,18 @@ const SubjectService = {
   /**
    * Get documents by subject
    * @param subjectId - ID của môn học
+   * @param isAdmin - Có phải admin không (tùy chọn)
    * @returns Promise<unknown>
    */
-  async getDocumentsBySubject(subjectId: string): Promise<unknown> {
+  async getDocumentsBySubject(
+    subjectId: string,
+    isAdmin?: boolean
+  ): Promise<unknown> {
     try {
-      const response = await SubjectAPI.getDocumentsBySubject(subjectId);
+      const response = await SubjectAPI.getDocumentsBySubject(
+        subjectId,
+        isAdmin
+      );
       console.log("SubjectService.getDocumentsBySubject response:", response);
       return response;
     } catch (error) {
@@ -129,9 +136,7 @@ const SubjectService = {
    * @param subjectId - ID của môn học
    * @returns Promise<{message: string, old_count?: number, new_count?: number, count?: number}>
    */
-  async syncSubjectDocCount(
-    subjectId: string
-  ): Promise<{
+  async syncSubjectDocCount(subjectId: string): Promise<{
     message: string;
     old_count?: number;
     new_count?: number;

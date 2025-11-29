@@ -1,7 +1,6 @@
 import React from "react";
 import { Row, Col, Card } from "antd";
 import { useNavigate } from "react-router-dom";
-import { Eye, EyeOff } from "lucide-react";
 
 interface QuickAction {
   title: string;
@@ -47,19 +46,7 @@ const AdminQuickActions: React.FC<AdminQuickActionsProps> = ({
                   ? "Ẩn chuyển hướng nhanh"
                   : "Hiện chuyển hướng nhanh"
               }
-            >
-              {showQuickActions ? (
-                <EyeOff
-                  className="w-4 h-4"
-                  style={{ color: "var(--secondary-text-color)" }}
-                />
-              ) : (
-                <Eye
-                  className="w-4 h-4"
-                  style={{ color: "var(--secondary-text-color)" }}
-                />
-              )}
-            </button>
+            ></button>
           </div>
           {showQuickActions && (
             <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-2">

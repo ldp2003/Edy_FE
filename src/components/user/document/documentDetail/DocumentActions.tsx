@@ -169,6 +169,35 @@ const DocumentActions: React.FC<DocumentActionsProps> = ({
     }
   }, [document._id]);
 
+  // Show message for deleted documents
+  if (document.is_deleted) {
+    return (
+      <div className="flex flex-col items-center justify-center m-4 p-4 bg-red-50 border border-red-200 rounded-lg">
+        <span className="text-red-600 font-medium mb-2">
+          Tài liệu này đã bị xóa
+        </span>
+        {document.is_delete_by_admin ? (
+          <div className="text-sm text-red-500 text-center">
+            <div>
+              Lý do:{" "}
+              {document.delete_by_admin_reason || "Không có lý do cụ thể"}
+            </div>
+            {document.delete_by_admin_at && (
+              <div>
+                Thời gian xóa:{" "}
+                {new Date(document.delete_by_admin_at).toLocaleString("vi-VN")}
+              </div>
+            )}
+          </div>
+        ) : (
+          <div className="text-sm text-red-500">
+            Tài liệu đã bị xóa bởi người dùng
+          </div>
+        )}
+      </div>
+    );
+  }
+
   return (
     <div
       data-document-actions={document._id}
@@ -178,19 +207,21 @@ const DocumentActions: React.FC<DocumentActionsProps> = ({
           : ""
       }`}
     >
-      <DownloadButton
-        point={
-          account?.is_vip
-            ? document.intensive
-              ? 5
-              : 3
-            : document.intensive
-            ? 6
-            : 4
-        }
-        documentId={document._id}
-        documentTitle={document.title}
-      />
+      {!isUser && (
+        <DownloadButton
+          point={
+            account?.is_vip
+              ? document.intensive
+                ? 5
+                : 3
+              : document.intensive
+              ? 6
+              : 4
+          }
+          documentId={document._id}
+          documentTitle={document.title}
+        />
+      )}
 
       <div className="flex items-center space-x-4">
         {!isUser && (
@@ -232,17 +263,19 @@ const DocumentActions: React.FC<DocumentActionsProps> = ({
           </>
         )}
         <FavoriteButton documentId={document._id} />
-        <ShareButton
-          documentId={document._id}
-          documentTitle={document.title}
-          isPublic={document.public_mode === "PUBLIC"}
-          isSharedWithOrganization={
-            document.public_mode === "SHARE_ORGANIZATION"
-          }
-          isPrivate={document.public_mode === "PRIVATE"}
-          isPrivateShared={document.public_mode === "PRIVATE_SHARED"}
-          isOwner={document.user._id === user?._id}
-        />
+        {!document.is_deleted && (
+          <ShareButton
+            documentId={document._id}
+            documentTitle={document.title}
+            isPublic={document.public_mode === "PUBLIC"}
+            isSharedWithOrganization={
+              document.public_mode === "SHARE_ORGANIZATION"
+            }
+            isPrivate={document.public_mode === "PRIVATE"}
+            isPrivateShared={document.public_mode === "PRIVATE_SHARED"}
+            isOwner={document.user._id === user?._id}
+          />
+        )}
       </div>
     </div>
   );

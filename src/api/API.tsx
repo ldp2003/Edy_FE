@@ -588,9 +588,12 @@ export const SubjectAPI = {
   },
 
   // Get documents by subject
-  getDocumentsBySubject: async (subjectId: string) => {
+  getDocumentsBySubject: async (subjectId: string, isAdmin?: boolean) => {
     try {
-      const response = await apiClient.get(`/subjects/${subjectId}/documents`);
+      const params = isAdmin ? { is_admin: isAdmin } : {};
+      const response = await apiClient.get(`/subjects/${subjectId}/documents`, {
+        params,
+      });
       return response.data;
     } catch (error) {
       console.error("Error fetching documents by subject:", error);
@@ -728,7 +731,9 @@ export const DocumentAPI = {
     public_mode?: string;
   }) => {
     try {
-      const response = await apiClient.get("/documents/recommended", { params });
+      const response = await apiClient.get("/documents/recommended", {
+        params,
+      });
       return response.data;
     } catch (error) {
       console.error("Error fetching recommended documents:", error);

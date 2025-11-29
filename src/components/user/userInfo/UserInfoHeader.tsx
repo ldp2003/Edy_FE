@@ -68,7 +68,7 @@ const UserInfoHeader: React.FC<UserInfoHeaderProps> = ({ user }) => {
                   <div className="font-semibold text-xs">
                     {user.doc_count || 0}
                   </div>
-                  <div className="text-xs">Bài đăng</div>
+                  <div className="text-xs">Tài liệu</div>
                 </div>
               </div>
               <FollowButton

@@ -10,7 +10,7 @@ export function NavigationMenu({ isCompact }: NavigationMenuProps) {
 
   const menuItems = [
     { icon: Home, label: "Trang chủ", path: ["/"] },
-    { icon: FileText, label: "Bài đăng của tôi", path: ["/personal-posts"] },
+    { icon: FileText, label: "Tài liệu của tôi", path: ["/personal-posts"] },
     { icon: Heart, label: "Yêu thích", path: ["/favorites"] },
     {
       icon: Users,

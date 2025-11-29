@@ -158,7 +158,7 @@ const SearchHeader: React.FC<SearchHeaderProps> = ({
       {/* Normal Header - ẩn hoàn toàn khi isFixed = true */}
       <div
         data-search-header
-        className={`bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl p-4 mb-6 shadow-sm transition-all duration-300 ${
+        className={`bg-[var(--secondary-background-color)] rounded-2xl p-4 mb-6 shadow-sm transition-all duration-300 ${
           isFixed
             ? "opacity-0 pointer-events-none h-0 mb-0 overflow-hidden"
             : "opacity-100"
@@ -167,10 +167,10 @@ const SearchHeader: React.FC<SearchHeaderProps> = ({
         <div className="w-full mx-auto">
           {/* Header Title */}
           <div className="text-center md:text-left mb-4">
-            <h1 className="text-base font-bold text-gray-900 mb-1 text-center md:text-left">
+            <h1 className="text-base font-bold text-[var(--primary-text-color)] mb-1 text-center md:text-left">
               Khám phá tài liệu học tập
             </h1>
-            <p className="text-gray-600 text-sm">
+            <p className="text-[var(--secondary-text-color)] text-sm">
               Tìm kiếm trong hàng nghìn tài liệu chất lượng cao từ các trường
               đại học hàng đầu
             </p>
@@ -186,18 +186,20 @@ const SearchHeader: React.FC<SearchHeaderProps> = ({
                   onChange={(e) => setQuery(e.target.value)}
                   onKeyPress={handleKeyPress}
                   placeholder="Nhập từ khóa tìm kiếm: Tên tài liệu, trường, môn học, tác giả..."
-                  prefix={<Search className="text-gray-400 w-5 h-5" />}
+                  prefix={
+                    <Search className="text-[var(--third-text-color)] w-5 h-5" />
+                  }
                   suffix={
                     <Button
                       type="primary"
                       onClick={handleSearch}
-                      className="border-0 shadow-none bg-blue-600 hover:bg-blue-700 transition-colors"
+                      className="border-0 shadow-none bg-[var(--primary-color)] hover:bg-[var(--secondary-color)] transition-colors"
                       size="small"
                     >
                       Tìm kiếm
                     </Button>
                   }
-                  className="pr-0 h-9 text-base border-2 border-gray-200 hover:border-blue-400 focus:border-blue-500 rounded-xl shadow-sm"
+                  className="pr-0 h-9 text-base border-2 border-[var(--border-color)] hover:border-[var(--primary-color)] focus:border-[var(--primary-color)] rounded-xl shadow-sm"
                   style={{
                     borderRadius: "12px",
                     fontSize: "16px",
@@ -213,8 +215,8 @@ const SearchHeader: React.FC<SearchHeaderProps> = ({
               onClick={() => setFilterDrawerOpen(true)}
               className={`flex items-center gap-2 h-14 px-6 rounded-xl font-medium transition-all duration-200 ${
                 hasActiveFilters()
-                  ? "bg-blue-600 hover:bg-blue-700 border-blue-600 shadow-lg shadow-blue-200"
-                  : "bg-white hover:bg-gray-50 border-2 border-gray-200 hover:border-blue-400 shadow-sm"
+                  ? "bg-[var(--primary-color)] hover:bg-[var(--secondary-color)] border-[var(--primary-color)] shadow-lg"
+                  : "bg-[var(--primary-background-color)] hover:bg-[var(--secondary-background-color)] border-2 border-[var(--border-color)] hover:border-[var(--primary-color)] shadow-sm"
               }`}
               size="middle"
             >
@@ -224,7 +226,9 @@ const SearchHeader: React.FC<SearchHeaderProps> = ({
 
           {/* Quick Search Tags */}
           <div className="mt-4">
-            <p className="text-xs text-gray-500 mb-2">Tìm kiếm phổ biến:</p>
+            <p className="text-xs text-[var(--third-text-color)] mb-2">
+              Tìm kiếm phổ biến:
+            </p>
             <div className="flex flex-wrap gap-2">
               {[
                 "Toán cao cấp",
@@ -239,7 +243,7 @@ const SearchHeader: React.FC<SearchHeaderProps> = ({
                   onClick={() => {
                     setQuery(tag); // Set the query in the search bar
                   }}
-                  className="px-3 py-1.5 bg-white bg-opacity-70 hover:bg-white hover:shadow-sm border border-gray-200 rounded-full text-xs text-gray-700 hover:text-blue-600 transition-all duration-200"
+                  className="cursor-pointer px-3 py-1.5 bg-[var(--primary-background-color)] bg-opacity-70 hover:bg-[var(--primary-background-color)] hover:shadow-sm border border-[var(--border-color)] rounded-full text-xs text-[var(--secondary-text-color)] hover:text-[var(--primary-color)] transition-all duration-200"
                 >
                   {tag}
                 </button>
@@ -254,10 +258,10 @@ const SearchHeader: React.FC<SearchHeaderProps> = ({
                 key !== "order" &&
                 appliedFilters[key as keyof typeof appliedFilters]
             ) && (
-              <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 mt-4">
+              <div className="bg-[var(--secondary-background-color)] border border-[var(--border-color)] rounded-xl p-4 mt-4">
                 <div className="flex items-center gap-2 mb-3">
-                  <Filter className="w-4 h-4 text-blue-600" />
-                  <h3 className="text-sm font-semibold text-blue-800">
+                  <Filter className="w-4 h-4 text-[var(--primary-color)]" />
+                  <h3 className="text-sm font-semibold text-[var(--primary-text-color)]">
                     Bộ lọc đang áp dụng
                   </h3>
                 </div>
@@ -326,7 +330,7 @@ const SearchHeader: React.FC<SearchHeaderProps> = ({
                     return (
                       <span
                         key={key}
-                        className="inline-flex items-center gap-1 px-3 py-1.5 bg-white border border-blue-300 rounded-full text-xs font-medium text-blue-700 shadow-sm"
+                        className="inline-flex items-center gap-1 px-3 py-1.5 bg-[var(--primary-background-color)] border border-[var(--border-color)] rounded-full text-xs font-medium text-[var(--primary-text-color)] shadow-sm"
                       >
                         <span className="font-semibold">
                           {getFilterLabel(key)}:
@@ -343,7 +347,7 @@ const SearchHeader: React.FC<SearchHeaderProps> = ({
 
       {/* Sticky Header - hiển thị khi isFixed = true */}
       {isFixed && (
-        <div className="sticky top-0 mx-[-31px] bg-white/95 backdrop-blur-sm border-b border-gray-200 shadow-lg z-50 transition-all duration-300">
+        <div className="sticky top-0 mx-[-31px] bg-[var(--primary-background-color)]/95 backdrop-blur-sm border-b border-[var(--border-color)] shadow-lg z-50 transition-all duration-300">
           <div className="max-w-7xl mx-auto px-4 py-3">
             <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
               {/* Sticky Search Input */}
@@ -355,18 +359,20 @@ const SearchHeader: React.FC<SearchHeaderProps> = ({
                     onChange={(e) => setQuery(e.target.value)}
                     onKeyPress={handleKeyPress}
                     placeholder="Tìm kiếm tài liệu..."
-                    prefix={<Search className="text-gray-400 w-4 h-4" />}
+                    prefix={
+                      <Search className="text-[var(--third-text-color)] w-4 h-4" />
+                    }
                     suffix={
                       <Button
                         type="primary"
                         onClick={handleSearch}
-                        className="border-0 shadow-none bg-blue-600 hover:bg-blue-700"
+                        className="border-0 shadow-none bg-[var(--primary-color)] hover:bg-[var(--secondary-color)]"
                         size="small"
                       >
                         Tìm
                       </Button>
                     }
-                    className="pr-0 h-10 border-gray-200 hover:border-blue-400 focus:border-blue-500 rounded-lg"
+                    className="pr-0 h-10 border-[var(--border-color)] hover:border-[var(--primary-color)] focus:border-[var(--primary-color)] rounded-lg"
                   />
                 </div>
               </div>
@@ -378,8 +384,8 @@ const SearchHeader: React.FC<SearchHeaderProps> = ({
                 onClick={() => setFilterDrawerOpen(true)}
                 className={`flex items-center gap-2 h-10 px-4 rounded-lg font-medium transition-all duration-200 ${
                   hasActiveFilters()
-                    ? "bg-blue-600 hover:bg-blue-700 border-blue-600"
-                    : "bg-white hover:bg-gray-50 border-gray-200 hover:border-blue-400"
+                    ? "bg-[var(--primary-color)] hover:bg-[var(--secondary-color)] border-[var(--primary-color)]"
+                    : "bg-[var(--primary-background-color)] hover:bg-[var(--secondary-background-color)] border-[var(--border-color)] hover:border-[var(--primary-color)]"
                 }`}
               >
                 Lọc

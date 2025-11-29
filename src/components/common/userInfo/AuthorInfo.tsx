@@ -96,7 +96,7 @@ const AuthorInfo: React.FC<AuthorInfoProps> = ({ document }) => {
                 {document.user.doc_count || 0}
               </div>
               <div className="text-[10px] sm:text-xs lg:text-sm text-[var(--secondary-text-color)]">
-                Bài đăng
+                Tài liệu
               </div>
             </div>
           </div>

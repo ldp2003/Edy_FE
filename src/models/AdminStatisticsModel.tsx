@@ -105,6 +105,7 @@ export interface PendingDocument {
   comment_count: number;
   download_count: number;
   createdAt: string;
+  ai_violation_level: string;
 }
 
 export interface PendingTasksResponse {
@@ -134,6 +135,6 @@ export interface TaskItem {
       avatar?: string;
     };
     aiChecked: boolean;
-    aiViolationLevel: string;
+    ai_violation_level: string;
   };
 }

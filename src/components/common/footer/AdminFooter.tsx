@@ -41,7 +41,7 @@ const AdminFooter: React.FC = () => {
               </li>
               <li>
                 <Link
-                  to="/admin/documents/all"
+                  to="/admin/documents"
                   className="text-sm hover:text-blue-400 transition-colors"
                 >
                   Tài liệu
@@ -86,14 +86,6 @@ const AdminFooter: React.FC = () => {
                   className="text-sm hover:text-blue-400 transition-colors"
                 >
                   Thống kê người dùng
-                </Link>
-              </li>
-              <li>
-                <Link
-                  to="/admin/statistics/general"
-                  className="text-sm hover:text-blue-400 transition-colors"
-                >
-                  Thống kê chung
                 </Link>
               </li>
               <li>

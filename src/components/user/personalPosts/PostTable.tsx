@@ -179,26 +179,47 @@ const PostTable: React.FC<PostTableProps> = ({
         const hasRejectionMessage = record.content_rejection?.message;
         const showRejectionReason =
           (isRejected || isRequestedEdit) && hasRejectionMessage;
+        const isDeleted = record.is_deleted;
+        const isDisabled = isRejected || isDeleted;
 
         return (
           <div
             onClick={
-              isRejected
+              isDisabled
                 ? undefined
                 : () =>
                     navigate(`/personal-posts/document-detail/${record._id}`)
             }
-            className={isRejected ? "cursor-not-allowed" : "cursor-pointer"}
+            className={isDisabled ? "cursor-not-allowed" : "cursor-pointer"}
           >
             <div
               className={`text-[var(--primary-text-color)] font-medium ${
-                isRejected ? "line-through text-gray-400" : ""
+                isRejected
+                  ? "line-through text-gray-400"
+                  : isDeleted
+                  ? "line-through text-red-400"
+                  : ""
               }`}
-              style={{ fontSize: isRejected ? "12px" : "14px" }}
+              style={{ fontSize: isRejected || isDeleted ? "12px" : "14px" }}
             >
               {text}
             </div>
-            {showRejectionReason && (
+            {isDeleted && (
+              <div
+                style={{
+                  fontSize: "11px",
+                  color: "#e74c3c",
+                  fontStyle: "italic",
+                  marginTop: "4px",
+                }}
+              >
+                Đã xóa:{" "}
+                {record.is_delete_by_admin
+                  ? record.delete_by_admin_reason || "Không có lý do cụ thể"
+                  : "Đã xóa bởi người dùng"}
+              </div>
+            )}
+            {showRejectionReason && !isDeleted && (
               <div
                 style={{
                   fontSize: "11px",
@@ -513,29 +534,33 @@ const PostTable: React.FC<PostTableProps> = ({
         const isRejected = record.status === "REJECTED";
         const isPendingApproval =
           record.status === "PENDING" || record.status === "PENDING_EDIT";
+        const isDeleted = record.is_deleted;
+        const isDisabled = isRejected || isPendingApproval || isDeleted;
 
         return (
           <div className="flex gap-1 justify-center">
             {/* Edit Button */}
             <button
               className={`p-2 text-xs text-white rounded transition-all duration-300 ${
-                isRejected || isPendingApproval
+                isDisabled
                   ? "bg-gray-400 cursor-not-allowed"
                   : "bg-[var(--green-button-color)] hover:bg-blue-600 hover:shadow-lg transform hover:scale-105 cursor-pointer"
               }`}
               onClick={
-                isRejected || isPendingApproval
+                isDisabled
                   ? undefined
                   : () => navigate(`/personal-posts/edit/${record._id}`)
               }
               title={
-                isRejected
+                isDeleted
+                  ? "Không thể sửa tài liệu đã xóa"
+                  : isRejected
                   ? "Không thể sửa tài liệu bị từ chối"
                   : isPendingApproval
                   ? "Không thể chỉnh sửa tài liệu đang chờ duyệt"
                   : "Chỉnh sửa tài liệu"
               }
-              disabled={isRejected || isPendingApproval}
+              disabled={isDisabled}
             >
               <Edit size={13} />
             </button>
@@ -618,22 +643,24 @@ const PostTable: React.FC<PostTableProps> = ({
                       style: { maxHeight: "200px", overflowY: "auto" },
                     }}
                     placement="bottomRight"
-                    disabled={isRejected || isPendingApproval}
+                    disabled={isDisabled}
                   >
                     <button
                       className={`p-2 text-xs text-white rounded transition-all duration-300 ${
-                        isRejected || isPendingApproval
+                        isDisabled
                           ? "bg-gray-400 cursor-not-allowed"
                           : "bg-blue-500 hover:bg-blue-600 hover:shadow-lg transform hover:scale-105 cursor-pointer"
                       }`}
                       title={
-                        isRejected
+                        isDeleted
+                          ? "Không thể thay đổi chế độ hiển thị tài liệu đã xóa"
+                          : isRejected
                           ? "Không thể thay đổi chế độ hiển thị tài liệu bị từ chối"
                           : isPendingApproval
                           ? "Không thể thay đổi chế độ hiển thị tài liệu đang chờ duyệt"
                           : "Thay đổi chế độ hiển thị"
                       }
-                      disabled={isRejected || isPendingApproval}
+                      disabled={isDisabled}
                     >
                       {getPublicModeIcon(record.public_mode || "PRIVATE")}
                     </button>
@@ -645,12 +672,12 @@ const PostTable: React.FC<PostTableProps> = ({
             {/* Delete Button */}
             <button
               className={`p-2 text-xs text-white rounded transition-all duration-300 ${
-                isRejected || isPendingApproval
+                isDisabled
                   ? "bg-gray-400 cursor-not-allowed"
                   : "bg-[var(--red-button-color)] hover:bg-red-600 hover:shadow-lg transform hover:scale-105 cursor-pointer"
               }`}
               onClick={
-                isRejected || isPendingApproval
+                isDisabled
                   ? undefined
                   : () => {
                       setSelectedPost(record);
@@ -658,13 +685,15 @@ const PostTable: React.FC<PostTableProps> = ({
                     }
               }
               title={
-                isRejected
+                isDeleted
+                  ? "Tài liệu đã bị xóa"
+                  : isRejected
                   ? "Không thể xóa tài liệu bị từ chối"
                   : isPendingApproval
                   ? "Không thể xóa tài liệu đang chờ duyệt"
                   : "Xóa tài liệu"
               }
-              disabled={isRejected || isPendingApproval}
+              disabled={isDisabled}
             >
               <Trash size={13} />
             </button>
@@ -712,6 +741,7 @@ const PostTable: React.FC<PostTableProps> = ({
           checked={visibleColumns.has(option.key)}
           disabled={option.disabled}
           onChange={(e) => toggleColumnVisibility(option.key, e.target.checked)}
+          onClick={(e) => e.stopPropagation()}
         >
           {option.label}
         </Checkbox>
@@ -761,6 +791,9 @@ const PostTable: React.FC<PostTableProps> = ({
             scroll={{ x: 1200, y: 600 }}
             bordered
             sticky={{ offsetHeader: 0 }}
+            onRow={(record) => ({
+              title: record.title,
+            })}
           />
         </div>
       </div>

@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { message, Spin } from "antd";
+import { message } from "antd";
 import { DocumentService } from "../../../utils/DocumentService";
 import type { Document } from "../../../models/document";
 import EditInformationForm from "../../../components/user/personalPosts/EditInformationForm";
+import LoadingScreen from "../../../components/common/LoadingScreen";
 
 const EditDocumentPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -44,14 +45,7 @@ const EditDocumentPage: React.FC = () => {
   };
 
   if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <Spin size="large" />
-          <p className="mt-4 text-gray-600">Đang tải thông tin tài liệu...</p>
-        </div>
-      </div>
-    );
+    return <LoadingScreen />;
   }
 
   if (!document) {

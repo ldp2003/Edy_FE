@@ -102,7 +102,7 @@ const SearchFilters: React.FC<SearchFiltersProps> = ({
       {/* Clear filters button */}
       {hasActiveFilters() && (
         <div className="flex justify-between items-center pb-4 border-b">
-          <span className="text-sm text-gray-600">
+          <span className="text-sm text-[var(--secondary-text-color)]">
             {
               Object.keys(filters).filter(
                 (key) =>
@@ -116,7 +116,7 @@ const SearchFilters: React.FC<SearchFiltersProps> = ({
             size="small"
             icon={<RotateCcw className="w-4 h-4" />}
             onClick={clearAllFilters}
-            className="text-red-500 hover:text-red-700"
+            className="text-[var(--red-button-color)] hover:text-[var(--red-button-color)]"
           >
             Xóa tất cả
           </Button>
@@ -226,7 +226,7 @@ const SearchFilters: React.FC<SearchFiltersProps> = ({
             size="small"
             allowClear
           />
-          <p className="text-xs text-gray-500 mt-1">
+          <p className="text-xs text-[var(--third-text-color)] mt-1">
             Nhập nhiều tác giả cách nhau bằng dấu phẩy
           </p>
         </div>
@@ -279,9 +279,12 @@ const SearchFilters: React.FC<SearchFiltersProps> = ({
                   e.target.checked ? true : undefined
                 )
               }
-              className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+              className="h-4 w-4 text-[var(--primary-color)] focus:ring-[var(--primary-color)] border-[var(--border-color)] rounded"
             />
-            <label htmlFor="intensive" className="ml-2 text-sm text-[var(--primary-text-color)]">
+            <label
+              htmlFor="intensive"
+              className="ml-2 text-sm text-[var(--primary-text-color)]"
+            >
               Chỉ hiển thị tài liệu chuyên sâu
             </label>
           </div>
@@ -333,7 +336,7 @@ const SearchFilters: React.FC<SearchFiltersProps> = ({
           <Button
             type="primary"
             onClick={applyFilters}
-            className="flex-1 bg-blue-600 hover:bg-blue-700"
+            className="flex-1 bg-[var(--primary-color)] hover:bg-[var(--secondary-color)]"
             size="small"
             disabled={!hasUnsavedChanges()}
           >

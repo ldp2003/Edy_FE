@@ -161,11 +161,10 @@ const UploadPage: React.FC = () => {
     <div className="min-h-screen">
       {contextHolder}
 
-      {/* Progress Bar */}
       <div className="border-b border-gray-200">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="max-w-4xl mx-auto">
-            <h1 className="text-base sm:text-base font-bold text-[var(--primary-text-color)] mb-4 text-center md:text-left">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-2">
+          <div className="max-w-7xl mx-auto">
+            <h1 className="text-base sm:text-base font-bold text-[var(--primary-text-color)] mb-2 text-center md:text-left">
               Đăng tải tài liệu
             </h1>
             <Steps
@@ -179,7 +178,7 @@ const UploadPage: React.FC = () => {
       </div>
 
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        <div className="max-w-4xl mx-auto space-y-6">
+        <div className="max-w-7xl mx-auto space-y-6">
           {/* Upload Section */}
           <div className="bg-white p-4 sm:p-6 rounded-lg border border-gray-200 shadow-sm">
             <h1 className="text-base sm:text-base text-[var(--primary-text-color)] font-bold mb-4 text-center md:text-left">

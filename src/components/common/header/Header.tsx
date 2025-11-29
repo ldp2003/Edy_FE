@@ -113,7 +113,7 @@ export function Header({ onMenuToggle }: HeaderProps) {
               }}
             />
             <button
-              className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-[var(--primary-color)] hover:bg-gray-700 text-white px-4 py-1 text-xs rounded transition-colors"
+              className="absolute cursor-pointer right-2 top-1/2 transform -translate-y-1/2 bg-[var(--primary-color)] hover:bg-gray-700 text-white px-4 py-1 text-xs rounded transition-colors"
               onClick={handleHeaderSearch}
             >
               Tìm kiếm

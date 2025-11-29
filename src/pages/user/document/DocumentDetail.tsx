@@ -14,6 +14,7 @@ import type { Document } from "../../../models/document";
 import { UserContext } from "../../../contexts/UserContext";
 import AuthorInfo from "../../../components/common/userInfo/AuthorInfo";
 import DocumentActions from "../../../components/user/document/documentDetail/DocumentActions";
+import LoadingScreen from "../../../components/common/LoadingScreen";
 
 const DocumentDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -108,14 +109,7 @@ const DocumentDetail: React.FC = () => {
   };
 
   if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-2 text-gray-600">Đang tải tài liệu...</p>
-        </div>
-      </div>
-    );
+    return <LoadingScreen />;
   }
 
   if (!document) {
