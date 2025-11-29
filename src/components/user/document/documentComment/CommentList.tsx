@@ -235,6 +235,8 @@ const CommentList: React.FC<CommentListProps> = ({
                 comment={comment}
                 documentId={documentId}
                 onReply={handleReply}
+                onCommentsUpdate={onCommentsUpdate}
+                allComments={comments}
               />
 
               {/* Replies */}
@@ -255,6 +257,8 @@ const CommentList: React.FC<CommentListProps> = ({
                             comment={reply}
                             documentId={documentId}
                             isReply={true}
+                            onCommentsUpdate={onCommentsUpdate}
+                            allComments={comments}
                           />
                         ))}
 
