@@ -27,7 +27,7 @@ export function AdminSidebar({ isVisible, setIsVisible }: AdminSidebarProps) {
 
   return (
     <aside
-      className={`border-r border-gray-200 bg-white transition-all duration-300 flex flex-col relative ${
+      className={`border-r border-gray-200 bg-white transition-all h-full duration-300 flex flex-col relative ${
         isVisible ? "w-64 flex-shrink-0" : "w-16 flex-shrink-0"
       }`}
       style={{ minHeight: "calc(100vh - 80px)" }}
