@@ -1,17 +1,31 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useContext } from "react";
+import { useNavigate } from "react-router-dom";
 import LimitNotificationModal from "./LimitNotificationModal";
+import { UserContext } from "../../../../contexts/UserContext";
+import RegisterForm from "../../../common/entry/RegisterForm";
 
 interface VideoViewerProps {
   url: string;
   isUser?: boolean;
+  documentId?: string;
 }
 
-const VideoViewer: React.FC<VideoViewerProps> = ({ url, isUser = false }) => {
+const VideoViewer: React.FC<VideoViewerProps> = ({
+  url,
+  isUser = false,
+  documentId,
+}) => {
   const [showLimitModal, setShowLimitModal] = useState(false);
   const [hasShownModal, setHasShownModal] = useState(false);
   const [isVideoDisabled, setIsVideoDisabled] = useState(false);
   const [limitTime, setLimitTime] = useState<number | null>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
+
+  const { user } = useContext(UserContext);
+  const isLoggedIn = !!user;
+  const [registerModalVisible, setRegisterModalVisible] = useState(false);
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (isUser) return;
@@ -84,6 +98,13 @@ const VideoViewer: React.FC<VideoViewerProps> = ({ url, isUser = false }) => {
     // Do not reset video, keep disabled
   };
 
+  const handleDownload = () => {
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "video.mp4";
+    link.click();
+  };
+
   return (
     <div className="relative w-full">
       <video
@@ -113,10 +134,28 @@ const VideoViewer: React.FC<VideoViewerProps> = ({ url, isUser = false }) => {
       <LimitNotificationModal
         visible={showLimitModal}
         onClose={handleModalClose}
-        message={`Bạn đã xem hết ${
-          limitTime ? Math.floor(limitTime) : 0
-        } giây của video. Để xem toàn bộ nội dung, vui lòng đăng ký tài khoản.`}
+        message={`Bạn đã xem hết ${Math.floor(
+          limitTime || 0
+        )} giây của video. Hãy tải về để xem bản đầy đủ.`}
+        isLoggedIn={isLoggedIn}
+        onDownload={handleDownload}
+        documentId={documentId}
       />
+
+      {/* Register Modal */}
+      {registerModalVisible && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+          <div className="bg-white p-6 rounded-lg max-w-md w-full mx-4 max-h-[90vh] overflow-y-auto">
+            <RegisterForm
+              onSuccess={() => setRegisterModalVisible(false)}
+              onSwitchToLogin={() => {
+                setRegisterModalVisible(false);
+                navigate("/auth/login");
+              }}
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 };
