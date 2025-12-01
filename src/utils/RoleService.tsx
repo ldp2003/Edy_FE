@@ -6,8 +6,12 @@ export const RoleService = {
     queryParams?: {
       page?: number;
       limit?: number;
-      search?: string;
-      status?: string;
+      query?: string;
+      name?: string;
+      code?: string;
+      description?: string;
+      permissions?: string[];
+      is_active?: boolean;
     }
   ) => {
     if (active === undefined) {
