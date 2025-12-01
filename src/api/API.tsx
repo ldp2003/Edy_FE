@@ -1658,6 +1658,11 @@ export const RoleAPI = {
       limit?: number;
       search?: string;
       status?: string;
+      name?: string;
+      code?: string;
+      description?: string;
+      permissions?: string[];
+      is_active?: boolean;
     }
   ) => {
     try {
@@ -1667,6 +1672,14 @@ export const RoleAPI = {
         if (queryParams.limit) params.limit = queryParams.limit;
         if (queryParams.search) params.search = queryParams.search;
         if (queryParams.status) params.status = queryParams.status;
+        if (queryParams.name) params.name = queryParams.name;
+        if (queryParams.code) params.code = queryParams.code;
+        if (queryParams.description)
+          params.description = queryParams.description;
+        if (queryParams.permissions)
+          params.permissions = queryParams.permissions;
+        if (queryParams.is_active !== undefined)
+          params.is_active = queryParams.is_active;
       }
       const response = await apiClient.get("/admin/roles", { params });
       return response.data;

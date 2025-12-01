@@ -8,6 +8,11 @@ export const RoleService = {
       limit?: number;
       search?: string;
       status?: string;
+      name?: string;
+      code?: string;
+      description?: string;
+      permissions?: string[];
+      is_active?: boolean;
     }
   ) => {
     if (active === undefined) {
