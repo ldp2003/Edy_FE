@@ -19,12 +19,15 @@ const DocumentPreview: React.FC<DocumentPreviewProps> = ({
   onViewDocument,
 }) => {
   const [imageLoading, setImageLoading] = React.useState(true);
-  const [imageError, setImageError] = React.useState(false);
 
   // Reset states when document changes
   React.useEffect(() => {
     setImageLoading(true);
-    setImageError(false);
+    // Fallback: clear loading after 3 seconds to prevent infinite loading
+    const timeout = setTimeout(() => {
+      setImageLoading(false);
+    }, 3000);
+    return () => clearTimeout(timeout);
   }, [document.cover_page]);
   const formatFileSize = (bytes: number): string => {
     if (bytes === 0) return "0 Bytes";
@@ -34,44 +37,19 @@ const DocumentPreview: React.FC<DocumentPreviewProps> = ({
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i];
   };
 
-  const handleImageError = (e: React.SyntheticEvent<HTMLImageElement>) => {
-    const target = e.target as HTMLImageElement;
-
-    // Prevent infinite loop by checking if we're already trying the fallback
-    if (target.src.includes("default_cover.png")) {
-      // If default image also fails, hide the image and show error state
-      setImageError(true);
-      setImageLoading(false);
-      target.style.display = "none";
-      return;
-    }
-
-    target.src = "/image/default_cover.png";
-  };
-
   const handleImageLoad = () => {
     setImageLoading(false);
-    setImageError(false);
   };
 
-  // Function to get the correct image source
-  const getImageSource = (coverPage: string | undefined): string => {
-    if (!coverPage) {
-      return "/image/default_cover.png";
+  const handleImageError = (e: React.SyntheticEvent<HTMLImageElement>) => {
+    const target = e.target as HTMLImageElement;
+    // Only set fallback if not already set to prevent infinite loops
+    if (target.src !== "/image/default_cover.png") {
+      target.src = "/image/default_cover.png";
+    } else {
+      // If fallback also fails, stop loading
+      setImageLoading(false);
     }
-
-    // Check if it's a base64 image (starts with data:image/)
-    if (coverPage.startsWith("data:image/")) {
-      return coverPage;
-    }
-
-    // Check if it's a full URL
-    if (coverPage.startsWith("http://") || coverPage.startsWith("https://")) {
-      return coverPage;
-    }
-
-    // Assume it's a relative path
-    return coverPage;
   };
 
   // Calculate estimated file size (placeholder since we don't have actual size)
@@ -80,7 +58,7 @@ const DocumentPreview: React.FC<DocumentPreviewProps> = ({
   return (
     <div className="space-y-4">
       <div className="mb-0 relative group">
-        {imageLoading && !imageError && (
+        {imageLoading && (
           <div
             className="border bg-gray-100 border-gray-200 rounded flex items-center justify-center"
             style={{ maxHeight: "300px", width: "100%", minHeight: "200px" }}
@@ -89,47 +67,21 @@ const DocumentPreview: React.FC<DocumentPreviewProps> = ({
           </div>
         )}
 
-        {!imageError && (
-          <img
-            src={getImageSource(document.cover_page)}
-            alt="Document preview"
-            className={`border bg-white border-gray-200 rounded object-cover cursor-pointer hover:opacity-90 transition-opacity ${
-              imageLoading ? "hidden" : ""
-            }`}
-            style={{ maxHeight: "300px", width: "100%" }}
-            onClick={onViewDocument}
-            onError={handleImageError}
-            onLoad={handleImageLoad}
-            loading="lazy"
-          />
-        )}
-
-        {imageError && (
-          <div
-            className="border bg-gray-100 border-gray-200 rounded flex items-center justify-center"
-            style={{ maxHeight: "300px", width: "100%", minHeight: "200px" }}
-          >
-            <div className="text-center text-gray-500">
-              <svg
-                className="mx-auto h-12 w-12 text-gray-400"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
-                />
-              </svg>
-              <p className="mt-2 text-sm">Không thể tải ảnh bìa</p>
-            </div>
-          </div>
-        )}
+        <img
+          src={document.cover_page || "/image/default_cover.png"}
+          alt="Document preview"
+          className={`border bg-white border-gray-200 rounded object-cover cursor-pointer hover:opacity-90 transition-opacity ${
+            imageLoading ? "hidden" : ""
+          }`}
+          style={{ maxHeight: "300px", width: "100%" }}
+          onClick={onViewDocument}
+          onError={handleImageError}
+          onLoad={handleImageLoad}
+          loading="lazy"
+        />
 
         {/* Overlay with view icon - only show when image is loaded successfully */}
-        {!imageLoading && !imageError && (
+        {!imageLoading && (
           <div
             className="absolute inset-0 bg-black/30 bg-opacity-0 group-hover:bg-opacity-30 transition-all duration-200 flex items-center justify-center cursor-pointer rounded opacity-0 group-hover:opacity-100"
             onClick={onViewDocument}
@@ -140,14 +92,12 @@ const DocumentPreview: React.FC<DocumentPreviewProps> = ({
 
         <div className="text-xs text-gray-500 mt-1">
           {formatFileSize(estimatedFileSize)}
-          {!imageError && (
-            <span
-              className="ml-2 text-blue-600 cursor-pointer hover:underline"
-              onClick={onViewDocument}
-            >
-              Xem tài liệu
-            </span>
-          )}
+          <span
+            className="ml-2 text-blue-600 cursor-pointer hover:underline"
+            onClick={onViewDocument}
+          >
+            Xem tài liệu
+          </span>
         </div>
       </div>
 
