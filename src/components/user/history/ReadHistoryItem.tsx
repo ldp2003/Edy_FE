@@ -22,7 +22,10 @@ const ReadHistoryItem: React.FC<ReadHistoryItemProps> = ({ item, onClick }) => {
 
   const handleImageError = (e: React.SyntheticEvent<HTMLImageElement>) => {
     const target = e.target as HTMLImageElement;
-    target.src = "/public/image/default_cover.png";
+    // Only set fallback if not already set to prevent infinite loops
+    if (target.src !== "/image/default_cover.png") {
+      target.src = "/image/default_cover.png";
+    }
   };
 
   const getFileTypeStyle = (fileType: string) => {
@@ -51,7 +54,7 @@ const ReadHistoryItem: React.FC<ReadHistoryItemProps> = ({ item, onClick }) => {
         onClick={handleClick}
       >
         <img
-          src={item.document?.cover_page || "/public/image/default_cover.png"}
+          src={item.document?.cover_page || "/image/default_cover.png"}
           alt={item.document?.title || "Tài liệu không khả dụng"}
           onError={handleImageError}
           className="w-16 h-16 object-cover rounded-lg bg-white border border-gray-200 flex-shrink-0"

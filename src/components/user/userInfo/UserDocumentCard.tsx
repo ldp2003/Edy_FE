@@ -56,7 +56,10 @@ const UserDocumentCard: React.FC<UserDocumentCardProps> = ({ document }) => {
 
   const handleImageError = (e: React.SyntheticEvent<HTMLImageElement>) => {
     const target = e.target as HTMLImageElement;
-    target.src = "/public/image/default_cover.png";
+    // Only set fallback if not already set to prevent infinite loops
+    if (target.src !== "/image/default_cover.png") {
+      target.src = "/image/default_cover.png";
+    }
   };
 
   return (
@@ -67,7 +70,7 @@ const UserDocumentCard: React.FC<UserDocumentCardProps> = ({ document }) => {
       {contextHolder}
       <div className="bg-[var(--card-background-color)] rounded-md relative flex justify-center items-center">
         <img
-          src={document.cover_page || "/public/image/default_cover.png"}
+          src={document.cover_page || "/image/default_cover.png"}
           alt={document.title}
           className="h-40 m-3 w-full object-fill rounded-md bg-white"
           onError={handleImageError}

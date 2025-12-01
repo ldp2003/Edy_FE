@@ -11,7 +11,10 @@ const SuggestCard: React.FC<SuggestCardProps> = ({ document }) => {
   const { _id, title, subject, cover_page } = document;
   const handleImageError = (e: React.SyntheticEvent<HTMLImageElement>) => {
     const target = e.target as HTMLImageElement;
-    target.src = "/public/image/default_cover.png";
+    // Only set fallback if not already set to prevent infinite loops
+    if (target.src !== "/image/default_cover.png") {
+      target.src = "/image/default_cover.png";
+    }
   };
 
   const onClick = () => {
@@ -25,7 +28,7 @@ const SuggestCard: React.FC<SuggestCardProps> = ({ document }) => {
     >
       <div className="relative w-15 h-15 md:w-18 md:h-18 rounded-lg overflow-hidden flex-shrink-0 bg-[var(--secondary-background-color)]">
         <img
-          src={cover_page || "/public/image/default_cover.png"}
+          src={cover_page || "/image/default_cover.png"}
           alt={title}
           className="w-full h-full object-cover"
           onError={handleImageError}
