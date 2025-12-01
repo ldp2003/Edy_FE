@@ -22,7 +22,7 @@ const ReadHistoryItem: React.FC<ReadHistoryItemProps> = ({ item, onClick }) => {
 
   const handleImageError = (e: React.SyntheticEvent<HTMLImageElement>) => {
     const target = e.target as HTMLImageElement;
-    target.src = "/public/image/default_cover.png";
+    target.src = "/image/default_cover.png";
   };
 
   const getFileTypeStyle = (fileType: string) => {
