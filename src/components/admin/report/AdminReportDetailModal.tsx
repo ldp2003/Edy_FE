@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   Modal,
   Tag,
@@ -9,6 +9,7 @@ import {
   Checkbox,
   Input,
   Radio,
+  message,
 } from "antd";
 import { UserOutlined, FileTextOutlined } from "@ant-design/icons";
 import type { Report } from "../../../models/report";
@@ -35,12 +36,38 @@ const AdminReportDetailModal: React.FC<AdminReportDetailModalProps> = ({
   onResolve,
 }) => {
   const [form] = Form.useForm();
+  const [confirmLoading, setConfirmLoading] = useState(false);
+
+  // Tính toán an toàn khi report có thể null
+  const initialTypes = Array.isArray(report?.type) ? (report?.type as string[]) : [];
+  const docObj = typeof report?.doc === "object" ? report!.doc : null;
+  const cmtObj = typeof report?.cmt === "object" ? report!.cmt : null;
+  const isCommentReport = !!cmtObj;
+
+  // Đồng bộ form khi mở modal hoặc report thay đổi
+  useEffect(() => {
+    if (!visible || !report) return;
+    form.resetFields();
+    form.setFieldsValue({
+      validTypes: initialTypes,
+      action: "DELETE",
+      resolveReason: "",
+    });
+  }, [visible, report?._id, form]);
+
+  // Đảm bảo action hợp lệ theo loại report (document/comment)
+  useEffect(() => {
+    if (!visible) return;
+    const allowedActions = isCommentReport
+      ? ["DELETE", "FALSE_REPORT"]
+      : ["DELETE", "EDIT_REQUESTED", "FALSE_REPORT"];
+    const currAction = (form.getFieldValue("action") as string) || "DELETE";
+    if (!allowedActions.includes(currAction)) {
+      form.setFieldsValue({ action: "DELETE" });
+    }
+  }, [visible, isCommentReport, form]);
 
   if (!report) return null;
-
-  const initialTypes =
-    Array.isArray(report.type) && report.type.length > 0 ? report.type : [];
-  const docObj = typeof report.doc === "object" ? report.doc : null;
 
   return (
     <Modal
@@ -61,11 +88,17 @@ const AdminReportDetailModal: React.FC<AdminReportDetailModalProps> = ({
       }
       onOk={() => form.submit()}
       okText="Xác nhận xử lý"
+      confirmLoading={confirmLoading}
       footer={[
         <Button key="cancel" onClick={onClose}>
           Đóng
         </Button>,
-        <Button key="ok" type="primary" onClick={() => form.submit()}>
+        <Button
+          key="ok"
+          type="primary"
+          onClick={() => form.submit()}
+          loading={confirmLoading}
+        >
           Xác nhận xử lý
         </Button>,
       ]}
@@ -112,13 +145,25 @@ const AdminReportDetailModal: React.FC<AdminReportDetailModalProps> = ({
             action: "DELETE",
             resolveReason: "",
           }}
-          onFinish={(values) =>
-            onResolve?.({
-              validTypes: values.validTypes || [],
-              action: values.action,
-              resolveReason: values.resolveReason || "",
-            })
-          }
+          onFinish={async (values) => {
+            setConfirmLoading(true);
+            try {
+              await Promise.resolve(
+                onResolve?.({
+                  validTypes: values.validTypes || [],
+                  action: values.action,
+                  resolveReason: values.resolveReason || "",
+                })
+              );
+              message.success("Xử lý báo cáo thành công");
+              form.resetFields();
+              onClose();
+            } catch (err) {
+              message.error("Có lỗi khi xử lý báo cáo, vui lòng thử lại");
+            } finally {
+              setConfirmLoading(false);
+            }
+          }}
         >
           <Form.Item
             name="validTypes"
@@ -148,7 +193,9 @@ const AdminReportDetailModal: React.FC<AdminReportDetailModalProps> = ({
           >
             <Radio.Group>
               <Radio value="DELETE">Gỡ nội dung</Radio>
-              <Radio value="EDIT_REQUESTED">Yêu cầu chỉnh sửa</Radio>
+              {!isCommentReport && (
+                <Radio value="EDIT_REQUESTED">Yêu cầu chỉnh sửa</Radio>
+              )}
               <Radio value="FALSE_REPORT">Giữ lại (Báo cáo sai)</Radio>
             </Radio.Group>
           </Form.Item>
