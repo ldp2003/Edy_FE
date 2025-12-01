@@ -6,8 +6,7 @@ export const RoleService = {
     queryParams?: {
       page?: number;
       limit?: number;
-      search?: string;
-      status?: string;
+      query?: string;
       name?: string;
       code?: string;
       description?: string;

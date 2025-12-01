@@ -1656,8 +1656,7 @@ export const RoleAPI = {
     queryParams?: {
       page?: number;
       limit?: number;
-      search?: string;
-      status?: string;
+      query?: string;
       name?: string;
       code?: string;
       description?: string;
@@ -1670,8 +1669,7 @@ export const RoleAPI = {
       if (queryParams) {
         if (queryParams.page) params.page = queryParams.page;
         if (queryParams.limit) params.limit = queryParams.limit;
-        if (queryParams.search) params.search = queryParams.search;
-        if (queryParams.status) params.status = queryParams.status;
+        if (queryParams.query) params.query = queryParams.query;
         if (queryParams.name) params.name = queryParams.name;
         if (queryParams.code) params.code = queryParams.code;
         if (queryParams.description)

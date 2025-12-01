@@ -65,8 +65,7 @@ const AdminRoleTable: React.FC = () => {
   const fetchRoles = async (params?: {
     page?: number;
     limit?: number;
-    search?: string;
-    status?: string;
+    query?: string;
     name?: string;
     code?: string;
     description?: string;
@@ -78,8 +77,7 @@ const AdminRoleTable: React.FC = () => {
       const queryParams = {
         page: params?.page || currentPage,
         limit: params?.limit || pageSize,
-        search: params?.search !== undefined ? params.search : searchText,
-        status: params?.status || filters.status,
+        query: params?.query !== undefined ? params.query : searchText,
         name: params?.name || filters.name,
         code: params?.code || filters.code,
         description: params?.description || filters.description,
@@ -109,7 +107,6 @@ const AdminRoleTable: React.FC = () => {
     const page = searchParams.get("page");
     const limit = searchParams.get("limit");
     const search = searchParams.get("search");
-    const status = searchParams.get("status");
     const name = searchParams.get("name");
     const code = searchParams.get("code");
     const description = searchParams.get("description");
@@ -122,9 +119,8 @@ const AdminRoleTable: React.FC = () => {
       setSearchText(search);
       setSearchInput(search);
     }
-    if (status || name || code || description || permissions || is_active) {
+    if (name || code || description || permissions || is_active) {
       const newFilters: any = {};
-      if (status) newFilters.status = status;
       if (name) newFilters.name = name;
       if (code) newFilters.code = code;
       if (description) newFilters.description = description;
@@ -137,7 +133,6 @@ const AdminRoleTable: React.FC = () => {
       page ||
       limit ||
       search ||
-      status ||
       name ||
       code ||
       description ||
@@ -147,8 +142,7 @@ const AdminRoleTable: React.FC = () => {
       fetchRoles({
         page: page ? parseInt(page) : 1,
         limit: limit ? parseInt(limit) : 10,
-        search: search || "",
-        status: status || undefined,
+        query: search || "",
         name: name || undefined,
         code: code || undefined,
         description: description || undefined,
@@ -160,12 +154,10 @@ const AdminRoleTable: React.FC = () => {
     }
   }, [searchParams]);
 
-  // Update URL with search params
   const updateURL = (params: {
     page?: number;
     limit?: number;
-    search?: string;
-    status?: string;
+    query?: string;
     name?: string;
     code?: string;
     description?: string;
@@ -177,8 +169,7 @@ const AdminRoleTable: React.FC = () => {
       newParams.set("page", params.page.toString());
     if (params.limit && params.limit !== 10)
       newParams.set("limit", params.limit.toString());
-    if (params.search) newParams.set("search", params.search);
-    if (params.status) newParams.set("status", params.status);
+    if (params.query) newParams.set("search", params.query);
     if (params.name) newParams.set("name", params.name);
     if (params.code) newParams.set("code", params.code);
     if (params.description) newParams.set("description", params.description);
@@ -380,8 +371,7 @@ const AdminRoleTable: React.FC = () => {
     const params = {
       page: 1,
       limit: pageSize,
-      search: searchInput,
-      status: filters.status,
+      query: searchInput,
       name: filters.name,
       code: filters.code,
       description: filters.description,
@@ -514,43 +504,164 @@ const AdminRoleTable: React.FC = () => {
                           const params = {
                             page: 1,
                             limit: pageSize,
-                            search: searchText,
+                            query: searchText,
                           };
                           updateURL(params);
                           fetchRoles(params);
                         },
                       },
                       {
-                        key: "active",
-                        label: "Hoạt động",
+                        key: "status",
+                        label: "Trạng thái",
+                        children: [
+                          {
+                            key: "status_all",
+                            label: "Tất cả",
+                            onClick: () => {
+                              const newFilters = { ...filters };
+                              delete newFilters.is_active;
+                              setFilters(newFilters);
+                              setCurrentPage(1);
+                              const params = {
+                                page: 1,
+                                limit: pageSize,
+                                query: searchText,
+                              };
+                              updateURL(params);
+                              fetchRoles(params);
+                            },
+                          },
+                          {
+                            key: "status_active",
+                            label: "Hoạt động",
+                            onClick: () => {
+                              setFilters({ ...filters, is_active: true });
+                              setCurrentPage(1);
+                              const params = {
+                                page: 1,
+                                limit: pageSize,
+                                query: searchText,
+                                is_active: true,
+                              };
+                              updateURL(params);
+                              fetchRoles(params);
+                            },
+                          },
+                          {
+                            key: "status_inactive",
+                            label: "Vô hiệu",
+                            onClick: () => {
+                              setFilters({ ...filters, is_active: false });
+                              setCurrentPage(1);
+                              const params = {
+                                page: 1,
+                                limit: pageSize,
+                                query: searchText,
+                                is_active: false,
+                              };
+                              updateURL(params);
+                              fetchRoles(params);
+                            },
+                          },
+                        ],
+                      },
+                      {
+                        key: "description",
+                        label: "Có mô tả",
                         onClick: () => {
-                          setFilters({ ...filters, is_active: true });
+                          setFilters({
+                            ...filters,
+                            description: "{exists:true}",
+                          });
                           setCurrentPage(1);
                           const params = {
                             page: 1,
                             limit: pageSize,
-                            search: searchText,
-                            is_active: true,
+                            query: searchText,
+                            description: "{exists:true}",
                           };
                           updateURL(params);
                           fetchRoles(params);
                         },
                       },
                       {
-                        key: "inactive",
-                        label: "Vô hiệu",
-                        onClick: () => {
-                          setFilters({ ...filters, is_active: false });
-                          setCurrentPage(1);
-                          const params = {
-                            page: 1,
-                            limit: pageSize,
-                            search: searchText,
-                            is_active: false,
-                          };
-                          updateURL(params);
-                          fetchRoles(params);
-                        },
+                        key: "permissions",
+                        label: "Quyền hạn",
+                        children: [
+                          {
+                            key: "perm_manage_role",
+                            label: "Quản lý quyền",
+                            onClick: () => {
+                              setFilters({
+                                ...filters,
+                                permissions: ["MANAGE_ROLE"],
+                              });
+                              setCurrentPage(1);
+                              const params = {
+                                page: 1,
+                                limit: pageSize,
+                                query: searchText,
+                                permissions: ["MANAGE_ROLE"],
+                              };
+                              updateURL(params);
+                              fetchRoles(params);
+                            },
+                          },
+                          {
+                            key: "perm_manage_user",
+                            label: "Quản lý người dùng",
+                            onClick: () => {
+                              setFilters({
+                                ...filters,
+                                permissions: ["MANAGE_USER"],
+                              });
+                              setCurrentPage(1);
+                              const params = {
+                                page: 1,
+                                limit: pageSize,
+                                query: searchText,
+                                permissions: ["MANAGE_USER"],
+                              };
+                              updateURL(params);
+                              fetchRoles(params);
+                            },
+                          },
+                          {
+                            key: "perm_manage_doc",
+                            label: "Quản lý tài liệu",
+                            onClick: () => {
+                              setFilters({
+                                ...filters,
+                                permissions: ["MANAGE_DOCUMENT"],
+                              });
+                              setCurrentPage(1);
+                              const params = {
+                                page: 1,
+                                limit: pageSize,
+                                query: searchText,
+                                permissions: ["MANAGE_DOCUMENT"],
+                              };
+                              updateURL(params);
+                              fetchRoles(params);
+                            },
+                          },
+                          {
+                            key: "perm_all",
+                            label: "Tất cả quyền",
+                            onClick: () => {
+                              setFilters({ ...filters, permissions: ["ALL"] });
+                              setCurrentPage(1);
+                              const params = {
+                                page: 1,
+                                limit: pageSize,
+                                query: searchText,
+                                permissions: ["ALL"],
+                              };
+                              updateURL(params);
+                              fetchRoles(params);
+                            },
+                          },
+                        ],
                       },
                     ],
                   }}
@@ -570,70 +681,17 @@ const AdminRoleTable: React.FC = () => {
             </div>
 
             {/* Search Bar */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-              <div className="relative">
+            <div className="flex items-center space-x-2">
+              <div className="relative flex-1 max-w-sm">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
                 <Input
-                  placeholder="Tìm kiếm chung..."
+                  placeholder="Tìm kiếm theo tên, mã..."
                   className="pl-10"
                   size="small"
                   value={searchInput}
                   onChange={(e) => setSearchInput(e.target.value)}
                   onPressEnter={handleSearch}
                 />
-              </div>
-              <Input
-                placeholder="Tên quyền"
-                size="small"
-                value={filters.name || ""}
-                onChange={(e) =>
-                  setFilters({ ...filters, name: e.target.value })
-                }
-                onPressEnter={handleSearch}
-              />
-              <Input
-                placeholder="Mã quyền"
-                size="small"
-                value={filters.code || ""}
-                onChange={(e) =>
-                  setFilters({ ...filters, code: e.target.value })
-                }
-                onPressEnter={handleSearch}
-              />
-              <Input
-                placeholder="Mô tả"
-                size="small"
-                value={filters.description || ""}
-                onChange={(e) =>
-                  setFilters({ ...filters, description: e.target.value })
-                }
-                onPressEnter={handleSearch}
-              />
-            </div>
-            <div className="flex items-center justify-between mt-4">
-              <div className="flex items-center space-x-4">
-                <div className="flex items-center space-x-2">
-                  <label className="text-sm">Trạng thái:</label>
-                  <select
-                    className="border border-gray-300 rounded px-2 py-1 text-sm"
-                    value={
-                      filters.is_active === undefined
-                        ? ""
-                        : filters.is_active.toString()
-                    }
-                    onChange={(e) => {
-                      const value = e.target.value;
-                      setFilters({
-                        ...filters,
-                        is_active: value === "" ? undefined : value === "true",
-                      });
-                    }}
-                  >
-                    <option value="">Tất cả</option>
-                    <option value="true">Hoạt động</option>
-                    <option value="false">Vô hiệu</option>
-                  </select>
-                </div>
               </div>
               <Button type="primary" size="small" onClick={handleSearch}>
                 Tìm kiếm
@@ -657,8 +715,12 @@ const AdminRoleTable: React.FC = () => {
                     const params = {
                       page,
                       limit: pageSize || 10,
-                      search: searchText,
-                      status: filters.status,
+                      query: searchText,
+                      name: filters.name,
+                      code: filters.code,
+                      description: filters.description,
+                      permissions: filters.permissions,
+                      is_active: filters.is_active,
                     };
                     updateURL(params);
                     fetchRoles(params);
@@ -669,8 +731,12 @@ const AdminRoleTable: React.FC = () => {
                     const params = {
                       page: current,
                       limit: size,
-                      search: searchText,
-                      status: filters.status,
+                      query: searchText,
+                      name: filters.name,
+                      code: filters.code,
+                      description: filters.description,
+                      permissions: filters.permissions,
+                      is_active: filters.is_active,
                     };
                     updateURL(params);
                     fetchRoles(params);
