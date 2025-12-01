@@ -1,16 +1,19 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useState, useEffect } from "react";
-import { Table, Button, Input, message, Popconfirm, Tooltip, Tag } from "antd";
-import type { ColumnsType } from "antd/es/table";
 import {
-  Download,
-  Printer,
-  Search,
-  Filter,
-  Edit,
-  Lock,
-  Unlock,
-  Plus,
-} from "lucide-react";
+  Table,
+  Button,
+  Input,
+  message,
+  Popconfirm,
+  Tooltip,
+  Tag,
+  Dropdown,
+  Checkbox,
+} from "antd";
+import type { ColumnsType } from "antd/es/table";
+import { useSearchParams } from "react-router-dom";
+import { Search, Filter, Edit, Lock, Unlock, Plus, Eye } from "lucide-react";
 import { RoleService } from "../../../utils/RoleService";
 import CreateRoleModal from "./CreateRoleModal";
 import EditRoleModal from "./EditRoleModal";
@@ -34,25 +37,50 @@ interface RoleDisplay extends Role {
 }
 
 const AdminRoleTable: React.FC = () => {
+  const [searchParams, setSearchParams] = useSearchParams();
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
-  const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
   const [loading, setLoading] = useState(false);
   const [searchText, setSearchText] = useState("");
+  const [searchInput, setSearchInput] = useState("");
   const [roles, setRoles] = useState<Role[]>([]);
   const [totalRoles, setTotalRoles] = useState(0);
   const [isCreateModalVisible, setIsCreateModalVisible] = useState(false);
   const [isEditModalVisible, setIsEditModalVisible] = useState(false);
   const [selectedRole, setSelectedRole] = useState<Role | null>(null);
   const [messageApi, contextHolder] = message.useMessage();
+  const [filters, setFilters] = useState<any>({});
+  const [visibleColumns, setVisibleColumns] = useState<Set<string>>(
+    new Set([
+      "index",
+      "name",
+      "code",
+      "description",
+      "permissions",
+      "is_active",
+      "actions",
+    ])
+  );
 
-  const fetchRoles = async () => {
+  const fetchRoles = async (params?: {
+    page?: number;
+    limit?: number;
+    search?: string;
+    status?: string;
+  }) => {
     setLoading(true);
     try {
-      const response = await RoleService.getAllRoles(true);
+      const queryParams = {
+        page: params?.page || currentPage,
+        limit: params?.limit || pageSize,
+        search: params?.search !== undefined ? params.search : searchText,
+        status: params?.status || filters.status,
+      };
+
+      const response = await RoleService.getAllRoles(true, queryParams);
       console.log("response:", response);
-      setRoles(response || []);
-      setTotalRoles(response?.length || 0);
+      setRoles(response?.data || response || []);
+      setTotalRoles(response?.pagination?.total || response?.length || 0);
     } catch (error) {
       console.error("Error fetching roles:", error);
       message.error("Không thể tải danh sách quyền!");
@@ -63,10 +91,83 @@ const AdminRoleTable: React.FC = () => {
     }
   };
 
-  // Fetch roles from API
+  // Initialize from URL params
   useEffect(() => {
-    fetchRoles();
-  }, [currentPage, pageSize, searchText]);
+    const page = searchParams.get("page");
+    const limit = searchParams.get("limit");
+    const search = searchParams.get("search");
+    const status = searchParams.get("status");
+
+    if (page) setCurrentPage(parseInt(page));
+    if (limit) setPageSize(parseInt(limit));
+    if (search) {
+      setSearchText(search);
+      setSearchInput(search);
+    }
+    if (status) setFilters({ status });
+
+    if (page || limit || search || status) {
+      fetchRoles({
+        page: page ? parseInt(page) : 1,
+        limit: limit ? parseInt(limit) : 10,
+        search: search || "",
+        status: status || undefined,
+      });
+    } else {
+      fetchRoles();
+    }
+  }, [searchParams]);
+
+  // Initialize from URL params
+  useEffect(() => {
+    const page = searchParams.get("page");
+    const limit = searchParams.get("limit");
+    const search = searchParams.get("search");
+    const status = searchParams.get("status");
+
+    if (page) setCurrentPage(parseInt(page));
+    if (limit) setPageSize(parseInt(limit));
+    if (search) setSearchText(search);
+    if (status) setFilters({ status });
+
+    if (page || limit || search || status) {
+      fetchRoles({
+        page: page ? parseInt(page) : 1,
+        limit: limit ? parseInt(limit) : 10,
+        search: search || "",
+        status: status || undefined,
+      });
+    }
+  }, [searchParams]);
+
+  // Update URL with search params
+  const updateURL = (params: {
+    page?: number;
+    limit?: number;
+    search?: string;
+    status?: string;
+  }) => {
+    const newParams = new URLSearchParams();
+    if (params.page && params.page !== 1)
+      newParams.set("page", params.page.toString());
+    if (params.limit && params.limit !== 10)
+      newParams.set("limit", params.limit.toString());
+    if (params.search) newParams.set("search", params.search);
+    if (params.status) newParams.set("status", params.status);
+    setSearchParams(newParams);
+  };
+
+  const toggleColumnVisibility = (columnKey: string, checked: boolean) => {
+    setVisibleColumns((prev) => {
+      const newSet = new Set(prev);
+      if (checked) {
+        newSet.add(columnKey);
+      } else {
+        newSet.delete(columnKey);
+      }
+      return newSet;
+    });
+  };
 
   const handleEditRole = (role: Role) => {
     setSelectedRole(role);
@@ -236,16 +337,111 @@ const AdminRoleTable: React.FC = () => {
     }));
   };
 
-  const handleSearch = (value: string) => {
-    setSearchText(value);
-    setCurrentPage(1);
+  // Get total count for pagination
+  const getTotalCount = () => {
+    return totalRoles;
   };
 
-  const rowSelection = {
-    selectedRowKeys,
-    onChange: (newSelectedRowKeys: React.Key[]) => {
-      setSelectedRowKeys(newSelectedRowKeys);
-    },
+  const handleSearch = () => {
+    setSearchText(searchInput);
+    setCurrentPage(1);
+    const params = {
+      page: 1,
+      limit: pageSize,
+      search: searchInput,
+      status: filters.status,
+    };
+    updateURL(params);
+    fetchRoles(params);
+  };
+
+  // Filter columns based on visibility
+  const filteredColumns = columns.filter((column) =>
+    visibleColumns.has(column.key as string)
+  );
+
+  const columnVisibilityMenu = {
+    items: [
+      {
+        key: "columns",
+        label: (
+          <div className="p-2 min-w-48">
+            <div className="space-y-2">
+              <div>
+                <Checkbox
+                  checked={visibleColumns.has("index")}
+                  onChange={(e) =>
+                    toggleColumnVisibility("index", e.target.checked)
+                  }
+                >
+                  STT
+                </Checkbox>
+              </div>
+              <div>
+                <Checkbox
+                  checked={visibleColumns.has("name")}
+                  onChange={(e) =>
+                    toggleColumnVisibility("name", e.target.checked)
+                  }
+                >
+                  Tên
+                </Checkbox>
+              </div>
+              <div>
+                <Checkbox
+                  checked={visibleColumns.has("code")}
+                  onChange={(e) =>
+                    toggleColumnVisibility("code", e.target.checked)
+                  }
+                >
+                  Mã
+                </Checkbox>
+              </div>
+              <div>
+                <Checkbox
+                  checked={visibleColumns.has("description")}
+                  onChange={(e) =>
+                    toggleColumnVisibility("description", e.target.checked)
+                  }
+                >
+                  Mô tả
+                </Checkbox>
+              </div>
+              <div>
+                <Checkbox
+                  checked={visibleColumns.has("permissions")}
+                  onChange={(e) =>
+                    toggleColumnVisibility("permissions", e.target.checked)
+                  }
+                >
+                  Quyền hạn
+                </Checkbox>
+              </div>
+              <div>
+                <Checkbox
+                  checked={visibleColumns.has("is_active")}
+                  onChange={(e) =>
+                    toggleColumnVisibility("is_active", e.target.checked)
+                  }
+                >
+                  Trạng thái
+                </Checkbox>
+              </div>
+              <div>
+                <Checkbox
+                  checked={visibleColumns.has("actions")}
+                  onChange={(e) =>
+                    toggleColumnVisibility("actions", e.target.checked)
+                  }
+                >
+                  Thao tác
+                </Checkbox>
+              </div>
+            </div>
+          </div>
+        ),
+      },
+    ],
   };
 
   return (
@@ -266,24 +462,73 @@ const AdminRoleTable: React.FC = () => {
                 >
                   Tạo mới
                 </Button>
-                <Button icon={<Download size={14} />} size="small">
-                  Download
-                </Button>
-                <Button icon={<Printer size={14} />} size="small">
-                  Print
-                </Button>
               </div>
 
               <div className="flex items-center space-x-2">
-                <button
-                  className="flex items-center text-xs gap-1 border border-gray-300 rounded-md px-2 py-1 hover:bg-gray-100 cursor-pointer"
-                  onClick={() =>
-                    message.info("Tính năng bộ lọc đang được phát triển")
-                  }
+                <Dropdown
+                  menu={{
+                    items: [
+                      {
+                        key: "all",
+                        label: "Tất cả",
+                        onClick: () => {
+                          setFilters({});
+                          setCurrentPage(1);
+                          const params = {
+                            page: 1,
+                            limit: pageSize,
+                            search: searchText,
+                          };
+                          updateURL(params);
+                          fetchRoles(params);
+                        },
+                      },
+                      {
+                        key: "active",
+                        label: "Hoạt động",
+                        onClick: () => {
+                          setFilters({ status: "active" });
+                          setCurrentPage(1);
+                          const params = {
+                            page: 1,
+                            limit: pageSize,
+                            search: searchText,
+                            status: "active",
+                          };
+                          updateURL(params);
+                          fetchRoles(params);
+                        },
+                      },
+                      {
+                        key: "inactive",
+                        label: "Vô hiệu",
+                        onClick: () => {
+                          setFilters({ status: "inactive" });
+                          setCurrentPage(1);
+                          const params = {
+                            page: 1,
+                            limit: pageSize,
+                            search: searchText,
+                            status: "inactive",
+                          };
+                          updateURL(params);
+                          fetchRoles(params);
+                        },
+                      },
+                    ],
+                  }}
+                  trigger={["click"]}
                 >
-                  <Filter size={14} />
-                  Bộ lọc
-                </button>
+                  <button className="flex items-center text-xs gap-1 border border-gray-300 rounded-md px-2 py-1 hover:bg-gray-100 cursor-pointer">
+                    <Filter size={14} />
+                    Bộ lọc
+                  </button>
+                </Dropdown>
+                <Dropdown menu={columnVisibilityMenu} trigger={["click"]}>
+                  <Button icon={<Eye size={14} />} size="small">
+                    Ẩn hiện cột
+                  </Button>
+                </Dropdown>
               </div>
             </div>
 
@@ -295,10 +540,14 @@ const AdminRoleTable: React.FC = () => {
                   placeholder="Tìm kiếm theo mã, tên..."
                   className="pl-10"
                   size="small"
-                  value={searchText}
-                  onChange={(e) => handleSearch(e.target.value)}
+                  value={searchInput}
+                  onChange={(e) => setSearchInput(e.target.value)}
+                  onPressEnter={handleSearch}
                 />
               </div>
+              <Button type="primary" size="small" onClick={handleSearch}>
+                Tìm kiếm
+              </Button>
             </div>
           </div>
 
@@ -306,15 +555,36 @@ const AdminRoleTable: React.FC = () => {
           <div className="w-full overflow-hidden">
             <div className="rounded-md border border-gray-200 bg-white shadow-sm">
               <Table
-                rowSelection={rowSelection}
-                columns={columns}
+                columns={filteredColumns}
                 dataSource={getDisplayData()}
                 pagination={{
                   current: currentPage,
                   pageSize: pageSize,
-                  total: totalRoles,
-                  onChange: (page) => setCurrentPage(page),
-                  onShowSizeChange: (_, size) => setPageSize(size),
+                  total: getTotalCount(),
+                  onChange: (page, pageSize) => {
+                    setCurrentPage(page);
+                    setPageSize(pageSize || 10);
+                    const params = {
+                      page,
+                      limit: pageSize || 10,
+                      search: searchText,
+                      status: filters.status,
+                    };
+                    updateURL(params);
+                    fetchRoles(params);
+                  },
+                  onShowSizeChange: (current, size) => {
+                    setCurrentPage(current);
+                    setPageSize(size);
+                    const params = {
+                      page: current,
+                      limit: size,
+                      search: searchText,
+                      status: filters.status,
+                    };
+                    updateURL(params);
+                    fetchRoles(params);
+                  },
                   showSizeChanger: true,
                   showTotal: (total, range) =>
                     `${range[0]}-${range[1]} của ${total}`,

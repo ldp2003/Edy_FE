@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import axios from "axios";
 import {
   extractPublicIdFromUrl,
@@ -1650,11 +1651,24 @@ export const NotificationAPI = {
 
 export const RoleAPI = {
   // Get all roles
-  getAllRoles: async (active: boolean) => {
+  getAllRoles: async (
+    active: boolean,
+    queryParams?: {
+      page?: number;
+      limit?: number;
+      search?: string;
+      status?: string;
+    }
+  ) => {
     try {
-      const response = await apiClient.get("/admin/roles", {
-        params: { active },
-      });
+      const params: any = { active };
+      if (queryParams) {
+        if (queryParams.page) params.page = queryParams.page;
+        if (queryParams.limit) params.limit = queryParams.limit;
+        if (queryParams.search) params.search = queryParams.search;
+        if (queryParams.status) params.status = queryParams.status;
+      }
+      const response = await apiClient.get("/admin/roles", { params });
       return response.data;
     } catch (error) {
       console.error("Error fetching roles:", error);
