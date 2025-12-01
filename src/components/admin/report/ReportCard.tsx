@@ -65,8 +65,9 @@ const ReportCard: React.FC<ReportCardProps> = ({ report, onResolve }) => {
 
   const handleImageError = (e: React.SyntheticEvent<HTMLImageElement>) => {
     const target = e.target as HTMLImageElement;
-    target.src = "/public/image/default_cover.png";
+    target.src = "/image/default_cover.png";
   };
+  
 
   return (
     <Card className="w-full shadow-sm hover:shadow-md transition-shadow bg-gray-50">
