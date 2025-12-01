@@ -67,13 +67,13 @@ const UserItem: React.FC<UserItemProps> = ({
 
   return (
     <div
-      className="text-left bg-white border border-gray-200 rounded-lg p-3 md:p-4 mb-3 hover:shadow-md transition-shadow cursor-pointer"
+      className="text-left bg-white border border-gray-200 rounded-md p-2 md:p-3 hover:shadow-sm transition-shadow cursor-pointer"
       onClick={() => onViewUser(user._id)}
     >
-      <div className="flex flex-col md:flex-row md:items-start justify-between gap-3">
+      <div className="flex items-center justify-between gap-2">
         {/* Avatar và thông tin cơ bản */}
-        <div className="flex items-start space-x-3 flex-1">
-          <div className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden flex-shrink-0">
+        <div className="flex items-center space-x-2 flex-1 min-w-0">
+          <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden flex-shrink-0">
             {user.avatar ? (
               <img
                 src={user.avatar}
@@ -81,7 +81,7 @@ const UserItem: React.FC<UserItemProps> = ({
                 className="w-full h-full object-cover"
               />
             ) : (
-              <span className="text-sm font-medium">
+              <span className="text-xs font-medium">
                 {user.first_name.charAt(0)}
                 {user.last_name.charAt(0)}
               </span>
@@ -89,109 +89,112 @@ const UserItem: React.FC<UserItemProps> = ({
           </div>
 
           <div className="flex-1 min-w-0">
-            {/* Tên và email */}
-            <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2 mb-1">
-              <span className="font-semibold text-gray-900 truncate">
+            {/* Tên và trạng thái */}
+            <div className="flex items-center gap-2 mb-1">
+              <span className="font-medium text-gray-900 text-sm truncate">
                 {user.first_name} {user.last_name}
               </span>
               <span
-                className={`px-2 py-0.5 rounded-full text-xs whitespace-nowrap ${statusColor} ${statusBg}`}
+                className={`px-1.5 py-0.5 rounded text-xs whitespace-nowrap ${statusColor} ${statusBg}`}
               >
                 {statusText}
               </span>
             </div>
 
-            <div className="text-sm text-gray-600 mb-2 truncate">
+            {/* Email và thông tin cơ bản */}
+            <div className="text-xs text-gray-500 truncate mb-1">
               {user.contact_email}
             </div>
 
-            {/* Thông tin bổ sung */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs text-gray-500 mb-2">
-              <div>
+            {/* Thông tin bổ sung trên cùng dòng */}
+            <div className="flex items-center gap-3 text-xs text-gray-500">
+              <span>
                 <span className="font-medium">Tổ chức:</span>{" "}
                 {typeof user.organization === "object" && user.organization
                   ? user.organization.name
                   : "Chưa có"}
-              </div>
-              <div>
+              </span>
+              <span>
                 <span className="font-medium">Lĩnh vực:</span>{" "}
                 {user.field_of_study && user.field_of_study.length > 0
-                  ? user.field_of_study.slice(0, 1).join("") +
-                    (user.field_of_study.length > 1 ? "..." : "")
+                  ? user.field_of_study.slice(0, 1).join("")
                   : "N/A"}
-              </div>
+              </span>
             </div>
 
-            {/* Vai trò */}
-            {roleGroups.length > 0 && (
-              <div className="mb-2">
-                <span className="text-xs font-medium text-gray-500 mr-2">
-                  Vai trò:
-                </span>
-                <div className="flex flex-col gap-1">
-                  {roleGroups.map((group, groupIndex) => (
-                    <div key={groupIndex} className="flex gap-1 flex-wrap">
-                      {group.map((role, index) => (
+            {/* Vai trò và thống kê trên cùng dòng */}
+            <div className="flex items-center justify-between mt-1">
+              {/* Vai trò */}
+              <div className="flex items-center gap-1">
+                {user.role_names && user.role_names.length > 0 && (
+                  <>
+                    <span className="text-xs font-medium text-gray-500">
+                      Vai trò:
+                    </span>
+                    <div className="flex gap-1">
+                      {user.role_names.slice(0, 2).map((role, index) => (
                         <Tag
-                          key={`${groupIndex}-${index}`}
+                          key={index}
                           color="blue"
-                          className="text-xs"
+                          className="text-xs px-1 py-0 h-4"
                         >
                           {getRoleDisplayName(role)}
                         </Tag>
                       ))}
+                      {user.role_names.length > 2 && (
+                        <span className="text-xs text-gray-400">
+                          +{user.role_names.length - 2}
+                        </span>
+                      )}
                     </div>
-                  ))}
-                </div>
+                  </>
+                )}
               </div>
-            )}
 
-            {/* Thống kê */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs text-gray-500">
-              <div className="text-center">
-                <div className="font-medium text-gray-900">
-                  {user.doc_count || 0}
-                </div>
-                <div>Tài liệu</div>
-              </div>
-              <div className="text-center">
-                <div className="font-medium text-gray-900">
-                  {user.point || 0}
-                </div>
-                <div>Điểm</div>
-              </div>
-              <div className="text-center">
-                <div className="font-medium text-gray-900">
-                  {user.rank_point || 0}
-                </div>
-                <div>Xếp hạng</div>
-              </div>
-              <div className="text-center">
-                <div
-                  className={`font-medium ${
-                    (user.strike || 0) > 0 ? "text-red-600" : "text-gray-900"
-                  }`}
+              {/* Thống kê */}
+              <div className="flex items-center gap-3 text-xs text-gray-500">
+                <span>
+                  <span className="font-medium text-gray-900">
+                    {user.doc_count || 0}
+                  </span>{" "}
+                  Tài liệu
+                </span>
+                <span>
+                  <span className="font-medium text-gray-900">
+                    {user.point || 0}
+                  </span>{" "}
+                  Điểm dùng
+                </span>
+                <span>
+                  <span className="font-medium text-gray-900">
+                    {user.rank_point || 0}
+                  </span>{" "}
+                  Điểm hạng
+                </span>
+                <span
+                  className={
+                    (user.strike || 0) > 0 ? "text-red-600 font-medium" : ""
+                  }
                 >
-                  {user.strike || 0}
-                </div>
-                <div>Cảnh cáo</div>
+                  {user.strike || 0} Cảnh cáo
+                </span>
               </div>
             </div>
           </div>
         </div>
 
         {/* Actions */}
-        <div className="flex flex-row md:flex-col space-x-1 md:space-x-0 md:space-y-1 justify-end">
+        <div className="flex space-x-1">
           <Tooltip title="Chỉnh sửa">
             <Button
               type="text"
-              icon={<Edit size={14} />}
+              icon={<Edit size={12} />}
               size="small"
               onClick={(e) => {
                 e.stopPropagation();
                 onEditUser(user._id);
               }}
-              className="w-8 h-8"
+              className="w-6 h-6"
             />
           </Tooltip>
 
@@ -220,15 +223,15 @@ const UserItem: React.FC<UserItemProps> = ({
                 type="text"
                 icon={
                   user.status === "ACTIVE" ? (
-                    <Lock size={14} />
+                    <Lock size={12} />
                   ) : (
-                    <Unlock size={14} />
+                    <Unlock size={12} />
                   )
                 }
                 size="small"
                 onClick={(e) => e.stopPropagation()}
                 danger={user.status === "ACTIVE"}
-                className="w-8 h-8"
+                className="w-6 h-6"
               />
             </Tooltip>
           </Popconfirm>

@@ -15,8 +15,6 @@ import {
 import { useNavigate, useSearchParams } from "react-router-dom";
 import type { ColumnsType } from "antd/es/table";
 import {
-  Download,
-  Printer,
   Search,
   Filter,
   Lock,
@@ -29,7 +27,6 @@ import {
 import type { User } from "../../../models/user";
 import { UserService } from "../../../utils/UserService";
 import { getStatusStyle } from "../../../utils/AdminTableStyles";
-import { getRoleDisplayName } from "../../../constants/RoleConstants";
 import UserFilterModal from "./UserFilterModal";
 import UserItem from "./UserItem";
 
@@ -38,6 +35,7 @@ const { Option } = Select;
 interface UserDisplay extends User {
   index: number;
   role_names?: string[];
+  is_admin?: boolean;
 }
 
 const AdminUserTable: React.FC = () => {
@@ -239,180 +237,154 @@ const AdminUserTable: React.FC = () => {
   const columnVisibilityMenu = {
     items: [
       {
-        key: "index",
+        key: "column-group-1",
         label: (
-          <Checkbox
-            checked={visibleColumns.has("index")}
-            onChange={(e) => toggleColumnVisibility("index", e.target.checked)}
-          >
-            STT
-          </Checkbox>
-        ),
-      },
-      {
-        key: "fullName",
-        label: (
-          <Checkbox
-            checked={visibleColumns.has("fullName")}
-            onChange={(e) =>
-              toggleColumnVisibility("fullName", e.target.checked)
-            }
-            disabled
-          >
-            Người dùng
-          </Checkbox>
-        ),
-      },
-      {
-        key: "organization",
-        label: (
-          <Checkbox
-            checked={visibleColumns.has("organization")}
-            onChange={(e) =>
-              toggleColumnVisibility("organization", e.target.checked)
-            }
-          >
-            Tổ chức
-          </Checkbox>
-        ),
-      },
-      {
-        key: "role_names",
-        label: (
-          <Checkbox
-            checked={visibleColumns.has("role_names")}
-            onChange={(e) =>
-              toggleColumnVisibility("role_names", e.target.checked)
-            }
-          >
-            Vai trò
-          </Checkbox>
-        ),
-      },
-      {
-        key: "field_of_study",
-        label: (
-          <Checkbox
-            checked={visibleColumns.has("field_of_study")}
-            onChange={(e) =>
-              toggleColumnVisibility("field_of_study", e.target.checked)
-            }
-          >
-            Lĩnh vực
-          </Checkbox>
-        ),
-      },
-      {
-        key: "follower",
-        label: (
-          <Checkbox
-            checked={visibleColumns.has("follower")}
-            onChange={(e) =>
-              toggleColumnVisibility("follower", e.target.checked)
-            }
-          >
-            Người theo dõi
-          </Checkbox>
-        ),
-      },
-      {
-        key: "following",
-        label: (
-          <Checkbox
-            checked={visibleColumns.has("following")}
-            onChange={(e) =>
-              toggleColumnVisibility("following", e.target.checked)
-            }
-          >
-            Đang theo dõi
-          </Checkbox>
-        ),
-      },
-      {
-        key: "doc_count",
-        label: (
-          <Checkbox
-            checked={visibleColumns.has("doc_count")}
-            onChange={(e) =>
-              toggleColumnVisibility("doc_count", e.target.checked)
-            }
-          >
-            Tài liệu
-          </Checkbox>
-        ),
-      },
-      {
-        key: "point",
-        label: (
-          <Checkbox
-            checked={visibleColumns.has("point")}
-            onChange={(e) => toggleColumnVisibility("point", e.target.checked)}
-          >
-            Điểm
-          </Checkbox>
-        ),
-      },
-      {
-        key: "rank_point",
-        label: (
-          <Checkbox
-            checked={visibleColumns.has("rank_point")}
-            onChange={(e) =>
-              toggleColumnVisibility("rank_point", e.target.checked)
-            }
-          >
-            Xếp hạng
-          </Checkbox>
-        ),
-      },
-      {
-        key: "strike",
-        label: (
-          <Checkbox
-            checked={visibleColumns.has("strike")}
-            onChange={(e) => toggleColumnVisibility("strike", e.target.checked)}
-          >
-            Cảnh cáo
-          </Checkbox>
-        ),
-      },
-      {
-        key: "createdAt",
-        label: (
-          <Checkbox
-            checked={visibleColumns.has("createdAt")}
-            onChange={(e) =>
-              toggleColumnVisibility("createdAt", e.target.checked)
-            }
-          >
-            Ngày tạo
-          </Checkbox>
-        ),
-      },
-      {
-        key: "status",
-        label: (
-          <Checkbox
-            checked={visibleColumns.has("status")}
-            onChange={(e) => toggleColumnVisibility("status", e.target.checked)}
-            disabled
-          >
-            Trạng thái
-          </Checkbox>
-        ),
-      },
-      {
-        key: "actions",
-        label: (
-          <Checkbox
-            checked={visibleColumns.has("actions")}
-            onChange={(e) =>
-              toggleColumnVisibility("actions", e.target.checked)
-            }
-            disabled
-          >
-            Thao tác
-          </Checkbox>
+          <div className="grid grid-cols-2 gap-4 p-2 min-w-[300px]">
+            <div className="space-y-2">
+              <div>
+                <Checkbox
+                  checked={visibleColumns.has("index")}
+                  onChange={(e) =>
+                    toggleColumnVisibility("index", e.target.checked)
+                  }
+                >
+                  STT
+                </Checkbox>
+              </div>
+              <div>
+                <Checkbox
+                  checked={visibleColumns.has("fullName")}
+                  onChange={(e) =>
+                    toggleColumnVisibility("fullName", e.target.checked)
+                  }
+                >
+                  Người dùng
+                </Checkbox>
+              </div>
+              <div>
+                <Checkbox
+                  checked={visibleColumns.has("organization")}
+                  onChange={(e) =>
+                    toggleColumnVisibility("organization", e.target.checked)
+                  }
+                >
+                  Tổ chức
+                </Checkbox>
+              </div>
+              <div>
+                <Checkbox
+                  checked={visibleColumns.has("role_names")}
+                  onChange={(e) =>
+                    toggleColumnVisibility("role_names", e.target.checked)
+                  }
+                >
+                  Vai trò
+                </Checkbox>
+              </div>
+              <div>
+                <Checkbox
+                  checked={visibleColumns.has("field_of_study")}
+                  onChange={(e) =>
+                    toggleColumnVisibility("field_of_study", e.target.checked)
+                  }
+                >
+                  Lĩnh vực
+                </Checkbox>
+              </div>
+              <div>
+                <Checkbox
+                  checked={visibleColumns.has("follower")}
+                  onChange={(e) =>
+                    toggleColumnVisibility("follower", e.target.checked)
+                  }
+                >
+                  Người theo dõi
+                </Checkbox>
+              </div>
+              <div>
+                <Checkbox
+                  checked={visibleColumns.has("following")}
+                  onChange={(e) =>
+                    toggleColumnVisibility("following", e.target.checked)
+                  }
+                >
+                  Đang theo dõi
+                </Checkbox>
+              </div>
+            </div>
+            <div className="space-y-2">
+              <div>
+                <Checkbox
+                  checked={visibleColumns.has("doc_count")}
+                  onChange={(e) =>
+                    toggleColumnVisibility("doc_count", e.target.checked)
+                  }
+                >
+                  Tài liệu
+                </Checkbox>
+              </div>
+              <div>
+                <Checkbox
+                  checked={visibleColumns.has("point")}
+                  onChange={(e) =>
+                    toggleColumnVisibility("point", e.target.checked)
+                  }
+                >
+                  Điểm
+                </Checkbox>
+              </div>
+              <div>
+                <Checkbox
+                  checked={visibleColumns.has("rank_point")}
+                  onChange={(e) =>
+                    toggleColumnVisibility("rank_point", e.target.checked)
+                  }
+                >
+                  Xếp hạng
+                </Checkbox>
+              </div>
+              <div>
+                <Checkbox
+                  checked={visibleColumns.has("strike")}
+                  onChange={(e) =>
+                    toggleColumnVisibility("strike", e.target.checked)
+                  }
+                >
+                  Cảnh cáo
+                </Checkbox>
+              </div>
+              <div>
+                <Checkbox
+                  checked={visibleColumns.has("createdAt")}
+                  onChange={(e) =>
+                    toggleColumnVisibility("createdAt", e.target.checked)
+                  }
+                >
+                  Ngày tạo
+                </Checkbox>
+              </div>
+              <div>
+                <Checkbox
+                  checked={visibleColumns.has("status")}
+                  onChange={(e) =>
+                    toggleColumnVisibility("status", e.target.checked)
+                  }
+                >
+                  Trạng thái
+                </Checkbox>
+              </div>
+              <div>
+                <Checkbox
+                  checked={visibleColumns.has("actions")}
+                  onChange={(e) =>
+                    toggleColumnVisibility("actions", e.target.checked)
+                  }
+                >
+                  Thao tác
+                </Checkbox>
+              </div>
+            </div>
+          </div>
         ),
       },
     ],
@@ -516,36 +488,35 @@ const AdminUserTable: React.FC = () => {
     {
       title: "Vai trò",
       key: "role_names",
-      width: 150,
+      width: 100,
       render: (_, record: UserDisplay) => {
-        const roles = record.role_names || [];
-        if (roles.length === 0) {
-          return <Tag>Người dùng</Tag>;
+        if (record.is_admin) {
+          return (
+            <Tag
+              className="text-xs"
+              style={{
+                backgroundColor: "var(--permission-all-bg)",
+                color: "var(--permission-all-text)",
+                borderColor: "var(--permission-all-border)",
+              }}
+            >
+              Admin
+            </Tag>
+          );
+        } else {
+          return (
+            <Tag
+              className="text-xs"
+              style={{
+                backgroundColor: "var(--color-info-bg)",
+                color: "var(--color-info-text)",
+                borderColor: "var(--color-info-border)",
+              }}
+            >
+              Người dùng
+            </Tag>
+          );
         }
-
-        // Chia roles thành các nhóm của 2
-        const roleGroups = [];
-        for (let i = 0; i < roles.length; i += 2) {
-          roleGroups.push(roles.slice(i, i + 2));
-        }
-
-        return (
-          <div className="flex flex-col gap-1">
-            {roleGroups.map((group, groupIndex) => (
-              <div key={groupIndex} className="flex gap-1">
-                {group.map((role, index) => (
-                  <Tag
-                    key={`${groupIndex}-${index}`}
-                    color="blue"
-                    className="text-xs"
-                  >
-                    {getRoleDisplayName(role)}
-                  </Tag>
-                ))}
-              </div>
-            ))}
-          </div>
-        );
       },
     },
     {
@@ -893,61 +864,42 @@ const AdminUserTable: React.FC = () => {
       <div className="space-y-4 md:space-y-6">
         {/* Filter and Search Section */}
         <div className="border border-gray-200 rounded-lg p-3 md:p-4 bg-white shadow-sm">
-          {/* Header Controls */}
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
-            <div className="hidden md:flex items-center space-x-2">
-              <Button icon={<Download size={14} />} size="small">
-                Download
-              </Button>
-              <Button icon={<Printer size={14} />} size="small">
-                Print
-              </Button>
-              <Dropdown menu={columnVisibilityMenu} trigger={["click"]}>
-                <Button icon={<Eye size={14} />} size="small">
-                  Ẩn hiện cột
-                </Button>
-              </Dropdown>
-            </div>
-
-            <div className="flex items-center space-x-2 w-full sm:w-auto">
-              {/* View Mode Toggle - Hidden on mobile, auto-switches */}
-              <div className="hidden md:flex items-center border border-gray-300 rounded-md">
-                <button
-                  title="Xem dạng bảng"
-                  className={`flex items-center px-2 py-1 text-xs ${
-                    viewMode === "table"
-                      ? "bg-blue-500 text-white"
-                      : "text-gray-600 hover:bg-gray-100"
-                  }`}
-                  onClick={() => setViewMode("table")}
-                >
-                  <Grid3X3 size={14} />
-                </button>
-                <button
-                  title="Xem dạng danh sách"
-                  className={`flex items-center px-2 py-1 text-xs ${
-                    viewMode === "list"
-                      ? "bg-blue-500 text-white"
-                      : "text-gray-600 hover:bg-gray-100"
-                  }`}
-                  onClick={() => setViewMode("list")}
-                >
-                  <List size={14} />
-                </button>
-              </div>
-
-              <button
-                className="flex items-center text-xs gap-1 border border-gray-300 rounded-md px-2 py-1 hover:bg-gray-100 cursor-pointer"
-                onClick={handleToggleFilterPanel}
-              >
-                <Filter size={14} />
-                Bộ lọc
-              </button>
-            </div>
-          </div>
-
           {/* Search Bar */}
           <div className="flex items-center space-x-2">
+            {/* View Mode Toggle - Hidden on mobile, auto-switches */}
+            <div className="hidden md:flex items-center border border-gray-300 rounded-md">
+              <button
+                title="Xem dạng bảng"
+                className={`flex items-center px-2 py-1 text-xs cursor-pointer ${
+                  viewMode === "table"
+                    ? "bg-[var(--color-info-bg)] text-[var(--color-info-text)] border-[var(--color-info-border)]"
+                    : "text-gray-600 hover:bg-gray-100"
+                }`}
+                onClick={() => setViewMode("table")}
+              >
+                <Grid3X3 size={14} />
+              </button>
+              <button
+                title="Xem dạng danh sách"
+                className={`flex items-center px-2 py-1 text-xs  cursor-pointer ${
+                  viewMode === "list"
+                    ? "bg-[var(--color-info-bg)] text-[var(--color-info-text)] border-[var(--color-info-border)]"
+                    : "text-gray-600 hover:bg-gray-100"
+                }`}
+                onClick={() => setViewMode("list")}
+              >
+                <List size={14} />
+              </button>
+            </div>
+
+            <button
+              className="flex items-center text-xs gap-1 rounded-md px-2 py-1 cursor-pointer border border-[var(--border-color)] hover:bg-[var(--color-gray-bg)]"
+              onClick={handleToggleFilterPanel}
+            >
+              <Filter size={14} />
+              Bộ lọc
+            </button>
+
             <div className="relative flex-1 max-w-sm">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
               <Input
@@ -967,12 +919,12 @@ const AdminUserTable: React.FC = () => {
         {/* Filter and Search Summary */}
         <div className="flex flex-wrap items-center gap-2 text-xs text-gray-600">
           {searchText && (
-            <span className="bg-blue-50 text-blue-700 px-2 py-1 rounded">
+            <span className="px-2 py-1 rounded bg-[var(--color-info-bg)] text-[var(--color-info-text)] border border-[var(--color-info-border)]">
               Tìm kiếm: "{searchText}"
             </span>
           )}
           {filters?.status && (
-            <span className="bg-green-50 text-green-700 px-2 py-1 rounded">
+            <span className="px-2 py-1 rounded bg-[var(--color-success-bg)] text-[var(--color-success-text)] border border-[var(--color-success-border)]">
               Trạng thái:{" "}
               {filters.status === "ACTIVE"
                 ? "Hoạt động"
@@ -982,20 +934,20 @@ const AdminUserTable: React.FC = () => {
             </span>
           )}
           {filters?.organization && (
-            <span className="bg-purple-50 text-purple-700 px-2 py-1 rounded">
+            <span className="px-2 py-1 rounded bg-[var(--color-purple-bg)] text-[var(--color-purple-text)] border border-[var(--color-purple-border)]">
               Tổ chức: {filters.organizationName || filters.organization}
             </span>
           )}
           {filters?.point_range &&
             (filters.point_range[0] || filters.point_range[1]) && (
-              <span className="bg-yellow-50 text-yellow-700 px-2 py-1 rounded">
+              <span className="px-2 py-1 rounded bg-[var(--color-warning-bg)] text-[var(--color-warning-text)] border border-[var(--color-warning-border)]">
                 Điểm: {filters.point_range[0] || 0} -{" "}
                 {filters.point_range[1] || "∞"}
               </span>
             )}
           {filters?.strike_range &&
             (filters.strike_range[0] || filters.strike_range[1]) && (
-              <span className="bg-red-50 text-red-700 px-2 py-1 rounded">
+              <span className="px-2 py-1 rounded bg-[var(--color-error-bg)] text-[var(--color-error-text)] border border-[var(--color-error-border)]">
                 Cảnh cáo: {filters.strike_range[0] || 0} -{" "}
                 {filters.strike_range[1] || "∞"}
               </span>
@@ -1006,7 +958,7 @@ const AdminUserTable: React.FC = () => {
             filters?.point_range ||
             filters?.strike_range) && (
             <button
-              className="text-blue-500 hover:text-blue-700 underline text-xs"
+              className="underline text-xs text-[var(--color-info-text)] hover:opacity-80"
               onClick={() => {
                 setSearchText("");
                 setFilters({});
@@ -1053,7 +1005,7 @@ const AdminUserTable: React.FC = () => {
                 
                 /* Make rows clickable with hover effect */
                 .compact-table .ant-table-tbody > tr:hover > td {
-                  background-color: #f5f5f5 !important;
+                  background-color: var(--color-gray-bg) !important;
                 }
                 
                 /* Responsive adjustments */
@@ -1089,6 +1041,15 @@ const AdminUserTable: React.FC = () => {
               `}
               </style>
               <Table
+                title={() => (
+                  <div className="flex justify-end">
+                    <Dropdown menu={columnVisibilityMenu} trigger={["click"]}>
+                      <Button icon={<Eye size={14} />} size="small">
+                        Ẩn hiện cột
+                      </Button>
+                    </Dropdown>
+                  </div>
+                )}
                 columns={filteredColumns}
                 dataSource={currentData}
                 pagination={false}
@@ -1126,14 +1087,14 @@ const AdminUserTable: React.FC = () => {
                   </span>
                   <div className="flex items-center gap-1">
                     <button
-                      className="px-3 py-1.5 text-sm border border-gray-300 rounded-md hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="px-3 py-1.5 text-sm rounded-md disabled:opacity-50 disabled:cursor-not-allowed border border-[var(--border-color)] hover:bg-[var(--color-gray-bg)]"
                       onClick={handlePreviousPage}
                       disabled={currentPage === 1}
                     >
                       ‹
                     </button>
                     <button
-                      className="px-3 py-1.5 text-sm border border-gray-300 rounded-md hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="px-3 py-1.5 text-sm rounded-md disabled:opacity-50 disabled:cursor-not-allowed border border-[var(--border-color)] hover:bg-[var(--color-gray-bg)]"
                       onClick={handleNextPage}
                       disabled={currentPage === totalPages}
                     >
@@ -1147,7 +1108,7 @@ const AdminUserTable: React.FC = () => {
         ) : (
           <div className="w-full">
             {/* List View */}
-            <div className="space-y-3">
+            <div className="space-y-2">
               {currentData.map((user) => (
                 <UserItem
                   key={user._id}
@@ -1182,14 +1143,14 @@ const AdminUserTable: React.FC = () => {
                 </span>
                 <div className="flex items-center gap-1">
                   <button
-                    className="px-3 py-1.5 text-sm border border-gray-300 rounded-md hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="px-3 py-1.5 text-sm rounded-md disabled:opacity-50 disabled:cursor-not-allowed border border-[var(--border-color)] hover:bg-[var(--color-gray-bg)]"
                     onClick={handlePreviousPage}
                     disabled={currentPage === 1}
                   >
                     ‹
                   </button>
                   <button
-                    className="px-3 py-1.5 text-sm border border-gray-300 rounded-md hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="px-3 py-1.5 text-sm rounded-md disabled:opacity-50 disabled:cursor-not-allowed border border-[var(--border-color)] hover:bg-[var(--color-gray-bg)]"
                     onClick={handleNextPage}
                     disabled={currentPage === totalPages}
                   >
