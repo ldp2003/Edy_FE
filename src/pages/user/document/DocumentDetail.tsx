@@ -159,6 +159,7 @@ const DocumentDetail: React.FC = () => {
             currentPage={currentPage}
             onPageUpdate={handlePageUpdate}
             isUser={isUserOwner}
+            documentId={document!._id}
           />
         </div>
       </div>

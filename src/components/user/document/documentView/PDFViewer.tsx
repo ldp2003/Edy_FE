@@ -1,7 +1,10 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useContext } from "react";
 import * as pdfjsLib from "pdfjs-dist";
+import { useNavigate } from "react-router-dom";
 import LimitNotificationModal from "./LimitNotificationModal";
 import LimitNotificationBanner from "./LimitNotificationBanner";
+import { UserContext } from "../../../../contexts/UserContext";
+import RegisterForm from "../../../common/entry/RegisterForm";
 
 // Configure PDF.js worker
 pdfjsLib.GlobalWorkerOptions.workerSrc =
@@ -14,6 +17,7 @@ interface PDFViewerProps {
   onPageUpdate?: (page: number) => void;
   zoom?: number;
   isUser?: boolean; // True if document belongs to current user (no limitations)
+  documentId?: string;
 }
 
 const PDFViewer: React.FC<PDFViewerProps> = ({
@@ -23,6 +27,7 @@ const PDFViewer: React.FC<PDFViewerProps> = ({
   onPageUpdate,
   zoom = 1,
   isUser = false,
+  documentId,
 }) => {
   const [pdfDocument, setPdfDocument] =
     useState<pdfjsLib.PDFDocumentProxy | null>(null);
@@ -32,6 +37,12 @@ const PDFViewer: React.FC<PDFViewerProps> = ({
   const [error, setError] = useState<string | null>(null);
   const [showLimitModal, setShowLimitModal] = useState(false);
   const [hasShownModal, setHasShownModal] = useState(false);
+
+  const { user } = useContext(UserContext);
+  const isLoggedIn = !!user;
+  const [registerModalVisible, setRegisterModalVisible] = useState(false);
+
+  const navigate = useNavigate();
 
   const renderPages = useCallback(
     async (pdf: pdfjsLib.PDFDocumentProxy) => {
@@ -213,6 +224,13 @@ const PDFViewer: React.FC<PDFViewerProps> = ({
     setShowLimitModal(false);
   };
 
+  const handleDownload = () => {
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "document.pdf";
+    link.click();
+  };
+
   return (
     <div className="w-full mx-auto z-0 pdf-viewer-wrapper">
       {loading && (
@@ -280,6 +298,7 @@ const PDFViewer: React.FC<PDFViewerProps> = ({
                 title="Bạn đã xem hết 10 trang đầu"
                 message="Đăng ký tài khoản để xem toàn bộ nội dung tài liệu"
                 icon="📖"
+                documentId={documentId}
               />
             )}
           </div>
@@ -291,8 +310,26 @@ const PDFViewer: React.FC<PDFViewerProps> = ({
         <LimitNotificationModal
           visible={showLimitModal}
           onClose={handleModalClose}
-          message="Bạn đã xem hết 10 trang đầu của tài liệu. Để xem toàn bộ nội dung, vui lòng đăng ký tài khoản."
+          message="Hãy tải về để xem bản đầy đủ"
+          isLoggedIn={isLoggedIn}
+          onDownload={handleDownload}
+          documentId={documentId}
         />
+      )}
+
+      {/* Register Modal */}
+      {registerModalVisible && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+          <div className="bg-white p-6 rounded-lg max-w-md w-full mx-4 max-h-[90vh] overflow-y-auto">
+            <RegisterForm
+              onSuccess={() => setRegisterModalVisible(false)}
+              onSwitchToLogin={() => {
+                setRegisterModalVisible(false);
+                navigate("/auth/login");
+              }}
+            />
+          </div>
+        </div>
       )}
     </div>
   );
