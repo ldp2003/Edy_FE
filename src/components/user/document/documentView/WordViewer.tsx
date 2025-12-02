@@ -1,24 +1,35 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
+import { useNavigate } from "react-router-dom";
 import mammoth from "mammoth";
 import LimitNotificationModal from "./LimitNotificationModal";
 import LimitNotificationBanner from "./LimitNotificationBanner";
+import { UserContext } from "../../../../contexts/UserContext";
+import RegisterForm from "../../../common/entry/RegisterForm";
 
 interface WordViewerProps {
   url: string;
   isUser?: boolean; // True if document belongs to current user
   zoom?: number; // Zoom level for the document
+  documentId?: string;
 }
 
 const WordViewer: React.FC<WordViewerProps> = ({
   url,
   isUser = false,
   zoom,
+  documentId,
 }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [pages, setPages] = useState<string[]>([]);
   const [showLimitModal, setShowLimitModal] = useState(false);
   const [showLimitBanner, setShowLimitBanner] = useState(false);
+
+  const { user } = useContext(UserContext);
+  const isLoggedIn = !!user;
+  const [registerModalVisible, setRegisterModalVisible] = useState(false);
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchAndRender = async () => {
@@ -159,6 +170,13 @@ const WordViewer: React.FC<WordViewerProps> = ({
     setShowLimitModal(false);
   };
 
+  const handleDownload = () => {
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "document.docx";
+    link.click();
+  };
+
   return (
     <div className="w-full max-w-full md:max-w-4xl lg:max-w-5xl xl:max-w-6xl z-0 min-h-[200px] mx-auto word-viewer-wrapper">
       {loading && (
@@ -231,6 +249,7 @@ const WordViewer: React.FC<WordViewerProps> = ({
           title="Bạn đã xem hết 10 trang đầu"
           message="Đăng ký tài khoản để xem toàn bộ nội dung tài liệu Word"
           icon="📖"
+          documentId={documentId}
         />
       )}
 
@@ -239,8 +258,26 @@ const WordViewer: React.FC<WordViewerProps> = ({
         <LimitNotificationModal
           visible={showLimitModal}
           onClose={handleModalClose}
-          message="Bạn đã xem hết giới hạn của tài liệu Word. Để xem toàn bộ nội dung, vui lòng đăng ký tài khoản."
+          message="Hãy tải về để xem bản đầy đủ"
+          isLoggedIn={isLoggedIn}
+          onDownload={handleDownload}
+          documentId={documentId}
         />
+      )}
+
+      {/* Register Modal */}
+      {registerModalVisible && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+          <div className="bg-white p-6 rounded-lg max-w-md w-full mx-4 max-h-[90vh] overflow-y-auto">
+            <RegisterForm
+              onSuccess={() => setRegisterModalVisible(false)}
+              onSwitchToLogin={() => {
+                setRegisterModalVisible(false);
+                navigate("/auth/login");
+              }}
+            />
+          </div>
+        </div>
       )}
     </div>
   );

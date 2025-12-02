@@ -14,6 +14,7 @@ interface DocumentViewerProps {
   onPageUpdate?: (page: number) => void;
   zoom?: number;
   isUser?: boolean; // True if document belongs to current user (no limitations)
+  documentId?: string;
 }
 
 const DocumentViewer: React.FC<DocumentViewerProps> = ({
@@ -24,6 +25,7 @@ const DocumentViewer: React.FC<DocumentViewerProps> = ({
   onPageUpdate,
   zoom,
   isUser = false,
+  documentId,
 }) => {
   const renderViewer = () => {
     if (type === "pdf") {
@@ -35,11 +37,19 @@ const DocumentViewer: React.FC<DocumentViewerProps> = ({
           onPageUpdate={onPageUpdate}
           zoom={zoom}
           isUser={isUser}
+          documentId={documentId}
         />
       );
     }
     if (type === "word") {
-      return <WordViewer url={url} zoom={zoom} isUser={isUser} />;
+      return (
+        <WordViewer
+          url={url}
+          zoom={zoom}
+          isUser={isUser}
+          documentId={documentId}
+        />
+      );
     }
     if (type === "ppt") {
       return <PowerPointViewer url={url} zoom={zoom} isUser={isUser} />;
@@ -48,7 +58,7 @@ const DocumentViewer: React.FC<DocumentViewerProps> = ({
       return <ExcelViewer url={url} zoom={zoom} isUser={isUser} />;
     }
     if (type === "video") {
-      return <VideoViewer url={url} isUser={isUser} />;
+      return <VideoViewer url={url} isUser={isUser} documentId={documentId} />;
     }
     return (
       <div className="text-center py-10 px-4 text-sm sm:text-base text-gray-600">

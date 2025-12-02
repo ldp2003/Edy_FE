@@ -1,40 +1,176 @@
-import React from "react";
+import React, { useState, useContext } from "react";
+import { UserContext } from "../../../../contexts/UserContext";
+import LoginForm from "../../../common/entry/LoginForm";
+import { DocumentService } from "../../../../utils/DocumentService";
 
 interface LimitNotificationBannerProps {
   message: string;
   title?: string;
   icon?: string;
   buttonText?: string;
+  documentId?: string;
 }
 
 const LimitNotificationBanner: React.FC<LimitNotificationBannerProps> = ({
   message,
   title = "Giới hạn xem",
   icon = "📊",
-  buttonText = "Đăng ký ngay - Miễn phí",
+  buttonText = "Tải về ngay",
+  documentId,
 }) => {
-  const handleRegisterClick = () => {
-    window.location.href = "/auth/register";
+  const { user } = useContext(UserContext);
+  const isLoggedIn = !!user;
+  const [loginModalVisible, setLoginModalVisible] = useState(false);
+  const [downloadModalVisible, setDownloadModalVisible] = useState(false);
+  const [downloadLink, setDownloadLink] = useState<string | null>(null);
+  const [downloadLoading, setDownloadLoading] = useState(false);
+  const [downloadError, setDownloadError] = useState<string | null>(null);
+
+  const handleButtonClick = async () => {
+    if (!isLoggedIn) {
+      setLoginModalVisible(true);
+    } else if (documentId) {
+      setDownloadLoading(true);
+      setDownloadModalVisible(true);
+      try {
+        const response = await DocumentService.createDownloadLink(documentId);
+        const { url } = response;
+        const fullDownloadUrl = url.startsWith("/")
+          ? `${window.location.origin}${url}`
+          : url;
+        setDownloadLink(fullDownloadUrl);
+        // message.success("Link tải xuống đã được tạo thành công!");
+      } catch (error: unknown) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const err = error as any;
+        let errorMsg = "Có lỗi xảy ra khi tạo link tải xuống!";
+        if (err?.response) {
+          const status = err.response.status;
+          const responseData = err.response.data;
+          switch (status) {
+            case 401:
+              errorMsg = "Bạn cần đăng nhập để tải tài liệu!";
+              break;
+            case 403:
+              errorMsg =
+                responseData?.message ||
+                "Bạn không có đủ điểm để tải tài liệu này!";
+              break;
+            case 404:
+              errorMsg = "Không tìm thấy tài liệu!";
+              break;
+            default:
+              errorMsg = responseData?.message || `Lỗi server (${status})`;
+          }
+        }
+        setDownloadError(errorMsg);
+        // message.error(errorMsg);
+      } finally {
+        setDownloadLoading(false);
+      }
+    } else {
+      // Placeholder
+      window.location.href = "/auth/register";
+    }
   };
 
   return (
-    <div className="mx-4 my-8">
-      <div className="border-2 rounded-xl p-6 text-center shadow-lg bg-[var(--primary-background-color)] border-[var(--primary-color)]">
-        <div className="text-5xl mb-4">{icon}</div>
-        <h3 className="text-xl sm:text-2xl font-bold mb-2 text-[var(--primary-text-color)]">
-          {title}
-        </h3>
-        <p className="text-sm sm:text-base mb-6 text-[var(--secondary-text-color)]">
-          {message}
-        </p>
-        <button
-          onClick={handleRegisterClick}
-          className="px-8 py-3 text-white text-base sm:text-lg rounded-lg font-semibold hover:opacity-90 transition-opacity shadow-md bg-[var(--primary-color)]"
-        >
-          {buttonText}
-        </button>
+    <>
+      <div className="mx-4 my-8">
+        <div className="border-2 rounded-xl p-6 text-center shadow-lg bg-[var(--primary-background-color)] border-[var(--primary-color)]">
+          <div className="text-5xl mb-4">{icon}</div>
+          <h3 className="text-xl sm:text-2xl font-bold mb-2 text-[var(--primary-text-color)]">
+            {title}
+          </h3>
+          <p className="text-sm sm:text-base mb-6 text-[var(--secondary-text-color)]">
+            {message}
+          </p>
+          <button
+            onClick={handleButtonClick}
+            className="px-8 py-3 text-white text-base sm:text-lg rounded-lg font-semibold hover:opacity-90 transition-opacity shadow-md bg-[var(--primary-color)]"
+          >
+            {buttonText}
+          </button>
+        </div>
       </div>
-    </div>
+
+      {/* Login Modal */}
+      {loginModalVisible && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+          <div className="bg-white p-6 rounded-lg max-w-md w-full mx-4 max-h-[90vh] overflow-y-auto">
+            <LoginForm
+              onSuccess={() => setLoginModalVisible(false)}
+              onSwitchToRegister={() => {
+                setLoginModalVisible(false);
+                window.location.href = "/auth/register";
+              }}
+            />
+          </div>
+        </div>
+      )}
+
+      {/* Download Modal */}
+      {downloadModalVisible && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+          <div className="bg-white p-6 rounded-lg max-w-md w-full mx-4 max-h-[90vh] overflow-y-auto">
+            <div className="text-center">
+              {downloadLoading && (
+                <div className="py-8">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto mb-4"></div>
+                  <p>Đang tạo link tải xuống...</p>
+                </div>
+              )}
+              {downloadError && (
+                <div className="py-8">
+                  <p className="text-red-600 mb-4">{downloadError}</p>
+                  <button
+                    onClick={() => setDownloadModalVisible(false)}
+                    className="px-4 py-2 bg-red-600 text-white rounded"
+                  >
+                    Đóng
+                  </button>
+                </div>
+              )}
+              {downloadLink && (
+                <div className="py-4">
+                  <h3 className="text-lg font-semibold mb-4">
+                    Link tải xuống đã sẵn sàng!
+                  </h3>
+                  <input
+                    type="text"
+                    value={downloadLink}
+                    readOnly
+                    className="w-full px-3 py-2 border rounded mb-4"
+                  />
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() =>
+                        navigator.clipboard.writeText(downloadLink)
+                      }
+                      className="flex-1 px-4 py-2 bg-blue-600 text-white rounded"
+                    >
+                      Sao chép
+                    </button>
+                    <button
+                      onClick={() => window.open(downloadLink, "_blank")}
+                      className="flex-1 px-4 py-2 bg-green-600 text-white rounded"
+                    >
+                      Tải về
+                    </button>
+                  </div>
+                  <button
+                    onClick={() => setDownloadModalVisible(false)}
+                    className="mt-4 px-4 py-2 bg-gray-600 text-white rounded w-full"
+                  >
+                    Đóng
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+    </>
   );
 };
 
