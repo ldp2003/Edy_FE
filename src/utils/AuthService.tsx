@@ -12,13 +12,13 @@ export const login = async (email: string, password: string) => {
 };
 
 // Register function
-export const register = async (
-  firstName: string,
-  lastName: string,
-  email: string,
-  password: string
-) => {
-  return AuthAPI.register(firstName, lastName, email, password);
+export const register = async (data: {
+  firstName: string;
+  lastName: string;
+  email: string;
+  password: string;
+}) => {
+  return AuthAPI.register(data);
 };
 
 // Logout function
