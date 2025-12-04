@@ -296,7 +296,7 @@ const PDFViewer: React.FC<PDFViewerProps> = ({
             {!isUser && canvases.length >= 10 && (
               <LimitNotificationBanner
                 title="Bạn đã xem hết 10 trang đầu"
-                message="Đăng ký tài khoản để xem toàn bộ nội dung tài liệu"
+                message="Tải xuống để xem toàn bộ nội dung tài liệu"
                 icon="📖"
                 documentId={documentId}
               />

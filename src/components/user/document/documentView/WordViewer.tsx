@@ -247,7 +247,7 @@ const WordViewer: React.FC<WordViewerProps> = ({
       {showLimitBanner && (
         <LimitNotificationBanner
           title="Bạn đã xem hết 10 trang đầu"
-          message="Đăng ký tài khoản để xem toàn bộ nội dung tài liệu Word"
+          message="Tải xuống để xem toàn bộ nội dung tài liệu Word"
           icon="📖"
           documentId={documentId}
         />

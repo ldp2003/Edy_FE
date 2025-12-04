@@ -108,9 +108,8 @@ const DocumentActionButtons: React.FC<DocumentActionButtonsProps> = ({
       setTimeout(() => {
         window.location.reload();
       }, 1500);
-    } catch (error) {
-      console.error("Approve error:", error);
-      messageApi.error("Có lỗi xảy ra khi duyệt tài liệu!");
+    } catch (error: any) {
+      messageApi.error(error.response.data.message);
     } finally {
       setProcessing(false);
     }
@@ -165,9 +164,8 @@ const DocumentActionButtons: React.FC<DocumentActionButtonsProps> = ({
       setTimeout(() => {
         window.location.reload();
       }, 1500);
-    } catch (error) {
-      console.error("Reject error:", error);
-      messageApi.error("Có lỗi xảy ra khi từ chối tài liệu!");
+    } catch (error: any) {
+      messageApi.error(error.response.data.message);
     } finally {
       setProcessing(false);
     }
@@ -208,9 +206,8 @@ const DocumentActionButtons: React.FC<DocumentActionButtonsProps> = ({
       setTimeout(() => {
         window.location.reload();
       }, 1500);
-    } catch (error) {
-      console.error("Delete error:", error);
-      messageApi.error("Có lỗi xảy ra khi xóa tài liệu!");
+    } catch (error: any) {
+      messageApi.error(error.response.data.message);
     } finally {
       setProcessing(false);
     }
@@ -259,9 +256,8 @@ const DocumentActionButtons: React.FC<DocumentActionButtonsProps> = ({
       setTimeout(() => {
         window.location.reload();
       }, 1500);
-    } catch (error) {
-      console.error("Edit request error:", error);
-      messageApi.error("Có lỗi xảy ra khi gửi yêu cầu chỉnh sửa!");
+    } catch (error: any) {
+      messageApi.error(error.response.data.message);
     } finally {
       setProcessing(false);
     }
