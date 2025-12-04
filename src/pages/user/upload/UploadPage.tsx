@@ -41,18 +41,13 @@ const UploadPage: React.FC = () => {
     };
   }, [uploadedFileUrl, isUploading]);
 
-  // Cleanup effect when component unmounts
   useEffect(() => {
     return () => {
-      // Clear cleanup timer
       if (cleanupTimer) {
         clearTimeout(cleanupTimer);
       }
 
-      // Cleanup when component unmounts (user navigates away)
       if (uploadedFileUrl && isUploading) {
-        // Note: This cleanup runs when component unmounts, but async operations
-        // might not complete. The beforeunload handler above handles browser close/refresh
         console.log(
           "Component unmounting with uploaded file, cleanup may be needed"
         );
@@ -60,11 +55,10 @@ const UploadPage: React.FC = () => {
     };
   }, [uploadedFileUrl, isUploading, cleanupTimer]);
 
-  // Calculate current step based on state
   const getCurrentStep = () => {
-    if (uploadedFile && !isUploading) return 1; // File uploaded, filling information
-    if (isUploading) return 0; // Uploading file
-    return 0; // Selecting file
+    if (uploadedFile && !isUploading) return 1;
+    if (isUploading) return 0;
+    return 0;
   };
 
   const uploadSteps = [
@@ -82,6 +76,14 @@ const UploadPage: React.FC = () => {
     },
   ];
   const handleFileUploaded = (fileInfo: FileInfo) => {
+    // Hàm xử lý khi file được upload thành công từ UploadDocument:
+    // - Lưu fileInfo vào state uploadedFile (để truyền xuống InformationForm qua prop fileInfo)
+    // - Lưu URL vào uploadedFileUrl để quản lý cleanup
+    // - Set isUploading = false để cập nhật UI
+    // - Set timer 30 phút để tự động xóa file trên Cloudinary nếu user không submit form (cleanupTimer)
+    //   + Sử dụng currentUrl để capture giá trị URL trong closure
+    //   + Timer gọi CloudinaryService.deleteFile sau 30*60*1000 ms
+    // Tham số: fileInfo - object chứa thông tin file đã upload (url, originalName, size, type, thumbnail, pageCount)
     setUploadedFile(fileInfo);
     setUploadedFileUrl(fileInfo.url); // Store URL for cleanup
     setIsUploading(false);

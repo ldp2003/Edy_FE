@@ -281,6 +281,14 @@ const UploadDocument: React.FC<UploadDocumentProps> = ({
   const uploadToCloudinary = async (
     file: File
   ): Promise<{ url: string; thumbnail?: string; pageCount?: number }> => {
+    // Hàm upload file lên Cloudinary:
+    // - Đếm số trang cho PDF (sử dụng PDF.js) hoặc Word (sử dụng docx-preview và html2canvas)
+    // - Tạo thumbnail cho PDF (render trang đầu bằng canvas) hoặc Word (render HTML rồi chụp screenshot)
+    // - Upload file chính lên Cloudinary với preset và public_id ngẫu nhiên
+    // - Nếu có thumbnail Word, upload riêng và lấy URL
+    // - Trả về object chứa url (URL file chính), thumbnail (URL ảnh preview), pageCount (số trang)
+    // Tham số: file - đối tượng File từ input upload
+    // Trả về: Promise với object {url: string, thumbnail?: string, pageCount?: number}
     console.log("Starting upload to Cloudinary...");
     console.log("File:", file.name, file.size, file.type);
 
@@ -459,6 +467,16 @@ const UploadDocument: React.FC<UploadDocumentProps> = ({
     onSuccess,
     onError,
   }) => {
+    // Hàm xử lý upload tùy chỉnh cho Antd Upload component:
+    // - Set trạng thái uploading = true, reset progress
+    // - Gọi callback onUploadStart để thông báo parent component bắt đầu upload
+    // - Gọi uploadToCloudinary để upload file và lấy kết quả
+    // - Tạo object fileInfo từ kết quả upload (url, originalName, size, type, thumbnail, pageCount)
+    // - Gọi callback onFileUploaded(fileInfo) để truyền dữ liệu file đã upload lên parent (UploadPage)
+    // - Hiển thị message success/error qua messageApi
+    // - Gọi onSuccess/onError của Upload component
+    // - Reset trạng thái uploading và progress sau khi xong
+    // Tham số: {file, onSuccess, onError} - từ Antd Upload
     setUploading(true);
     setUploadProgress(0);
     onUploadStart?.();

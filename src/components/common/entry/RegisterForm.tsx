@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Form, Input, Button, message } from "antd";
-import { login, createOTP, registerWithOTP } from "../../../utils/AuthService";
+import { login, createOTP, register } from "../../../utils/AuthService";
 import {
   validateEmail,
   validatePassword,
@@ -20,8 +20,8 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
   const [form] = Form.useForm();
   const [messageApi, contextHolder] = message.useMessage();
   const [registrationData, setRegistrationData] = useState<{
-    first_name: string;
-    last_name: string;
+    firstName: string;
+    lastName: string;
     email: string;
     password: string;
   } | null>(null);
@@ -38,10 +38,10 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
 
     // Lưu dữ liệu đăng ký để sử dụng sau khi xác thực OTP
     setRegistrationData({
-      first_name: firstname,
-      last_name: lastname,
-      email,
-      password,
+      firstName: firstname,
+      lastName: lastname,
+      email: email,
+      password: password,
     });
 
     // Gửi OTP trước
@@ -71,12 +71,9 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
 
     setLoadingRegistering(true);
     try {
-      const result = await registerWithOTP({
-        ...registrationData,
-        otp: "", // OTP đã được xác thực trong modal
-      });
+      const result = await register(registrationData);
 
-      if (result.message === "Đăng ký thành công với OTP") {
+      if (result.message === "Đăng ký thành công") {
         messageApi.success("Đăng ký thành công!");
         setOtpModalVisible(false);
         form.resetFields();

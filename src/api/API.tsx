@@ -127,18 +127,18 @@ export const AuthAPI = {
       throw error;
     }
   },
-  register: async (
-    firstName: string,
-    lastName: string,
-    email: string,
-    password: string
-  ) => {
+  register: async (data: {
+    firstName: string;
+    lastName: string;
+    email: string;
+    password: string;
+  }) => {
     try {
       const response = await apiClient.post("/auth/register", {
-        first_name: firstName,
-        last_name: lastName,
-        email,
-        password,
+        first_name: data.firstName,
+        last_name: data.lastName,
+        email: data.email,
+        password: data.password,
       });
       return response.data;
     } catch (error) {

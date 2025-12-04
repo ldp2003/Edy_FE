@@ -98,7 +98,13 @@ const InformationForm = ({
     }
   }, [user, form]);
 
-  // Auto-fill form when file is uploaded
+  // Auto-fill form when file is uploaded: khi fileInfo (được truyền từ UploadDocument qua UploadPage) thay đổi,
+  // tự động điền các trường form dựa trên thông tin file:
+  // - documentName: tên file không có extension
+  // - documentType: đoán loại tài liệu dựa trên từ khóa trong tên file (báo cáo -> RESEARCH_REPORT, giáo trình -> TEXTBOOK, etc.)
+  // - pageCount: điền số trang nếu có (từ PDF.js hoặc docx-preview)
+  // - Hiển thị message success với tên file và số trang
+  // Dependency: [fileInfo, form] - chạy lại khi fileInfo hoặc form thay đổi
   useEffect(() => {
     if (fileInfo) {
       const fileName = fileInfo.originalName;
@@ -205,6 +211,22 @@ const InformationForm = ({
   };
 
   const onFinish = async (values: FormData) => {
+    // Hàm xử lý submit form đăng tải tài liệu:
+    // - Kiểm tra fileInfo đã có (từ upload) và không đang upload
+    // - Chuẩn bị documentData từ form values và fileInfo:
+    //   + url: fileInfo.url (Cloudinary URL)
+    //   + title: values.documentName
+    //   + doc_type: values.documentType
+    //   + file_type: fileInfo.type (PDF, WORD, etc.)
+    //   + subject, author (filtered), published_year, publisher, organization, level, public_mode
+    //   + keyword: split từ values.keywords
+    //   + description: values.summary
+    //   + page: fileInfo.pageCount
+    //   + cover_page: fileInfo.thumbnail
+    // - Gọi DocumentService.uploadDocument(documentData) để upload lên server
+    // - Nếu thành công (status 201), gửi notification đến admin, reset form, gọi onUploadSuccess, navigate đến /personal-posts
+    // - Xử lý lỗi: hiển thị message error dựa trên response status (401, 403, 404, etc.)
+    // Tham số: values - dữ liệu từ form (FormData interface)
     console.log("Form values received:", values);
     console.log("Subject value:", values.subject);
 
@@ -547,6 +569,25 @@ const InformationForm = ({
                     placeholder="Số trang"
                     style={{ width: "100%" }}
                     disabled={isUploading}
+                    onKeyDown={(e) => {
+                      // Chỉ cho phép số, backspace, delete, arrow keys, tab
+                      const allowedKeys = [
+                        "Backspace",
+                        "Delete",
+                        "ArrowLeft",
+                        "ArrowRight",
+                        "ArrowUp",
+                        "ArrowDown",
+                        "Tab",
+                        "Enter",
+                      ];
+                      if (
+                        !/[0-9]/.test(e.key) &&
+                        !allowedKeys.includes(e.key)
+                      ) {
+                        e.preventDefault();
+                      }
+                    }}
                   />
                 </Form.Item>
 
