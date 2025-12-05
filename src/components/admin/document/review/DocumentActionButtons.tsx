@@ -591,7 +591,7 @@ const DocumentActionButtons: React.FC<DocumentActionButtonsProps> = ({
 
       {/* Delete Modal */}
       <Modal
-        title="Xóa bài viết"
+        title="Xóa tài liệu"
         open={deleteModalVisible}
         onOk={handleDelete}
         onCancel={() => {
