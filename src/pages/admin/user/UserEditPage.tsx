@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { Button, message, Spin } from "antd";
+import { Button, message, Spin, Tabs } from "antd";
 import { ArrowLeft } from "lucide-react";
 import { UserService } from "../../../utils/UserService";
 import type { User } from "../../../models/user";
 import UserInfoView from "../../../components/admin/user/UserInfoView";
-import UserRoleManager from "../../../components/admin/user/UserRoleManager";
 import UserViolationHistory from "../../../components/admin/user/UserViolationHistory";
+import UserAssignmentTable from "../../../components/admin/user/UserAssignmentTable";
 import { AdminBreadcrumb } from "../../../components/admin/common/AdminBreadcrumb";
 
 const UserEditPage: React.FC = () => {
@@ -103,18 +103,40 @@ const UserEditPage: React.FC = () => {
         {/* User Info Section */}
         <UserInfoView user={user!} />
 
-        {/* Role & Violations Section */}
-        <div className="mt-8 flex flex-row bg-white rounded-lg border border-[var(--border-color)]">
-          {/* Left Column - Role Management */}
-          <div className="w-1/2 p-6 border-r border-[var(--border-color)]">
-            <UserRoleManager userId={id!} currentRole={user?.role || "USER"} />
-          </div>
-
-          {/* Right Column - Violation History */}
-          <div className="w-1/2 p-6">
-            <div className="font-bold text-sm mb-4">Lịch sử vi phạm</div>
-            <UserViolationHistory userId={id!} />
-          </div>
+        {/* Tabs Section */}
+        <div className="mt-8">
+          <Tabs
+            defaultActiveKey="roles"
+            items={[
+              {
+                key: "roles",
+                label: "Quản lý quyền người dùng",
+                children: (
+                  <div className="bg-white rounded-lg border border-[var(--border-color)] p-6">
+                    <UserAssignmentTable userId={id!} />
+                  </div>
+                ),
+              },
+              {
+                key: "violations",
+                label: "Lịch sử vi phạm",
+                children: (
+                  <div className="bg-white rounded-lg border border-[var(--border-color)] p-6">
+                    <UserViolationHistory userId={id!} type="violations" />
+                  </div>
+                ),
+              },
+              {
+                key: "restrictions",
+                label: "Lịch sử bị phạt",
+                children: (
+                  <div className="bg-white rounded-lg border border-[var(--border-color)] p-6">
+                    <UserViolationHistory userId={id!} type="restrictions" />
+                  </div>
+                ),
+              },
+            ]}
+          />
         </div>
       </div>
     </div>
