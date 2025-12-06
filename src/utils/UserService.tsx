@@ -56,6 +56,31 @@ export const UserService = {
     }
   },
 
+  async suspendUser(
+    userId: string,
+    data: { reason: string; duration_days: number }
+  ) {
+    try {
+      const result = await UserAPI.suspendUser(userId, data);
+      console.log("User suspended:", result);
+      return result;
+    } catch (error) {
+      console.error("Failed to suspend user:", error);
+      throw error;
+    }
+  },
+
+  async unsuspendUser(userId: string) {
+    try {
+      const result = await UserAPI.unsuspendUser(userId);
+      console.log("User unsuspended:", result);
+      return result;
+    } catch (error) {
+      console.error("Failed to unsuspend user:", error);
+      throw error;
+    }
+  },
+
   async updateUser(
     userId: string,
     userData: {

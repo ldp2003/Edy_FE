@@ -1,5 +1,5 @@
 import React from "react";
-import { Tag, Button, Tooltip, Popconfirm } from "antd";
+import { Tag, Button, Tooltip, Popconfirm, Select } from "antd";
 import { Edit, Lock, Unlock } from "lucide-react";
 import type { User } from "../../../models/user";
 import { getRoleDisplayName } from "../../../constants/RoleConstants";
@@ -14,6 +14,9 @@ interface UserItemProps {
   onViewUser: (userId: string) => void;
   onEditUser: (userId: string) => void;
   onToggleUserStatus: (userId: string, currentStatus?: string) => void;
+  onSuspendUser: (userId: string, userName: string) => void;
+  onChangeUserStatus: (userId: string, newStatus: string) => void;
+  currentUserId?: string;
 }
 
 const UserItem: React.FC<UserItemProps> = ({
@@ -21,6 +24,9 @@ const UserItem: React.FC<UserItemProps> = ({
   onViewUser,
   onEditUser,
   onToggleUserStatus,
+  onSuspendUser,
+  onChangeUserStatus,
+  currentUserId,
 }) => {
   const getStatusDisplay = (status?: string) => {
     switch (status) {
@@ -99,6 +105,17 @@ const UserItem: React.FC<UserItemProps> = ({
               >
                 {statusText}
               </span>
+              <Select
+                value={user.status}
+                onChange={(value) => onChangeUserStatus(user._id, value)}
+                size="small"
+                style={{ width: 100 }}
+                disabled={user._id === currentUserId}
+              >
+                <Select.Option value="ACTIVE">Hoạt động</Select.Option>
+                <Select.Option value="INACTIVE">Không hoạt động</Select.Option>
+                <Select.Option value="BANNED">Bị khóa</Select.Option>
+              </Select>
             </div>
 
             {/* Email và thông tin cơ bản */}
@@ -201,12 +218,16 @@ const UserItem: React.FC<UserItemProps> = ({
           <Popconfirm
             title={
               user.status === "ACTIVE"
-                ? "Khóa tài khoản?"
-                : "Mở khóa tài khoản?"
+                ? "Khóa tài khoản người dùng?"
+                : "Mở khóa tài khoản người dùng?"
             }
             onConfirm={(e) => {
               e?.stopPropagation();
-              onToggleUserStatus(user._id, user.status);
+              if (user.status === "ACTIVE") {
+                onSuspendUser(user._id, `${user.first_name} ${user.last_name}`);
+              } else {
+                onToggleUserStatus(user._id, user.status);
+              }
             }}
             onCancel={(e) => e?.stopPropagation()}
             okText="Có"

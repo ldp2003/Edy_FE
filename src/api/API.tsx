@@ -502,7 +502,30 @@ export const UserAPI = {
       throw error;
     }
   },
+  // Suspend user account
+  suspendUser: async (
+    userId: string,
+    data: { reason: string; duration_days: number }
+  ) => {
+    try {
+      const response = await apiClient.post(`/users/${userId}/suspend`, data);
+      return response.data;
+    } catch (error) {
+      console.error("Error suspending user:", error);
+      throw error;
+    }
+  },
 
+  // Unsuspend user account
+  unsuspendUser: async (userId: string) => {
+    try {
+      const response = await apiClient.post(`/users/${userId}/unsuspend`);
+      return response.data;
+    } catch (error) {
+      console.error("Error unsuspending user:", error);
+      throw error;
+    }
+  },
   getUserRestrictions: async (userId: string) => {
     try {
       const response = await apiClient.get(`/users/${userId}/restrictions`);
