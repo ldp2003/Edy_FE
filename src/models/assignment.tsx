@@ -3,7 +3,7 @@ export interface Assignment {
   account: {
     _id: string;
     user: {
-      _id: string;
+      id: string;
       first_name: string;
       last_name: string;
       fullname: string;
@@ -70,7 +70,7 @@ export const defaultAssignment: Assignment = {
   account: {
     _id: "",
     user: {
-      _id: "",
+      id: "",
       first_name: "",
       last_name: "",
       fullname: "",

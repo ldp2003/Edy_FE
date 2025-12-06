@@ -15,7 +15,7 @@ interface EditRoleModalProps {
     _id: string;
     account: {
       user: {
-        _id: string;
+        id: string;
       };
     };
     role: {
@@ -84,7 +84,7 @@ const EditRoleModal: React.FC<EditRoleModalProps> = ({
       });
 
       // Send notification to user
-      const userId = assignment.account.user._id;
+      const userId = assignment.account.user.id;
       if (userId) {
         const role = roles.find((r) => r._id === values.role);
         const roleName = role
