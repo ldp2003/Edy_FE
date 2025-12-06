@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import {
   Table,
   Select,
@@ -29,6 +29,7 @@ import { UserService } from "../../../utils/UserService";
 import { getStatusStyle } from "../../../utils/AdminTableStyles";
 import UserFilterModal from "./UserFilterModal";
 import UserItem from "./UserItem";
+import { UserContext } from "../../../contexts/UserContext";
 
 const { Option } = Select;
 
@@ -41,6 +42,7 @@ interface UserDisplay extends User {
 const AdminUserTable: React.FC = () => {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
+  const { user: currentUser } = useContext(UserContext);
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [users, setUsers] = useState<User[]>([]);
@@ -147,8 +149,14 @@ const AdminUserTable: React.FC = () => {
     setLoading(true);
     try {
       const response = await UserService.getAllUsers(params);
-      setUsers(response.data || []);
-      setTotalUsers(response.pagination?.totalUsers || 0);
+      //Bỏ qua user hiện tại
+      const filteredUsers = (response.data || []).filter(
+        (user: User) => user._id !== currentUser?._id
+      );
+      setUsers(filteredUsers);
+      setTotalUsers(
+        users.length > 0 ? filteredUsers.length : response.total || 0
+      );
     } catch (error) {
       console.error("Error fetching users:", error);
       message.error("Không thể tải danh sách người dùng!");
