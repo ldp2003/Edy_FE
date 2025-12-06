@@ -1,23 +1,10 @@
 import type React from "react";
 import { Avatar } from "antd";
 import { School } from "lucide-react";
-
-export interface UserInfo {
-  _id: string;
-  first_name: string;
-  last_name: string;
-  organization?: {
-    _id: string;
-    name: string;
-  };
-  avatar?: string;
-  follower?: string[];
-  following?: string[];
-  doc_count?: number;
-}
+import type { User } from "../../../models/user";
 
 interface UserInfoHeaderProps {
-  user: UserInfo;
+  user: User;
 }
 
 const UserInfoHeader: React.FC<UserInfoHeaderProps> = ({ user }) => {
@@ -54,12 +41,18 @@ const UserInfoHeader: React.FC<UserInfoHeaderProps> = ({ user }) => {
                 <span
                   className="text-xs text-black font-bold cursor-pointer truncate"
                   onClick={() => {
-                    if (user.organization && user.organization._id) {
+                    if (
+                      user.organization &&
+                      typeof user.organization === "object" &&
+                      user.organization._id
+                    ) {
                       window.location.href = `/organization/${user.organization._id}`;
                     }
                   }}
                 >
-                  {user.organization.name}
+                  {typeof user.organization === "object"
+                    ? user.organization.name
+                    : user.organization}
                 </span>
               </div>
             )}
@@ -94,7 +87,7 @@ const UserInfoHeader: React.FC<UserInfoHeaderProps> = ({ user }) => {
           </div>
           <div className="text-center">
             <div className="text-sm font-bold text-[var(--primary-text-color)]">
-              0
+              {(user.point || 0).toLocaleString()}
             </div>
             <div className="text-xs text-[var(--primary-text-color)]">
               Điểm dùng
@@ -102,7 +95,7 @@ const UserInfoHeader: React.FC<UserInfoHeaderProps> = ({ user }) => {
           </div>
           <div className="text-center">
             <div className="text-sm font-bold text-[var(--primary-text-color)]">
-              0
+              {(user.rank_point || 0).toLocaleString()}
             </div>
             <div className="text-xs text-[var(--primary-text-color)]">
               Điểm hạng
@@ -110,7 +103,7 @@ const UserInfoHeader: React.FC<UserInfoHeaderProps> = ({ user }) => {
           </div>
           <div className="text-center">
             <div className="text-sm font-bold text-[var(--primary-text-color)]">
-              0
+              {(user.strike || 0).toLocaleString()}
             </div>
             <div className="text-xs text-[var(--primary-text-color)]">
               Cảnh cáo
@@ -153,12 +146,18 @@ const UserInfoHeader: React.FC<UserInfoHeaderProps> = ({ user }) => {
               <span
                 className="text-xs text-black  font-bold cursor-pointer"
                 onClick={() => {
-                  if (user.organization && user.organization._id) {
+                  if (
+                    user.organization &&
+                    typeof user.organization === "object" &&
+                    user.organization._id
+                  ) {
                     window.location.href = `/organization/${user.organization._id}`;
                   }
                 }}
               >
-                {user.organization.name}
+                {typeof user.organization === "object"
+                  ? user.organization.name
+                  : user.organization}
               </span>
             </div>
           )}
@@ -195,7 +194,7 @@ const UserInfoHeader: React.FC<UserInfoHeaderProps> = ({ user }) => {
           {/* Second row */}
           <div>
             <div className="text-xs font-bold text-[var(--primary-text-color)]">
-              0
+              {(user.point || 0).toLocaleString()}
             </div>
             <div className="text-xs text-[var(--primary-text-color)]">
               Điểm dùng
@@ -203,7 +202,7 @@ const UserInfoHeader: React.FC<UserInfoHeaderProps> = ({ user }) => {
           </div>
           <div>
             <div className="text-xs font-bold text-[var(--primary-text-color)]">
-              0
+              {(user.rank_point || 0).toLocaleString()}
             </div>
             <div className="text-xs text-[var(--primary-text-color)]">
               Điểm hạng
@@ -211,7 +210,7 @@ const UserInfoHeader: React.FC<UserInfoHeaderProps> = ({ user }) => {
           </div>
           <div>
             <div className="text-xs font-bold text-[var(--primary-text-color)]">
-              0
+              {(user.strike || 0).toLocaleString()}
             </div>
             <div className="text-xs text-[var(--primary-text-color)]">
               Cảnh cáo
