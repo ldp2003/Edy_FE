@@ -293,11 +293,6 @@ const AdminRoleTable: React.FC = () => {
       width: 120,
       fixed: "right",
       render: (_, record: RoleDisplay) => {
-        // Không hiển thị nút chỉnh sửa và vô hiệu hóa cho SUPER_ADMIN
-        if (record.code !== "CUSTOM_ROLE") {
-          return null;
-        }
-
         return (
           <div className="flex justify-center space-x-1">
             <Tooltip title="Chỉnh sửa">

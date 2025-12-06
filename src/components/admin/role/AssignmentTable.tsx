@@ -20,6 +20,7 @@ import AssignRoleModal from "./AssignRoleModal";
 import EditAssignmentModel from "./EditAssigmentModel";
 import { Input } from "antd";
 import { NotificationService } from "../../../utils/NotificationService";
+import type { User } from "../../../models/user";
 const { Search } = Input;
 
 interface Assignment {
@@ -48,7 +49,9 @@ interface Assignment {
   is_active: boolean;
 }
 
-const AssignmentTable: React.FC = () => {
+const AssignmentTable: React.FC<{ selectedUser?: User }> = ({
+  selectedUser,
+}) => {
   const [assignments, setAssignments] = useState<Assignment[]>([]);
   const [loading, setLoading] = useState(false);
   // const [isModalVisible, setIsModalVisible] = useState(false);
@@ -61,6 +64,9 @@ const AssignmentTable: React.FC = () => {
   const [searchText, setSearchText] = useState("");
 
   const filteredAssignments = assignments.filter((assignment: Assignment) => {
+    if (selectedUser) {
+      return assignment.account._id === selectedUser._id;
+    }
     const searchLower = searchText.toLowerCase();
     return (
       assignment.account.user.fullname.toLowerCase().includes(searchLower) ||

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { Button, message, Spin } from "antd";
+import { Button, message, Spin, Tabs } from "antd";
 import { ArrowLeft } from "lucide-react";
 import { UserService } from "../../../utils/UserService";
 import type { User } from "../../../models/user";
@@ -107,13 +107,34 @@ const UserEditPage: React.FC = () => {
         <div className="mt-8 flex flex-row bg-white rounded-lg border border-[var(--border-color)]">
           {/* Left Column - Role Management */}
           <div className="w-1/2 p-6 border-r border-[var(--border-color)]">
-            <UserRoleManager userId={id!} currentRole={user?.role || "USER"} />
+            <UserRoleManager
+              userId={id!}
+              currentRole={user?.role || "USER"}
+              user={user!}
+            />
           </div>
 
           {/* Right Column - Violation History */}
           <div className="w-1/2 p-6">
-            <div className="font-bold text-sm mb-4">Lịch sử vi phạm</div>
-            <UserViolationHistory userId={id!} />
+            <Tabs
+              defaultActiveKey="violations"
+              items={[
+                {
+                  key: "violations",
+                  label: "Lịch sử vi phạm",
+                  children: (
+                    <UserViolationHistory userId={id!} type="violations" />
+                  ),
+                },
+                {
+                  key: "restrictions",
+                  label: "Lịch sử bị phạt",
+                  children: (
+                    <UserViolationHistory userId={id!} type="restrictions" />
+                  ),
+                },
+              ]}
+            />
           </div>
         </div>
       </div>

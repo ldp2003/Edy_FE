@@ -11,7 +11,7 @@ interface EditRoleModalProps {
   visible: boolean;
   onCancel: () => void;
   onSuccess: () => void;
-  assignment: {
+  assignment?: {
     _id: string;
     account: {
       user: {
@@ -30,7 +30,7 @@ interface EditRoleModalProps {
       _id: string;
       name: string;
     };
-  };
+  } | null;
 }
 
 const EditRoleModal: React.FC<EditRoleModalProps> = ({
@@ -45,7 +45,7 @@ const EditRoleModal: React.FC<EditRoleModalProps> = ({
   const [messageApi, contextHolder] = message.useMessage();
 
   useEffect(() => {
-    if (visible) {
+    if (visible && assignment) {
       fetchData();
       form.setFieldsValue({
         role: assignment.role._id,
@@ -74,6 +74,8 @@ const EditRoleModal: React.FC<EditRoleModalProps> = ({
   };
 
   const handleSubmit = async (values: any) => {
+    if (!assignment) return;
+
     try {
       await AssignmentService.updateAssignment(assignment._id, {
         role: values.role,
