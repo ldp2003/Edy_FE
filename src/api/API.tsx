@@ -502,6 +502,26 @@ export const UserAPI = {
       throw error;
     }
   },
+
+  getUserRestrictions: async (userId: string) => {
+    try {
+      const response = await apiClient.get(`/users/${userId}/restrictions`);
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching user restrictions:", error);
+      throw error;
+    }
+  },
+
+  getUserViolations: async (userId: string) => {
+    try {
+      const response = await apiClient.get(`/users/${userId}/violations`);
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching user violations:", error);
+      throw error;
+    }
+  },
 };
 
 export const SubjectAPI = {

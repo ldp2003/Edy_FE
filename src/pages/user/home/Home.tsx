@@ -164,7 +164,7 @@ export default function HomePage() {
 
   const handleViewMoreRecent = () => {
     const recentDocs = readHistory.slice(0, 10).map((item) => item.document);
-    navigate("/documents", {
+    navigate("/history", {
       state: {
         documents: recentDocs,
         title: "Đã xem gần đây",

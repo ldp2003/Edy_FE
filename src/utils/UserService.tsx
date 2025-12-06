@@ -196,6 +196,28 @@ export const UserService = {
       throw error;
     }
   },
+
+  async getUserRestrictions(userId: string) {
+    try {
+      const restrictions = await UserAPI.getUserRestrictions(userId);
+      console.log("Fetched user restrictions:", restrictions);
+      return restrictions;
+    } catch (error) {
+      console.error("Failed to fetch user restrictions:", error);
+      throw error;
+    }
+  },
+
+  async getUserViolations(userId: string) {
+    try {
+      const violations = await UserAPI.getUserViolations(userId);
+      console.log("Fetched user violations:", violations);
+      return violations;
+    } catch (error) {
+      console.error("Failed to fetch user violations:", error);
+      throw error;
+    }
+  },
 };
 
 // Legacy exports for backward compatibility
@@ -214,3 +236,5 @@ export const unfollowUser = UserService.unfollowUser;
 export const updateFieldOfStudy = UserService.updateFieldOfStudy;
 export const getContributions = UserService.getContributions;
 export const getCurrentUser = UserService.getCurrentUser;
+export const getUserRestrictions = UserService.getUserRestrictions;
+export const getUserViolations = UserService.getUserViolations;
