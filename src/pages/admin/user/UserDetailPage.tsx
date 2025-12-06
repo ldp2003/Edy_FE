@@ -59,6 +59,33 @@ const UserDetailPage: React.FC = () => {
     }
   };
 
+  const handleChangeStatus = async (newStatus: string) => {
+    if (!user || !id) return;
+
+    try {
+      await UserService.updateUserStatus(id, newStatus);
+
+      setUser({
+        ...user,
+        status: newStatus as "ACTIVE" | "INACTIVE" | "BANNED",
+      });
+
+      const statusMessages = {
+        ACTIVE: "Đã kích hoạt tài khoản!",
+        BANNED: "Đã khóa tài khoản!",
+        INACTIVE: "Đã vô hiệu hóa tài khoản!",
+      };
+
+      message.success(
+        statusMessages[newStatus as keyof typeof statusMessages] ||
+          "Đã cập nhật trạng thái!"
+      );
+    } catch (error) {
+      console.error("Error updating user status:", error);
+      message.error("Có lỗi xảy ra khi cập nhật trạng thái!");
+    }
+  };
+
   const getStatusColor = (status?: string) => {
     switch (status) {
       case "ACTIVE":
@@ -137,6 +164,7 @@ const UserDetailPage: React.FC = () => {
           onBack={() => navigate("/admin/users")}
           onEdit={() => navigate(`/admin/users/edit/${id}`)}
           onToggleStatus={handleToggleStatus}
+          onChangeStatus={handleChangeStatus}
         />
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
