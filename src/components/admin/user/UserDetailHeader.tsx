@@ -1,5 +1,5 @@
 import React from "react";
-import { Button, Popconfirm } from "antd";
+import { Button, Popconfirm, Select } from "antd";
 import { ArrowLeft, Edit, Lock, Unlock } from "lucide-react";
 import type { User } from "../../../models/user";
 
@@ -8,6 +8,7 @@ interface UserDetailHeaderProps {
   onBack: () => void;
   onEdit: () => void;
   onToggleStatus: () => void;
+  onChangeStatus: (newStatus: string) => void;
 }
 
 const UserDetailHeader: React.FC<UserDetailHeaderProps> = ({
@@ -15,6 +16,7 @@ const UserDetailHeader: React.FC<UserDetailHeaderProps> = ({
   onBack,
   onEdit,
   onToggleStatus,
+  onChangeStatus,
 }) => {
   return (
     <div className="flex items-center justify-between mb-6">
@@ -31,6 +33,16 @@ const UserDetailHeader: React.FC<UserDetailHeaderProps> = ({
       </div>
 
       <div className="flex space-x-2">
+        <Select
+          value={user.status}
+          onChange={onChangeStatus}
+          style={{ width: 120 }}
+        >
+          <Select.Option value="ACTIVE">Hoạt động</Select.Option>
+          <Select.Option value="INACTIVE">Không hoạt động</Select.Option>
+          <Select.Option value="BANNED">Bị khóa</Select.Option>
+        </Select>
+
         <Button icon={<Edit size={16} />} onClick={onEdit}>
           Thao tác
         </Button>

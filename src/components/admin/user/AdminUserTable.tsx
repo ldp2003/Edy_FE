@@ -30,6 +30,7 @@ import { getStatusStyle } from "../../../utils/AdminTableStyles";
 import UserFilterModal from "./UserFilterModal";
 import UserItem from "./UserItem";
 import { UserContext } from "../../../contexts/UserContext";
+import UserSuspendModal from "./UserSuspendModal";
 
 const { Option } = Select;
 
@@ -52,6 +53,11 @@ const AdminUserTable: React.FC = () => {
   const [filters, setFilters] = useState<any>({});
   const [isFilterPanelVisible, setIsFilterPanelVisible] = useState(false);
   const [viewMode, setViewMode] = useState<"table" | "list">("table");
+  const [suspendModalVisible, setSuspendModalVisible] = useState(false);
+  const [selectedUserForSuspend, setSelectedUserForSuspend] = useState<{
+    id: string;
+    name: string;
+  } | null>(null);
 
   // State for column visibility
   const [visibleColumns, setVisibleColumns] = useState<Set<string>>(
@@ -69,6 +75,7 @@ const AdminUserTable: React.FC = () => {
       "strike",
       "createdAt",
       "status",
+      "changeStatus",
       "actions",
     ])
   );
@@ -410,12 +417,56 @@ const AdminUserTable: React.FC = () => {
     userId: string,
     currentStatus?: string
   ) => {
+    if (currentStatus === "ACTIVE") {
+      // For suspending, open modal
+      const user = users.find((u) => u._id === userId);
+      if (user) {
+        setSelectedUserForSuspend({
+          id: userId,
+          name: `${user.first_name} ${user.last_name}`,
+        });
+        setSuspendModalVisible(true);
+      }
+    } else {
+      // For unsuspending, directly call API
+      await handleUnsuspendUser(userId);
+      await UserService.updateUserStatus(userId, "ACTIVE");
+    }
+  };
+
+  const handleUnsuspendUser = async (userId: string) => {
     try {
-      const newStatus = currentStatus === "ACTIVE" ? "BANNED" : "ACTIVE";
+      await UserService.unsuspendUser(userId);
+
+      message.success("Đã mở khóa tài khoản!");
+
+      // Refresh data
+      setUsers(
+        users.map((user) =>
+          user._id === userId
+            ? { ...user, status: "ACTIVE" as "ACTIVE" | "INACTIVE" | "BANNED" }
+            : user
+        )
+      );
+    } catch (error) {
+      console.error("Error unsuspending user:", error);
+      message.error("Có lỗi xảy ra khi mở khóa tài khoản!");
+    }
+  };
+
+  const handleChangeUserStatus = async (userId: string, newStatus: string) => {
+    try {
       await UserService.updateUserStatus(userId, newStatus);
 
+      const statusMessages = {
+        ACTIVE: "Đã kích hoạt tài khoản!",
+        BANNED: "Đã khóa tài khoản!",
+        INACTIVE: "Đã vô hiệu hóa tài khoản!",
+      };
+
       message.success(
-        newStatus === "BANNED" ? "Đã khóa tài khoản!" : "Đã mở khóa tài khoản!"
+        statusMessages[newStatus as keyof typeof statusMessages] ||
+          "Đã cập nhật trạng thái!"
       );
 
       // Refresh data
@@ -428,8 +479,18 @@ const AdminUserTable: React.FC = () => {
       );
     } catch (error) {
       console.error("Error updating user status:", error);
-      message.error("Có lỗi xảy ra khi cập nhật trạng thái tài khoản!");
+      message.error("Có lỗi xảy ra khi cập nhật trạng thái!");
     }
+  };
+
+  const handleSuspendUser = (userId: string, userName: string) => {
+    setSelectedUserForSuspend({ id: userId, name: userName });
+    setSuspendModalVisible(true);
+  };
+
+  const handleSuspendSuccess = () => {
+    // Refresh data after suspend
+    fetchUsers();
   };
 
   const columns: ColumnsType<UserDisplay> = [
@@ -673,6 +734,25 @@ const AdminUserTable: React.FC = () => {
       },
     },
     {
+      title: "Thay đổi trạng thái",
+      key: "changeStatus",
+      align: "center",
+      width: 120,
+      render: (_, record: UserDisplay) => (
+        <Select
+          value={record.status}
+          onChange={(value) => handleChangeUserStatus(record._id, value)}
+          size="small"
+          style={{ width: 100 }}
+          disabled={record._id === currentUser?._id} // Không cho phép thay đổi trạng thái của chính mình
+        >
+          <Select.Option value="ACTIVE">Hoạt động</Select.Option>
+          <Select.Option value="INACTIVE">Không hoạt động</Select.Option>
+          <Select.Option value="BANNED">Bị khóa</Select.Option>
+        </Select>
+      ),
+    },
+    {
       title: "Thao tác",
       key: "actions",
       align: "center",
@@ -695,8 +775,8 @@ const AdminUserTable: React.FC = () => {
           <Popconfirm
             title={
               record.status === "ACTIVE"
-                ? "Khóa tài khoản?"
-                : "Mở khóa tài khoản?"
+                ? "Khóa tài khoản người dùng?"
+                : "Mở khóa tài khoản người dùng?"
             }
             onConfirm={(e) => {
               e?.stopPropagation();
@@ -1123,7 +1203,10 @@ const AdminUserTable: React.FC = () => {
                   user={user}
                   onViewUser={handleViewUser}
                   onEditUser={handleEditUser}
-                  onToggleUserStatus={handleToggleUserStatus}
+                  onToggleUserStatus={handleUnsuspendUser}
+                  onSuspendUser={handleSuspendUser}
+                  onChangeUserStatus={handleChangeUserStatus}
+                  currentUserId={currentUser?._id}
                 />
               ))}
             </div>
@@ -1210,6 +1293,18 @@ const AdminUserTable: React.FC = () => {
           onClick={handleCloseFilterPanel}
         />
       )}
+
+      {/* Suspend Modal */}
+      <UserSuspendModal
+        visible={suspendModalVisible}
+        onClose={() => {
+          setSuspendModalVisible(false);
+          setSelectedUserForSuspend(null);
+        }}
+        onSuccess={handleSuspendSuccess}
+        userId={selectedUserForSuspend?.id || ""}
+        userName={selectedUserForSuspend?.name || ""}
+      />
     </div>
   );
 };
