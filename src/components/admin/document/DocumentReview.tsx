@@ -2,9 +2,7 @@
 import React, { useState, useEffect, type JSX } from "react";
 import { Form, message, Alert, Input } from "antd";
 import type { Document, PendingRequest } from "../../../models/document";
-import type { User } from "../../../models/user";
 import UserInfoHeader from "./UserInfoHeader";
-import type { UserInfo } from "./UserInfoHeader";
 import { DocumentService } from "../../../utils/DocumentService";
 import DocumentPreview from "./review/DocumentPreview";
 import DocumentBasicInfo from "./review/DocumentBasicInfo";
@@ -13,48 +11,6 @@ import DocumentActionButtons from "./review/DocumentActionButtons";
 import DocumentViewModal from "./review/DocumentViewModal";
 
 // Removed unused imports
-
-// Helper function to convert User to UserInfo
-const convertUserToUserInfo = (user: User): UserInfo => {
-  if (!user) {
-    return {
-      _id: "",
-      first_name: "",
-      last_name: "",
-      organization: undefined,
-      avatar: undefined,
-      follower: [],
-      following: [],
-      doc_count: 0,
-    };
-  }
-
-  let organizationInfo: { _id: string; name: string } | undefined;
-
-  if (user.organization) {
-    if (typeof user.organization === "string") {
-      // If organization is a string (ID), we can't get the name, so set undefined
-      organizationInfo = undefined;
-    } else {
-      // If organization is an object, extract _id and name
-      organizationInfo = {
-        _id: user.organization._id || "",
-        name: user.organization.name || "",
-      };
-    }
-  }
-
-  return {
-    _id: user._id || "",
-    first_name: user.first_name || "",
-    last_name: user.last_name || "",
-    organization: organizationInfo,
-    avatar: user.avatar,
-    follower: user.follower || [],
-    following: user.following || [],
-    doc_count: user.doc_count || 0,
-  };
-};
 
 // Using PendingRequest from document model
 
@@ -211,9 +167,7 @@ const DocumentReview: React.FC<DocumentReviewProps> = ({
       {contextHolder}
 
       {/* User Info Header */}
-      {document.user && (
-        <UserInfoHeader user={convertUserToUserInfo(document.user)} />
-      )}
+      {document.user && <UserInfoHeader user={document.user} />}
 
       <div className="font-bold text-base mb-4 sm:mb-6 text-[var(--primary-text-color)]">
         Thông tin tài liệu
