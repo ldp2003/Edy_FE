@@ -56,8 +56,8 @@ const SearchResults: React.FC<SearchResultsProps> = ({
             "Danh sách môn học"
           ) : isShowingFallback ? (
             <span className="text-[var(--red-button-color)]">
-              Không tìm thấy tài liệu này với từ khóa "{searchQuery}". Dưới đây
-              là đề xuất cho bạn:
+              Không tìm thấy tài liệu nào với tiêu đề, tên tác giả hay từ khóa "{searchQuery}". Dưới đây
+              là đề xuất dựa vào nội dung bạn đã xem gần đây:
             </span>
           ) : (
             "Kết quả tìm kiếm"

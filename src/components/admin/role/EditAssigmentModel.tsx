@@ -168,7 +168,7 @@ const EditRoleModal: React.FC<EditRoleModalProps> = ({
             </Select>
           </Form.Item> */}
 
-          <Form.Item name="organization" label="Tổ chức">
+          {/* <Form.Item name="organization" label="Tổ chức">
             <Select
               showSearch
               placeholder="Chọn tổ chức"
@@ -181,7 +181,7 @@ const EditRoleModal: React.FC<EditRoleModalProps> = ({
                 </Select.Option>
               ))}
             </Select>
-          </Form.Item>
+          </Form.Item> */}
         </Form>
       </Modal>
     </>

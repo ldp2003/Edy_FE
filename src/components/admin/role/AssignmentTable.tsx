@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import {
   Table,
   Button,
@@ -21,6 +21,7 @@ import EditAssignmentModel from "./EditAssigmentModel";
 import { Input } from "antd";
 import { NotificationService } from "../../../utils/NotificationService";
 import type { User } from "../../../models/user";
+import { UserContext } from "../../../contexts/UserContext";
 const { Search } = Input;
 
 interface Assignment {
@@ -62,6 +63,8 @@ const AssignmentTable: React.FC<{ selectedUser?: User }> = ({
   const [selectedAssignment, setSelectedAssignment] = useState<any>(null);
   const [messageApi, contextHolder] = message.useMessage();
   const [searchText, setSearchText] = useState("");
+  const { user } = useContext(UserContext);
+  const currentUserId = user?._id;
 
   const filteredAssignments = assignments.filter((assignment: Assignment) => {
     if (selectedUser) {
@@ -224,14 +227,14 @@ const AssignmentTable: React.FC<{ selectedUser?: User }> = ({
     //         return assignment.subject?.name || "-";
     //     }
     // },
-    {
-      title: "Tổ chức",
-      key: "organization",
-      ellipsis: true,
-      render: (_, record) => {
-        return record.organization?.name || "-";
-      },
-    },
+    // {
+    //   title: "Tổ chức",
+    //   key: "organization",
+    //   ellipsis: true,
+    //   render: (_, record) => {
+    //     return record.organization?.name || "-";
+    //   },
+    // },
     {
       title: "Trạng thái",
       key: "status",
@@ -331,6 +334,10 @@ const AssignmentTable: React.FC<{ selectedUser?: User }> = ({
         <div className="grid gap-4">
           {filteredAssignments.map((assignment: any) => {
             console.log("assignment.account:", assignment.account);
+            const isSelf =
+              assignment?.account?.user?._id === currentUserId ||
+              assignment?.account?.user?.id === currentUserId;
+
             return (
               <Card key={assignment.account._id} className="text-left w-full">
                 <div className="flex items-center justify-between mb-4">
@@ -346,28 +353,30 @@ const AssignmentTable: React.FC<{ selectedUser?: User }> = ({
                     </div>
                   </div>
                   <Space>
-                    <Popconfirm
-                      title="Thu hồi toàn bộ quyền quản trị"
-                      description={`Bạn có chắc chắn muốn thu hồi toàn bộ quyền quản trị của ${assignment.account.user.fullname}? Người dùng sẽ nhận được thông báo về hành động này.`}
-                      onConfirm={() =>
-                        handleRevokeAllRoles(
-                          assignment.account._id,
-                          assignment.account.user.id,
-                          assignment.account.user.fullname
-                        )
-                      }
-                      okText="Xác nhận"
-                      cancelText="Hủy"
-                      okButtonProps={{ danger: true }}
-                    >
-                      <Button
-                        danger
-                        icon={<UserX size={16} />}
-                        loading={loading}
+                    {!isSelf && (
+                      <Popconfirm
+                        title="Thu hồi toàn bộ quyền quản trị"
+                        description={`Bạn có chắc chắn muốn thu hồi toàn bộ quyền quản trị của ${assignment.account.user.fullname}? Người dùng sẽ nhận được thông báo về hành động này.`}
+                        onConfirm={() =>
+                          handleRevokeAllRoles(
+                            assignment.account._id,
+                            assignment.account.user.id,
+                            assignment.account.user.fullname
+                          )
+                        }
+                        okText="Xác nhận"
+                        cancelText="Hủy"
+                        okButtonProps={{ danger: true }}
                       >
-                        Tước quyền admin
-                      </Button>
-                    </Popconfirm>
+                        <Button
+                          danger
+                          icon={<UserX size={16} />}
+                          loading={loading}
+                        >
+                          Tước quyền admin
+                        </Button>
+                      </Popconfirm>
+                    )}
                     <Button
                       type="primary"
                       icon={<Plus size={16} />}
