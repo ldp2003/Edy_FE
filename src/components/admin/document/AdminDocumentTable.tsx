@@ -577,10 +577,10 @@ const AdminDocumentTable: React.FC = () => {
       align: "center",
       fixed: "right",
       onHeaderCell: () => ({ style: { textAlign: "center" } }),
-      render: (status: string) => {
+      render: (status: string, record: DocumentDisplay) => {
         const statusLabels: { [key: string]: string } = {
           PENDING: "Chờ duyệt",
-          APPROVED: "Đã duyệt",
+          APPROVED: !!record?.approved_by_ai ? "Đã duyệt bởi AI" : "Đã duyệt",
           REJECTED: "Đã từ chối",
           REQUESTED_EDIT: "Chờ chỉnh sửa",
           PENDING_EDIT: "Chờ duyệt chỉnh sửa",
