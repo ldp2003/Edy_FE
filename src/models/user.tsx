@@ -45,6 +45,7 @@ export interface User {
   has_been_vip?: boolean;
   createdAt?: string;
   updatedAt?: string;
+  is_admin?: boolean;
 }
 
 export const defaultUser: User = {

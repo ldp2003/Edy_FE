@@ -201,7 +201,7 @@ export function Header({ onMenuToggle }: HeaderProps) {
                     <div className="flex gap-1">
                       {account?.is_admin && (
                         <span className="text-xs bg-red-100 text-red-700 px-1 rounded font-medium">
-                          Admin
+                          Quản trị viên
                         </span>
                       )}
                       {!account?.is_admin && !account?.is_vip && (
