@@ -104,6 +104,16 @@
   --status-inactive-text: var(--color-warning-text);
   --status-inactive-border: var(--color-warning-border);
 
+  /* REQUESTED_EDIT */
+  --status-requested_edit-bg: var(--color-info-bg);
+  --status-requested_edit-text: var(--color-info-text);
+  --status-requested_edit-border: var(--color-info-border);
+
+  /* PENDING_EDIT */
+  --status-pending_edit-bg: var(--color-warning-bg);
+  --status-pending_edit-text: var(--color-warning-text);
+  --status-pending_edit-border: var(--color-warning-border);
+
   --status-banned-bg: var(--color-error-bg);
   --status-banned-text: var(--color-error-text);
   --status-banned-border: var(--color-error-border);

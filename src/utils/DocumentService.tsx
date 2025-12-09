@@ -83,7 +83,10 @@ export const DocumentService = {
     try {
       return await DocumentAPI.fetchRecommendedDocuments(params);
     } catch (error) {
-      console.error("Error in DocumentService.fetchRecommendedDocuments:", error);
+      console.error(
+        "Error in DocumentService.fetchRecommendedDocuments:",
+        error
+      );
       throw error;
     }
   },
@@ -138,6 +141,24 @@ export const DocumentService = {
       return response;
     } catch (error) {
       console.error("Error in DocumentService.getMyDocuments:", error);
+      throw error;
+    }
+  },
+
+  async getOldDocuments(params?: { page?: number; limit?: number }) {
+    try {
+      return await DocumentAPI.getOldDocuments(params);
+    } catch (error) {
+      console.error("Error in DocumentService.getOldDocuments:", error);
+      throw error;
+    }
+  },
+
+  async deleteDocuments(documentIds: string[], reason?: string) {
+    try {
+      return await DocumentAPI.deleteDocuments(documentIds, reason);
+    } catch (error) {
+      console.error("Error in DocumentService.deleteDocuments:", error);
       throw error;
     }
   },
@@ -206,7 +227,10 @@ export const DocumentService = {
     try {
       return await DocumentAPI.requestEditDirectDocument(documentId, reason);
     } catch (error) {
-      console.error("Error in DocumentService.requestEditDirectDocument:", error);
+      console.error(
+        "Error in DocumentService.requestEditDirectDocument:",
+        error
+      );
       throw error;
     }
   },
@@ -548,16 +572,22 @@ export const DocumentService = {
     try {
       return await DocumentAPI.getEditApprovalByDocumentId(documentId);
     } catch (error) {
-      console.error("Error in DocumentService.getEditApprovalByDocumentId:", error);
+      console.error(
+        "Error in DocumentService.getEditApprovalByDocumentId:",
+        error
+      );
       throw error;
     }
   },
 
   // Handle edit approval (approve/reject)
-  async handleEditApproval(editApprovalId: string, actionData: {
-    action: 'APPROVE' | 'REJECT';
-    message?: string;
-  }) {
+  async handleEditApproval(
+    editApprovalId: string,
+    actionData: {
+      action: "APPROVE" | "REJECT";
+      message?: string;
+    }
+  ) {
     try {
       return await DocumentAPI.handleEditApproval(editApprovalId, actionData);
     } catch (error) {
@@ -566,3 +596,13 @@ export const DocumentService = {
     }
   },
 };
+
+// Legacy exports for backward compatibility
+export const getAllDocuments = DocumentService.getAllDocuments;
+export const fetchNewestDocuments = DocumentService.fetchNewestDocuments;
+export const fetchRecommendedDocuments =
+  DocumentService.fetchRecommendedDocuments;
+export const fetchFeaturedDocuments = DocumentService.fetchFeaturedDocuments;
+export const getMyDocuments = DocumentService.getMyDocuments;
+export const getOldDocuments = DocumentService.getOldDocuments;
+export const deleteDocuments = DocumentService.deleteDocuments;

@@ -4,7 +4,6 @@ import { Modal, Form, Select, message } from "antd";
 import { RoleService } from "../../../utils/RoleService";
 import { ROLE_DISPLAY_NAMES } from "../../../constants/RoleConstants";
 import { AssignmentService } from "../../../utils/AssignmentService";
-import { OrganizationService } from "../../../utils/OrganizationService";
 import { NotificationService } from "../../../utils/NotificationService";
 
 interface EditRoleModalProps {
@@ -41,7 +40,6 @@ const EditRoleModal: React.FC<EditRoleModalProps> = ({
 }) => {
   const [form] = Form.useForm();
   const [roles, setRoles] = useState<any[]>([]);
-  const [organizations, setOrganizations] = useState<any[]>([]);
   const [messageApi, contextHolder] = message.useMessage();
 
   useEffect(() => {
@@ -65,9 +63,9 @@ const EditRoleModal: React.FC<EditRoleModalProps> = ({
       // const subjectsResponse = await SubjectService.get();
       // setSubjects(subjectsResponse);
 
-      // Fetch organizations
-      const orgsResponse = await OrganizationService.getOrganizations();
-      setOrganizations(orgsResponse);
+      // Fetch organizations - commented out
+      // const orgsResponse = await OrganizationService.getOrganizations();
+      // setOrganizations(orgsResponse);
     } catch (error) {
       console.error("Error fetching data:", error);
     }
@@ -163,21 +161,6 @@ const EditRoleModal: React.FC<EditRoleModalProps> = ({
                   label={subject.name}
                 >
                   {subject.name}
-                </Select.Option>
-              ))}
-            </Select>
-          </Form.Item> */}
-
-          {/* <Form.Item name="organization" label="Tổ chức">
-            <Select
-              showSearch
-              placeholder="Chọn tổ chức"
-              optionFilterProp="label"
-              allowClear
-            >
-              {organizations.map((org) => (
-                <Select.Option key={org._id} value={org._id} label={org.name}>
-                  {org.name}
                 </Select.Option>
               ))}
             </Select>
