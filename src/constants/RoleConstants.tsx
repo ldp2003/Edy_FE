@@ -70,7 +70,7 @@ export const USER_ROLES: UserRole[] = [
 // Role mapping for display
 export const ROLE_DISPLAY_NAMES: Record<string, string> = {
   Admin: "Quản trị viên",
-  SUPER_ADMIN: "Quản trị viên",
+  SUPER_ADMIN: "Quản trị viên hệ thống",
   DOCUMENT_ADMIN: "Quản lý tài liệu",
   USER_ADMIN: "Quản lý người dùng",
   SYSTEM_ADMIN: "Quản trị hệ thống",

@@ -62,12 +62,12 @@ const DocumentCard: React.FC<DocumentCardProps> = ({
 
   return (
     <div
-      className="bg-white text-center md:text-left rounded-lg shadow-sm border border-gray-200 overflow-hidden cursor-pointer transform transition-all duration-200 hover:shadow-xl hover:-translate-y-1 w-full max-w-[160px] md:max-w-[180px] flex-shrink-0"
+      className="bg-white text-center md:text-left rounded-lg shadow-sm border border-gray-200 overflow-hidden cursor-pointer transform transition-all duration-200 hover:shadow-xl hover:-translate-y-1 w-full max-w-[160px] md:max-w-[180px] flex-shrink-0 flex flex-col"
       onClick={handleCardClick}
     >
       {contextHolder}
       {/* Cover Image */}
-      <div className="relative aspect-[4/3] overflow-hidden">
+      <div className="relative aspect-[4/3] overflow-hidden flex-shrink-0">
         <img
           src={document.cover_page || "/image/default_cover.png"}
           alt={document.title}
@@ -91,8 +91,8 @@ const DocumentCard: React.FC<DocumentCardProps> = ({
           onClick={handleFavoriteClick}
           className={`absolute top-2 right-2 p-1.5 rounded-full cursor-pointer ${
             isFavorite
-              ? "bg-red-500 text-white"
-              : "bg-white/80 text-[var(--secondary-text-color)] hover:bg-white"
+              ? "bg-[var(--color-error-bg)] text-[var(--color-error-text)]"
+              : "bg-[var(--secondary-background-color)]/80 text-[var(--secondary-text-color)] hover:bg-[var(--secondary-background-color)]"
           }`}
         >
           <Heart className="w-3.5 h-3.5" />
@@ -107,14 +107,15 @@ const DocumentCard: React.FC<DocumentCardProps> = ({
       </div>
 
       {/* Content */}
-      <div className="p-2 md:p-3 h-[88px] md:h-[104px]">
+      <div className="p-2 md:p-3 flex flex-col flex-1">
         <h3
-          className="text-xs md:text-sm font-medium text-[var(--primary-text-color)] line-clamp-2 mb-1"
-          title={document.title}
+          className="text-xs md:text-sm font-medium text-[var(--primary-text-color)]
+         line-clamp-2 break-words break-all min-h-[32px] md:min-h-[40px] mb-2"
         >
           {document.title}
         </h3>
-        <div className="space-y-1">
+
+        <div className="space-y-1 mt-auto">
           {/* Môn học */}
           <div className="flex items-center gap-1 text-[var(--secondary-text-color)] text-[10px] md:text-xs h-[16px] md:h-[18px]">
             {document.subject ? (

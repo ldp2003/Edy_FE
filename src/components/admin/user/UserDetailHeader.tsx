@@ -20,17 +20,19 @@ const UserDetailHeader: React.FC<UserDetailHeaderProps> = ({
 }) => {
   console.log("Rendering UserDetailHeader with user:", user);
   return (
-    <div className="flex items-center justify-between mb-6">
-      <div className="flex items-center space-x-4">
-        <div className="flex flex-row gap-3 items-center">
-          <h1 className="text-base font-bold text-gray-900">
+    <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4 md:mb-6">
+      <div className="flex items-center space-x-2 md:space-x-4">
+        <div className="flex flex-col md:flex-row md:gap-3 md:items-center">
+          <h1 className="text-sm md:text-base font-bold text-gray-900">
             Thông tin người dùng{" "}
           </h1>
-          <p className="text-gray-600">{"ID: " + user._id}</p>
+          <p className="text-xs md:text-sm text-gray-600">
+            {"ID: " + user._id}
+          </p>
         </div>
       </div>
 
-      <div className="flex space-x-2">
+      <div className="flex flex-wrap gap-2">
         {/* <Select
           value={user.status}
           onChange={onChangeStatus}

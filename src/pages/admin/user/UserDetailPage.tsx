@@ -184,7 +184,7 @@ const UserDetailPage: React.FC = () => {
   }
 
   return (
-    <div className="">
+    <div className="p-2 md:p-0">
       <AdminBreadcrumb
         items={[
           { label: "Admin", path: "/admin" },
@@ -197,7 +197,7 @@ const UserDetailPage: React.FC = () => {
         ]}
       />
 
-      <div className="mt-4">
+      <div className="mt-2 md:mt-4">
         {/* Header */}
         <UserDetailHeader
           user={user}
@@ -207,7 +207,7 @@ const UserDetailPage: React.FC = () => {
           onChangeStatus={handleChangeStatus}
         />
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6">
           {/* User Profile and Stats */}
           <div className="lg:col-span-1 shadow-sm border border-gray-200 rounded-lg bg-white">
             <UserProfileCard

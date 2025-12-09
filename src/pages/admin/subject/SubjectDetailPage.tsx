@@ -63,9 +63,6 @@ const SubjectDetailPage: React.FC = () => {
         <p className="text-[var(--secondary-text-color)]">
           Không tìm thấy môn học
         </p>
-        <Button onClick={handleBack} className="mt-4">
-          Quay lại
-        </Button>
       </div>
     );
   }

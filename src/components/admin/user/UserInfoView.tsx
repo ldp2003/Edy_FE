@@ -41,24 +41,24 @@ const UserInfoView: React.FC<UserInfoViewProps> = ({ user }) => {
   };
 
   return (
-    <div className="bg-white p-6 rounded-lg border border-gray-300">
-      <h2 className="font-bold text-sm mb-6">
+    <div className="bg-white p-3 md:p-6 rounded-lg border border-gray-300">
+      <h2 className="font-bold text-xs md:text-sm mb-4 md:mb-6">
         Thông tin người dùng{" "}
         <span className="text-gray-500">ID: {user._id}</span>
       </h2>
 
-      <div className="flex items-start space-x-6">
+      <div className="flex flex-col md:flex-row items-start md:space-x-6 gap-4 md:gap-0">
         {/* Avatar */}
-        <div className="flex flex-col items-center">
-          <Avatar size={80} src={user.avatar}>
+        <div className="flex flex-col items-center md:items-start">
+          <Avatar size={64} src={user.avatar} className="md:w-20 md:h-20">
             {user.last_name?.charAt(0)}
             {user.first_name?.charAt(0)}
           </Avatar>
-          <p className="text-xs text-gray-500 mt-2">ID: {user._id}</p>
+          <p className="text-xs text-gray-500 mt-2 md:hidden">ID: {user._id}</p>
         </div>
 
         {/* User Info */}
-        <div className="flex-1 grid grid-cols-2 gap-4">
+        <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4 w-full">
           <div>
             <label className="block text-xs font-medium text-gray-500 mb-1">
               Họ
