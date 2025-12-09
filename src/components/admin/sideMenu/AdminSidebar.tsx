@@ -3,7 +3,6 @@ import { PanelLeftClose, PanelLeftOpen } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useEffect, useContext } from "react";
 import { UserContext } from "../../../contexts/UserContext";
-import { roleTranslations } from "../../../locales/documentEnums";
 
 interface AdminSidebarProps {
   isVisible: boolean;
@@ -19,10 +18,20 @@ export function AdminSidebar({ isVisible, setIsVisible }: AdminSidebarProps) {
     // You can add specific logic here if needed
   }, [location.pathname, setIsVisible]);
 
-  const { user, role } = useContext(UserContext);
+  const { user } = useContext(UserContext);
 
   const handleUserInfoClick = () => {
     navigate("/personal-profile");
+  };
+
+  const handleOrganizationClick = () => {
+    if (
+      user?.organization &&
+      typeof user.organization === "object" &&
+      user.organization._id
+    ) {
+      navigate(`/organization/${user.organization._id}`);
+    }
   };
 
   return (
@@ -37,15 +46,9 @@ export function AdminSidebar({ isVisible, setIsVisible }: AdminSidebarProps) {
         onClick={() => setIsVisible(!isVisible)}
       >
         {isVisible ? (
-          <PanelLeftClose
-            className="w-3 h-3"
-            style={{ color: "var(--primary-text-color)" }}
-          />
+          <PanelLeftClose className="w-3 h-3" />
         ) : (
-          <PanelLeftOpen
-            className="w-3 h-3"
-            style={{ color: "var(--primary-text-color)" }}
-          />
+          <PanelLeftOpen className="w-3 h-3" />
         )}
       </button>
 
@@ -61,29 +64,45 @@ export function AdminSidebar({ isVisible, setIsVisible }: AdminSidebarProps) {
             !isVisible ? "justify-center" : ""
           }`}
         >
-          <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
+          <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden">
             <img
-              src={user?.avatar || ""}
-              alt=""
-              className="w-full h-full object-cover rounded-full"
+              src={user?.avatar || "/image/avatar-default.svg"}
+              alt="Avatar"
+              className="w-full h-full object-cover"
+              onError={(e) => {
+                e.currentTarget.style.display = "none";
+                const sibling = e.currentTarget
+                  .nextElementSibling as HTMLElement | null;
+                if (sibling) {
+                  sibling.style.display = "flex";
+                }
+              }}
             />
+            <span className="text-xs font-medium text-gray-600 hidden">NA</span>
           </div>
           {isVisible && (
-            <div className="text-left">
-              <p
-                className="text-sm font-medium"
-                style={{ color: "var(--primary-text-color)" }}
+            <div className="text-left flex-1">
+              <div
+                className="font-bold text-sm cursor-pointer hover:underline"
+                onClick={() => (window.location.href = "/personal-profile")}
               >
                 {user?.first_name && user?.last_name
                   ? `${user.first_name} ${user.last_name}`
                   : "Admin"}
-              </p>
+              </div>
+              <div className="flex gap-1">
+                <span className="text-xs bg-red-100 text-red-700 px-1 rounded font-medium">
+                  Quản trị viên
+                </span>
+              </div>
               <p
-                className="text-xs"
-                style={{ color: "var(--secondary-text-color)" }}
+                className="text-xs font-medium overflow-hidden whitespace-nowrap text-ellipsis cursor-pointer hover:underline text-[var(--primary-color)]"
+                style={{ maxWidth: "150px" }}
+                onClick={handleOrganizationClick}
               >
-                {roleTranslations[role as keyof typeof roleTranslations] ||
-                  "Quản trị viên"}
+                {typeof user?.organization === "string"
+                  ? user.organization
+                  : user?.organization?.name || "Chưa có tổ chức"}
               </p>
             </div>
           )}

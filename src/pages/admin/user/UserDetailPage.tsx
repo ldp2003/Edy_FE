@@ -28,7 +28,10 @@ const UserDetailPage: React.FC = () => {
     try {
       setLoading(true);
       const userData = await UserService.getUserById(id);
-      setUser(userData.user || userData);
+      setUser({
+        ...(userData.user || userData),
+        is_admin: userData.account?.is_admin,
+      });
     } catch (error) {
       console.error("Error fetching user:", error);
       message.error("Không thể tải thông tin người dùng!");
