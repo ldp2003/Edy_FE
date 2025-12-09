@@ -181,10 +181,16 @@ const InformationForm = ({
       return;
     }
 
+    const organizationId = user.organization._id;
+    if (!organizationId) {
+      message.error("Không xác định được ID tổ chức");
+      return;
+    }
+
     try {
       await SubjectService.createSubject({
         ...values,
-        organization: user.organization._id,
+        organization: organizationId,
       });
 
       message.success("Tạo môn học mới thành công!");

@@ -37,7 +37,13 @@ const EditProfile: React.FC = () => {
         <UserProfileHeader
           firstName={user?.first_name || "Chưa đặt tên"}
           lastName={user?.last_name || "Chưa đặt tên"}
-          organization={user?.organization || "Chưa có tổ chức"}
+          organization={
+            typeof user?.organization === "object" && user?.organization?._id
+              ? { _id: user.organization._id, name: user.organization.name }
+              : typeof user?.organization === "string"
+              ? user.organization
+              : "Chưa có tổ chức"
+          }
           email={user?.contact_email || ""}
           organizationOptions={organizations}
           messageApi={messageApi}

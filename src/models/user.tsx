@@ -1,6 +1,9 @@
 import type { Document } from "./document";
 import type { OrganizationDetailed } from "./organization";
 
+// Export Organization type for backward compatibility
+export type Organization = OrganizationDetailed;
+
 export interface User {
   _id: string;
   first_name: string;
