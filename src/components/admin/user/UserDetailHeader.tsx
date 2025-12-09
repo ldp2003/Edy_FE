@@ -1,6 +1,6 @@
 import React from "react";
-import { Button, Popconfirm, Select } from "antd";
-import {  Edit, Lock, Unlock } from "lucide-react";
+import { Button } from "antd";
+import { Edit, Lock, Unlock } from "lucide-react";
 import type { User } from "../../../models/user";
 
 interface UserDetailHeaderProps {
@@ -16,12 +16,11 @@ const UserDetailHeader: React.FC<UserDetailHeaderProps> = ({
 
   onEdit,
   onToggleStatus,
-  onChangeStatus,
+  // onChangeStatus,
 }) => {
   return (
     <div className="flex items-center justify-between mb-6">
       <div className="flex items-center space-x-4">
-
         <div className="flex flex-row gap-3 items-center">
           <h1 className="text-base font-bold text-gray-900">
             Thông tin người dùng{" "}
@@ -31,7 +30,7 @@ const UserDetailHeader: React.FC<UserDetailHeaderProps> = ({
       </div>
 
       <div className="flex space-x-2">
-        <Select
+        {/* <Select
           value={user.status}
           onChange={onChangeStatus}
           style={{ width: 120 }}
@@ -39,35 +38,21 @@ const UserDetailHeader: React.FC<UserDetailHeaderProps> = ({
           <Select.Option value="ACTIVE">Hoạt động</Select.Option>
           <Select.Option value="INACTIVE">Không hoạt động</Select.Option>
           <Select.Option value="BANNED">Bị khóa</Select.Option>
-        </Select>
+        </Select> */}
 
         <Button icon={<Edit size={16} />} onClick={onEdit}>
           Thao tác
         </Button>
 
-        <Popconfirm
-          title={
-            user.status === "ACTIVE"
-              ? "Bạn có chắc muốn khóa tài khoản này?"
-              : "Bạn có chắc muốn mở khóa tài khoản này?"
+        <Button
+          icon={
+            user.status === "ACTIVE" ? <Lock size={16} /> : <Unlock size={16} />
           }
-          onConfirm={onToggleStatus}
-          okText="Có"
-          cancelText="Không"
+          onClick={onToggleStatus}
+          danger={user.status === "ACTIVE"}
         >
-          <Button
-            icon={
-              user.status === "ACTIVE" ? (
-                <Lock size={16} />
-              ) : (
-                <Unlock size={16} />
-              )
-            }
-            danger={user.status === "ACTIVE"}
-          >
-            {user.status === "ACTIVE" ? "Khóa tài khoản" : "Mở khóa"}
-          </Button>
-        </Popconfirm>
+          {user.status === "ACTIVE" ? "Khóa tài khoản" : "Mở khóa"}
+        </Button>
       </div>
     </div>
   );

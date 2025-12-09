@@ -430,7 +430,6 @@ const AdminUserTable: React.FC = () => {
     } else {
       // For unsuspending, directly call API
       await handleUnsuspendUser(userId);
-      await UserService.updateUserStatus(userId, "ACTIVE");
     }
   };
 
@@ -448,9 +447,37 @@ const AdminUserTable: React.FC = () => {
             : user
         )
       );
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error unsuspending user:", error);
-      message.error("Có lỗi xảy ra khi mở khóa tài khoản!");
+
+      // If unsuspend fails with 400 or "Tài khoản không bị khóa", try updateUserStatus instead
+      if (
+        error.response?.status === 400 ||
+        error.response?.data?.message?.includes("Tài khoản không bị khóa") ||
+        error.message?.includes("Tài khoản không bị khóa")
+      ) {
+        try {
+          await UserService.updateUserStatus(userId, "ACTIVE");
+          message.success("Đã mở khóa tài khoản!");
+
+          // Refresh data
+          setUsers(
+            users.map((user) =>
+              user._id === userId
+                ? {
+                    ...user,
+                    status: "ACTIVE" as "ACTIVE" | "INACTIVE" | "BANNED",
+                  }
+                : user
+            )
+          );
+        } catch (updateError) {
+          console.error("Error updating user status:", updateError);
+          message.error("Có lỗi xảy ra khi mở khóa tài khoản!");
+        }
+      } else {
+        message.error("Có lỗi xảy ra khi mở khóa tài khoản!");
+      }
     }
   };
 
@@ -733,25 +760,25 @@ const AdminUserTable: React.FC = () => {
         );
       },
     },
-    {
-      title: "Thay đổi trạng thái",
-      key: "changeStatus",
-      align: "center",
-      width: 120,
-      render: (_, record: UserDisplay) => (
-        <Select
-          value={record.status}
-          onChange={(value) => handleChangeUserStatus(record._id, value)}
-          size="small"
-          style={{ width: 100 }}
-          disabled={record._id === currentUser?._id} // Không cho phép thay đổi trạng thái của chính mình
-        >
-          <Select.Option value="ACTIVE">Hoạt động</Select.Option>
-          <Select.Option value="INACTIVE">Không hoạt động</Select.Option>
-          <Select.Option value="BANNED">Bị khóa</Select.Option>
-        </Select>
-      ),
-    },
+    // {
+    //   title: "Thay đổi trạng thái",
+    //   key: "changeStatus",
+    //   align: "center",
+    //   width: 120,
+    //   render: (_, record: UserDisplay) => (
+    //     <Select
+    //       value={record.status}
+    //       onChange={(value) => handleChangeUserStatus(record._id, value)}
+    //       size="small"
+    //       style={{ width: 100 }}
+    //       disabled={record._id === currentUser?._id} // Không cho phép thay đổi trạng thái của chính mình
+    //     >
+    //       <Select.Option value="ACTIVE">Hoạt động</Select.Option>
+    //       <Select.Option value="INACTIVE">Không hoạt động</Select.Option>
+    //       <Select.Option value="BANNED">Bị khóa</Select.Option>
+    //     </Select>
+    //   ),
+    // },
     {
       title: "Thao tác",
       key: "actions",

@@ -32,6 +32,7 @@ export const ActivityAction = {
   USER_LOST_VIP: "USER_LOST_VIP",
   ORGANIZATION_CREATED: "ORGANIZATION_CREATED",
   SUBJECT_CREATED: "SUBJECT_CREATED",
+  DOCUMENTS_BATCH_DELETED: "DOCUMENTS_BATCH_DELETED",
 } as const;
 
 export type ActivityActionType =
@@ -113,6 +114,7 @@ export const activityActionLabels: Record<ActivityActionType, string> = {
   [ActivityAction.USER_LOST_VIP]: "Người dùng mất VIP",
   [ActivityAction.ORGANIZATION_CREATED]: "Tạo tổ chức",
   [ActivityAction.SUBJECT_CREATED]: "Tạo môn học",
+  [ActivityAction.DOCUMENTS_BATCH_DELETED]: "Xóa hàng loạt tài liệu",
 };
 
 // Target type labels in Vietnamese
