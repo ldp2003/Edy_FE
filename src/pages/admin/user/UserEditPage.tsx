@@ -67,7 +67,7 @@ const UserEditPage: React.FC = () => {
   }
 
   return (
-    <div className="text-left">
+    <div className="text-left p-2 md:p-0">
       <AdminBreadcrumb
         items={[
           { label: "Admin", path: "/admin" },
@@ -81,9 +81,9 @@ const UserEditPage: React.FC = () => {
         ]}
       />
 
-      <div className="mt-4">
+      <div className="mt-2 md:mt-4">
         {/* Header */}
-        <div className="flex items-center space-x-4 mb-6">
+        <div className="flex flex-col md:flex-row md:items-center gap-3 md:gap-4 mb-4 md:mb-6">
           <Button
             icon={<ArrowLeft size={16} />}
             onClick={() => navigate(`/admin/users/detail/${id}`)}
@@ -91,10 +91,10 @@ const UserEditPage: React.FC = () => {
             Quay lại
           </Button>
           <div>
-            <h1 className="text-xl font-bold text-gray-900">
+            <h1 className="text-base md:text-xl font-bold text-gray-900">
               Thông tin chi tiết người dùng
             </h1>
-            <p className="text-gray-600">
+            <p className="text-xs md:text-sm text-gray-600">
               {user?.first_name} {user?.last_name} - ID: {user?._id}
             </p>
           </div>
@@ -104,7 +104,7 @@ const UserEditPage: React.FC = () => {
         <UserInfoView user={user!} />
 
         {/* Tabs Section */}
-        <div className="mt-8">
+        <div className="mt-4 md:mt-8">
           <Tabs
             defaultActiveKey="roles"
             items={[
@@ -112,7 +112,7 @@ const UserEditPage: React.FC = () => {
                 key: "roles",
                 label: "Quản lý quyền người dùng",
                 children: (
-                  <div className="bg-white rounded-lg border border-[var(--border-color)] p-6">
+                  <div className="bg-white rounded-lg border border-[var(--border-color)] p-3 md:p-6">
                     <UserAssignmentTable userId={id!} />
                   </div>
                 ),
@@ -121,7 +121,7 @@ const UserEditPage: React.FC = () => {
                 key: "violations",
                 label: "Lịch sử vi phạm",
                 children: (
-                  <div className="bg-white rounded-lg border border-[var(--border-color)] p-6">
+                  <div className="bg-white rounded-lg border border-[var(--border-color)] p-3 md:p-6">
                     <UserViolationHistory userId={id!} type="violations" />
                   </div>
                 ),
@@ -130,7 +130,7 @@ const UserEditPage: React.FC = () => {
                 key: "restrictions",
                 label: "Lịch sử bị phạt",
                 children: (
-                  <div className="bg-white rounded-lg border border-[var(--border-color)] p-6">
+                  <div className="bg-white rounded-lg border border-[var(--border-color)] p-3 md:p-6">
                     <UserViolationHistory userId={id!} type="restrictions" />
                   </div>
                 ),
