@@ -1,9 +1,8 @@
 import type { Document } from "./document";
+import type { OrganizationDetailed } from "./organization";
 
-export interface Organization {
-  _id: string;
-  name: string;
-}
+// Export Organization type for backward compatibility
+export type Organization = OrganizationDetailed;
 
 export interface User {
   _id: string;
@@ -11,7 +10,7 @@ export interface User {
   last_name: string;
   contact_email: string;
   avatar?: string;
-  organization: Organization | string;
+  organization: OrganizationDetailed | string;
   last_organization_change?: string;
   follower?: string[];
   following?: string[];
@@ -73,5 +72,6 @@ export const defaultUser: User = {
   organization: {
     _id: "",
     name: "Chưa có trường/tổ chức",
-  } as Organization,
+    code: "",
+  } as OrganizationDetailed,
 };

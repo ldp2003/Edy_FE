@@ -17,7 +17,7 @@ const UserDetailInfo: React.FC<UserDetailInfoProps> = ({
 }) => {
   return (
     <Card title="Thông tin chi tiết">
-      <Descriptions column={2} bordered size="small">
+      <Descriptions column={{ xs: 1, sm: 1, md: 2 }} bordered size="small">
         <Descriptions.Item label="ID người dùng" span={2}>
           {user._id}
         </Descriptions.Item>

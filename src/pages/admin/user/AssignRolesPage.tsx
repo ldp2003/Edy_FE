@@ -15,10 +15,10 @@ const AssignRolesPage: React.FC = () => {
   ];
 
   return (
-    <div className="h-full">
+    <div className="h-full p-2 md:p-0">
       <AdminBreadcrumb items={breadcrumbItems} />
 
-      <div className="mt-4">
+      <div className="mt-2 md:mt-4">
         <AssignmentTable selectedUser={selectedUser} />
       </div>
     </div>

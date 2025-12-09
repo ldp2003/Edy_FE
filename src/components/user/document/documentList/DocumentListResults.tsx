@@ -42,12 +42,12 @@ const DocumentListResults: React.FC<DocumentListResultsProps> = ({
   return (
     <div className="space-y-4">
       {/* Controls */}
-      <div className="bg-white">
+      <div className="bg-white p-4 rounded-lg border border-[var(--border-color)]">
         <div className="flex flex-col sm:flex-row justify-start items-start sm:items-center gap-4">
           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
             {/* Sort Dropdown */}
             <div className="flex items-center gap-2">
-              <span className="text-sm text-gray-600">Sắp xếp:</span>
+              <span className="text-xs md:text-sm text-gray-600">Sắp xếp:</span>
               <Select
                 placeholder="Chọn cách sắp xếp"
                 onChange={handleSortChange}
@@ -66,7 +66,9 @@ const DocumentListResults: React.FC<DocumentListResultsProps> = ({
 
             {/* View Mode Toggle */}
             <div className="flex items-center gap-2">
-              <span className="text-sm text-gray-600">Hiển thị:</span>
+              <span className="text-xs md:text-sm text-gray-600">
+                Hiển thị:
+              </span>
               <div className="flex border border-gray-300 rounded">
                 <Button
                   type={viewMode === "grid" ? "primary" : "default"}
@@ -114,19 +116,28 @@ const DocumentListResults: React.FC<DocumentListResultsProps> = ({
         <>
           {/* Grid View */}
           {viewMode === "grid" && (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 2xl:grid-cols-5 gap-4 justify-items-center">
-              {documents
-                .filter((doc) => doc && doc._id)
-                .map((document) => (
-                  <DocumentCard key={document._id} document={document} />
-                ))}
+            <div className="bg-white p-4 rounded-lg border border-[var(--border-color)]">
+              <div className="overflow-x-auto -mx-4 px-4 md:mx-0 md:px-0">
+                <div className="flex md:grid md:grid-cols-3 lg:grid-cols-5 2xl:grid-cols-6 gap-2 md:gap-4 min-w-max md:min-w-0">
+                  {documents
+                    .filter((doc) => doc && doc._id)
+                    .map((document) => (
+                      <div
+                        key={document._id}
+                        className="flex-shrink-0 w-[160px] md:w-auto"
+                      >
+                        <DocumentCard document={document} />
+                      </div>
+                    ))}
+                </div>
+              </div>
             </div>
           )}
 
           {/* List View */}
           {viewMode === "list" && (
-            <Card>
-              <div className="">
+            <Card className="border border-[var(--border-color)]">
+              <div>
                 {documents
                   .filter((doc) => doc && doc._id)
                   .map((document) => (
