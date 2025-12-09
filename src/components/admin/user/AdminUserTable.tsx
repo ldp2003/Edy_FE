@@ -573,7 +573,7 @@ const AdminUserTable: React.FC = () => {
         if (typeof record.organization === "object" && record.organization) {
           return (
             <Tooltip title={record.organization.name}>
-              <span className="text-xs">{record.organization.name}</span>
+              <span className="text-xs line-clamp-1 truncate max-w-52">{record.organization.name}</span>
             </Tooltip>
           );
         }
@@ -741,6 +741,7 @@ const AdminUserTable: React.FC = () => {
       dataIndex: "status",
       key: "status",
       align: "center",
+      fixed: "right",
       width: 90,
       render: (status?: string) => {
         const statusLabels: { [key: string]: string } = {
@@ -759,25 +760,6 @@ const AdminUserTable: React.FC = () => {
         );
       },
     },
-    // {
-    //   title: "Thay đổi trạng thái",
-    //   key: "changeStatus",
-    //   align: "center",
-    //   width: 120,
-    //   render: (_, record: UserDisplay) => (
-    //     <Select
-    //       value={record.status}
-    //       onChange={(value) => handleChangeUserStatus(record._id, value)}
-    //       size="small"
-    //       style={{ width: 100 }}
-    //       disabled={record._id === currentUser?._id} // Không cho phép thay đổi trạng thái của chính mình
-    //     >
-    //       <Select.Option value="ACTIVE">Hoạt động</Select.Option>
-    //       <Select.Option value="INACTIVE">Không hoạt động</Select.Option>
-    //       <Select.Option value="BANNED">Bị khóa</Select.Option>
-    //     </Select>
-    //   ),
-    // },
     {
       title: "Thao tác",
       key: "actions",

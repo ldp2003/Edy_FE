@@ -452,14 +452,7 @@ const AdminDocumentTable: React.FC = () => {
       render: (text: string, record: DocumentDisplay) => (
         <span
           onClick={() => handleRowClick(record)}
-          className="line-clamp-1"
-          style={{
-            overflow: "hidden",
-            textAlign: "left",
-            color: "var(--primary-text-color)",
-            fontWeight: 500,
-            cursor: "pointer",
-          }}
+          className="line-clamp-1 truncate hover:cursor-pointer hover:underline text-[var(--primary-text-color)] font-medium max-w-52"
           title={text}
         >
           {text}
@@ -723,7 +716,7 @@ const AdminDocumentTable: React.FC = () => {
       render: (organization: { name: string }) => {
         if (!organization) return "N/A";
         return (
-          <span className="text-sm" title={organization.name}>
+          <span className="text-sm line-clamp-1 truncate max-w-52" title={organization.name}>
             {organization.name}
           </span>
         );

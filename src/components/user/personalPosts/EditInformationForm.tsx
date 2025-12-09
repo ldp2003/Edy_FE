@@ -99,24 +99,30 @@ const EditInformationForm = ({
   // Load existing edit document if any
   useEffect(() => {
     let isMounted = true;
-    
+
     const loadEditDocument = async () => {
       try {
         setLoadingEditData(true);
         const editDoc = await DocumentService.getEditDocument(document._id);
-        
+
         // Only update if component is still mounted
         if (!isMounted) return;
-        
+
         setExistingEditDocument(editDoc);
-        
+
         // If there's existing edit data, load it into the form
         if (editDoc && editDoc.title) {
           // Set form values with existing edit data
           const formValues: Partial<FormData> = {
             documentName: editDoc.title,
-            subject: typeof editDoc.subject === "object" ? editDoc.subject._id : editDoc.subject,
-            organization: typeof editDoc.organization === "object" ? editDoc.organization._id : editDoc.organization,
+            subject:
+              typeof editDoc.subject === "object"
+                ? editDoc.subject._id
+                : editDoc.subject,
+            organization:
+              typeof editDoc.organization === "object"
+                ? editDoc.organization._id
+                : editDoc.organization,
             documentType: editDoc.doc_type,
             pageCount: editDoc.page,
             level: editDoc.level,
@@ -126,22 +132,27 @@ const EditInformationForm = ({
             summary: editDoc.summary_by_user || "",
             public_mode: document.public_mode || "PUBLIC",
           };
-          
+
           // Set authors
           if (editDoc.author && editDoc.author.length > 0) {
             setAuthors(editDoc.author);
             formValues.authors = editDoc.author;
           }
-          
+
           form.setFieldsValue(formValues);
           setFormInitialized(true);
-          message.info("Đang chỉnh sửa bản nháp trước đó. Bạn có thể tiếp tục chỉnh sửa và gửi lại.");
+          message.info(
+            "Đang chỉnh sửa bản nháp trước đó. Bạn có thể tiếp tục chỉnh sửa và gửi lại."
+          );
         }
       } catch (error: any) {
         // If error is 404 or "not found", it means no edit document exists yet
         if (!isMounted) return;
-        
-        if (error.response?.status === 404 || error.message?.includes("không tồn tại")) {
+
+        if (
+          error.response?.status === 404 ||
+          error.message?.includes("không tồn tại")
+        ) {
           console.log("No existing edit document found");
         } else {
           console.error("Error loading edit document:", error);
@@ -154,7 +165,7 @@ const EditInformationForm = ({
     };
 
     loadEditDocument();
-    
+
     // Cleanup function
     return () => {
       isMounted = false;
@@ -164,7 +175,12 @@ const EditInformationForm = ({
   // Ensure form is updated when both document and subjects are available
   // Only apply this if we don't have edit data to avoid conflicts
   useEffect(() => {
-    if (document && subjects.length > 0 && !subjectsLoading && !existingEditDocument) {
+    if (
+      document &&
+      subjects.length > 0 &&
+      !subjectsLoading &&
+      !existingEditDocument
+    ) {
       const subjectId =
         typeof document.subject === "object"
           ? document.subject._id
@@ -185,7 +201,12 @@ const EditInformationForm = ({
   // Pre-fill form with existing document data (only if no edit document exists and form not initialized)
   useEffect(() => {
     // Only set original document data if we don't have an existing edit document and form hasn't been initialized
-    if (document && subjects.length > 0 && !existingEditDocument && !formInitialized) {
+    if (
+      document &&
+      subjects.length > 0 &&
+      !existingEditDocument &&
+      !formInitialized
+    ) {
       console.log("Setting form values with document:", document);
       console.log("Available subjects:", subjects);
 
@@ -254,10 +275,16 @@ const EditInformationForm = ({
       return;
     }
 
+    const organizationId = user.organization._id;
+    if (!organizationId) {
+      message.error("Không xác định được ID tổ chức");
+      return;
+    }
+
     try {
       await SubjectService.createSubject({
         ...values,
-        organization: user.organization._id,
+        organization: organizationId,
       });
 
       message.success("Tạo môn học mới thành công!");
@@ -337,7 +364,9 @@ const EditInformationForm = ({
       await DocumentService.createEditDocument(document._id, editData);
 
       const showMessage = messageApi || message;
-      showMessage.success("Gửi yêu cầu chỉnh sửa tài liệu thành công! Vui lòng chờ admin phê duyệt.");
+      showMessage.success(
+        "Gửi yêu cầu chỉnh sửa tài liệu thành công! Vui lòng chờ admin phê duyệt."
+      );
 
       if (onEditSuccess) {
         onEditSuccess();
@@ -402,7 +431,7 @@ const EditInformationForm = ({
       <div className="font-bold text-base mb-6 text-[var(--primary-text-color)]">
         Chỉnh sửa thông tin tài liệu
       </div>
-      
+
       {existingEditDocument && existingEditDocument.status === "PENDING" && (
         <Alert
           message="Bạn đã có một yêu cầu chỉnh sửa đang chờ phê duyệt"
@@ -720,7 +749,11 @@ const EditInformationForm = ({
                 disabled={submitting || loadingEditData}
                 className="w-full sm:w-auto"
               >
-                {submitting ? "Đang gửi..." : existingEditDocument ? "Cập nhật yêu cầu chỉnh sửa" : "Gửi yêu cầu chỉnh sửa"}
+                {submitting
+                  ? "Đang gửi..."
+                  : existingEditDocument
+                  ? "Cập nhật yêu cầu chỉnh sửa"
+                  : "Gửi yêu cầu chỉnh sửa"}
               </Button>
             </div>
           </div>

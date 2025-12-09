@@ -11,12 +11,10 @@ const AdminUsersPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="">
+      <div className="p-2 md:p-0">
         <AdminBreadcrumb items={breadcrumbItems} />
-        <div className="mt-4">
-          <div className="mt-6">
-            <AdminUserTable />
-          </div>
+        <div className="mt-2 md:mt-4">
+          <AdminUserTable />
         </div>
       </div>
     </div>
