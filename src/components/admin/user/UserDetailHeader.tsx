@@ -1,6 +1,6 @@
 import React from "react";
 import { Button, Popconfirm, Select } from "antd";
-import { ArrowLeft, Edit, Lock, Unlock } from "lucide-react";
+import {  Edit, Lock, Unlock } from "lucide-react";
 import type { User } from "../../../models/user";
 
 interface UserDetailHeaderProps {
@@ -13,7 +13,7 @@ interface UserDetailHeaderProps {
 
 const UserDetailHeader: React.FC<UserDetailHeaderProps> = ({
   user,
-  onBack,
+
   onEdit,
   onToggleStatus,
   onChangeStatus,
@@ -21,9 +21,7 @@ const UserDetailHeader: React.FC<UserDetailHeaderProps> = ({
   return (
     <div className="flex items-center justify-between mb-6">
       <div className="flex items-center space-x-4">
-        <Button icon={<ArrowLeft size={16} />} onClick={onBack}>
-          Quay lại
-        </Button>
+
         <div className="flex flex-row gap-3 items-center">
           <h1 className="text-base font-bold text-gray-900">
             Thông tin người dùng{" "}

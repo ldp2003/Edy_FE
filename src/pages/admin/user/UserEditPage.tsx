@@ -67,7 +67,7 @@ const UserEditPage: React.FC = () => {
   }
 
   return (
-    <div className="p-4 text-left">
+    <div className="text-left">
       <AdminBreadcrumb
         items={[
           { label: "Admin", path: "/admin" },

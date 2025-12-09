@@ -39,14 +39,6 @@ const processQueue = (error: unknown, token: string | null = null) => {
 // Response interceptor to handle 401 errors
 apiClient.interceptors.response.use(
   (response) => {
-    // Check if user is banned in successful responses
-    if (response.data?.user?.status === "BANNED") {
-      console.log("🚫 User is banned - detected in API response");
-      // Force logout and redirect
-      if (typeof window !== "undefined") {
-        window.location.href = "/banned";
-      }
-    }
     return response;
   },
   async (error) => {
