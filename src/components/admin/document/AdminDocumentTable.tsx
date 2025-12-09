@@ -7,8 +7,16 @@ import {
   getWarningStyle,
 } from "../../../utils/AdminTableStyles";
 import React, { useState, useEffect, useCallback } from "react";
-import { Table, Select, message, Dropdown, Checkbox } from "antd";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import {
+  Table,
+  Select,
+  message,
+  Dropdown,
+  Checkbox,
+  Modal,
+  Button,
+} from "antd";
+import { useNavigate, useSearchParams, useLocation } from "react-router-dom";
 import type { ColumnsType } from "antd/es/table";
 // import { Download, Printer } from "lucide-react";
 import type { Document } from "../../../models/document";
@@ -41,17 +49,23 @@ interface ApprovalRequest {
 
 const AdminDocumentTable: React.FC = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [searchParams, setSearchParams] = useSearchParams();
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(5);
   const [documents, setDocuments] = useState<Document[]>([]);
   const [loading, setLoading] = useState(false);
   const [totalDocuments, setTotalDocuments] = useState(0);
-  // Đã bỏ viewMode, luôn dùng getAllDocuments
+  const [viewMode, setViewMode] = useState<"all" | "old">("all"); // Chế độ xem
+  const [selectedDocuments, setSelectedDocuments] = useState<Set<string>>(
+    new Set()
+  ); // Documents được chọn
+  const [selectAll, setSelectAll] = useState(false); // Select all checkbox
   const [filterParams, setFilterParams] = useState<AdminFilterSearchParams>({});
   const [appliedFilters, setAppliedFilters] = useState<AdminFilterSearchParams>(
     {}
   );
+  const [showDeleteModal, setShowDeleteModal] = useState(false); // State for delete modal
 
   // Sorting state
   const [sortInfo, setSortInfo] = useState<{
@@ -62,6 +76,7 @@ const AdminDocumentTable: React.FC = () => {
   // State for column visibility
   const [visibleColumns, setVisibleColumns] = useState<Set<string>>(
     new Set([
+      "checkbox",
       "index",
       "title",
       "doc_type",
@@ -87,7 +102,14 @@ const AdminDocumentTable: React.FC = () => {
     if (saved) {
       try {
         const parsed = JSON.parse(saved);
-        setVisibleColumns(new Set(parsed));
+        // Always include essential columns
+        const updatedColumns = new Set([
+          ...parsed,
+          "checkbox",
+          "title",
+          "status",
+        ]);
+        setVisibleColumns(updatedColumns);
       } catch (error) {
         console.error("Error loading column visibility:", error);
       }
@@ -109,8 +131,12 @@ const AdminDocumentTable: React.FC = () => {
       newVisibleColumns.add(columnKey);
     } else {
       // Don't allow hiding essential columns
-      if (columnKey === "title" || columnKey === "status") {
-        message.warning("Không thể ẩn cột Tên tài liệu và Trạng thái!");
+      if (
+        columnKey === "checkbox" ||
+        columnKey === "title" ||
+        columnKey === "status"
+      ) {
+        message.warning("Không thể ẩn cột Chọn, Tên tài liệu và Trạng thái!");
         return;
       }
       newVisibleColumns.delete(columnKey);
@@ -153,52 +179,87 @@ const AdminDocumentTable: React.FC = () => {
     setAppliedFilters(urlParams);
   }, [searchParams]);
 
+  // Set initial view mode based on URL query parameter or path
+  useEffect(() => {
+    const currentPath = location.pathname;
+    const viewParam = searchParams.get("view");
+
+    // If accessing old_documents path directly, redirect to query param version
+    if (currentPath.includes("/old_documents") && !viewParam) {
+      const newSearchParams = new URLSearchParams(searchParams);
+      newSearchParams.set("view", "old");
+      setSearchParams(newSearchParams);
+      navigate("/admin/documents?" + newSearchParams.toString(), {
+        replace: true,
+      });
+      return;
+    }
+
+    // Set view mode based on query parameter
+    if (viewParam === "old") {
+      setViewMode("old");
+    } else {
+      setViewMode("all");
+    }
+  }, [location.pathname, searchParams, navigate, setSearchParams]);
+
+  // Reset selection when data changes
+  useEffect(() => {
+    setSelectedDocuments(new Set());
+    setSelectAll(false);
+  }, [documents, currentPage, pageSize]);
+
+  // Fetch documents function
+  const fetchDocuments = useCallback(async () => {
+    setLoading(true);
+    try {
+      // Build ordering parameter
+      let ordering = appliedFilters.ordering || "createdAt";
+      let order: 1 | -1 = appliedFilters.order || -1;
+
+      if (sortInfo.field && sortInfo.order) {
+        ordering = sortInfo.field;
+        order = sortInfo.order === "ascend" ? 1 : -1;
+      }
+
+      const apiParams = {
+        page: currentPage,
+        limit: pageSize,
+        ordering,
+        order,
+        search: appliedFilters.search,
+        status: appliedFilters.status,
+        doc_type: appliedFilters.doc_type,
+        level: appliedFilters.level,
+        intensive: appliedFilters.intensive,
+        published_year: appliedFilters.published_year,
+        start_date: appliedFilters.dateRange?.[0],
+        end_date: appliedFilters.dateRange?.[1],
+      };
+
+      // Use appropriate API based on view mode
+      const response =
+        viewMode === "old"
+          ? await DocumentService.getOldDocuments(apiParams)
+          : await DocumentService.getAllDocuments(apiParams);
+      const fetchedDocuments = response.documents || [];
+
+      setDocuments(fetchedDocuments);
+      setTotalDocuments(response.total || 0);
+    } catch (error) {
+      console.error("Error fetching documents:", error);
+      message.error("Không thể tải danh sách tài liệu!");
+      setDocuments([]);
+      setTotalDocuments(0);
+    } finally {
+      setLoading(false);
+    }
+  }, [appliedFilters, currentPage, pageSize, sortInfo, viewMode]);
+
   // Fetch documents from API - only when appliedFilters, currentPage, pageSize, or sortInfo change
   useEffect(() => {
-    const fetchDocuments = async () => {
-      setLoading(true);
-      try {
-        // Build ordering parameter
-        let ordering = appliedFilters.ordering || "createdAt";
-        let order: 1 | -1 = appliedFilters.order || -1;
-
-        if (sortInfo.field && sortInfo.order) {
-          ordering = sortInfo.field;
-          order = sortInfo.order === "ascend" ? 1 : -1;
-        }
-
-        const apiParams = {
-          page: currentPage,
-          limit: pageSize,
-          ordering,
-          order,
-          search: appliedFilters.search,
-          status: appliedFilters.status,
-          doc_type: appliedFilters.doc_type,
-          level: appliedFilters.level,
-          intensive: appliedFilters.intensive,
-          published_year: appliedFilters.published_year,
-          start_date: appliedFilters.dateRange?.[0],
-          end_date: appliedFilters.dateRange?.[1],
-        };
-
-        const response = await DocumentService.getAllDocuments(apiParams);
-        const fetchedDocuments = response.documents || [];
-
-        setDocuments(fetchedDocuments);
-        setTotalDocuments(response.total || 0);
-      } catch (error) {
-        console.error("Error fetching documents:", error);
-        message.error("Không thể tải danh sách tài liệu!");
-        setDocuments([]);
-        setTotalDocuments(0);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchDocuments();
-  }, [currentPage, pageSize, appliedFilters, sortInfo]);
+  }, [fetchDocuments]);
 
   const handleFilterChange = useCallback(
     (newParams: AdminFilterSearchParams) => {
@@ -244,6 +305,82 @@ const AdminDocumentTable: React.FC = () => {
     requestId?: string; // Thêm requestId để lưu ID của đơn duyệt
   }
 
+  // Handle view mode toggle
+  const handleViewModeToggle = () => {
+    const newViewMode = viewMode === "all" ? "old" : "all";
+    setViewMode(newViewMode);
+    setSelectedDocuments(new Set());
+    setSelectAll(false);
+    setCurrentPage(1);
+
+    // Update URL with query parameter
+    const newSearchParams = new URLSearchParams(searchParams);
+    if (newViewMode === "old") {
+      newSearchParams.set("view", "old");
+    } else {
+      newSearchParams.delete("view");
+    }
+    setSearchParams(newSearchParams);
+  };
+
+  // Handle document selection
+  const handleSelectDocument = (documentId: string, checked: boolean) => {
+    console.log("handleSelectDocument called:", documentId, checked);
+    const newSelected = new Set(selectedDocuments);
+    if (checked) {
+      newSelected.add(documentId);
+    } else {
+      newSelected.delete(documentId);
+    }
+    console.log("New selected documents:", newSelected.size);
+    setSelectedDocuments(newSelected);
+    setSelectAll(newSelected.size === documents.length && documents.length > 0);
+  };
+
+  // Handle select all
+  const handleSelectAll = (checked: boolean) => {
+    if (checked) {
+      const allIds = new Set(documents.map((doc) => doc._id));
+      setSelectedDocuments(allIds);
+    } else {
+      setSelectedDocuments(new Set());
+    }
+    setSelectAll(checked);
+  };
+
+  // Handle bulk delete
+  const handleBulkDelete = async () => {
+    console.log("handleBulkDelete called, selected:", selectedDocuments.size);
+    if (selectedDocuments.size === 0) {
+      message.warning("Vui lòng chọn ít nhất một tài liệu để xóa!");
+      return;
+    }
+
+    console.log("About to show modal");
+    setShowDeleteModal(true);
+  };
+
+  // Confirm bulk delete
+  const confirmBulkDelete = async () => {
+    try {
+      const documentIds = Array.from(selectedDocuments);
+      console.log("Deleting documents:", documentIds);
+      await DocumentService.deleteDocuments(
+        documentIds,
+        "Tài liệu quá cũ, không còn phù hợp nữa."
+      );
+      message.success(`Đã xóa ${selectedDocuments.size} tài liệu thành công!`);
+      setSelectedDocuments(new Set());
+      setSelectAll(false);
+      setShowDeleteModal(false);
+      // Refresh data
+      await fetchDocuments();
+    } catch (error) {
+      console.error("Error deleting documents:", error);
+      message.error("Không thể xóa tài liệu!");
+    }
+  };
+
   const handleRowClick = async (record: DocumentDisplay) => {
     try {
       // Lấy danh sách đơn duyệt của tài liệu này
@@ -273,6 +410,28 @@ const AdminDocumentTable: React.FC = () => {
   };
 
   const columns: ColumnsType<DocumentDisplay> = [
+    {
+      title: (
+        <Checkbox
+          checked={selectAll}
+          onChange={(e) => handleSelectAll(e.target.checked)}
+          onClick={(e) => e.stopPropagation()}
+        />
+      ),
+      dataIndex: "checkbox",
+      key: "checkbox",
+      align: "center",
+      fixed: "left",
+      width: 50,
+      onHeaderCell: () => ({ style: { textAlign: "center" } }),
+      render: (_, record: DocumentDisplay) => (
+        <Checkbox
+          checked={selectedDocuments.has(record._id)}
+          onChange={(e) => handleSelectDocument(record._id, e.target.checked)}
+          onClick={(e) => e.stopPropagation()}
+        />
+      ),
+    },
     {
       title: "STT",
       dataIndex: "index",
@@ -577,10 +736,10 @@ const AdminDocumentTable: React.FC = () => {
       align: "center",
       fixed: "right",
       onHeaderCell: () => ({ style: { textAlign: "center" } }),
-      render: (status: string) => {
+      render: (status: string, record: DocumentDisplay) => {
         const statusLabels: { [key: string]: string } = {
           PENDING: "Chờ duyệt",
-          APPROVED: "Đã duyệt",
+          APPROVED: !record?.approved_by_ai ? "Đã duyệt bởi AI" : "Đã duyệt",
           REJECTED: "Đã từ chối",
           REQUESTED_EDIT: "Chờ chỉnh sửa",
           PENDING_EDIT: "Chờ duyệt chỉnh sửa",
@@ -662,8 +821,16 @@ const AdminDocumentTable: React.FC = () => {
     visibleColumns.has(column.key as string)
   );
 
+  console.log("Visible columns:", [...visibleColumns]);
+  console.log("Filtered columns count:", filteredColumns.length);
+  console.log(
+    "Has checkbox column:",
+    filteredColumns.some((col) => col.key === "checkbox")
+  );
+
   // Column options for visibility toggle
   const columnOptions = [
+    { key: "checkbox", label: "Chọn", disabled: true },
     { key: "index", label: "STT" },
     { key: "title", label: "Tên tài liệu", disabled: true },
     { key: "doc_type", label: "Loại tài liệu" },
@@ -727,9 +894,28 @@ const AdminDocumentTable: React.FC = () => {
 
       {/* Table Header with Column Visibility Controls */}
       <div className="flex justify-between items-center mb-4">
-        <h3 className="text-base font-bold text-[var(--primary-text-color)]">
-          Danh sách tài liệu
-        </h3>
+        <div className="flex items-center gap-4">
+          <h3 className="text-base font-bold text-[var(--primary-text-color)]">
+            Danh sách tài liệu {viewMode === "old" ? "(Cũ)" : "(Tất cả)"}
+          </h3>
+          <Button
+            type={viewMode === "old" ? "primary" : "default"}
+            onClick={handleViewModeToggle}
+            size="small"
+          >
+            {viewMode === "old" ? "Xem tất cả" : "Xem tài liệu cũ"}
+          </Button>
+          {selectedDocuments.size > 0 && (
+            <Button
+              type="primary"
+              danger
+              onClick={handleBulkDelete}
+              size="small"
+            >
+              Xóa ({selectedDocuments.size})
+            </Button>
+          )}
+        </div>
         <Dropdown
           menu={columnVisibilityMenu}
           placement="bottomRight"
@@ -808,6 +994,22 @@ const AdminDocumentTable: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {/* Delete Confirmation Modal */}
+      <Modal
+        title="Xác nhận xóa tài liệu"
+        open={showDeleteModal}
+        onOk={confirmBulkDelete}
+        onCancel={() => setShowDeleteModal(false)}
+        okText="Xóa"
+        cancelText="Hủy"
+        okType="danger"
+        confirmLoading={loading}
+      >
+        <p>
+          Bạn có chắc chắn muốn xóa {selectedDocuments.size} tài liệu đã chọn?
+        </p>
+      </Modal>
     </div>
   );
 };

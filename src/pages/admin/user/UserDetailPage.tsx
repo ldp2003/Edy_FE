@@ -144,7 +144,7 @@ const UserDetailPage: React.FC = () => {
   }
 
   return (
-    <div className="p-6 max-w-6xl mx-auto">
+    <div className="">
       <AdminBreadcrumb
         items={[
           { label: "Admin", path: "/admin" },

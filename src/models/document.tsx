@@ -125,6 +125,7 @@ export interface Document {
   is_delete_by_admin?: boolean;
   delete_by_admin_reason?: string;
   delete_by_admin_at?: string;
+  approved_by_ai?: boolean;
   expiredAt?: string;
 }
 

@@ -5,7 +5,6 @@ import { RoleService } from "../../../utils/RoleService";
 import { ROLE_DISPLAY_NAMES } from "../../../constants/RoleConstants";
 import { AssignmentService } from "../../../utils/AssignmentService";
 import { UserService } from "../../../utils/UserService";
-import { OrganizationService } from "../../../utils/OrganizationService";
 import { NotificationService } from "../../../utils/NotificationService";
 
 interface AssignRoleModalProps {
@@ -31,7 +30,6 @@ const AssignRoleModal: React.FC<AssignRoleModalProps> = ({
   const [form] = Form.useForm();
   const [roles, setRoles] = useState<any[]>([]);
   const [users, setUsers] = useState<any[]>([]);
-  const [organizations, setOrganizations] = useState<any[]>([]);
   const [messageApi, contextHolder] = message.useMessage();
 
   const fetchData = useCallback(async () => {
@@ -54,9 +52,9 @@ const AssignRoleModal: React.FC<AssignRoleModalProps> = ({
       // const subjectsResponse = await SubjectService.get();
       // setSubjects(subjectsResponse);
 
-      // Fetch organizations
-      const orgsResponse = await OrganizationService.getOrganizations();
-      setOrganizations(orgsResponse);
+      // Fetch organizations - commented out
+      // const orgsResponse = await OrganizationService.getOrganizations();
+      // setOrganizations(orgsResponse);
     } catch (error) {
       console.error("Error fetching data:", error);
     }
@@ -199,21 +197,6 @@ const AssignRoleModal: React.FC<AssignRoleModalProps> = ({
             ))}
           </Select>
         </Form.Item> */}
-
-          <Form.Item name="organization" label="Tổ chức">
-            <Select
-              showSearch
-              placeholder="Chọn tổ chức"
-              optionFilterProp="label"
-              allowClear
-            >
-              {organizations.map((org) => (
-                <Select.Option key={org._id} value={org._id} label={org.name}>
-                  {org.name}
-                </Select.Option>
-              ))}
-            </Select>
-          </Form.Item>
         </Form>
       </Modal>
     </>

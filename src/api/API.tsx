@@ -39,14 +39,6 @@ const processQueue = (error: unknown, token: string | null = null) => {
 // Response interceptor to handle 401 errors
 apiClient.interceptors.response.use(
   (response) => {
-    // Check if user is banned in successful responses
-    if (response.data?.user?.status === "BANNED") {
-      console.log("🚫 User is banned - detected in API response");
-      // Force logout and redirect
-      if (typeof window !== "undefined") {
-        window.location.href = "/banned";
-      }
-    }
     return response;
   },
   async (error) => {
@@ -814,6 +806,35 @@ export const DocumentAPI = {
       return response.data;
     } catch (error) {
       console.error("Error fetching my documents:", error);
+      throw error;
+    }
+  },
+
+  // Get old documents
+  getOldDocuments: async (params?: { page?: number; limit?: number }) => {
+    try {
+      const response = await apiClient.get("/documents/old", {
+        params,
+      });
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching old documents:", error);
+      throw error;
+    }
+  },
+
+  // Delete multiple documents
+  deleteDocuments: async (documentIds: string[], reason?: string) => {
+    try {
+      const response = await apiClient.delete("/documents/batch", {
+        data: {
+          ids: documentIds,
+          reason: reason || "Xóa tài liệu theo yêu cầu admin",
+        },
+      });
+      return response.data;
+    } catch (error) {
+      console.error("Error deleting documents:", error);
       throw error;
     }
   },
