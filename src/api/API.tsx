@@ -810,6 +810,35 @@ export const DocumentAPI = {
     }
   },
 
+  // Get old documents
+  getOldDocuments: async (params?: { page?: number; limit?: number }) => {
+    try {
+      const response = await apiClient.get("/documents/old", {
+        params,
+      });
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching old documents:", error);
+      throw error;
+    }
+  },
+
+  // Delete multiple documents
+  deleteDocuments: async (documentIds: string[], reason?: string) => {
+    try {
+      const response = await apiClient.delete("/documents/batch", {
+        data: {
+          ids: documentIds,
+          reason: reason || "Xóa tài liệu theo yêu cầu admin",
+        },
+      });
+      return response.data;
+    } catch (error) {
+      console.error("Error deleting documents:", error);
+      throw error;
+    }
+  },
+
   // Upload a new document
   uploadDocument: async (documentData: {
     url: string;
