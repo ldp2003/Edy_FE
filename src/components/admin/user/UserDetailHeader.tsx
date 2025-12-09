@@ -1,5 +1,5 @@
 import React from "react";
-import { Button } from "antd";
+import { Button, Tooltip } from "antd";
 import { Edit, Lock, Unlock } from "lucide-react";
 import type { User } from "../../../models/user";
 
@@ -18,6 +18,7 @@ const UserDetailHeader: React.FC<UserDetailHeaderProps> = ({
   onToggleStatus,
   // onChangeStatus,
 }) => {
+  console.log("Rendering UserDetailHeader with user:", user);
   return (
     <div className="flex items-center justify-between mb-6">
       <div className="flex items-center space-x-4">
@@ -44,15 +45,27 @@ const UserDetailHeader: React.FC<UserDetailHeaderProps> = ({
           Thao tác
         </Button>
 
-        <Button
-          icon={
-            user.status === "ACTIVE" ? <Lock size={16} /> : <Unlock size={16} />
-          }
-          onClick={onToggleStatus}
-          danger={user.status === "ACTIVE"}
-        >
-          {user.status === "ACTIVE" ? "Khóa tài khoản" : "Mở khóa"}
-        </Button>
+        {user.is_admin ? (
+          <Tooltip title="Không thể khóa tài khoản quản trị viên">
+            <Button icon={<Lock size={16} />} disabled>
+              Khóa tài khoản
+            </Button>
+          </Tooltip>
+        ) : (
+          <Button
+            icon={
+              user.status === "ACTIVE" ? (
+                <Lock size={16} />
+              ) : (
+                <Unlock size={16} />
+              )
+            }
+            onClick={onToggleStatus}
+            danger={user.status === "ACTIVE"}
+          >
+            {user.status === "ACTIVE" ? "Khóa tài khoản" : "Mở khóa"}
+          </Button>
+        )}
       </div>
     </div>
   );

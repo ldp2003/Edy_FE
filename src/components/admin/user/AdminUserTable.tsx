@@ -37,7 +37,6 @@ const { Option } = Select;
 interface UserDisplay extends User {
   index: number;
   role_names?: string[];
-  is_admin?: boolean;
 }
 
 const AdminUserTable: React.FC = () => {
@@ -799,42 +798,54 @@ const AdminUserTable: React.FC = () => {
             />
           </Tooltip>
 
-          <Popconfirm
-            title={
-              record.status === "ACTIVE"
-                ? "Khóa tài khoản người dùng?"
-                : "Mở khóa tài khoản người dùng?"
-            }
-            onConfirm={(e) => {
-              e?.stopPropagation();
-              handleToggleUserStatus(record._id, record.status);
-            }}
-            onCancel={(e) => e?.stopPropagation()}
-            okText="Có"
-            cancelText="Không"
-          >
-            <Tooltip
-              title={
-                record.status === "ACTIVE"
-                  ? "Khóa tài khoản"
-                  : "Mở khóa tài khoản"
-              }
-            >
+          {record.is_admin ? (
+            <Tooltip title="Không thể khóa tài khoản quản trị viên">
               <Button
                 type="text"
-                icon={
-                  record.status === "ACTIVE" ? (
-                    <Lock size={12} />
-                  ) : (
-                    <Unlock size={12} />
-                  )
-                }
+                icon={<Lock size={12} />}
                 size="small"
+                disabled
                 onClick={(e) => e.stopPropagation()}
-                danger={record.status === "ACTIVE"}
               />
             </Tooltip>
-          </Popconfirm>
+          ) : (
+            <Popconfirm
+              title={
+                record.status === "ACTIVE"
+                  ? "Khóa tài khoản người dùng?"
+                  : "Mở khóa tài khoản người dùng?"
+              }
+              onConfirm={(e) => {
+                e?.stopPropagation();
+                handleToggleUserStatus(record._id, record.status);
+              }}
+              onCancel={(e) => e?.stopPropagation()}
+              okText="Có"
+              cancelText="Không"
+            >
+              <Tooltip
+                title={
+                  record.status === "ACTIVE"
+                    ? "Khóa tài khoản"
+                    : "Mở khóa tài khoản"
+                }
+              >
+                <Button
+                  type="text"
+                  icon={
+                    record.status === "ACTIVE" ? (
+                      <Lock size={12} />
+                    ) : (
+                      <Unlock size={12} />
+                    )
+                  }
+                  size="small"
+                  onClick={(e) => e.stopPropagation()}
+                  danger={record.status === "ACTIVE"}
+                />
+              </Tooltip>
+            </Popconfirm>
+          )}
         </div>
       ),
     },
