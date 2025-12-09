@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from "react";
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import React, { useState, useEffect, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Button, Spin, message } from "antd";
 import { UserService } from "../../../utils/UserService";
@@ -8,55 +9,91 @@ import UserProfileCard from "../../../components/admin/user/UserProfileCard";
 import UserStatsCard from "../../../components/admin/user/UserStatsCard";
 import UserDetailInfo from "../../../components/admin/user/UserDetailInfo";
 import { AdminBreadcrumb } from "../../../components/admin/common/AdminBreadcrumb";
+import UserSuspendModal from "../../../components/admin/user/UserSuspendModal";
 
 const UserDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const [suspendModalVisible, setSuspendModalVisible] = useState(false);
+
+  const fetchUser = useCallback(async () => {
+    if (!id) {
+      message.error("ID người dùng không hợp lệ!");
+      navigate("/admin/users");
+      return;
+    }
+
+    try {
+      setLoading(true);
+      const userData = await UserService.getUserById(id);
+      setUser(userData.user || userData);
+    } catch (error) {
+      console.error("Error fetching user:", error);
+      message.error("Không thể tải thông tin người dùng!");
+      navigate("/admin/users");
+    } finally {
+      setLoading(false);
+    }
+  }, [id, navigate]);
 
   useEffect(() => {
-    const fetchUser = async () => {
-      if (!id) {
-        message.error("ID người dùng không hợp lệ!");
-        navigate("/admin/users");
-        return;
-      }
-
-      try {
-        setLoading(true);
-        const userData = await UserService.getUserById(id);
-        setUser(userData.user || userData);
-      } catch (error) {
-        console.error("Error fetching user:", error);
-        message.error("Không thể tải thông tin người dùng!");
-        navigate("/admin/users");
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchUser();
-  }, [id, navigate]);
+  }, [fetchUser]);
 
   const handleToggleStatus = async () => {
     if (!user || !id) return;
 
+    if (user.status === "ACTIVE") {
+      // For suspending, open modal
+      setSuspendModalVisible(true);
+    } else {
+      // For unsuspending, directly call API
+      await handleUnsuspendUser();
+    }
+  };
+
+  const handleUnsuspendUser = async () => {
+    if (!user || !id) return;
+
     try {
-      const newStatus = user.status === "ACTIVE" ? "BANNED" : "ACTIVE";
-      await UserService.updateUserStatus(id, newStatus);
+      await UserService.unsuspendUser(id);
 
       setUser({
         ...user,
-        status: newStatus as "ACTIVE" | "INACTIVE" | "BANNED",
+        status: "ACTIVE" as "ACTIVE" | "INACTIVE" | "BANNED",
       });
-      message.success(
-        newStatus === "BANNED" ? "Đã khóa tài khoản!" : "Đã mở khóa tài khoản!"
-      );
-    } catch (error) {
-      console.error("Error updating user status:", error);
-      message.error("Có lỗi xảy ra khi cập nhật trạng thái!");
+      message.success("Đã mở khóa tài khoản!");
+    } catch (error: any) {
+      console.error("Error unsuspending user:", error);
+
+      // If unsuspend fails with 400 or "Tài khoản không bị khóa", try updateUserStatus instead
+      if (
+        error.response?.status === 400 ||
+        error.response?.data?.message?.includes("Tài khoản không bị khóa") ||
+        error.message?.includes("Tài khoản không bị khóa")
+      ) {
+        try {
+          await UserService.updateUserStatus(id, "ACTIVE");
+          setUser({
+            ...user,
+            status: "ACTIVE" as "ACTIVE" | "INACTIVE" | "BANNED",
+          });
+          message.success("Đã mở khóa tài khoản!");
+        } catch (updateError) {
+          console.error("Error updating user status:", updateError);
+          message.error("Có lỗi xảy ra khi mở khóa tài khoản!");
+        }
+      } else {
+        message.error("Có lỗi xảy ra khi mở khóa tài khoản!");
+      }
     }
+  };
+
+  const handleSuspendSuccess = () => {
+    // Refresh user data after suspend
+    fetchUser();
   };
 
   const handleChangeStatus = async (newStatus: string) => {
@@ -191,6 +228,17 @@ const UserDetailPage: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {/* Suspend Modal */}
+      <UserSuspendModal
+        visible={suspendModalVisible}
+        onClose={() => setSuspendModalVisible(false)}
+        onSuccess={handleSuspendSuccess}
+        userId={id || ""}
+        userName={
+          user ? `${user.first_name || ""} ${user.last_name || ""}`.trim() : ""
+        }
+      />
     </div>
   );
 };
