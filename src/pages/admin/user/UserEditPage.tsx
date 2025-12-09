@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Button, message, Spin, Tabs } from "antd";
-import { ArrowLeft } from "lucide-react";
 import { UserService } from "../../../utils/UserService";
 import type { User } from "../../../models/user";
 import UserInfoView from "../../../components/admin/user/UserInfoView";
@@ -84,12 +83,6 @@ const UserEditPage: React.FC = () => {
       <div className="mt-2 md:mt-4">
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center gap-3 md:gap-4 mb-4 md:mb-6">
-          <Button
-            icon={<ArrowLeft size={16} />}
-            onClick={() => navigate(`/admin/users/detail/${id}`)}
-          >
-            Quay lại
-          </Button>
           <div>
             <h1 className="text-base md:text-xl font-bold text-gray-900">
               Thông tin chi tiết người dùng
