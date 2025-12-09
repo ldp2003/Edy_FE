@@ -8,14 +8,20 @@ import UserDropdown from "../dropdown/UserDropdown";
 import AdminDropdown from "../dropdown/AdminDropdown";
 import { UserContext } from "../../../contexts/UserContext";
 import NotificationDropdown from "../Notification/NotificationDropdown";
+import { getRoleDisplayName } from "../../../constants/RoleConstants";
 
 interface HeaderProps {
   onMenuToggle?: () => void;
 }
 
 export function Header({ onMenuToggle }: HeaderProps) {
-  const { isLoggedIn, user, account, notifications, unreadCount } =
+  const { isLoggedIn, user, account, notifications, unreadCount, roles } =
     useContext(UserContext);
+
+  // Chọn role hiển thị: ưu tiên SUPER_ADMIN, else role đầu tiên
+  const displayRole = roles?.includes("SUPER_ADMIN")
+    ? "SUPER_ADMIN"
+    : roles?.[0] || "CUSTOM_ROLE";
 
   // Detect if we're on admin page
   const isOnAdminPage = window.location.pathname.startsWith("/admin");
@@ -192,28 +198,21 @@ export function Header({ onMenuToggle }: HeaderProps) {
                     </span>
                   </div>
                   <div className="hidden md:flex flex-col items-start">
-                    <span
-                      className="text-sm font-medium"
-                      style={{ color: "var(--primary-color)" }}
-                    >
+                    <span className="text-sm font-medium text-[var(--primary-color)] hover:underline">
                       {user?.first_name} {user?.last_name}
                     </span>
                     <div className="flex gap-1">
-                      {account?.is_admin && (
-                        <span className="text-xs bg-red-100 text-red-700 px-1 rounded font-medium">
-                          Quản trị viên
-                        </span>
-                      )}
-                      {!account?.is_admin && !account?.is_vip && (
-                        <span className="text-xs bg-gray-100 text-gray-700 px-1 rounded font-medium">
-                          Người dùng
-                        </span>
-                      )}
-                      {account?.is_vip && !account?.is_admin && (
-                        <span className="text-xs bg-yellow-100 text-yellow-700 px-1 rounded font-medium">
-                          VIP
-                        </span>
-                      )}
+                      <span
+                        className={`text-xs px-1 rounded font-medium ${
+                          displayRole === "SUPER_ADMIN"
+                            ? "bg-[var(--color-error-bg)] text-[var(--color-error-text)]"
+                            : displayRole === "CUSTOM_ROLE"
+                            ? "bg-[var(--color-info-bg)] text-[var(--color-info-text)]"
+                            : "bg-[var(--color-info-bg)] text-[var(--color-info-text)]"
+                        }`}
+                      >
+                        {getRoleDisplayName(displayRole)}
+                      </span>
                     </div>
                   </div>
                 </div>
