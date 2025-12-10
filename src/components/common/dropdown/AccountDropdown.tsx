@@ -21,7 +21,7 @@ const AccountDropdown: React.FC = () => {
       messageApi.success("Đăng xuất thành công");
       window.location.href = "/";
     } catch (error) {
-      messageApi.error("Đăng xuất thất bại");
+      messageApi.error("Đăng xuất thất bại, vui lòng thử tải lại trang.");
       console.error("Logout failed:", error);
     } finally {
       setLogoutModalVisible(false);

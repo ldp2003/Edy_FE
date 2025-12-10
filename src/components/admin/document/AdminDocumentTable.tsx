@@ -732,7 +732,7 @@ const AdminDocumentTable: React.FC = () => {
       render: (status: string, record: DocumentDisplay) => {
         const statusLabels: { [key: string]: string } = {
           PENDING: "Chờ duyệt",
-          APPROVED: !record?.approved_by_ai ? "Đã duyệt bởi AI" : "Đã duyệt",
+          APPROVED: record?.approved_by_ai ? "Đã duyệt bởi AI" : "Đã duyệt",
           REJECTED: "Đã từ chối",
           REQUESTED_EDIT: "Chờ chỉnh sửa",
           PENDING_EDIT: "Chờ duyệt chỉnh sửa",
