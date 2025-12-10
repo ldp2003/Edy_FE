@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect, useContext, useCallback } from "react";
 import {
   Table,
   Button,
@@ -65,6 +65,16 @@ const AssignmentTable: React.FC<{ selectedUser?: User }> = ({
   const [searchText, setSearchText] = useState("");
   const { user } = useContext(UserContext);
   const currentUserId = user?._id;
+
+  const isCurrentUserAssignment = useCallback(
+    (assignment: any) => {
+      return (
+        assignment?.account?.user?._id === currentUserId ||
+        assignment?.account?.user?.id === currentUserId
+      );
+    },
+    [currentUserId]
+  );
 
   const filteredAssignments = assignments.filter((assignment: Assignment) => {
     if (selectedUser) {
@@ -257,32 +267,36 @@ const AssignmentTable: React.FC<{ selectedUser?: User }> = ({
       width: 120,
       fixed: "right",
       align: "center",
-      render: (_, record) => (
-        <Space>
-          <Button
-            icon={<Edit size={16} />}
-            onClick={() => {
-              setSelectedAssignment(record);
-              setIsEditModalVisible(true);
-            }}
-          />
-          <Popconfirm
-            title={`Bạn có chắc muốn ${
-              record.is_active ? "vô hiệu" : "kích hoạt"
-            } phân quyền này?`}
-            onConfirm={() => handleToggleStatus(record._id, record.is_active)}
-            okText="Đồng ý"
-            cancelText="Hủy"
-          >
+      render: (_, record) => {
+        const canSelfDisable = !isCurrentUserAssignment(record);
+        return (
+          <Space>
             <Button
-              icon={
-                record.is_active ? <Lock size={16} /> : <Unlock size={16} />
-              }
-              type={record.is_active ? "default" : "primary"}
+              icon={<Edit size={16} />}
+              onClick={() => {
+                setSelectedAssignment(record);
+                setIsEditModalVisible(true);
+              }}
             />
-          </Popconfirm>
-        </Space>
-      ),
+            <Popconfirm
+              title={`Bạn có chắc muốn ${
+                record.is_active ? "vô hiệu" : "kích hoạt"
+              } phân quyền này?`}
+              onConfirm={() => handleToggleStatus(record._id, record.is_active)}
+              okText="Đồng ý"
+              cancelText="Hủy"
+            >
+              <Button
+                icon={
+                  record.is_active ? <Lock size={16} /> : <Unlock size={16} />
+                }
+                type={record.is_active ? "default" : "primary"}
+                disabled={!canSelfDisable}
+              />
+            </Popconfirm>
+          </Space>
+        );
+      },
     },
   ];
 
@@ -334,9 +348,8 @@ const AssignmentTable: React.FC<{ selectedUser?: User }> = ({
         <div className="grid gap-4">
           {filteredAssignments.map((assignment: any) => {
             console.log("assignment.account:", assignment.account);
-            const isSelf =
-              assignment?.account?.user?._id === currentUserId ||
-              assignment?.account?.user?.id === currentUserId;
+            const isSelf = isCurrentUserAssignment(assignment);
+            const canSelfDisable = !isSelf;
 
             return (
               <Card key={assignment.account._id} className="text-left w-full">
@@ -353,30 +366,29 @@ const AssignmentTable: React.FC<{ selectedUser?: User }> = ({
                     </div>
                   </div>
                   <Space>
-                    {!isSelf && (
-                      <Popconfirm
-                        title="Thu hồi toàn bộ quyền quản trị"
-                        description={`Bạn có chắc chắn muốn thu hồi toàn bộ quyền quản trị của ${assignment.account.user.fullname}? Người dùng sẽ nhận được thông báo về hành động này.`}
-                        onConfirm={() =>
-                          handleRevokeAllRoles(
-                            assignment.account._id,
-                            assignment.account.user.id,
-                            assignment.account.user.fullname
-                          )
-                        }
-                        okText="Xác nhận"
-                        cancelText="Hủy"
-                        okButtonProps={{ danger: true }}
+                    <Popconfirm
+                      title="Thu hồi toàn bộ quyền quản trị"
+                      description={`Bạn có chắc chắn muốn thu hồi toàn bộ quyền quản trị của ${assignment.account.user.fullname}? Người dùng sẽ nhận được thông báo về hành động này.`}
+                      onConfirm={() =>
+                        handleRevokeAllRoles(
+                          assignment.account._id,
+                          assignment.account.user.id,
+                          assignment.account.user.fullname
+                        )
+                      }
+                      okText="Xác nhận"
+                      cancelText="Hủy"
+                      okButtonProps={{ danger: true }}
+                    >
+                      <Button
+                        danger
+                        icon={<UserX size={16} />}
+                        loading={loading}
+                        disabled={!canSelfDisable}
                       >
-                        <Button
-                          danger
-                          icon={<UserX size={16} />}
-                          loading={loading}
-                        >
-                          Tước quyền admin
-                        </Button>
-                      </Popconfirm>
-                    )}
+                        Tước quyền admin
+                      </Button>
+                    </Popconfirm>
                     <Button
                       type="primary"
                       icon={<Plus size={16} />}
@@ -391,7 +403,10 @@ const AssignmentTable: React.FC<{ selectedUser?: User }> = ({
                 </div>
                 <Table
                   columns={columns}
-                  dataSource={assignment.assignments}
+                  dataSource={assignment.assignments.map((a: any) => ({
+                    ...a,
+                    account: assignment.account,
+                  }))}
                   rowKey={(record) => record._id}
                   loading={loading}
                   pagination={false}
