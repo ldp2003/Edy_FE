@@ -114,7 +114,7 @@ const ShareModal: React.FC<ShareModalProps> = ({
       }
       setPendingRequestsCount(totalPending);
     } catch (error: unknown) {
-      let errorMessage = "Không thể tải danh sách link chia sẻ!";
+      let errorMessage = "Không thể tải danh sách đường link chia sẻ!";
 
       if (error && typeof error === "object" && "response" in error) {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -122,7 +122,7 @@ const ShareModal: React.FC<ShareModalProps> = ({
         if (apiError.response?.data?.message) {
           errorMessage = apiError.response.data.message;
         } else if (apiError.response?.status === 403) {
-          errorMessage = "Bạn không có quyền xem danh sách link chia sẻ!";
+          errorMessage = "Bạn không có quyền xem danh sách đường link chia sẻ!";
         } else if (apiError.response?.status === 404) {
           errorMessage = "Tài liệu không tồn tại!";
         }
