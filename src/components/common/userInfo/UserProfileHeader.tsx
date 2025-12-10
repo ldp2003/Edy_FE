@@ -1,10 +1,11 @@
 import React, { useState } from "react";
-import { Button, Input, Select, Upload } from "antd";
+import { Button, Input, Select, Upload, Modal } from "antd";
 import type { RcFile } from "antd/es/upload/interface";
 import type { MessageInstance } from "antd/es/message/interface";
 import { updateProfile } from "../../../utils/UserService";
 import { uploadImageToCloudinary } from "../../../utils/CloudinaryService";
 import type { OrganizationDetailed } from "../../../models/organization";
+import InsertOrganization from "../../user/organization/InsertOrganization";
 
 const { Option } = Select;
 
@@ -45,6 +46,15 @@ const UserProfileHeader: React.FC<UserProfileHeaderProps> = ({
   const [loading, setLoading] = useState(false);
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const [isEditMode, setIsEditMode] = useState(false);
+  const [isModalVisible, setIsModalVisible] = useState(false);
+
+  const showModal = () => {
+    setIsModalVisible(true);
+  };
+
+  const handleModalCancel = () => {
+    setIsModalVisible(false);
+  };
 
   const beforeUpload = (file: RcFile) => {
     const isImage = file.type.startsWith("image/");
@@ -250,19 +260,31 @@ const UserProfileHeader: React.FC<UserProfileHeaderProps> = ({
               Học tập/làm việc tại:
             </label>
             <div className="sm:col-span-2 lg:col-span-3">
-              <Select
-                value={organizationValue}
-                onChange={(value) => setOrganizationValue(value)}
-                className="text-sm w-full text-left"
-                size="small"
-                disabled={!isEditMode}
-              >
-                {organizationOptions.map((org) => (
-                  <Option key={org._id} value={org._id}>
-                    {org.name}
-                  </Option>
-                ))}
-              </Select>
+              <div className="flex flex-col sm:flex-row gap-2">
+                <Select
+                  value={organizationValue}
+                  onChange={(value) => setOrganizationValue(value)}
+                  className="text-sm w-full text-left"
+                  size="small"
+                  disabled={!isEditMode}
+                >
+                  {organizationOptions.map((org) => (
+                    <Option key={org._id} value={org._id}>
+                      {org.name}
+                    </Option>
+                  ))}
+                </Select>
+                {isEditMode && (
+                  <Button
+                    onClick={showModal}
+                    size="small"
+                    type="primary"
+                    className="text-xs whitespace-nowrap"
+                  >
+                    Thêm mới
+                  </Button>
+                )}
+              </div>
             </div>
           </div>
 
@@ -309,6 +331,16 @@ const UserProfileHeader: React.FC<UserProfileHeaderProps> = ({
           </Button>
         </div>
       )}
+
+      {/* Modal thêm tổ chức mới */}
+      <Modal
+        title="Thêm Tổ chức/Trường"
+        open={isModalVisible}
+        onCancel={handleModalCancel}
+        footer={null}
+      >
+        <InsertOrganization />
+      </Modal>
     </div>
   );
 };
