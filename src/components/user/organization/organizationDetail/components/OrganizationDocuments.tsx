@@ -46,7 +46,7 @@ const OrganizationDocuments: React.FC<OrganizationDocumentsProps> = ({
 
         {documents.length > 0 ? (
           <>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-2">
               {displayedDocuments.map((doc) => (
                 <DocumentCard key={doc._id} document={doc} />
               ))}
