@@ -91,11 +91,15 @@ const DocumentCard: React.FC<DocumentCardProps> = ({
           onClick={handleFavoriteClick}
           className={`absolute top-2 right-2 p-1.5 rounded-full cursor-pointer ${
             isFavorite
-              ? "bg-[var(--color-error-bg)] text-[var(--color-error-text)]"
+              ? "bg-[var(--color-error-bg)] text-[var(--heart-color)]"
               : "bg-[var(--secondary-background-color)]/80 text-[var(--secondary-text-color)] hover:bg-[var(--secondary-background-color)]"
           }`}
         >
-          <Heart className="w-3.5 h-3.5" />
+          <Heart
+            className={`w-3.5 h-3.5 ${
+              isFavorite ? "fill-[var(--heart-color)]" : ""
+            }`}
+          />
         </button>
         {/* Số trang */}
         {document.page && (
