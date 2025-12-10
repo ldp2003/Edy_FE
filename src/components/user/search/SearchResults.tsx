@@ -51,12 +51,12 @@ const SearchResults: React.FC<SearchResultsProps> = ({
   return (
     <div className="space-y-4">
       <div className="text-center md:text-left">
-        <h2 className="text-lg font-semibold text-[var(--primary-text-color)] mb-1 text-center md:text-left">
+        <h2 className="text-sm font-semibold text-[var(--primary-text-color)] mb-1 text-center md:text-left">
           {currentTab === "subjects" ? (
             "Danh sách môn học"
           ) : isShowingFallback ? (
             <span className="text-[var(--red-button-color)]">
-              Không tìm thấy tài liệu nào với tiêu đề, tên tác giả hay từ khóa "{searchQuery}". Dưới đây
+              Không tìm thấy tài liệu nào liên quan đến "{searchQuery}". Dưới đây
               là đề xuất dựa vào nội dung bạn đã xem gần đây:
             </span>
           ) : (
