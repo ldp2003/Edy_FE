@@ -7,13 +7,11 @@ const { Text } = Typography;
 interface AdminRecentActivitiesProps {
   activities: RecentActivity[] | undefined;
   loading: boolean;
-  onActivityClick: (activity: RecentActivity) => void;
 }
 
 const AdminRecentActivities: React.FC<AdminRecentActivitiesProps> = ({
   activities,
   loading,
-  onActivityClick,
 }) => {
   return (
     <div>
@@ -41,8 +39,7 @@ const AdminRecentActivities: React.FC<AdminRecentActivitiesProps> = ({
             {activities.map((activity) => (
               <div
                 key={activity.id}
-                className="flex items-start gap-1.5 p-1 rounded-md hover:bg-opacity-50 transition-colors cursor-pointer"
-                onClick={() => onActivityClick(activity)}
+                className="flex items-start gap-1.5 p-1 rounded-md hover:bg-opacity-50 transition-colors"
               >
                 {/* User Avatar */}
                 <Avatar
