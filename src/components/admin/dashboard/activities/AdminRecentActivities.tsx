@@ -40,7 +40,6 @@ const AdminRecentActivities: React.FC<AdminRecentActivitiesProps> = ({
             {activities.map((activity) => (
               <div
                 key={activity.id}
-
                 className="flex items-start gap-1.5 p-1 rounded-md transition-colors"
               >
                 {/* User Avatar */}
