@@ -29,6 +29,10 @@ import UserProfilePage from "../pages/user/userInfo/UserProfilePage";
 import FollowPage from "../pages/user/follow/FollowPage";
 import StatsPage from "../pages/user/personalProfile/StatsPage";
 import PointManagementPage from "../pages/user/point/PointManagementPage";
+import AboutPage from "../pages/common/AboutPage";
+import PrivacyPage from "../pages/common/PrivacyPage";
+import TermsPage from "../pages/common/TermsPage";
+import HelpPage from "../pages/common/HelpPage";
 
 const UserRoute: React.FC = () => {
   return (
@@ -60,6 +64,10 @@ const UserRoute: React.FC = () => {
             path="subject/:subjectId/documents"
             element={<SubjectDocumentPage />}
           />
+          <Route path="about" element={<AboutPage />} />
+          <Route path="privacy" element={<PrivacyPage />} />
+          <Route path="terms" element={<TermsPage />} />
+          <Route path="help" element={<HelpPage />} />
 
           {/* Protected pages - will be handled by individual components */}
           <Route path="personal-posts" element={<PersonalPost />} />

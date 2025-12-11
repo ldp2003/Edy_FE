@@ -32,8 +32,8 @@ const OrganizationDetail: React.FC = () => {
 
   // Pagination states
   const [subjectPage, setSubjectPage] = useState(1);
-  const [myDocsDisplayedCount, setMyDocsDisplayedCount] = useState(4);
-  const [recentDocsDisplayedCount, setRecentDocsDisplayedCount] = useState(4);
+  const [myDocsDisplayedCount, setMyDocsDisplayedCount] = useState(5);
+  const [recentDocsDisplayedCount, setRecentDocsDisplayedCount] = useState(5);
 
   // Collapse states
   const [isMyDocsCollapsed, setIsMyDocsCollapsed] = useState(false);
