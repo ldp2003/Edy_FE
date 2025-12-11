@@ -1,6 +1,4 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { useState, useEffect } from "react";
-import type { Role } from "../../../models/role";
 import { USER_ROLES } from "../../../constants/RoleConstants";
 import LoadingScreen from "../../common/LoadingScreen";
 
