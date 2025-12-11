@@ -394,8 +394,8 @@ const EditInformationForm = ({
     }
   };
 
-  const onFinishFailed = (errorInfo: unknown) => {
-    // console.log("Failed:", errorInfo);
+  const onFinishFailed = () => {
+    // console.log("Failed:");
     message.error("Vui lòng kiểm tra lại thông tin!");
   };
 

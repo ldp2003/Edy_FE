@@ -159,7 +159,7 @@ const SubjectDocuments: React.FC = () => {
   // Group by document type - use smart categorization from filename if doc_type is missing
   const documentsByType: Record<string, Document[]> = {};
   // console.log("Total documents:", documents.length);
-  documents.forEach((doc, index) => {
+  documents.forEach((doc) => {
     // Use existing doc_type or determine from filename
     const docType = doc.doc_type || getDocumentTypeFromFileName(doc.title);
 
