@@ -48,7 +48,7 @@ const UserStatisticsPage: React.FC = () => {
   const [statisticsData, setStatisticsData] = useState<StatisticsData | null>(
     null
   );
-  const [usersList, setUsersList] = useState<User[]>([]);
+  // const [usersList, setUsersList] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedYear, setSelectedYear] = useState<number>(
@@ -85,19 +85,12 @@ const UserStatisticsPage: React.FC = () => {
         };
         // console.log("Setting statistics data:", processedData);
         setStatisticsData(processedData);
-
-        // Fetch users list using UserService (same as AdminUserTable)
-        const usersResponse = await UserService.getAllUsers();
-        const usersData = usersResponse;
-        // console.log("Processing users data:", usersData);
-        setUsersList(Array.isArray(usersData) ? usersData : []);
       } catch (err) {
         console.error("Error fetching user statistics:", err);
         setError("Không thể tải dữ liệu thống kê người dùng");
         message.error("Không thể tải dữ liệu thống kê người dùng");
         // Set empty data on error
         setStatisticsData(null);
-        setUsersList([]);
       } finally {
         setLoading(false);
       }
@@ -137,7 +130,6 @@ const UserStatisticsPage: React.FC = () => {
       setSyncLoading(false);
     }
   };
-
 
   // Prepare pie chart data
   const pieChartData = [
