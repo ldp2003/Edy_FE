@@ -19,11 +19,19 @@ const OrganizationDocuments: React.FC<OrganizationDocumentsProps> = ({
   displayedDocuments,
   displayedCount,
   totalDocuments,
-  onLoadMore,
   title,
-  isCollapsed = false,
-  onToggleCollapse,
 }) => {
+  const [isExpanded, setIsExpanded] = React.useState(false);
+
+  const handleLoadMore = () => {
+    setIsExpanded(true);
+  };
+
+  const handleCollapse = () => {
+    setIsExpanded(false);
+  };
+
+  const currentDisplayed = isExpanded ? documents : displayedDocuments;
   return (
     <div className="bg-white rounded-lg border border-[var(--border-color)] mb-6">
       <div className="p-6">
@@ -34,12 +42,12 @@ const OrganizationDocuments: React.FC<OrganizationDocumentsProps> = ({
               {title} ({totalDocuments})
             </h2>
           </div>
-          {onToggleCollapse && (
+          {isExpanded && (
             <button
-              onClick={onToggleCollapse}
+              onClick={handleCollapse}
               className="text-sm text-[var(--secondary-text-color)] hover:text-[var(--primary-color)] transition-colors"
             >
-              {isCollapsed ? "Mở rộng" : "Thu gọn"}
+              Thu gọn
             </button>
           )}
         </div>
@@ -47,16 +55,16 @@ const OrganizationDocuments: React.FC<OrganizationDocumentsProps> = ({
         {documents.length > 0 ? (
           <>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-2">
-              {displayedDocuments.map((doc) => (
+              {currentDisplayed.map((doc) => (
                 <DocumentCard key={doc._id} document={doc} />
               ))}
             </div>
 
-            {documents.length > displayedCount && (
+            {!isExpanded && documents.length > displayedCount && (
               <div className="text-center mt-6">
                 <button
                   className="text-[var(--primary-color)] hover:underline font-medium cursor-pointer"
-                  onClick={onLoadMore}
+                  onClick={handleLoadMore}
                 >
                   Xem thêm {documents.length - displayedCount} tài liệu khác
                 </button>

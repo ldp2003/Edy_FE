@@ -30,6 +30,7 @@ const AdminRecentActivities: React.FC<AdminRecentActivitiesProps> = ({
           borderColor: "var(--border-color)",
           backgroundColor: "var(--primary-background-color)",
           overflow: "auto",
+          cursor: "default",
         }}
       >
         {loading ? (
@@ -41,8 +42,7 @@ const AdminRecentActivities: React.FC<AdminRecentActivitiesProps> = ({
             {activities.map((activity) => (
               <div
                 key={activity.id}
-                className="flex items-start gap-1.5 p-1 rounded-md hover:bg-opacity-50 transition-colors cursor-pointer"
-                onClick={() => onActivityClick(activity)}
+                className="flex items-start gap-1.5 p-1 rounded-md transition-colors"
               >
                 {/* User Avatar */}
                 <Avatar

@@ -1,4 +1,4 @@
-import React, { useCallback } from "react";
+import React, { useCallback, useState } from "react";
 import { Dropdown, Badge, Spin } from "antd";
 import { useNavigate } from "react-router-dom";
 import type { Notification } from "../../../models/notification";
@@ -14,6 +14,7 @@ interface NotificationDropdownProps {
 const NotificationDropdown: React.FC<NotificationDropdownProps> = React.memo(
   ({ notifications, loading = false, unreadCount = 0 }) => {
     const navigate = useNavigate();
+    const [open, setOpen] = useState(false);
 
     const handleViewAllNotifications = useCallback(() => {
       navigate("/notifications");
@@ -56,7 +57,10 @@ const NotificationDropdown: React.FC<NotificationDropdownProps> = React.memo(
                   key={notification._id}
                   className="border-b border-gray-100 last:border-b-0 hover:bg-gray-50 transition-colors"
                 >
-                  <NotificationItem notification={notification} />
+                  <NotificationItem
+                    notification={notification}
+                    onCloseDropdown={() => setOpen(false)}
+                  />
                 </div>
               ))}
             </>
@@ -87,6 +91,8 @@ const NotificationDropdown: React.FC<NotificationDropdownProps> = React.memo(
         popupRender={() => menu}
         trigger={["hover", "click"]}
         placement="bottomRight"
+        open={open}
+        onOpenChange={setOpen}
       >
         <Badge
           count={unreadCount > 99 ? "99+" : unreadCount}

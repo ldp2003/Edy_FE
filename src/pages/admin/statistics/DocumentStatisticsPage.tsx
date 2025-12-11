@@ -49,8 +49,6 @@ const DocumentStatisticsPage: React.FC = () => {
   const [chartType, setChartType] = useState("line");
   const [documentChartType, setDocumentChartType] = useState("bar");
   const [approvedFilter, setApprovedFilter] = useState({
-    author: "",
-    subject: "",
     dateFrom: "",
     dateTo: "",
   });
@@ -263,17 +261,11 @@ const DocumentStatisticsPage: React.FC = () => {
   const filteredApprovedDocuments = (
     statisticsData?.approvedDocuments || []
   ).filter((doc: any) => {
-    const matchesAuthor =
-      !approvedFilter.author ||
-      doc.author?.toLowerCase().includes(approvedFilter.author.toLowerCase());
-    const matchesSubject =
-      !approvedFilter.subject ||
-      doc.subject?.toLowerCase().includes(approvedFilter.subject.toLowerCase());
     const matchesDateFrom =
       !approvedFilter.dateFrom || doc.uploadDate >= approvedFilter.dateFrom;
     const matchesDateTo =
       !approvedFilter.dateTo || doc.uploadDate <= approvedFilter.dateTo;
-    return matchesAuthor && matchesSubject && matchesDateFrom && matchesDateTo;
+    return matchesDateFrom && matchesDateTo;
   });
 
   // Initialize charts
@@ -1033,31 +1025,7 @@ const DocumentStatisticsPage: React.FC = () => {
                 </div>
 
                 {/* Filters */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-3">
-                  <input
-                    type="text"
-                    placeholder="Người đăng"
-                    value={approvedFilter.author}
-                    onChange={(e) =>
-                      setApprovedFilter({
-                        ...approvedFilter,
-                        author: e.target.value,
-                      })
-                    }
-                    className="px-2 py-1 border border-gray-300 rounded text-sm"
-                  />
-                  <input
-                    type="text"
-                    placeholder="Chủ đề"
-                    value={approvedFilter.subject}
-                    onChange={(e) =>
-                      setApprovedFilter({
-                        ...approvedFilter,
-                        subject: e.target.value,
-                      })
-                    }
-                    className="px-2 py-1 border border-gray-300 rounded text-sm"
-                  />
+                <div className="grid grid-cols-2 gap-2 mb-3">
                   <input
                     type="date"
                     value={approvedFilter.dateFrom}
