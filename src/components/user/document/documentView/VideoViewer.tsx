@@ -54,7 +54,7 @@ const VideoViewer: React.FC<VideoViewerProps> = ({
     const checkTime = () => {
       const video = videoRef.current;
       if (video && video.currentTime >= limitTime && !hasShownModal) {
-        console.log(`Pausing video at ${limitTime}s (limit based on duration)`);
+        // console.log(`Pausing video at ${limitTime}s (limit based on duration)`);
         video.pause();
         setShowLimitModal(true);
         setHasShownModal(true);
@@ -69,23 +69,23 @@ const VideoViewer: React.FC<VideoViewerProps> = ({
 
   const handleTimeUpdate = (e: React.SyntheticEvent<HTMLVideoElement>) => {
     const video = e.currentTarget;
-    console.log(
-      "Video time update:",
-      video.currentTime,
-      "limitTime:",
-      limitTime,
-      "isUser:",
-      isUser,
-      "hasShownModal:",
-      hasShownModal
-    );
+    // console.log(
+    //   "Video time update:",
+    //   video.currentTime,
+    //   "limitTime:",
+    //   limitTime,
+    //   "isUser:",
+    //   isUser,
+    //   "hasShownModal:",
+    //   hasShownModal
+    // );
     if (
       !isUser &&
       limitTime !== null &&
       video.currentTime >= limitTime &&
       !hasShownModal
     ) {
-      console.log(`Pausing video at ${limitTime}s`);
+      // console.log(`Pausing video at ${limitTime}s`);
       video.pause();
       setShowLimitModal(true);
       setHasShownModal(true);

@@ -15,7 +15,7 @@ const SchoolSelection: React.FC<{
     const fetchSchools = async () => {
       try {
         const organizations = await OrganizationService.getOrganizations();
-        console.log("Fetched organizations in SchoolSelection:", organizations);
+        // console.log("Fetched organizations in SchoolSelection:", organizations);
         if (Array.isArray(organizations)) {
           const options = organizations
             .filter((org) => org._id)

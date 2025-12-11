@@ -40,20 +40,20 @@ const DocumentList: React.FC<DocumentListProps> = ({
 
     // Prevent double execution in development (StrictMode) - check if already fetching
     if (isFetchingRef.current) {
-      console.log("Skipping duplicate fetch - already fetching");
+      // console.log("Skipping duplicate fetch - already fetching");
       return;
     }
 
     // Prevent double execution in development (StrictMode) - check if already fetched initial data
     if (hasFetchedRef.current && searchText === "" && currentPage === 1) {
-      console.log("Skipping duplicate fetch - already fetched initial data");
+      // console.log("Skipping duplicate fetch - already fetched initial data");
       return;
     }
 
     const fetchDocuments = async () => {
-      console.log(
-        `Fetching documents: searchText="${searchText}", currentPage=${currentPage}, doc_id="${doc_id}"`
-      );
+      // console.log(
+      //   `Fetching documents: searchText="${searchText}", currentPage=${currentPage}, doc_id="${doc_id}"`
+      // );
       isFetchingRef.current = true; // Mark as fetching
 
       try {

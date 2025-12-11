@@ -94,7 +94,7 @@ const AdminRoleTable: React.FC = () => {
       };
 
       const response = await RoleService.getAllRoles(true, queryParams);
-      console.log("response:", response);
+      // console.log("response:", response);
       setRoles(response?.data || response || []);
       setTotalRoles(response?.pagination?.total || response?.length || 0);
     } catch (error) {

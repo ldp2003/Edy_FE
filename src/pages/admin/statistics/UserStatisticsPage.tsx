@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { useState, useEffect } from "react";
 import { ChevronDown, Search, RefreshCw, Users } from "lucide-react";
 import {
@@ -73,7 +74,7 @@ const UserStatisticsPage: React.FC = () => {
           });
         // API returns data in the format: { year, stats: {...}, monthlyStats: [...] }
         const apiData = statsResponse;
-        console.log("Processing stats data:", apiData);
+        // console.log("Processing stats data:", apiData);
         const processedData = {
           ...apiData?.stats,
           monthlyNewUsers:
@@ -82,13 +83,13 @@ const UserStatisticsPage: React.FC = () => {
               newUsers: item.newUsers,
             })) || [],
         };
-        console.log("Setting statistics data:", processedData);
+        // console.log("Setting statistics data:", processedData);
         setStatisticsData(processedData);
 
         // Fetch users list using UserService (same as AdminUserTable)
         const usersResponse = await UserService.getAllUsers();
         const usersData = usersResponse;
-        console.log("Processing users data:", usersData);
+        // console.log("Processing users data:", usersData);
         setUsersList(Array.isArray(usersData) ? usersData : []);
       } catch (err) {
         console.error("Error fetching user statistics:", err);
@@ -137,21 +138,6 @@ const UserStatisticsPage: React.FC = () => {
     }
   };
 
-  const filteredUsers = (usersList || []).filter(
-    (user: User) =>
-      `${user.first_name || ""} ${user.last_name || ""}`
-        .toLowerCase()
-        .includes(searchTerm.toLowerCase()) ||
-      user.contact_email?.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
-  console.log("Current state:", {
-    statisticsData,
-    usersList: usersList?.length,
-    filteredUsers: filteredUsers.length,
-    loading,
-    error,
-  });
 
   // Prepare pie chart data
   const pieChartData = [

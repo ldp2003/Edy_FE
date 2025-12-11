@@ -40,14 +40,14 @@ const MobileDocumentHeader: React.FC<MobileDocumentHeaderProps> = ({
       if (!target) return;
 
       const scrollTop = target.scrollTop;
-      console.log("MobileHeader - Scroll position:", scrollTop); // Debug log
+      // console.log("MobileHeader - Scroll position:", scrollTop); // Debug log
 
       // Ẩn header bự khi cuộn xuống quá 100px, hiện header gọn
       if (scrollTop > 100) {
-        console.log("MobileHeader - Setting isScrolled to true"); // Debug log
+        // console.log("MobileHeader - Setting isScrolled to true"); // Debug log
         setIsScrolled(true);
       } else {
-        console.log("MobileHeader - Setting isScrolled to false"); // Debug log
+        // console.log("MobileHeader - Setting isScrolled to false"); // Debug log
         setIsScrolled(false);
       }
     };
@@ -73,34 +73,34 @@ const MobileDocumentHeader: React.FC<MobileDocumentHeaderProps> = ({
     ) as HTMLElement;
     let scrollContainer: HTMLElement | null = null;
 
-    console.log("MobileHeader - Current element found:", currentElement); // Debug log
+    // console.log("MobileHeader - Current element found:", currentElement); // Debug log
 
     if (currentElement) {
       scrollContainer = findScrollableParent(currentElement.parentElement!);
-      console.log(
-        "MobileHeader - Scroll container from parent:",
-        scrollContainer
-      ); // Debug log
+      // console.log(
+      //   "MobileHeader - Scroll container from parent:",
+      //   scrollContainer
+      // ); // Debug log
     } else {
       // Fallback: tìm container với class overflow-y-auto trong cùng page
       scrollContainer = window.document.querySelector(
         ".flex-1.overflow-y-auto"
       ) as HTMLElement;
-      console.log("MobileHeader - Fallback scroll container:", scrollContainer); // Debug log
+      // console.log("MobileHeader - Fallback scroll container:", scrollContainer); // Debug log
     }
 
     if (scrollContainer) {
-      console.log("MobileHeader - Adding scroll listener"); // Debug log
+      // console.log("MobileHeader - Adding scroll listener"); // Debug log
       scrollContainer.addEventListener("scroll", handleScroll, {
         passive: true,
       });
 
       return () => {
-        console.log("MobileHeader - Removing scroll listener"); // Debug log
+        // console.log("MobileHeader - Removing scroll listener"); // Debug log
         scrollContainer!.removeEventListener("scroll", handleScroll);
       };
     } else {
-      console.log("MobileHeader - No scroll container found!"); // Debug log
+      // console.log("MobileHeader - No scroll container found!"); // Debug log
     }
   }, []);
 

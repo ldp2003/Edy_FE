@@ -42,9 +42,9 @@ const SearchFilters: React.FC<SearchFiltersProps> = ({
 
         // Nếu không có data hoặc empty, fallback về tất cả organizations
         if (!orgList || orgList.length === 0) {
-          console.log(
-            "No dropdown organizations found, fetching all organizations"
-          );
+          // console.log(
+          //   "No dropdown organizations found, fetching all organizations"
+          // );
           orgList = await OrganizationService.getOrganizations();
         }
 

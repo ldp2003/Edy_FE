@@ -4,7 +4,7 @@ export const UserService = {
   async verifyUser(organization: string, field_of_study: string) {
     try {
       const result = await UserAPI.verifyUser({ organization, field_of_study });
-      console.log("User verified successfully:", result);
+      // console.log("User verified successfully:", result);
       return result;
     } catch (error) {
       console.error("Failed to verify user:", error);
@@ -26,7 +26,7 @@ export const UserService = {
   }) {
     try {
       const users = await UserAPI.getAllUsers(params);
-      console.log("Fetched users:", users);
+      // console.log("Fetched users:", users);
       return users;
     } catch (error) {
       console.error("Failed to fetch users:", error);
@@ -37,7 +37,7 @@ export const UserService = {
   async getUserById(userId: string) {
     try {
       const user = await UserAPI.getUserById(userId);
-      console.log("Fetched user:", user);
+      // console.log("Fetched user:", user);
       return user;
     } catch (error) {
       console.error("Failed to fetch user:", error);
@@ -48,7 +48,7 @@ export const UserService = {
   async updateUserStatus(userId: string, status: string) {
     try {
       const result = await UserAPI.updateUserStatus(userId, status);
-      console.log("User status updated:", result);
+      // console.log("User status updated:", result);
       return result;
     } catch (error) {
       console.error("Failed to update user status:", error);
@@ -62,7 +62,7 @@ export const UserService = {
   ) {
     try {
       const result = await UserAPI.suspendUser(userId, data);
-      console.log("User suspended:", result);
+      // console.log("User suspended:", result);
       return result;
     } catch (error) {
       console.error("Failed to suspend user:", error);
@@ -73,7 +73,7 @@ export const UserService = {
   async unsuspendUser(userId: string) {
     try {
       const result = await UserAPI.unsuspendUser(userId);
-      console.log("User unsuspended:", result);
+      // console.log("User unsuspended:", result);
       return result;
     } catch (error) {
       console.error("Failed to unsuspend user:", error);
@@ -95,7 +95,7 @@ export const UserService = {
   ) {
     try {
       const result = await UserAPI.updateUser(userId, userData);
-      console.log("User updated:", result);
+      // console.log("User updated:", result);
       return result;
     } catch (error) {
       console.error("Failed to update user:", error);
@@ -111,7 +111,7 @@ export const UserService = {
   }) {
     try {
       const result = await UserAPI.updateProfile(profileData);
-      console.log("Profile updated successfully:", result);
+      // console.log("Profile updated successfully:", result);
       return result;
     } catch (error) {
       console.error("Failed to update profile:", error);
@@ -125,7 +125,7 @@ export const UserService = {
   }) {
     try {
       const result = await UserAPI.changePassword(passwordData);
-      console.log("Password changed successfully:", result);
+      // console.log("Password changed successfully:", result);
       return result;
     } catch (error) {
       console.error("Failed to change password:", error);
@@ -135,7 +135,7 @@ export const UserService = {
   async getListFavorites() {
     try {
       const favorites = await UserAPI.getListFavorites();
-      console.log("Fetched favorite documents:", favorites);
+      // console.log("Fetched favorite documents:", favorites);
       return favorites;
     } catch (error) {
       console.error("Failed to fetch favorite documents:", error);
@@ -146,7 +146,7 @@ export const UserService = {
   async addToFavorites(documentId: string) {
     try {
       const result = await UserAPI.addToFavorites(documentId);
-      console.log("Document added to favorites:", result);
+      // console.log("Document added to favorites:", result);
       return result;
     } catch (error) {
       console.error("Failed to add document to favorites:", error);
@@ -157,7 +157,7 @@ export const UserService = {
   async removeFromFavorites(documentId: string) {
     try {
       const result = await UserAPI.removeFromFavorites(documentId);
-      console.log("Document removed from favorites:", result);
+      // console.log("Document removed from favorites:", result);
       return result;
     } catch (error) {
       console.error("Failed to remove document from favorites:", error);
@@ -173,7 +173,7 @@ export const UserService = {
   async followUser(userId: string) {
     try {
       const result = await UserAPI.followUser(userId);
-      console.log("Followed user successfully:", result);
+      // console.log("Followed user successfully:", result);
       return result;
     } catch (error) {
       console.error("Failed to follow user:", error);
@@ -183,7 +183,7 @@ export const UserService = {
   async unfollowUser(userId: string) {
     try {
       const result = await UserAPI.unfollowUser(userId);
-      console.log("Unfollowed user successfully:", result);
+      // console.log("Unfollowed user successfully:", result);
       return result;
     } catch (error) {
       console.error("Failed to unfollow user:", error);
@@ -193,7 +193,7 @@ export const UserService = {
   async updateFieldOfStudy(field_of_study: string[]) {
     try {
       const result = await UserAPI.updateFieldStudy(field_of_study);
-      console.log("Field of study updated successfully:", result);
+      // console.log("Field of study updated successfully:", result);
       return result;
     } catch (error) {
       console.error("Failed to update field of study:", error);
@@ -203,7 +203,7 @@ export const UserService = {
   async getContributions(year?: number) {
     try {
       const contributions = await UserAPI.getContributions(year);
-      console.log("Fetched user contributions:", contributions);
+      // console.log("Fetched user contributions:", contributions);
       return contributions;
     } catch (error) {
       console.error("Failed to fetch user contributions:", error);
@@ -214,7 +214,7 @@ export const UserService = {
   async getCurrentUser() {
     try {
       const user = await UserAPI.getCurrentUser();
-      console.log("Fetched current user:", user);
+      // console.log("Fetched current user:", user);
       return user;
     } catch (error) {
       console.error("Failed to fetch current user:", error);
@@ -225,7 +225,7 @@ export const UserService = {
   async getUserRestrictions(userId: string) {
     try {
       const restrictions = await UserAPI.getUserRestrictions(userId);
-      console.log("Fetched user restrictions:", restrictions);
+      // console.log("Fetched user restrictions:", restrictions);
       return restrictions;
     } catch (error) {
       console.error("Failed to fetch user restrictions:", error);
@@ -236,7 +236,7 @@ export const UserService = {
   async getUserViolations(userId: string) {
     try {
       const violations = await UserAPI.getUserViolations(userId);
-      console.log("Fetched user violations:", violations);
+      // console.log("Fetched user violations:", violations);
       return violations;
     } catch (error) {
       console.error("Failed to fetch user violations:", error);

@@ -123,7 +123,7 @@ const SubjectService = {
         subjectId,
         isAdmin
       );
-      console.log("SubjectService.getDocumentsBySubject response:", response);
+      // console.log("SubjectService.getDocumentsBySubject response:", response);
       return response;
     } catch (error) {
       console.error("Error in SubjectService.getDocumentsBySubject:", error);

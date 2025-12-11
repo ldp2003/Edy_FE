@@ -99,10 +99,10 @@ const SearchPage: React.FC = () => {
 
   // Fetch documents based on filters
   const fetchDocuments = useCallback(async () => {
-    console.log("=== FETCH DOCUMENTS CALLED ===");
-    console.log("Current tab:", currentTab);
-    console.log("Current filters:", filters);
-    console.log("Current page:", currentPage);
+    // console.log("=== FETCH DOCUMENTS CALLED ===");
+    // console.log("Current tab:", currentTab);
+    // console.log("Current filters:", filters);
+    // console.log("Current page:", currentPage);
 
     // Skip fetching documents for subjects tab, only show subjects
     if (currentTab === "subjects") {
@@ -116,7 +116,7 @@ const SearchPage: React.FC = () => {
         const subRes = await SubjectService.searchSubjects(
           filters.search || ""
         );
-        console.log("Fetched subjects:", subRes);
+        // console.log("Fetched subjects:", subRes);
         setSubjects(subRes || []);
         setLastSubjectsQuery(filters.search || "");
         setTotalDocuments(6); // Mock count for subjects
@@ -140,10 +140,10 @@ const SearchPage: React.FC = () => {
         status: "APPROVED", // Chỉ lấy tài liệu đã duyệt
       };
 
-      console.log("API call with params:", params);
+      // console.log("API call with params:", params);
       const response = await DocumentService.fetchNewestDocuments(params);
       const subRes = await SubjectService.searchSubjects(filters.search || "");
-      console.log("Fetched subjects:", subRes);
+      // console.log("Fetched subjects:", subRes);
       setDocuments(response.documents || []);
       setSubjects(subRes || []);
       setLastSubjectsQuery(filters.search || "");
@@ -321,14 +321,14 @@ const SearchPage: React.FC = () => {
 
   // Handle filter changes
   const handleFilterChange = (newFilters: SearchFilters) => {
-    console.log("SearchPage handleFilterChange called with:", newFilters);
-    console.log("Previous filters were:", filters);
+    // console.log("SearchPage handleFilterChange called with:", newFilters);
+    // console.log("Previous filters were:", filters);
 
     // Prevent unnecessary updates if filters are the same
     const filtersChanged =
       JSON.stringify(filters) !== JSON.stringify(newFilters);
     if (!filtersChanged) {
-      console.log("Filters unchanged, skipping update");
+      // console.log("Filters unchanged, skipping update");
       return;
     }
 
@@ -395,7 +395,7 @@ const SearchPage: React.FC = () => {
     const filtersChanged =
       JSON.stringify(filters) !== JSON.stringify(urlFilters);
     if (filtersChanged) {
-      console.log("URL filters changed, updating filters:", urlFilters);
+      // console.log("URL filters changed, updating filters:", urlFilters);
       setFilters(urlFilters);
     }
   }, [searchParams, getFiltersFromURL, filters]);

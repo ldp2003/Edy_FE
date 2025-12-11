@@ -30,27 +30,27 @@ export function Header({ onMenuToggle }: HeaderProps) {
   const handleHeaderSearch = () => {
     const input = document.getElementById("search-input") as HTMLInputElement;
     const query = input?.value.trim();
-    console.log("Header handleHeaderSearch called with:", query);
-    console.log("isOnSearchPage:", isOnSearchPage);
+    // console.log("Header handleHeaderSearch called with:", query);
+    // console.log("isOnSearchPage:", isOnSearchPage);
 
     if (!query) {
-      console.log("No query provided, returning");
+      // console.log("No query provided, returning");
       return;
     }
 
     if (isOnSearchPage) {
       // If already on search page, trigger SearchHeader's search function
-      console.log("On search page, dispatching headerSearch event");
+      // console.log("On search page, dispatching headerSearch event");
       const event = new CustomEvent("headerSearch", { detail: { query } });
       window.dispatchEvent(event);
       // Clear the header input after search
       input.value = "";
     } else {
       // If not on search page, navigate to search page
-      console.log(
-        "Not on search page, navigating to:",
-        `/search?q=${encodeURIComponent(query)}`
-      );
+      // console.log(
+      //   "Not on search page, navigating to:",
+      //   `/search?q=${encodeURIComponent(query)}`
+      // );
       window.location.href = `/search?q=${encodeURIComponent(query)}`;
     }
   };

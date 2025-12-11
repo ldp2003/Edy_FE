@@ -36,15 +36,15 @@ const DocumentRouteWrapper: React.FC<DocumentRouteWrapperProps> = ({
         setLoading(true);
         const documentData = await DocumentService.getDocumentById(id);
 
-        // DEBUG: Log toàn bộ response để kiểm tra
-        console.log("📄 Document Data:", documentData);
-        console.log("📄 Document Status:", documentData?.status);
-        console.log("📄 Document Public Mode:", documentData?.public_mode);
-        console.log("👤 Current User:", user);
-        console.log("👤 Document Owner:", documentData?.user);
+        // // DEBUG: Log toàn bộ response để kiểm tra
+        // console.log("📄 Document Data:", documentData);
+        // console.log("📄 Document Status:", documentData?.status);
+        // console.log("📄 Document Public Mode:", documentData?.public_mode);
+        // console.log("👤 Current User:", user);
+        // console.log("👤 Document Owner:", documentData?.user);
 
         const isOwner = user && documentData.user._id === user._id;
-        console.log("🔑 Is Owner:", isOwner);
+        // console.log("🔑 Is Owner:", isOwner);
 
         if (type === "personal") {
           // Personal posts route - must be owner

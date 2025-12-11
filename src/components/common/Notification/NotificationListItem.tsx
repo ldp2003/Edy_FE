@@ -25,7 +25,7 @@ const NotificationListItem: React.FC<NotificationListItemProps> = ({
     if (!notification.isRead) {
       try {
         await NotificationService.markAsRead(notification._id);
-        console.log("Notification marked as read");
+        // console.log("Notification marked as read");
         // Refresh notifications in context after marking as read
         refreshNotifications();
       } catch (error) {
@@ -55,13 +55,14 @@ const NotificationListItem: React.FC<NotificationListItemProps> = ({
             docId ?? ""
           }?comment=${cmtId}`;
           break;
-        case "USER":
+        case "USER": {
           const userId =
             typeof notification.user === "string"
               ? notification.user
               : notification.user._id;
           targetPath = `/user/${userId}`;
           break;
+        }
         case "POINT":
           targetPath = "/point-management?showHistory=true";
           break;

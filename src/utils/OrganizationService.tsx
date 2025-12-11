@@ -5,7 +5,7 @@ export const OrganizationService = {
   createOrganization: async (organization: OrganizationDetailed) => {
     try {
       const result = await OrganizationAPI.createOrganization(organization);
-      console.log("Organization created successfully:", result);
+      // console.log("Organization created successfully:", result);
       return result;
     } catch (error) {
       console.error("Failed to create organization:", error);
@@ -26,7 +26,7 @@ export const OrganizationService = {
     try {
       const response = await OrganizationAPI.getOrganizations(params);
       if (response && response.data && Array.isArray(response.data)) {
-        console.log("Fetched organizations:", response.data);
+        // console.log("Fetched organizations:", response.data);
         return response.data;
       } else {
         console.error("Unexpected response format:", response);
@@ -55,7 +55,7 @@ export const OrganizationService = {
       const response = await OrganizationAPI.getOrganizationById(
         organizationId
       );
-      console.log("Fetched organization by ID:", response);
+      // console.log("Fetched organization by ID:", response);
       return response.organization || response;
     } catch (error) {
       console.error("Failed to fetch organization by ID:", error);

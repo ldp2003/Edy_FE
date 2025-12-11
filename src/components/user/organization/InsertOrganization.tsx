@@ -1,6 +1,5 @@
 import React from "react";
 import { Form, Input, Button, message } from "antd";
-import type { ValidateErrorEntity } from "rc-field-form/lib/interface";
 import { OrganizationService } from "../../../utils/OrganizationService";
 
 const InsertOrganization: React.FC = () => {
@@ -28,8 +27,8 @@ const InsertOrganization: React.FC = () => {
     }
   };
 
-  const onFinishFailed = (errorInfo: ValidateErrorEntity) => {
-    console.log("Failed:", errorInfo);
+  const onFinishFailed = () => {
+    messageApi.error("Vui lòng kiểm tra lại thông tin đã nhập.");
   };
 
   return (
