@@ -1,5 +1,6 @@
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { Modal } from "antd";
 import { NotificationService } from "../../../utils/NotificationService";
 import { UserContext } from "../../../contexts/UserContext";
 import type { Notification } from "../../../models/notification";
@@ -7,13 +8,16 @@ import { CheckCircle, Circle } from "lucide-react";
 
 interface NotificationItemProps {
   notification: Notification;
+  onCloseDropdown?: () => void;
 }
 
 const NotificationItem: React.FC<NotificationItemProps> = ({
   notification,
+  onCloseDropdown,
 }) => {
   const navigate = useNavigate();
   const { role: userRole, refreshNotifications } = useContext(UserContext);
+  const [isModalVisible, setIsModalVisible] = useState(false);
 
   const isAdminRole = Array.isArray(userRole)
     ? userRole.some(
@@ -70,42 +74,61 @@ const NotificationItem: React.FC<NotificationItemProps> = ({
         case "SYSTEM":
         case "NONE":
         default:
-          // Không điều hướng
+          // Không điều hướng, mở modal chi tiết
+          onCloseDropdown?.();
+          setIsModalVisible(true);
           return;
       }
     }
 
     // console.log("targetPath", targetPath);
     if (targetPath) {
+      onCloseDropdown?.();
       navigate(targetPath);
     }
   };
 
   return (
-    <div className="p-2 text-left cursor-pointer" onClick={handleClick}>
-      <div className="flex items-center gap-1.5">
-        {notification.isRead ? (
-          <CheckCircle
-            className="w-3.5 h-3.5 flex-shrink-0"
-            style={{ color: "var(--secondary-text-color)" }}
-          />
-        ) : (
-          <Circle
-            className="w-3.5 h-3.5 flex-shrink-0"
-            style={{ color: "var(--green-button-color)" }}
-          />
-        )}
-        <div className="text-xs font-medium flex-1 line-clamp-2">
-          {notification.message}
+    <>
+      <div className="p-2 text-left cursor-pointer" onClick={handleClick}>
+        <div className="flex items-center gap-1.5">
+          {notification.isRead ? (
+            <CheckCircle
+              className="w-3.5 h-3.5 flex-shrink-0"
+              style={{ color: "var(--secondary-text-color)" }}
+            />
+          ) : (
+            <Circle
+              className="w-3.5 h-3.5 flex-shrink-0"
+              style={{ color: "var(--green-button-color)" }}
+            />
+          )}
+          <div className="text-xs font-medium flex-1 line-clamp-2">
+            {notification.message}
+          </div>
+        </div>
+        <div
+          className="text-[10px] mt-0.5 ml-5"
+          style={{ color: "var(--secondary-text-color)" }}
+        >
+          {NotificationService.formatNotificationTime(notification.createdAt)}
         </div>
       </div>
-      <div
-        className="text-[10px] mt-0.5 ml-5"
-        style={{ color: "var(--secondary-text-color)" }}
+      <Modal
+        title="Chi tiết thông báo"
+        open={isModalVisible}
+        onCancel={() => setIsModalVisible(false)}
+        footer={null}
+        centered
       >
-        {NotificationService.formatNotificationTime(notification.createdAt)}
-      </div>
-    </div>
+        <div className="p-4">
+          <p className="text-sm mb-2">{notification.message}</p>
+          <p className="text-xs text-gray-500">
+            {NotificationService.formatNotificationTime(notification.createdAt)}
+          </p>
+        </div>
+      </Modal>
+    </>
   );
 };
 
