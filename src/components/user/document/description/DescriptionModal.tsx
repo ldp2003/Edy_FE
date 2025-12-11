@@ -11,12 +11,12 @@ const DescriptionModal: React.FC = () => {
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const { user, setUser } = useContext(UserContext);
 
-  console.log(
-    "DescriptionModal rendered, user:",
-    user,
-    "setUser:",
-    typeof setUser
-  );
+  // console.log(
+  //   "DescriptionModal rendered, user:",
+  //   user,
+  //   "setUser:",
+  //   typeof setUser
+  // );
 
   const refreshUserData = async () => {
     try {
@@ -30,14 +30,14 @@ const DescriptionModal: React.FC = () => {
   };
 
   const handleViewClick = () => {
-    console.log("handleViewClick called, user:", user);
-    console.log("About to show modal...");
+    // console.log("handleViewClick called, user:", user);
+    // console.log("About to show modal...");
 
     setShowConfirmModal(true);
   };
 
   const handleConfirmSpend = async () => {
-    console.log("User confirmed spending points");
+    // console.log("User confirmed spending points");
     setIsLoading(true);
     try {
       await PointTransactionService.spendPoints({
@@ -65,7 +65,7 @@ const DescriptionModal: React.FC = () => {
   };
 
   const handleCancelConfirm = () => {
-    console.log("User cancelled modal");
+    // console.log("User cancelled modal");
     setShowConfirmModal(false);
   };
 

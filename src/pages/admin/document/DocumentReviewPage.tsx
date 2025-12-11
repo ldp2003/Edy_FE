@@ -36,7 +36,7 @@ const DocumentReviewPage: React.FC = () => {
       try {
         setLoading(true);
         const documentData = await DocumentService.getDocumentById(id);
-        console.log("Fetched document data:", documentData);
+        // console.log("Fetched document data:", documentData);
         setDocument(documentData);
         const isEditRequest = documentData.status === "PENDING_EDIT";
         setIsEdit(isEditRequest);

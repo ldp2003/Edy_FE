@@ -79,12 +79,12 @@ const ReportModal: React.FC<ReportModalProps> = ({
     reasons: string[];
     description?: string;
   }) => {
-    console.log("Report submitted:", {
-      documentId,
-      documentTitle,
-      reasons: values.reasons,
-      description: values.description,
-    });
+    // console.log("Report submitted:", {
+    //   documentId,
+    //   documentTitle,
+    //   reasons: values.reasons,
+    //   description: values.description,
+    // });
 
     setLoading(true);
 

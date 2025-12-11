@@ -80,7 +80,7 @@ const SearchHeader: React.FC<SearchHeaderProps> = ({
   }, [handleScroll]);
 
   useEffect(() => {
-    console.log("SearchHeader initialQuery changed:", initialQuery);
+    // console.log("SearchHeader initialQuery changed:", initialQuery);
     setQuery(initialQuery);
     setLastSearchQuery(initialQuery);
   }, [initialQuery]);
@@ -88,19 +88,19 @@ const SearchHeader: React.FC<SearchHeaderProps> = ({
   // Listen for search events from Header component
   useEffect(() => {
     const handleHeaderSearchEvent = (event: CustomEvent) => {
-      console.log("Header search event received:", event.detail);
+      // console.log("Header search event received:", event.detail);
       const { query: headerQuery } = event.detail;
       const trimmedHeaderQuery = headerQuery?.trim();
-      console.log("Trimmed header query:", trimmedHeaderQuery);
-      console.log("Current lastSearchQuery:", lastSearchQuery);
+      // console.log("Trimmed header query:", trimmedHeaderQuery);
+      // console.log("Current lastSearchQuery:", lastSearchQuery);
 
       if (trimmedHeaderQuery && trimmedHeaderQuery !== lastSearchQuery) {
-        console.log("Processing header search for:", trimmedHeaderQuery);
+        // console.log("Processing header search for:", trimmedHeaderQuery);
         setQuery(trimmedHeaderQuery);
         setLastSearchQuery(trimmedHeaderQuery);
         onSearch(trimmedHeaderQuery);
       } else {
-        console.log("Skipping header search - duplicate or empty");
+        // console.log("Skipping header search - duplicate or empty");
       }
     };
 
@@ -119,16 +119,16 @@ const SearchHeader: React.FC<SearchHeaderProps> = ({
 
   const handleSearch = () => {
     const trimmedQuery = query.trim();
-    console.log("SearchHeader handleSearch called with:", trimmedQuery);
-    console.log("Last search query was:", lastSearchQuery);
+    // console.log("SearchHeader handleSearch called with:", trimmedQuery);
+    // console.log("Last search query was:", lastSearchQuery);
 
     // Avoid duplicate API calls
     if (trimmedQuery && trimmedQuery !== lastSearchQuery) {
-      console.log("Calling onSearch with:", trimmedQuery);
+      // console.log("Calling onSearch with:", trimmedQuery);
       setLastSearchQuery(trimmedQuery);
       onSearch(trimmedQuery);
     } else {
-      console.log("Skipping search - duplicate query or empty");
+      // console.log("Skipping search - duplicate query or empty");
     }
   };
 

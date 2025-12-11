@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { useState, useEffect } from "react";
 import type { Role } from "../../../models/role";
 import { USER_ROLES } from "../../../constants/RoleConstants";
@@ -12,7 +13,7 @@ const UserRole: React.FC = () => {
     const fetchRoles = async () => {
       try {
         // Simulate API call
-        console.log("Fetching roles...", roles);
+        // console.log("Fetching roles...", roles);
         setTimeout(() => {
           setRoles([]);
           setLoading(false);

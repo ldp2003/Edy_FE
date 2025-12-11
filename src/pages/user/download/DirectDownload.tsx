@@ -34,7 +34,7 @@ const DirectDownload: React.FC = () => {
       setLoading(true);
       setError(null);
 
-      console.log("Downloading file with linkId:", linkId);
+      // console.log("Downloading file with linkId:", linkId);
 
       const response = await DocumentService.downloadFile(linkId);
 
@@ -48,13 +48,13 @@ const DirectDownload: React.FC = () => {
       // 1. Try X-Filename first (full filename with extension)
       if (response.headers["x-filename"]) {
         filename = decodeURIComponent(response.headers["x-filename"]);
-        console.log("Using X-Filename:", filename);
+        // console.log("Using X-Filename:", filename);
       }
       // 3. Fallback to Content-Disposition
       else {
         const contentDisposition = response.headers["content-disposition"];
         if (contentDisposition) {
-          console.log("Raw Content-Disposition:", contentDisposition);
+          // console.log("Raw Content-Disposition:", contentDisposition);
 
           // Try parsing filename*=UTF-8'' format first (RFC 6266)
           const utf8Match = contentDisposition.match(
@@ -62,7 +62,7 @@ const DirectDownload: React.FC = () => {
           );
           if (utf8Match && utf8Match[1]) {
             filename = decodeURIComponent(utf8Match[1]);
-            console.log("Extracted UTF-8 filename:", filename);
+            // console.log("Extracted UTF-8 filename:", filename);
           } else {
             // Fallback to regular filename
             const regularMatch = contentDisposition.match(
@@ -74,16 +74,16 @@ const DirectDownload: React.FC = () => {
               regularMatch[1] !== "download"
             ) {
               filename = regularMatch[1];
-              console.log("Extracted regular filename:", filename);
+              // console.log("Extracted regular filename:", filename);
             }
           }
         } else {
-          console.log("No filename headers found, using fallback");
+          // console.log("No filename headers found, using fallback");
           filename = `document_${Date.now()}.pdf`;
         }
       }
 
-      console.log("Final filename:", filename);
+      // console.log("Final filename:", filename);
 
       // Tạo download link và click
       const downloadUrl = window.URL.createObjectURL(blob);
@@ -128,7 +128,7 @@ const DirectDownload: React.FC = () => {
         errorMsg = `Lỗi kết nối: ${error.message}`;
       }
 
-      console.log("Final error message:", errorMsg);
+      // console.log("Final error message:", errorMsg);
 
       setError(errorMsg);
       message.error(errorMsg);

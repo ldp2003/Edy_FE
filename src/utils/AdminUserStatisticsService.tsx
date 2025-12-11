@@ -6,16 +6,9 @@ export const AdminUserStatisticsService = {
     year?: number;
     month?: number;
   }) => {
-    try {
-      const result = await AdminUserStatisticsAPI.getAdminUserStatistics(
-        params
-      );
-      console.log("Admin user statistics fetched successfully:", result);
-      return result;
-    } catch (error) {
-      console.error("Failed to fetch admin user statistics:", error);
-      throw error;
-    }
+    const result = await AdminUserStatisticsAPI.getAdminUserStatistics(params);
+    // console.log("Admin user statistics fetched successfully:", result);
+    return result;
   },
 
   // Get users list for admin
@@ -26,7 +19,7 @@ export const AdminUserStatisticsService = {
   }) => {
     try {
       const result = await AdminUserStatisticsAPI.getUsersList(params);
-      console.log("Users list fetched successfully:", result);
+      // console.log("Users list fetched successfully:", result);
       return result;
     } catch (error) {
       console.error("Failed to fetch users list:", error);
@@ -43,7 +36,7 @@ export const AdminUserStatisticsService = {
       const result = await AdminUserStatisticsAPI.syncAdminUserStatistics(
         params
       );
-      console.log("Admin user statistics synced successfully:", result);
+      // console.log("Admin user statistics synced successfully:", result);
       return result;
     } catch (error) {
       console.error("Failed to sync admin user statistics:", error);

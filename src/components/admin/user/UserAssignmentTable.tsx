@@ -55,14 +55,14 @@ const UserAssignmentTable: React.FC<UserAssignmentTableProps> = ({
     try {
       setLoading(true);
       const response = await AssignmentService.getAllAssignments();
-      console.log("All assignments data:", response);
+      // console.log("All assignments data:", response);
 
       // Find the user's assignments from grouped data
       const userGroup = response.find(
         (group: any) => group.account.user.id === userId
       );
 
-      console.log("User group found:", userGroup);
+      // console.log("User group found:", userGroup);
 
       if (userGroup && userGroup.assignments) {
         setAssignments(userGroup.assignments);

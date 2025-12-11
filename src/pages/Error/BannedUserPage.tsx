@@ -18,7 +18,7 @@ const BannedUserPage: React.FC = () => {
   // Auto logout on any user interaction
   useEffect(() => {
     const handleUserInteraction = () => {
-      console.log("🚫 Banned user interaction detected, auto-logout initiated");
+      // console.log("🚫 Banned user interaction detected, auto-logout initiated");
       handleLogout();
     };
 

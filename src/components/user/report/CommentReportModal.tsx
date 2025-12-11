@@ -70,14 +70,14 @@ const CommentReportModal: React.FC<CommentReportModalProps> = ({
     reasons: string[];
     description?: string;
   }) => {
-    console.log("Comment report submitted:", {
-      documentId,
-      commentId,
-      commentContent,
-      commentAuthor,
-      reasons: values.reasons,
-      description: values.description,
-    });
+    // console.log("Comment report submitted:", {
+    //   documentId,
+    //   commentId,
+    //   commentContent,
+    //   commentAuthor,
+    //   reasons: values.reasons,
+    //   description: values.description,
+    // });
 
     setLoading(true);
 

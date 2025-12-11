@@ -56,7 +56,7 @@ const LoginForm: React.FC<LoginFormProps> = ({
       if (result) {
         messageApi.success("Đăng nhập thành công");
         form.resetFields();
-        console.log("Login successful:", result);
+        // console.log("Login successful:", result);
 
         // Trigger AuthRoute recheck sau khi login thành công
         // Có thể dùng window.location.reload() hoặc navigate

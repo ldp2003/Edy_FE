@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { useState, useEffect, useContext, useCallback } from "react";
 import { Form, Input, Select, InputNumber, Button, message, Modal } from "antd";
 import type { MessageInstance } from "antd/es/message/interface";
@@ -73,8 +74,8 @@ const InformationForm = ({
         const subjectsData = await SubjectService.getSubjectsByOrganization(
           user.organization._id
         );
-        console.log("Loaded subjects:", subjectsData);
-        console.log("First subject ID:", subjectsData[0]?._id);
+        // console.log("Loaded subjects:", subjectsData);
+        // console.log("First subject ID:", subjectsData[0]?._id);
         setSubjects(subjectsData);
       } catch (error) {
         console.error("Error loading subjects:", error);
@@ -140,7 +141,7 @@ const InformationForm = ({
       // Auto-fill page count if available
       if (fileInfo.pageCount && fileInfo.pageCount > 0) {
         formValues.pageCount = fileInfo.pageCount;
-        console.log("Auto-filled page count:", fileInfo.pageCount);
+        // console.log("Auto-filled page count:", fileInfo.pageCount);
       }
 
       form.setFieldsValue(formValues);
@@ -233,8 +234,8 @@ const InformationForm = ({
     // - Nếu thành công (status 201), gửi notification đến admin, reset form, gọi onUploadSuccess, navigate đến /personal-posts
     // - Xử lý lỗi: hiển thị message error dựa trên response status (401, 403, 404, etc.)
     // Tham số: values - dữ liệu từ form (FormData interface)
-    console.log("Form values received:", values);
-    console.log("Subject value:", values.subject);
+    // console.log("Form values received:", values);
+    // console.log("Subject value:", values.subject);
 
     if (!fileInfo) {
       message.error("Vui lòng tải lên file trước khi đăng tải!");
@@ -272,21 +273,21 @@ const InformationForm = ({
         cover_page: fileInfo.thumbnail,
       };
 
-      console.log("Document data being submitted:", documentData);
-      console.log("Original file URL:", fileInfo.url);
-      console.log("Thumbnail URL (for display):", fileInfo.thumbnail);
+      // console.log("Document data being submitted:", documentData);
+      // console.log("Original file URL:", fileInfo.url);
+      // console.log("Thumbnail URL (for display):", fileInfo.thumbnail);
 
       const response = await DocumentService.uploadDocument(documentData);
 
       // Kiểm tra status 201 để xác nhận tải lên thành công
-      console.log("Upload response:", response);
+      // console.log("Upload response:", response);
       if (response.status === 201) {
         // Sử dụng messageApi được truyền từ parent hoặc fallback về message global
         const showMessage = messageApi || message;
 
         showMessage.success("🎉 Đăng tải tài liệu thành công!");
 
-        console.log("Uploaded document ID:", response.document._id);
+        // console.log("Uploaded document ID:", response.document._id);
         // Gửi thông báo đến admin sau khi tải tài liệu thành công
         try {
           const senderName =
@@ -300,7 +301,7 @@ const InformationForm = ({
             message: `Tài liệu mới đã được tải lên: ${values.documentName} bởi ${senderName} (ID: ${senderId})`,
             docId: response.document._id, // ID tài liệu mới
           });
-          console.log("Thông báo đã được gửi đến admin.");
+          // console.log("Thông báo đã được gửi đến admin.");
         } catch (notificationError) {
           console.error(
             "Không thể gửi thông báo đến admin:",
@@ -342,7 +343,7 @@ const InformationForm = ({
   };
 
   const onFinishFailed = (errorInfo: unknown) => {
-    console.log("Failed:", errorInfo);
+    // console.log("Failed:", errorInfo);
     message.error("Vui lòng kiểm tra lại thông tin!");
   };
 
@@ -491,7 +492,7 @@ const InformationForm = ({
                     }
                     style={{ flex: 1 }}
                     onChange={(value) => {
-                      console.log("Subject selected:", value);
+                      // console.log("Subject selected:", value);
                       form.setFieldsValue({ subject: value });
                     }}
                   >

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { useState, useEffect, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { message, Table, Button, Card, Avatar, Tag } from "antd";
@@ -28,9 +29,9 @@ const OrganizationDetailPage: React.FC = () => {
     try {
       const org = await OrganizationService.getOrganizationById(id);
       setOrganization(org);
-      console.log("Loaded organization:", org);
+      // console.log("Loaded organization:", org);
     } catch (error) {
-      console.error("Error loading organization:", error);
+      // console.error("Error loading organization:", error);
       messageApi.error("Không thể tải thông tin tổ chức");
     } finally {
       setLoading(false);

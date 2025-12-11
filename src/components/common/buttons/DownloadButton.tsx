@@ -29,7 +29,7 @@ const DownloadButton: React.FC<DownloadButtonProps> = ({
 
   // First click - show confirmation
   const handleDownloadClick = () => {
-    console.log("Download button clicked, documentId:", documentId);
+    // console.log("Download button clicked, documentId:", documentId);
 
     if (!documentId) {
       message.error("Không tìm thấy ID tài liệu!");
@@ -41,7 +41,7 @@ const DownloadButton: React.FC<DownloadButtonProps> = ({
 
   // After confirmation - create download link
   const handleConfirmDownload = async () => {
-    console.log("Confirming download for documentId:", documentId);
+    // console.log("Confirming download for documentId:", documentId);
 
     setConfirmModalVisible(false);
     resetModalState(); // Reset all states
@@ -59,13 +59,13 @@ const DownloadButton: React.FC<DownloadButtonProps> = ({
       setModalVisible(true);
 
       // Call API to create download link
-      console.log("Calling API to create download link...");
+      // console.log("Calling API to create download link...");
       const response = await DocumentService.createDownloadLink(documentId);
 
-      console.log("Download link response:", response);
+      // console.log("Download link response:", response);
 
       // Debug: Log all available keys
-      console.log("Available response keys:", Object.keys(response));
+      // console.log("Available response keys:", Object.keys(response));
 
       // Hide loading message
       message.destroy("download-loading");
@@ -103,7 +103,7 @@ const DownloadButton: React.FC<DownloadButtonProps> = ({
         const status = error.response.status;
         const responseData = error.response.data;
 
-        console.log("API Error details:", { status, responseData });
+        // console.log("API Error details:", { status, responseData });
 
         switch (status) {
           case 401:
@@ -127,7 +127,7 @@ const DownloadButton: React.FC<DownloadButtonProps> = ({
         errorMsg = error.message;
       }
 
-      console.log("Setting error message:", errorMsg);
+      // console.log("Setting error message:", errorMsg);
       setErrorMessage(errorMsg);
 
       // Also show toast message

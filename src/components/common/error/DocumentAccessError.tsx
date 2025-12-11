@@ -86,7 +86,7 @@ const DocumentAccessError: React.FC<DocumentAccessErrorProps> = ({
                 className="text-blue-500 hover:underline"
                 onClick={() => {
                   // TODO: Implement contact support
-                  console.log("Contact support");
+                  // console.log("Contact support");
                 }}
               >
                 liên hệ hỗ trợ
