@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState, useEffect, useContext, useCallback } from "react";
 import {
@@ -153,7 +154,7 @@ const EditInformationForm = ({
           error.response?.status === 404 ||
           error.message?.includes("không tồn tại")
         ) {
-          console.log("No existing edit document found");
+          // console.log("No existing edit document found");
         } else {
           console.error("Error loading edit document:", error);
         }
@@ -170,7 +171,7 @@ const EditInformationForm = ({
     return () => {
       isMounted = false;
     };
-  }, [document._id]);
+  }, [document._id, document.public_mode, form]);
 
   // Ensure form is updated when both document and subjects are available
   // Only apply this if we don't have edit data to avoid conflicts
@@ -188,12 +189,12 @@ const EditInformationForm = ({
 
       // Check if the subject exists in the loaded subjects
       const subjectExists = subjects.find((s) => s._id === subjectId);
-      console.log("Subject exists in list:", subjectExists);
+      // console.log("Subject exists in list:", subjectExists);
 
       if (subjectExists) {
         // Force update the subject field specifically
         form.setFieldValue("subject", subjectId);
-        console.log("Force set subject field to:", subjectId);
+        // console.log("Force set subject field to:", subjectId);
       }
     }
   }, [document, subjects, subjectsLoading, form, existingEditDocument]);
@@ -207,15 +208,15 @@ const EditInformationForm = ({
       !existingEditDocument &&
       !formInitialized
     ) {
-      console.log("Setting form values with document:", document);
-      console.log("Available subjects:", subjects);
+      // console.log("Setting form values with document:", document);
+      // console.log("Available subjects:", subjects);
 
       const subjectId =
         typeof document.subject === "object"
           ? document.subject._id
           : document.subject;
 
-      console.log("Document subject ID:", subjectId);
+      // console.log("Document subject ID:", subjectId);
 
       const formValues: Partial<FormData> = {
         documentName: document.title,
@@ -240,7 +241,7 @@ const EditInformationForm = ({
       setAuthors(documentAuthors);
       formValues.authors = documentAuthors;
 
-      console.log("Setting form values:", formValues);
+      // console.log("Setting form values:", formValues);
       form.setFieldsValue(formValues);
       setCoverImage(document.cover_page || "");
       setFormInitialized(true);
@@ -358,7 +359,7 @@ const EditInformationForm = ({
         file_type: document.file_type,
       };
 
-      console.log("Edit document data:", editData);
+      // console.log("Edit document data:", editData);
 
       // Call the create/edit document API (this will create or update existing edit)
       await DocumentService.createEditDocument(document._id, editData);
@@ -393,8 +394,8 @@ const EditInformationForm = ({
     }
   };
 
-  const onFinishFailed = (errorInfo: unknown) => {
-    console.log("Failed:", errorInfo);
+  const onFinishFailed = () => {
+    // console.log("Failed:");
     message.error("Vui lòng kiểm tra lại thông tin!");
   };
 
@@ -541,7 +542,7 @@ const EditInformationForm = ({
                     }
                     style={{ flex: 1 }}
                     onChange={(value) => {
-                      console.log("Subject selected:", value);
+                      // console.log("Subject selected:", value);
                       form.setFieldValue("subject", value);
                     }}
                     loading={subjectsLoading}

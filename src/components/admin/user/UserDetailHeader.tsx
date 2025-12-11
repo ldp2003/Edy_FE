@@ -18,7 +18,7 @@ const UserDetailHeader: React.FC<UserDetailHeaderProps> = ({
   onToggleStatus,
   // onChangeStatus,
 }) => {
-  console.log("Rendering UserDetailHeader with user:", user);
+  // console.log("Rendering UserDetailHeader with user:", user);
   return (
     <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4 md:mb-6">
       <div className="flex items-center space-x-2 md:space-x-4">

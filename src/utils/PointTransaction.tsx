@@ -19,7 +19,7 @@ export const PointTransactionService = {
         userId,
         params
       );
-      console.log("Fetched point transaction history:", response);
+      // console.log("Fetched point transaction history:", response);
       return response;
     } catch (error) {
       console.error(
@@ -38,7 +38,7 @@ export const PointTransactionService = {
   async spendPoints(data: { amount: number; reason: string }) {
     try {
       const response = await PointTransactionAPI.spendPoints(data);
-      console.log("Spent points:", response);
+      // console.log("Spent points:", response);
       return response;
     } catch (error) {
       console.error("Error in PointTransactionService.spendPoints:", error);

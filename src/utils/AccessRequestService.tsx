@@ -64,7 +64,7 @@ const AccessRequestService = {
           have_next: response.have_next || false,
           privateShare: response.privateShare,
         };
-        console.log("🔄 Mapped Response:", result);
+        // console.log("🔄 Mapped Response:", result);
         return result;
       }
 
@@ -292,21 +292,21 @@ const AccessRequestService = {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   debugApiResponse(response: any, context: string = "API Response"): void {
     console.group(`🔍 ${context}`);
-    console.log("Full Response:", response);
-    console.log("Response Keys:", Object.keys(response || {}));
+    // console.log("Full Response:", response);
+    // console.log("Response Keys:", Object.keys(response || {}));
     if (response?.requests) {
-      console.log("Requests Array:", response.requests);
-      console.log("Number of Requests:", response.requests.length);
+      // console.log("Requests Array:", response.requests);
+      // console.log("Number of Requests:", response.requests.length);
       if (response.requests.length > 0) {
-        console.log("First Request Structure:", response.requests[0]);
-        console.log(
-          "First Request Keys:",
-          Object.keys(response.requests[0] || {})
-        );
+        // console.log("First Request Structure:", response.requests[0]);
+        // console.log(
+        //   "First Request Keys:",
+        //   Object.keys(response.requests[0] || {})
+        // );
       }
     }
     if (response?.privateShare) {
-      console.log("Private Share Info:", response.privateShare);
+      // console.log("Private Share Info:", response.privateShare);
     }
     console.groupEnd();
   },

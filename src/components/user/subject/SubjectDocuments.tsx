@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { Spin } from "antd";
@@ -51,7 +52,7 @@ const SubjectDocuments: React.FC = () => {
       setLoading(true);
       try {
         const response = await SubjectService.getDocumentsBySubject(subjectId);
-        console.log("Documents response:", response);
+        // console.log("Documents response:", response);
 
         // Assuming response structure matches DocumentsResponse or is an array
         const documents: Document[] = Array.isArray(response)
@@ -157,17 +158,17 @@ const SubjectDocuments: React.FC = () => {
 
   // Group by document type - use smart categorization from filename if doc_type is missing
   const documentsByType: Record<string, Document[]> = {};
-  console.log("Total documents:", documents.length);
-  documents.forEach((doc, index) => {
+  // console.log("Total documents:", documents.length);
+  documents.forEach((doc) => {
     // Use existing doc_type or determine from filename
     const docType = doc.doc_type || getDocumentTypeFromFileName(doc.title);
 
-    console.log(`Document ${index + 1}:`, {
-      title: doc.title,
-      doc_type: doc.doc_type,
-      determined_type: docType,
-      raw_document: doc, // Log toàn bộ document để debug
-    });
+    // console.log(`Document ${index + 1}:`, {
+    //   title: doc.title,
+    //   doc_type: doc.doc_type,
+    //   determined_type: docType,
+    //   raw_document: doc, // Log toàn bộ document để debug
+    // });
 
     if (!documentsByType[docType]) {
       documentsByType[docType] = [];
@@ -175,7 +176,7 @@ const SubjectDocuments: React.FC = () => {
     documentsByType[docType].push(doc);
   });
 
-  console.log("Documents by type:", documentsByType);
+  // console.log("Documents by type:", documentsByType);
 
   if (!subject) {
     return (

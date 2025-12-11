@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { Card, Upload, Progress } from "antd";
 import { CloudUpload } from "lucide-react";
 import React, { useState } from "react";
@@ -54,7 +55,7 @@ const UploadDocument: React.FC<UploadDocumentProps> = ({
         return null;
       }
 
-      console.log("Generating PDF thumbnail...");
+      // console.log("Generating PDF thumbnail...");
 
       // Convert file to ArrayBuffer
       const arrayBuffer = await file.arrayBuffer();
@@ -92,7 +93,7 @@ const UploadDocument: React.FC<UploadDocumentProps> = ({
       // Convert to JPEG with good quality
       const thumbnailDataUrl = canvas.toDataURL("image/jpeg", 0.8);
 
-      console.log("PDF thumbnail generated successfully");
+      // console.log("PDF thumbnail generated successfully");
       return thumbnailDataUrl;
     } catch (error) {
       console.error("Error creating PDF thumbnail:", error);
@@ -106,7 +107,7 @@ const UploadDocument: React.FC<UploadDocumentProps> = ({
         return null;
       }
 
-      console.log("Counting PDF pages...");
+      // console.log("Counting PDF pages...");
 
       // Convert file to ArrayBuffer
       const arrayBuffer = await file.arrayBuffer();
@@ -115,11 +116,11 @@ const UploadDocument: React.FC<UploadDocumentProps> = ({
       const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
 
       const pageCount = pdf.numPages;
-      console.log("PDF page count:", pageCount);
+      // console.log("PDF page count:", pageCount);
 
       return pageCount;
     } catch (error) {
-      console.error("Error counting PDF pages:", error);
+      // console.error("Error counting PDF pages:", error);
       return null;
     }
   };
@@ -151,7 +152,7 @@ const UploadDocument: React.FC<UploadDocumentProps> = ({
         return null;
       }
 
-      console.log("Generating Word document thumbnail...");
+      // console.log("Generating Word document thumbnail...");
 
       // Create container for rendering
       const container = document.createElement("div");
@@ -217,7 +218,7 @@ const UploadDocument: React.FC<UploadDocumentProps> = ({
         return null;
       }
 
-      console.log("Counting Word document pages...");
+      // console.log("Counting Word document pages...");
 
       // Create container for rendering
       const container = document.createElement("div");
@@ -270,10 +271,10 @@ const UploadDocument: React.FC<UploadDocumentProps> = ({
       // Clean up
       document.body.removeChild(container);
 
-      console.log("Word document page count:", pageCount);
+      // console.log("Word document page count:", pageCount);
       return pageCount;
     } catch (error) {
-      console.error("Error counting Word document pages:", error);
+      // console.error("Error counting Word document pages:", error);
       return null;
     }
   };
@@ -289,32 +290,32 @@ const UploadDocument: React.FC<UploadDocumentProps> = ({
     // - Trả về object chứa url (URL file chính), thumbnail (URL ảnh preview), pageCount (số trang)
     // Tham số: file - đối tượng File từ input upload
     // Trả về: Promise với object {url: string, thumbnail?: string, pageCount?: number}
-    console.log("Starting upload to Cloudinary...");
-    console.log("File:", file.name, file.size, file.type);
+    // console.log("Starting upload to Cloudinary...");
+    // console.log("File:", file.name, file.size, file.type);
 
     // Count pages for PDF and Word documents
     let pageCount: number | undefined;
     if (isPdfFile(file)) {
       try {
-        console.log("Counting PDF pages...");
+        // console.log("Counting PDF pages...");
         const pdfPageCount = await getPdfPageCount(file);
         if (pdfPageCount !== null) {
           pageCount = pdfPageCount;
-          console.log("PDF page count:", pageCount);
+          // console.log("PDF page count:", pageCount);
         }
       } catch (error) {
         console.error("Failed to count PDF pages:", error);
       }
     } else if (isWordDocument(file)) {
       try {
-        console.log("Counting Word document pages...");
+        // console.log("Counting Word document pages...");
         const wordPageCount = await getWordPageCount(file);
         if (wordPageCount !== null) {
           pageCount = wordPageCount;
-          console.log("Word page count:", pageCount);
+          // console.log("Word page count:", pageCount);
         }
       } catch (error) {
-        console.error("Failed to count Word pages:", error);
+        // console.error("Failed to count Word pages:", error);
       }
     }
 
@@ -322,13 +323,13 @@ const UploadDocument: React.FC<UploadDocumentProps> = ({
     let wordThumbnail: string | null = null;
     if (isWordDocument(file)) {
       try {
-        console.log("Generating Word document thumbnail...");
+        // console.log("Generating Word document thumbnail...");
         wordThumbnail = await createWordThumbnail(file);
         if (wordThumbnail) {
-          console.log("Word thumbnail generated successfully");
+          // console.log("Word thumbnail generated successfully");
         }
       } catch (error) {
-        console.error("Failed to generate Word thumbnail:", error);
+        // console.error("Failed to generate Word thumbnail:", error);
       }
     }
 
@@ -375,14 +376,14 @@ const UploadDocument: React.FC<UploadDocumentProps> = ({
       }
 
       const data = await response.json();
-      console.log("Main file upload success:", data);
+      // console.log("Main file upload success:", data);
 
       let thumbnailUrl: string | undefined;
 
       // Upload thumbnail if available
       if (wordThumbnail) {
         try {
-          console.log("Uploading Word thumbnail to Cloudinary...");
+          // console.log("Uploading Word thumbnail to Cloudinary...");
 
           const thumbnailFormData = new FormData();
           thumbnailFormData.append("file", wordThumbnail); // Upload base64 data URL directly
@@ -401,12 +402,12 @@ const UploadDocument: React.FC<UploadDocumentProps> = ({
           if (thumbnailResponse.ok) {
             const thumbnailData = await thumbnailResponse.json();
             thumbnailUrl = thumbnailData.secure_url;
-            console.log("Thumbnail uploaded successfully:", thumbnailUrl);
+            // console.log("Thumbnail uploaded successfully:", thumbnailUrl);
           } else {
-            console.error("Failed to upload thumbnail");
+            // console.error("Failed to upload thumbnail");
           }
         } catch (error) {
-          console.error("Error uploading thumbnail:", error);
+          // console.error("Error uploading thumbnail:", error);
         }
       }
 
@@ -483,7 +484,7 @@ const UploadDocument: React.FC<UploadDocumentProps> = ({
 
     try {
       const uploadResult = await uploadToCloudinary(file as File);
-      console.log("Upload result:", uploadResult);
+      // console.log("Upload result:", uploadResult);
       const fileInfo = {
         url: uploadResult.url,
         originalName: (file as File).name,

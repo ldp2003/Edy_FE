@@ -103,7 +103,7 @@ const DocumentReview: React.FC<DocumentReviewProps> = ({
           setDocumentRequest(docReq || null);
         }
 
-        console.log("Loaded requests:", { documentRequest });
+        // console.log("Loaded requests:", { documentRequest });
       } catch (error) {
         console.error("Error loading pending requests:", error);
         messageApi.error("Không thể tải thông tin requests!");

@@ -48,9 +48,9 @@ const UploadPage: React.FC = () => {
       }
 
       if (uploadedFileUrl && isUploading) {
-        console.log(
-          "Component unmounting with uploaded file, cleanup may be needed"
-        );
+        // console.log(
+        //   "Component unmounting with uploaded file, cleanup may be needed"
+        // );
       }
     };
   }, [uploadedFileUrl, isUploading, cleanupTimer]);
@@ -94,7 +94,7 @@ const UploadPage: React.FC = () => {
     const timer = window.setTimeout(async () => {
       try {
         await CloudinaryService.deleteFile(currentUrl);
-        console.log("Auto-cleanup: Deleted uploaded file after timeout");
+        // console.log("Auto-cleanup: Deleted uploaded file after timeout");
       } catch (error) {
         console.error("Auto-cleanup failed:", error);
       }

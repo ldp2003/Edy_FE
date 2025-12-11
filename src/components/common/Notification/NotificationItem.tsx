@@ -56,13 +56,14 @@ const NotificationItem: React.FC<NotificationItemProps> = ({
             docId ?? ""
           }?comment=${cmtId}`;
           break;
-        case "USER":
+        case "USER": {
           const userId =
             typeof notification.user === "string"
               ? notification.user
               : notification.user._id;
           targetPath = `/user/${userId}`;
           break;
+        }
         case "POINT":
           targetPath = "/point-management?showHistory=true";
           break;
@@ -74,7 +75,7 @@ const NotificationItem: React.FC<NotificationItemProps> = ({
       }
     }
 
-    console.log("targetPath", targetPath);
+    // console.log("targetPath", targetPath);
     if (targetPath) {
       navigate(targetPath);
     }

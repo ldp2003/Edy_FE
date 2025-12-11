@@ -31,7 +31,7 @@ export function AdminSidebar({ isVisible, setIsVisible }: AdminSidebarProps) {
   };
 
   return (
-    console.log("Rendering AdminSidebar with user:", user),
+    // console.log("Rendering AdminSidebar with user:", user),
     (
       <aside
         className={`border-r border-gray-200 bg-white transition-all h-full duration-300 flex flex-col relative ${

@@ -17,10 +17,8 @@ import {
   Cell,
 } from "recharts";
 import { AdminUserStatisticsService } from "../../../utils/AdminUserStatisticsService";
-import { UserService } from "../../../utils/UserService";
 import { message } from "antd";
 import { useNavigate } from "react-router-dom";
-import type { User } from "../../../models/user";
 import { AdminBreadcrumb } from "../../../components/admin/common/AdminBreadcrumb";
 
 interface StatisticsData {
@@ -47,7 +45,7 @@ const UserStatisticsPage: React.FC = () => {
   const [statisticsData, setStatisticsData] = useState<StatisticsData | null>(
     null
   );
-  const [usersList, setUsersList] = useState<User[]>([]);
+  // const [usersList, setUsersList] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedYear, setSelectedYear] = useState<number>(
@@ -73,7 +71,7 @@ const UserStatisticsPage: React.FC = () => {
           });
         // API returns data in the format: { year, stats: {...}, monthlyStats: [...] }
         const apiData = statsResponse;
-        console.log("Processing stats data:", apiData);
+        // console.log("Processing stats data:", apiData);
         const processedData = {
           ...apiData?.stats,
           monthlyNewUsers:
@@ -82,21 +80,14 @@ const UserStatisticsPage: React.FC = () => {
               newUsers: item.newUsers,
             })) || [],
         };
-        console.log("Setting statistics data:", processedData);
+        // console.log("Setting statistics data:", processedData);
         setStatisticsData(processedData);
-
-        // Fetch users list using UserService (same as AdminUserTable)
-        const usersResponse = await UserService.getAllUsers();
-        const usersData = usersResponse;
-        console.log("Processing users data:", usersData);
-        setUsersList(Array.isArray(usersData) ? usersData : []);
       } catch (err) {
         console.error("Error fetching user statistics:", err);
         setError("Không thể tải dữ liệu thống kê người dùng");
         message.error("Không thể tải dữ liệu thống kê người dùng");
         // Set empty data on error
         setStatisticsData(null);
-        setUsersList([]);
       } finally {
         setLoading(false);
       }
@@ -136,22 +127,6 @@ const UserStatisticsPage: React.FC = () => {
       setSyncLoading(false);
     }
   };
-
-  const filteredUsers = (usersList || []).filter(
-    (user: User) =>
-      `${user.first_name || ""} ${user.last_name || ""}`
-        .toLowerCase()
-        .includes(searchTerm.toLowerCase()) ||
-      user.contact_email?.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
-  console.log("Current state:", {
-    statisticsData,
-    usersList: usersList?.length,
-    filteredUsers: filteredUsers.length,
-    loading,
-    error,
-  });
 
   // Prepare pie chart data
   const pieChartData = [

@@ -325,14 +325,14 @@ const AdminDocumentTable: React.FC = () => {
 
   // Handle document selection
   const handleSelectDocument = (documentId: string, checked: boolean) => {
-    console.log("handleSelectDocument called:", documentId, checked);
+    // console.log("handleSelectDocument called:", documentId, checked);
     const newSelected = new Set(selectedDocuments);
     if (checked) {
       newSelected.add(documentId);
     } else {
       newSelected.delete(documentId);
     }
-    console.log("New selected documents:", newSelected.size);
+    // console.log("New selected documents:", newSelected.size);
     setSelectedDocuments(newSelected);
     setSelectAll(newSelected.size === documents.length && documents.length > 0);
   };
@@ -350,13 +350,13 @@ const AdminDocumentTable: React.FC = () => {
 
   // Handle bulk delete
   const handleBulkDelete = async () => {
-    console.log("handleBulkDelete called, selected:", selectedDocuments.size);
+    // console.log("handleBulkDelete called, selected:", selectedDocuments.size);
     if (selectedDocuments.size === 0) {
       message.warning("Vui lòng chọn ít nhất một tài liệu để xóa!");
       return;
     }
 
-    console.log("About to show modal");
+    // console.log("About to show modal");
     setShowDeleteModal(true);
   };
 
@@ -364,7 +364,7 @@ const AdminDocumentTable: React.FC = () => {
   const confirmBulkDelete = async () => {
     try {
       const documentIds = Array.from(selectedDocuments);
-      console.log("Deleting documents:", documentIds);
+      // console.log("Deleting documents:", documentIds);
       await DocumentService.deleteDocuments(
         documentIds,
         "Tài liệu quá cũ, không còn phù hợp nữa."
@@ -814,12 +814,12 @@ const AdminDocumentTable: React.FC = () => {
     visibleColumns.has(column.key as string)
   );
 
-  console.log("Visible columns:", [...visibleColumns]);
-  console.log("Filtered columns count:", filteredColumns.length);
-  console.log(
-    "Has checkbox column:",
-    filteredColumns.some((col) => col.key === "checkbox")
-  );
+  // console.log("Visible columns:", [...visibleColumns]);
+  // console.log("Filtered columns count:", filteredColumns.length);
+  // console.log(
+  //   "Has checkbox column:",
+  //   filteredColumns.some((col) => col.key === "checkbox")
+  // );
 
   // Column options for visibility toggle
   const columnOptions = [

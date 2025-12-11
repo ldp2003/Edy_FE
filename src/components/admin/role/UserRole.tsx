@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from "react";
-import type { Role } from "../../../models/role";
 import { USER_ROLES } from "../../../constants/RoleConstants";
 import LoadingScreen from "../../common/LoadingScreen";
 
 const UserRole: React.FC = () => {
-  const [roles, setRoles] = useState<Role[]>([]);
+  // const [roles, setRoles] = useState<Role[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -12,9 +11,9 @@ const UserRole: React.FC = () => {
     const fetchRoles = async () => {
       try {
         // Simulate API call
-        console.log("Fetching roles...", roles);
+        // console.log("Fetching roles...");
         setTimeout(() => {
-          setRoles([]);
+          // setRoles([]);
           setLoading(false);
         }, 1000);
       } catch (error) {

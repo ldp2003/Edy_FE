@@ -94,7 +94,7 @@ const AssignmentTable: React.FC<{ selectedUser?: User }> = ({
       const response = await AssignmentService.getAllAssignments();
       // Lấy assignments từ response.data
       const assignmentData = response || [];
-      console.log("Assignment data:", assignmentData);
+      // console.log("Assignment data:", assignmentData);
       setAssignments(assignmentData);
     } catch {
       message.error("Không thể tải danh sách phân quyền");
@@ -152,7 +152,7 @@ const AssignmentTable: React.FC<{ selectedUser?: User }> = ({
     userId: string,
     userName: string
   ) => {
-    console.log("assignment.account:", { accountId, userId, userName });
+    // console.log("assignment.account:", { accountId, userId, userName });
     try {
       setLoading(true);
       await AssignmentService.revokeAllRoles(accountId);
@@ -347,7 +347,7 @@ const AssignmentTable: React.FC<{ selectedUser?: User }> = ({
 
         <div className="grid gap-4">
           {filteredAssignments.map((assignment: any) => {
-            console.log("assignment.account:", assignment.account);
+            // console.log("assignment.account:", assignment.account);
             const isSelf = isCurrentUserAssignment(assignment);
             const canSelfDisable = !isSelf;
 

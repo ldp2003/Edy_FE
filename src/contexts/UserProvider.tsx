@@ -64,7 +64,7 @@ export const UserProvider: React.FC<UserProviderProps> = ({
     if (propRefreshNotifications) {
       await propRefreshNotifications();
     } else {
-      console.log("No refresh function provided from AuthRoute");
+      // console.log("No refresh function provided from AuthRoute");
     }
   }, [propRefreshNotifications]);
 

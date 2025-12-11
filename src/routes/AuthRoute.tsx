@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useEffect, useState, useRef } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
@@ -52,7 +53,7 @@ const AuthRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   // Function to fetch notifications - wrapped in useCallback to prevent infinite loops
   const fetchNotifications = React.useCallback(async () => {
     try {
-      console.log("🔄 Fetching notifications...");
+      // console.log("🔄 Fetching notifications...");
       const notificationRes = await NotificationService.getNotifications({
         page: 1,
         limit: 50,
@@ -63,16 +64,16 @@ const AuthRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
         (notification) => !notification.isRead
       ).length;
       setUnreadCount(unread);
-      console.log(
-        "✅ Fetched notifications:",
-        notificationRes.notifications.length,
-        "items"
-      );
+      // console.log(
+      //   "✅ Fetched notifications:",
+      //   notificationRes.notifications.length,
+      //   "items"
+      // );
     } catch (notifError) {
-      console.warn(
-        "⚠️ Failed to get notifications (non-critical):",
-        notifError
-      );
+      // console.warn(
+      //   "⚠️ Failed to get notifications (non-critical):",
+      //   notifError
+      // );
     }
   }, []);
 
@@ -121,15 +122,14 @@ const AuthRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
         // Kiểm tra có token hợp lệ không trước khi refresh
         try {
           // await refreshToken(); // Chỉ refresh nếu có token
-          // eslint-disable-next-line @typescript-eslint/no-unused-vars
         } catch (refreshError) {
-          console.log("🔄 Token refresh failed, proceeding without refresh");
+          // console.log("🔄 Token refresh failed, proceeding without refresh");
           // Không throw error, tiếp tục với getCurrentUser()
         }
 
         // Luôn gọi getCurrentUser() để kiểm tra trạng thái auth
         const data = await getCurrentUser();
-        console.log("🔍 Current user data:", data);
+        // console.log("🔍 Current user data:", data);
         if (data) {
           setIsLoggedIn(true);
           setUser(data.user);
@@ -137,11 +137,11 @@ const AuthRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
           setAccount(data.account);
           setRoles(data.roles || []);
           setPermissions(data.user.permissions || []);
-          console.log("Permissions set to:", data.user.permissions || []);
+          // console.log("Permissions set to:", data.user.permissions || []);
 
           // Check if user is banned
           if (data.user.status === "BANNED") {
-            console.log("🚫 User is banned, redirecting to banned page");
+            // console.log("🚫 User is banned, redirecting to banned page");
             navigate("/banned");
             setIsLoading(false);
             return; // Exit early to prevent further processing
@@ -160,7 +160,7 @@ const AuthRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
             })
           );
           setReadHistory(userReadHistory);
-          console.log("📚 User Read History:", userReadHistory.length, "items");
+          // console.log("📚 User Read History:", userReadHistory.length, "items");
 
           // Get shared documents from user data (populated with full document objects)
           const rawSharedDocs = data.user?.shared_documents || [];
@@ -183,14 +183,14 @@ const AuthRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 
             // Try to get favorites, but don't fail if it errors
             try {
-              console.log("🔄 Getting favorite documents...");
+              // console.log("🔄 Getting favorite documents...");
               const favoriteRes = await UserService.getListFavorites();
               const favoriteDocuments = favoriteRes?.documents || [];
-              console.log(
-                "✅ Got favorite documents:",
-                favoriteDocuments.length,
-                "items"
-              );
+              // console.log(
+              //   "✅ Got favorite documents:",
+              //   favoriteDocuments.length,
+              //   "items"
+              // );
               setFavoriteDocuments(favoriteDocuments);
             } catch (favError) {
               console.warn(
@@ -206,10 +206,10 @@ const AuthRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
           }
 
           // Debug user verification status
-          console.log("🔍 Checking verification status:");
-          console.log("  - data.roles:", data.roles);
-          console.log("  - data.account:", data.account);
-          console.log("  - data.user:", data.user);
+          // console.log("🔍 Checking verification status:");
+          // console.log("  - data.roles:", data.roles);
+          // console.log("  - data.account:", data.account);
+          // console.log("  - data.user:", data.user);
 
           // Check if user needs account activation
           const needsVerification =
@@ -218,19 +218,19 @@ const AuthRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
               data.roles.includes("NOT_VERIFY") ||
               data.roles.includes("PENDING_VERIFICATION"));
 
-          console.log("  - needsVerification:", needsVerification);
+          // console.log("  - needsVerification:", needsVerification);
 
           if (needsVerification) {
-            console.log(
-              "➡️ User needs verification, redirecting to activation page"
-            );
+            // console.log(
+            //   "➡️ User needs verification, redirecting to activation page"
+            // );
             // Only redirect if not already on activation page
             if (location.pathname !== "/account-activation") {
               navigate("/account-activation");
               return; // Exit early to avoid further processing
             }
           } else {
-            console.log("✅ User is verified, proceeding with role checks");
+            // console.log("✅ User is verified, proceeding with role checks");
             // Check if user has any admin role
             const adminRoles = [
               ROLE_CODES.SUPER_ADMIN,
@@ -275,9 +275,9 @@ const AuthRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
           setUnreadCount(0);
 
           // Không hiển thị modal ở đây, để navigation check xử lý
-          console.log(
-            "🔐 User not authenticated, navigation check will handle modal display"
-          );
+          // console.log(
+          //   "🔐 User not authenticated, navigation check will handle modal display"
+          // );
         }
       } catch (error) {
         console.error("❌ Error during auth check:", error);
@@ -301,9 +301,9 @@ const AuthRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 
           // Handle specific error cases
           if (axiosError.response?.status === 403) {
-            console.log(
-              "🔐 403 Forbidden - Token expired, invalid, or account not verified"
-            );
+            // console.log(
+            //   "🔐 403 Forbidden - Token expired, invalid, or account not verified"
+            // );
 
             // Check if error message indicates account not verified
             const errorData = axiosError.response.data as {
@@ -315,9 +315,9 @@ const AuthRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
               errorData?.message?.includes("NOT_VERIFIED") ||
               errorData?.code === "ACCOUNT_NOT_VERIFIED"
             ) {
-              console.log(
-                "📧 Account needs verification - redirecting to activation page"
-              );
+              // console.log(
+              //   "📧 Account needs verification - redirecting to activation page"
+              // );
               if (location.pathname !== "/account-activation") {
                 navigate("/account-activation");
                 return; // Exit early to avoid further processing
@@ -330,7 +330,7 @@ const AuthRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
               errorData?.message?.includes("BANNED") ||
               errorData?.code === "ACCOUNT_BANNED"
             ) {
-              console.log("🚫 Account is banned - redirecting to banned page");
+              // console.log("🚫 Account is banned - redirecting to banned page");
               navigate("/banned");
               setIsLoading(false);
               return; // Exit early to avoid further processing
@@ -339,9 +339,9 @@ const AuthRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
             // Clear any stored tokens/cookies here if needed
             // deleteCookie("token"); // if you store token in cookies
           } else if (axiosError.response?.status === 401) {
-            console.log("🔐 401 Unauthorized - User not authenticated");
+            // console.log("🔐 401 Unauthorized - User not authenticated");
           } else if (axiosError.response?.status === 500) {
-            console.log("🔴 500 Server Error - Backend issue");
+            // console.log("🔴 500 Server Error - Backend issue");
           }
         }
 
@@ -355,9 +355,9 @@ const AuthRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
         setSharedDocuments([]);
 
         // Không hiển thị modal ở đây, để navigation check xử lý
-        console.log(
-          "🔐 Auth failed, navigation check will handle modal display"
-        );
+        // console.log(
+        //   "🔐 Auth failed, navigation check will handle modal display"
+        // );
       } finally {
         setIsLoading(false);
         initialAuthCheckCompleted.current = true; // Đánh dấu đã hoàn thành initial check
@@ -384,12 +384,12 @@ const AuthRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
           const isCurrentPagePublic = isPublicPage(currentPath);
 
           if (!isCurrentPagePublic) {
-            console.log(
-              "🔐 Navigation to protected page without login, showing modal"
-            );
+            // console.log(
+            //   "🔐 Navigation to protected page without login, showing modal"
+            // );
             setShowLoginModal(true);
           } else {
-            console.log("📄 Navigation to public page, allowing access");
+            // console.log("📄 Navigation to public page, allowing access");
             setShowLoginModal(false);
           }
         } else {
