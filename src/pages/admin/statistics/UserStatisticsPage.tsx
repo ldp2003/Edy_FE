@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { useState, useEffect } from "react";
 import { ChevronDown, Search, RefreshCw, Users } from "lucide-react";
 import {
@@ -18,10 +17,8 @@ import {
   Cell,
 } from "recharts";
 import { AdminUserStatisticsService } from "../../../utils/AdminUserStatisticsService";
-import { UserService } from "../../../utils/UserService";
 import { message } from "antd";
 import { useNavigate } from "react-router-dom";
-import type { User } from "../../../models/user";
 import { AdminBreadcrumb } from "../../../components/admin/common/AdminBreadcrumb";
 
 interface StatisticsData {
