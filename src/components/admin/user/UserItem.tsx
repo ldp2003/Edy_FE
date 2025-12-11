@@ -101,6 +101,19 @@ const UserItem: React.FC<UserItemProps> = ({
               >
                 {statusText}
               </span>
+
+              {/* <Select
+                value={user.status}
+                onChange={(value) => onChangeUserStatus(user._id, value)}
+                size="small"
+                style={{ width: 100 }}
+                disabled={user._id === currentUserId}
+              >
+                <Select.Option value="ACTIVE">Hoạt động</Select.Option>
+                <Select.Option value="INACTIVE">Không hoạt động</Select.Option>
+                <Select.Option value="BANNED">Bị khóa</Select.Option>
+              </Select> */}
+
             </div>
 
             {/* Email và thông tin cơ bản */}
