@@ -16,7 +16,7 @@ export const MobileSidebar: React.FC<MobileSidebarProps> = ({
     <>
       {/* Overlay */}
       <div
-        className={`fixed inset-0 bg-black/50 transition-opacity duration-300 lg:hidden ${
+        className={`fixed inset-0 bg-black/50 transition-opacity duration-300 lg:hidden z-[90] ${
           isVisible ? "opacity-100" : "opacity-0 pointer-events-none"
         }`}
         onClick={onClose}
@@ -24,7 +24,7 @@ export const MobileSidebar: React.FC<MobileSidebarProps> = ({
 
       {/* Sidebar */}
       <div
-        className={`fixed top-0 left-0 h-full w-[280px] bg-white shadow-xl transition-transform duration-300 ease-in-out transform lg:hidden z-[80] ${
+        className={`fixed top-0 left-0 h-full w-[280px] bg-white shadow-xl transition-transform duration-300 ease-in-out transform lg:hidden z-[100] ${
           isVisible ? "translate-x-0" : "-translate-x-full"
         }`}
       >

@@ -44,6 +44,7 @@ const PostTable: React.FC<PostTableProps> = ({
 }) => {
   const navigate = useNavigate();
   const [messageApi, contextHolder] = message.useMessage();
+  const [isMobile, setIsMobile] = useState(false);
 
   // State for delete functionality
   const [confirmModalVisible, setConfirmModalVisible] = useState(false);
@@ -73,6 +74,13 @@ const PostTable: React.FC<PostTableProps> = ({
   useEffect(() => {
     setUpdatedData(data);
   }, [data]);
+
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 1024);
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
 
   // Save column visibility to localStorage
   const saveColumnVisibility = (columns: Set<string>) => {
@@ -156,7 +164,7 @@ const PostTable: React.FC<PostTableProps> = ({
       key: "index",
       align: "center",
       width: 60,
-      fixed: true,
+      fixed: isMobile ? false : true,
       responsive: ["md"],
       render: (_: unknown, __: Document, index: number) => {
         return (currentPage - 1) * pageSize + index + 1;
@@ -166,7 +174,7 @@ const PostTable: React.FC<PostTableProps> = ({
       title: "Tên tài liệu",
       dataIndex: "title",
       key: "title",
-      fixed: "left",
+      fixed: isMobile ? false : "left",
       className: "text-xs",
       width: 300,
       sorter: (a, b) => a.title.localeCompare(b.title),
@@ -529,7 +537,7 @@ const PostTable: React.FC<PostTableProps> = ({
       key: "action",
       align: "center",
       width: 120,
-      fixed: "right",
+      fixed: isMobile ? false : "right",
       render: (_, record) => {
         const isRejected = record.status === "REJECTED";
         const isPendingApproval =
@@ -761,7 +769,7 @@ const PostTable: React.FC<PostTableProps> = ({
       {contextHolder}
       <div className="w-full">
         {/* Table Header with Column Visibility Controls */}
-        <div className="flex justify-between items-center mb-4">
+        <div className="flex justify-between items-center mb-4 z-0">
           <h3 className="text-lg font-medium text-[var(--primary-text-color)]">
             Danh sách tài liệu cá nhân
           </h3>
@@ -781,7 +789,7 @@ const PostTable: React.FC<PostTableProps> = ({
         </div>
 
         {/* Desktop Table View - Hidden on mobile */}
-        <div className="hidden md:block rounded-md overflow-hidden border border-[rgba(0,0,0,0.2)]">
+        <div className="hidden md:block rounded-md overflow-hidden border border-[rgba(0,0,0,0.2)] z-0">
           <Table
             columns={filteredColumns}
             dataSource={displayData}
