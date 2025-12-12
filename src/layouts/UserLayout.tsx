@@ -24,12 +24,13 @@ const UserLayout: React.FC = () => {
   // Set sidebar visibility based on screen size
   useEffect(() => {
     const handleResize = () => {
-      const isMobile = window.innerWidth < 1024;
+      const isMobile = window.innerWidth < 1280;
       setIsSidebarVisible(!isMobile);
       if (!isMobile) {
         setIsMobileSidebarVisible(false);
       }
     };
+    console.log("isMobile:", window.innerWidth);
 
     // Set initial value
     handleResize();
@@ -42,7 +43,7 @@ const UserLayout: React.FC = () => {
   }, []);
 
   const handleMenuToggle = () => {
-    const isMobile = window.innerWidth < 1024;
+    const isMobile = window.innerWidth < 1280;
     if (isMobile) {
       setIsMobileSidebarVisible(!isMobileSidebarVisible);
     } else {
@@ -53,14 +54,14 @@ const UserLayout: React.FC = () => {
   return (
     <div className="h-screen bg-[var(--secondary-background-color)] flex flex-col overflow-hidden">
       {/* Header - cố định ở trên cùng */}
-      <div className="relative z-10 flex-shrink-0">
+      <div className="relative z-[200] flex-shrink-0">
         <Header onMenuToggle={handleMenuToggle} />
       </div>
 
       {/* Content area bên dưới header */}
       <div className="flex flex-1 overflow-hidden">
         {/* Desktop Sidebar - chỉ hiển thị trên desktop */}
-        <div className="hidden lg:block">
+        <div className="hidden z-20 lg:block">
           <Sidebar
             isVisible={isSidebarVisible}
             setIsVisible={setIsSidebarVisible}
@@ -78,8 +79,8 @@ const UserLayout: React.FC = () => {
                 isDocumentDetailPage
                   ? "" // No padding for document detail page
                   : isSidebarVisible
-                  ? "px-4 md:px-20" // Normal padding when sidebar is open
-                  : "px-4 md:px-30 lg:min-w-lg" // Center content when sidebar is closed
+                  ? "px-4 lg:px-20" // Normal padding when sidebar is open
+                  : "px-4 lg:px-30 lg:min-w-lg" // Center content when sidebar is closed
               }`}
             >
               <Outlet />

@@ -12,6 +12,7 @@ const AdminLayout: React.FC = () => {
   const [isMobileSidebarVisible, setIsMobileSidebarVisible] = useState(false);
   const location = useLocation();
   const mainRef = useRef<HTMLElement>(null);
+  console.log("isMobile:", window.innerWidth);
 
   // Scroll to top when route changes
   useEffect(() => {
@@ -23,10 +24,12 @@ const AdminLayout: React.FC = () => {
   // Set sidebar visibility based on screen size
   useEffect(() => {
     const handleResize = () => {
-      const isMobile = window.innerWidth < 1024;
+      const isMobile = window.innerWidth < 1280;
       setIsSidebarVisible(!isMobile);
+      console.log("isMobile outside:", isMobile);
       if (!isMobile) {
         setIsMobileSidebarVisible(false);
+        console.log("isMobile inside:", isMobile);
       }
     };
 
@@ -41,7 +44,7 @@ const AdminLayout: React.FC = () => {
   }, []);
 
   const handleMenuToggle = () => {
-    const isMobile = window.innerWidth < 1024;
+    const isMobile = window.innerWidth < 1280;
     if (isMobile) {
       setIsMobileSidebarVisible(!isMobileSidebarVisible);
     } else {
@@ -52,14 +55,14 @@ const AdminLayout: React.FC = () => {
   return (
     <div className="h-screen flex flex-col overflow-hidden bg-[var(--secondary-background-color)]">
       {/* Header - cố định ở trên cùng */}
-      <div className="relative z-10 flex-shrink-0">
+      <div className="relative z-[200] flex-shrink-0">
         <Header onMenuToggle={handleMenuToggle} />
       </div>
 
       {/* Content area bên dưới header */}
       <div className="flex flex-1 overflow-hidden">
         {/* Desktop Sidebar - chỉ hiển thị trên desktop */}
-        <div className="hidden lg:block">
+        <div className="hidden z-20 lg:block">
           <AdminSidebar
             isVisible={isSidebarVisible}
             setIsVisible={setIsSidebarVisible}

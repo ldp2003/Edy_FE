@@ -34,7 +34,7 @@ export function AdminSidebar({ isVisible, setIsVisible }: AdminSidebarProps) {
     // console.log("Rendering AdminSidebar with user:", user),
     (
       <aside
-        className={`border-r border-gray-200 bg-white transition-all h-full duration-300 flex flex-col relative ${
+        className={`border-r border-gray-200 bg-white transition-all h-full duration-300 flex flex-col relative z-[100] ${
           isVisible ? "w-64 flex-shrink-0" : "w-16 flex-shrink-0"
         }`}
         style={{ minHeight: "calc(100vh - 80px)" }}
@@ -46,7 +46,7 @@ export function AdminSidebar({ isVisible, setIsVisible }: AdminSidebarProps) {
           {isVisible ? (
             <PanelLeftClose className="w-3 h-3" />
           ) : (
-            <PanelLeftOpen className="w-3 h-3" />
+            <PanelLeftOpen className="w-3 h-3 z-20" />
           )}
         </button>
 

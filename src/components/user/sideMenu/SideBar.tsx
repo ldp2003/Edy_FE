@@ -21,7 +21,7 @@ export function Sidebar({ isVisible, setIsVisible }: SidebarProps) {
 
   return (
     <aside
-      className={`border-r border-gray-200 bg-white transition-all duration-300 flex flex-col relative min-h-dvh ${
+      className={`border-r z-[100] border-gray-200 bg-white transition-all duration-300 flex flex-col relative min-h-dvh ${
         isVisible ? "w-64 flex-shrink-0" : "w-16 flex-shrink-0"
       }`}
     >

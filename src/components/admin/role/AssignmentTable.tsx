@@ -63,6 +63,7 @@ const AssignmentTable: React.FC<{ selectedUser?: User }> = ({
   const [selectedAssignment, setSelectedAssignment] = useState<any>(null);
   const [messageApi, contextHolder] = message.useMessage();
   const [searchText, setSearchText] = useState("");
+  const [isMobile, setIsMobile] = useState(false);
   const { user } = useContext(UserContext);
   const currentUserId = user?._id;
 
@@ -106,6 +107,13 @@ const AssignmentTable: React.FC<{ selectedUser?: User }> = ({
 
   useEffect(() => {
     fetchAssignments();
+  }, []);
+
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 768);
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
   }, []);
 
   const handleToggleStatus = async (
@@ -265,7 +273,7 @@ const AssignmentTable: React.FC<{ selectedUser?: User }> = ({
       title: "Thao tác",
       key: "action",
       width: 120,
-      fixed: "right",
+      fixed: isMobile ? false : "right",
       align: "center",
       render: (_, record) => {
         const canSelfDisable = !isCurrentUserAssignment(record);

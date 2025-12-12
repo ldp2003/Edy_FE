@@ -1,5 +1,5 @@
-import React from 'react';
-import { X } from 'lucide-react';
+import React from "react";
+import { X } from "lucide-react";
 
 interface MobileSidebarProps {
   isVisible: boolean;
@@ -10,22 +10,22 @@ interface MobileSidebarProps {
 export const MobileSidebar: React.FC<MobileSidebarProps> = ({
   isVisible,
   onClose,
-  children
+  children,
 }) => {
   return (
     <>
       {/* Overlay */}
       <div
-        className={`fixed inset-0 bg-black/50 transition-opacity duration-300 md:hidden ${
-          isVisible ? 'opacity-100' : 'opacity-0 pointer-events-none'
+        className={`fixed inset-0 bg-black/50 transition-opacity duration-300 lg:hidden z-[90] ${
+          isVisible ? "opacity-100" : "opacity-0 pointer-events-none"
         }`}
         onClick={onClose}
       />
 
       {/* Sidebar */}
       <div
-        className={`fixed top-0 left-0 h-full w-[280px] bg-white shadow-xl transition-transform duration-300 ease-in-out transform md:hidden ${
-          isVisible ? 'translate-x-0' : '-translate-x-full'
+        className={`fixed top-0 left-0 h-full w-[280px] bg-white shadow-xl transition-transform duration-300 ease-in-out transform lg:hidden z-[100] ${
+          isVisible ? "translate-x-0" : "-translate-x-full"
         }`}
       >
         {/* Close button */}
@@ -37,9 +37,7 @@ export const MobileSidebar: React.FC<MobileSidebarProps> = ({
         </button>
 
         {/* Content */}
-        <div className="h-full pt-16 pb-20 overflow-y-auto">
-          {children}
-        </div>
+        <div className="h-full pt-16 pb-20 overflow-y-auto">{children}</div>
       </div>
     </>
   );
