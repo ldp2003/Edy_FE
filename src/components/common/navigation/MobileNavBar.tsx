@@ -26,7 +26,7 @@ export const MobileNavBar: React.FC<MobileNavBarProps> = ({
       bg-white dark:bg-gray-800 
       border-t border-gray-200 dark:border-gray-700
       py-2 px-4
-      md:hidden
+      lg:hidden
       z-20
      `}
     >

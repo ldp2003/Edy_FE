@@ -24,12 +24,13 @@ const UserLayout: React.FC = () => {
   // Set sidebar visibility based on screen size
   useEffect(() => {
     const handleResize = () => {
-      const isMobile = window.innerWidth < 1024;
+      const isMobile = window.innerWidth < 1280;
       setIsSidebarVisible(!isMobile);
       if (!isMobile) {
         setIsMobileSidebarVisible(false);
       }
     };
+    console.log("isMobile:", window.innerWidth);
 
     // Set initial value
     handleResize();
@@ -42,7 +43,7 @@ const UserLayout: React.FC = () => {
   }, []);
 
   const handleMenuToggle = () => {
-    const isMobile = window.innerWidth < 1024;
+    const isMobile = window.innerWidth < 1280;
     if (isMobile) {
       setIsMobileSidebarVisible(!isMobileSidebarVisible);
     } else {
