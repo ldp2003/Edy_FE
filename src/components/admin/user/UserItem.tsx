@@ -1,5 +1,5 @@
 import React from "react";
-import { Tag, Button, Tooltip, Popconfirm, Select } from "antd";
+import { Tag, Button, Tooltip, Popconfirm } from "antd";
 import { Edit, Lock, Unlock } from "lucide-react";
 import type { User } from "../../../models/user";
 import { getRoleDisplayName } from "../../../constants/RoleConstants";
@@ -15,8 +15,6 @@ interface UserItemProps {
   onEditUser: (userId: string) => void;
   onToggleUserStatus: (userId: string, currentStatus?: string) => void;
   onSuspendUser: (userId: string, userName: string) => void;
-  onChangeUserStatus: (userId: string, newStatus: string) => void;
-  currentUserId?: string;
 }
 
 const UserItem: React.FC<UserItemProps> = ({
@@ -25,8 +23,6 @@ const UserItem: React.FC<UserItemProps> = ({
   onEditUser,
   onToggleUserStatus,
   onSuspendUser,
-  onChangeUserStatus,
-  currentUserId,
 }) => {
   const getStatusDisplay = (status?: string) => {
     switch (status) {
@@ -105,6 +101,7 @@ const UserItem: React.FC<UserItemProps> = ({
               >
                 {statusText}
               </span>
+
               {/* <Select
                 value={user.status}
                 onChange={(value) => onChangeUserStatus(user._id, value)}
@@ -116,6 +113,7 @@ const UserItem: React.FC<UserItemProps> = ({
                 <Select.Option value="INACTIVE">Không hoạt động</Select.Option>
                 <Select.Option value="BANNED">Bị khóa</Select.Option>
               </Select> */}
+
             </div>
 
             {/* Email và thông tin cơ bản */}

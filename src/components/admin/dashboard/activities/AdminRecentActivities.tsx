@@ -7,13 +7,11 @@ const { Text } = Typography;
 interface AdminRecentActivitiesProps {
   activities: RecentActivity[] | undefined;
   loading: boolean;
-  onActivityClick: (activity: RecentActivity) => void;
 }
 
 const AdminRecentActivities: React.FC<AdminRecentActivitiesProps> = ({
   activities,
   loading,
-  onActivityClick,
 }) => {
   return (
     <div>

@@ -15,7 +15,6 @@ import {
 import AdminStatisticsService from "../../../utils/AdminStatisticsService";
 import type {
   AdminDashboardData,
-  RecentActivity,
   PendingDocument,
 } from "../../../models/AdminStatisticsModel";
 import AdminTasksToDo from "../../../components/admin/dashboard/tasks/AdminTasksToDo";
@@ -74,30 +73,6 @@ const AdminHomePage: React.FC = () => {
   // Handle task click - navigate to document review page
   const handleTaskClick = (task: PendingDocument) => {
     navigate(`/admin/documents/review/${task._id}`);
-  };
-
-  // Handle activity click - navigate based on targetType
-  const handleActivityClick = (activity: RecentActivity) => {
-    switch (activity.targetType) {
-      case "Document":
-        navigate(`/admin/documents/review/${activity.targetId}`);
-        break;
-      case "User":
-        navigate(`/admin/users`);
-        break;
-      case "Organization":
-        navigate(`/admin/organizations`);
-        break;
-      case "Subject":
-        navigate(`/admin/subjects`);
-        break;
-      case "Report":
-        navigate(`/admin/reports`);
-        break;
-      default:
-        // Default navigation or do nothing
-        break;
-    }
   };
 
   const statsCards = [
@@ -295,7 +270,6 @@ const AdminHomePage: React.FC = () => {
             <AdminRecentActivities
               activities={apiData?.recent_activities}
               loading={loading}
-              onActivityClick={handleActivityClick}
             />
           </Col>
         </Row>

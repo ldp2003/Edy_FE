@@ -480,34 +480,6 @@ const AdminUserTable: React.FC = () => {
     }
   };
 
-  const handleChangeUserStatus = async (userId: string, newStatus: string) => {
-    try {
-      await UserService.updateUserStatus(userId, newStatus);
-
-      const statusMessages = {
-        ACTIVE: "Đã kích hoạt tài khoản!",
-        BANNED: "Đã khóa tài khoản!",
-        INACTIVE: "Đã vô hiệu hóa tài khoản!",
-      };
-
-      message.success(
-        statusMessages[newStatus as keyof typeof statusMessages] ||
-          "Đã cập nhật trạng thái!"
-      );
-
-      // Refresh data
-      setUsers(
-        users.map((user) =>
-          user._id === userId
-            ? { ...user, status: newStatus as "ACTIVE" | "INACTIVE" | "BANNED" }
-            : user
-        )
-      );
-    } catch (error) {
-      console.error("Error updating user status:", error);
-      message.error("Có lỗi xảy ra khi cập nhật trạng thái!");
-    }
-  };
 
   const handleSuspendUser = (userId: string, userName: string) => {
     setSelectedUserForSuspend({ id: userId, name: userName });
@@ -1225,8 +1197,6 @@ const AdminUserTable: React.FC = () => {
                   onEditUser={handleEditUser}
                   onToggleUserStatus={handleUnsuspendUser}
                   onSuspendUser={handleSuspendUser}
-                  onChangeUserStatus={handleChangeUserStatus}
-                  currentUserId={currentUser?._id}
                 />
               ))}
             </div>
