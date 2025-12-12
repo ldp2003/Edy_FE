@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Table, Button } from "antd";
 import { EditOutlined, DeleteOutlined, SyncOutlined } from "@ant-design/icons";
 import type { ColumnsType } from "antd/es/table";
@@ -23,12 +23,21 @@ const SubjectTable: React.FC<SubjectTableProps> = ({
   onSync,
   syncingSubjects = new Set(),
 }) => {
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 768);
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
+
   const columns: ColumnsType<Subject> = [
     {
       title: "STT",
       key: "index",
       className: "text-center text-base sm:text-sm xs:text-xs",
-      fixed: "left",
+      fixed: isMobile ? false : "left",
       render: (_, __, index) => (
         <span className="text-base sm:text-sm xs:text-xs font-medium">
           {index + 1}
@@ -41,7 +50,7 @@ const SubjectTable: React.FC<SubjectTableProps> = ({
       key: "name",
       sorter: (a, b) => a.name.localeCompare(b.name),
       className: "text-left text-base sm:text-sm xs:text-xs",
-      fixed: "left",
+      fixed: isMobile ? false : "left",
       render: (name: string, record: Subject) => (
         <Button
           type="link"
@@ -58,7 +67,6 @@ const SubjectTable: React.FC<SubjectTableProps> = ({
       key: "code",
       sorter: (a, b) => a.code.localeCompare(b.code),
       className: "text-left text-base sm:text-sm xs:text-xs",
-      responsive: ["md"],
     },
     {
       title: "Mô tả",
@@ -66,7 +74,6 @@ const SubjectTable: React.FC<SubjectTableProps> = ({
       key: "description",
       ellipsis: true,
       className: "text-left text-base sm:text-sm xs:text-xs",
-      responsive: ["lg"],
     },
     {
       title: "Số tài liệu",
@@ -74,14 +81,13 @@ const SubjectTable: React.FC<SubjectTableProps> = ({
       key: "doc_count",
       sorter: (a, b) => a.doc_count - b.doc_count,
       className: "text-left text-base sm:text-sm xs:text-xs",
-      responsive: ["sm"],
     },
 
     {
       title: "Thao tác",
       key: "actions",
       className: "text-left text-base sm:text-sm xs:text-xs",
-      fixed: "right",
+      fixed: isMobile ? false : "right",
       render: (_, record) => (
         <div className="flex flex-wrap gap-2">
           <Button
@@ -91,7 +97,7 @@ const SubjectTable: React.FC<SubjectTableProps> = ({
             onClick={() => onEdit(record)}
             className="text-base sm:text-sm xs:text-xs p-0"
           >
-            Sửa
+            <span className="hidden sm:inline">Sửa</span>
           </Button>
           <Button
             type="link"
@@ -101,7 +107,7 @@ const SubjectTable: React.FC<SubjectTableProps> = ({
             onClick={() => onDelete(record._id)}
             className="text-base sm:text-sm xs:text-xs p-0"
           >
-            Xóa
+            <span className="hidden sm:inline">Xóa</span>
           </Button>
           {onSync && (
             <Button
@@ -115,7 +121,11 @@ const SubjectTable: React.FC<SubjectTableProps> = ({
               loading={syncingSubjects.has(record._id)}
               disabled={syncingSubjects.has(record._id)}
             >
-              {syncingSubjects.has(record._id) ? "Đang đồng bộ..." : "Đồng bộ"}
+              <span className="hidden sm:inline">
+                {syncingSubjects.has(record._id)
+                  ? "Đang đồng bộ..."
+                  : "Đồng bộ"}
+              </span>
             </Button>
           )}
         </div>

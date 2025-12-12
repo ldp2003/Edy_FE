@@ -73,6 +73,9 @@ const AdminDocumentTable: React.FC = () => {
     order: "ascend" | "descend" | null;
   }>({ field: null, order: null });
 
+  // Mobile detection
+  const [isMobile, setIsMobile] = useState(false);
+
   // State for column visibility
   const [visibleColumns, setVisibleColumns] = useState<Set<string>>(
     new Set([
@@ -114,6 +117,14 @@ const AdminDocumentTable: React.FC = () => {
         console.error("Error loading column visibility:", error);
       }
     }
+  }, []);
+
+  // Mobile detection effect
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 768);
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
   }, []);
 
   // Save column visibility to localStorage
@@ -421,7 +432,7 @@ const AdminDocumentTable: React.FC = () => {
       dataIndex: "checkbox",
       key: "checkbox",
       align: "center",
-      fixed: "left",
+      fixed: isMobile ? false : "left",
       width: 50,
       onHeaderCell: () => ({ style: { textAlign: "center" } }),
       render: (_, record: DocumentDisplay) => (
@@ -437,14 +448,14 @@ const AdminDocumentTable: React.FC = () => {
       dataIndex: "index",
       key: "index",
       align: "center",
-      fixed: "left",
+      fixed: isMobile ? false : "left",
       onHeaderCell: () => ({ style: { textAlign: "center" } }),
     },
     {
       title: "Tên tài liệu",
       dataIndex: "title",
       key: "title",
-      fixed: "left",
+      fixed: isMobile ? false : "left",
       width: 200,
       sorter: true,
       sortDirections: ["ascend", "descend"],
@@ -716,7 +727,10 @@ const AdminDocumentTable: React.FC = () => {
       render: (organization: { name: string }) => {
         if (!organization) return "N/A";
         return (
-          <span className="text-sm line-clamp-1 truncate max-w-52" title={organization.name}>
+          <span
+            className="text-sm line-clamp-1 truncate max-w-52"
+            title={organization.name}
+          >
             {organization.name}
           </span>
         );
@@ -727,7 +741,7 @@ const AdminDocumentTable: React.FC = () => {
       dataIndex: "status",
       key: "status",
       align: "center",
-      fixed: "right",
+      fixed: isMobile ? false : "right",
       onHeaderCell: () => ({ style: { textAlign: "center" } }),
       render: (status: string, record: DocumentDisplay) => {
         const statusLabels: { [key: string]: string } = {
@@ -932,7 +946,7 @@ const AdminDocumentTable: React.FC = () => {
           rowKey="_id"
           scroll={{ x: "max-content" }}
           bordered
-          sticky={{ offsetHeader: 0 }}
+          sticky={isMobile ? false : { offsetHeader: 0 }}
           onChange={handleTableChange}
           onRow={(record) => ({
             style: { cursor: "pointer" },

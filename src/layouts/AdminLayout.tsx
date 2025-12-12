@@ -52,14 +52,14 @@ const AdminLayout: React.FC = () => {
   return (
     <div className="h-screen flex flex-col overflow-hidden bg-[var(--secondary-background-color)]">
       {/* Header - cố định ở trên cùng */}
-      <div className="relative z-10 flex-shrink-0">
+      <div className="relative z-[200] flex-shrink-0">
         <Header onMenuToggle={handleMenuToggle} />
       </div>
 
       {/* Content area bên dưới header */}
       <div className="flex flex-1 overflow-hidden">
         {/* Desktop Sidebar - chỉ hiển thị trên desktop */}
-        <div className="hidden lg:block">
+        <div className="hidden z-20 lg:block">
           <AdminSidebar
             isVisible={isSidebarVisible}
             setIsVisible={setIsSidebarVisible}
