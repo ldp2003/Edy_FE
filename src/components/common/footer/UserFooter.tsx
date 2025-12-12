@@ -121,7 +121,7 @@ const UserFooter: React.FC = () => {
                 <span>support@gmail.com</span>
               </li>
               <li className="text-xs md:text-sm">
-                <span>+84 987 654 321</span>
+                <span>+84 3333 191 21</span>
               </li>
               <li className="text-xs md:text-sm leading-tight">
                 <span>
