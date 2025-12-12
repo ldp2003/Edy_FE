@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Table, Button } from "antd";
 import { EditOutlined } from "@ant-design/icons";
 import type { ColumnsType } from "antd/es/table";
@@ -18,12 +18,20 @@ const OrganizationTable: React.FC<OrganizationTableProps> = ({
   onEdit,
   onView,
 }) => {
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 768);
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
   const columns: ColumnsType<OrganizationDetailed> = [
     {
       title: "STT",
       key: "index",
       className: "text-center text-base sm:text-sm xs:text-xs",
-      fixed: "left",
+      fixed: isMobile ? false : "left",
       render: (_, __, index) => (
         <span className="text-base sm:text-sm xs:text-xs font-medium">
           {index + 1}
@@ -36,7 +44,7 @@ const OrganizationTable: React.FC<OrganizationTableProps> = ({
       key: "name",
       sorter: (a, b) => a.name.localeCompare(b.name),
       className: "text-left text-base sm:text-sm xs:text-xs",
-      fixed: "left",
+      fixed: isMobile ? false : "left",
       render: (name: string, record: OrganizationDetailed) => (
         <Button
           type="link"
@@ -94,7 +102,7 @@ const OrganizationTable: React.FC<OrganizationTableProps> = ({
       title: "Thao tác",
       key: "actions",
       className: "text-left text-base sm:text-sm xs:text-xs",
-      fixed: "right",
+      fixed: isMobile ? false : "right",
       render: (_, record) => (
         <div className="flex flex-wrap gap-2">
           <Button
