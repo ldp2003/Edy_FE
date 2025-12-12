@@ -66,6 +66,7 @@ const AdminRoleTable: React.FC = () => {
   );
   const [drawerVisible, setDrawerVisible] = useState(false);
   const [form] = Form.useForm();
+  const [isMobile, setIsMobile] = useState(false);
 
   const fetchRoles = async (params?: {
     page?: number;
@@ -144,6 +145,13 @@ const AdminRoleTable: React.FC = () => {
     }
   }, [searchParams]);
 
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 768);
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
+
   const updateURL = (params: {
     page?: number;
     limit?: number;
@@ -220,7 +228,7 @@ const AdminRoleTable: React.FC = () => {
       key: "index",
       align: "center",
       width: 60,
-      fixed: "left",
+      fixed: isMobile ? false : "left",
     },
     {
       title: "Tên",
@@ -233,7 +241,7 @@ const AdminRoleTable: React.FC = () => {
       dataIndex: "code",
       key: "code",
       width: 150,
-      fixed: "left",
+      fixed: isMobile ? false : "left",
       render: (code: string) => (
         <span className="font-semibold text-xs">
           {code == "CUSTOM_ROLE" ? "Quyền tùy chỉnh" : code}
@@ -291,7 +299,7 @@ const AdminRoleTable: React.FC = () => {
       key: "actions",
       align: "center",
       width: 120,
-      fixed: "right",
+      fixed: isMobile ? false : "right",
       render: (_, record: RoleDisplay) => {
         return (
           <div className="flex justify-center space-x-1">

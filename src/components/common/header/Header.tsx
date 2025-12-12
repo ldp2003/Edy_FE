@@ -68,11 +68,11 @@ export function Header({ onMenuToggle }: HeaderProps) {
   // Remove unnecessary notification fetching - handled by AuthRoute
 
   return (
-    <header className="bg-white border-b border-gray-200 px-4 lg:w-screen md:px-6 py-2 w-full flex-shrink-0 shadow-lg text-sm">
+    <header className="bg-white border-b border-gray-200 px-4 lg:w-screen md:px-6 py-2 w-full flex-shrink-0 z-[100] shadow-lg text-sm">
       <div className="flex items-center justify-between">
         {/* Menu Toggle Button - Only visible on mobile */}
         <button
-          className="md:hidden p-2 hover:bg-gray-100 rounded-lg"
+          className="lg:hidden p-2 hover:bg-gray-100 rounded-lg"
           onClick={onMenuToggle}
         >
           <svg
@@ -105,7 +105,7 @@ export function Header({ onMenuToggle }: HeaderProps) {
         </div>
 
         {/* Search Bar - Hidden on mobile */}
-        <div className="hidden md:flex flex-1 max-w-2xl mx-8">
+        <div className="hidden lg:flex flex-1 max-w-2xl mx-8">
           <div className="relative w-full">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
             <input
@@ -131,7 +131,7 @@ export function Header({ onMenuToggle }: HeaderProps) {
         <div className="flex items-center gap-2 md:gap-4">
           {isLoggedIn ? (
             <>
-              <div className="hidden md:block">
+              <div className="hidden lg:block">
                 <UploadHeaderButton></UploadHeaderButton>
               </div>
 
@@ -139,7 +139,7 @@ export function Header({ onMenuToggle }: HeaderProps) {
               {account?.is_admin && (
                 <button
                   onClick={handleModeToggle}
-                  className={`hidden md:flex items-center gap-2 px-3 py-2 rounded-full text-xs font-medium cursor-pointer transition-colors ${
+                  className={`hidden lg:flex items-center gap-2 px-3 py-2 rounded-full text-xs font-medium cursor-pointer transition-colors ${
                     isOnAdminPage
                       ? "bg-[var(--secondary-background-color)] text-[var(--primary-color)] hover:bg-blue-200"
                       : "bg-red-100 text-red-700 hover:bg-red-200"
@@ -197,7 +197,7 @@ export function Header({ onMenuToggle }: HeaderProps) {
                       NA
                     </span>
                   </div>
-                  <div className="hidden md:flex flex-col items-start">
+                  <div className="hidden lg:flex flex-col items-start">
                     <span className="text-sm font-medium text-[var(--primary-color)] hover:underline">
                       {user?.first_name} {user?.last_name}
                     </span>

@@ -14,6 +14,9 @@ const ManageRolesPage: React.FC = () => {
       <AdminBreadcrumb items={breadcrumbItems} />
 
       <div className="mt-2 md:mt-4">
+        <h1 className="text-base  text-left text-[var(--primary-text-color)] font-bold mb-4">
+          Quản lý quyền
+        </h1>
         <AdminRoleTable />
       </div>
     </div>

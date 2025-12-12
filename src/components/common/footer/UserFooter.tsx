@@ -6,7 +6,7 @@ const UserFooter: React.FC = () => {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="text-left px-4 sm:px-6 md:px-12 lg:px-20 bg-white z-20 text-[var(--secondary-text-color)] border-t border-[var(--border-color)]">
+    <footer className="text-left px-4 sm:px-6 md:px-12 lg:px-20 bg-white z-1 text-[var(--secondary-text-color)] border-t border-[var(--border-color)]">
       <div className="container mx-auto px-2 sm:px-4 md:px-6 py-6 md:py-8">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
           {/* Logo & Description */}
@@ -121,7 +121,7 @@ const UserFooter: React.FC = () => {
                 <span>support@gmail.com</span>
               </li>
               <li className="text-xs md:text-sm">
-                <span>+84 987 654 321</span>
+                <span>+84 3333 191 21</span>
               </li>
               <li className="text-xs md:text-sm leading-tight">
                 <span>
