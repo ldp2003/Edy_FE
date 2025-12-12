@@ -216,6 +216,11 @@ const ManageSubjectsPage: React.FC = () => {
           <h1 className="text-xl sm:text-lg xs:text-base font-bold text-[var(--primary-text-color)] mb-4 text-left">
             Quản lý môn học
           </h1>
+          {!selectedOrganization && !searchText.trim() && (
+            <div className="text-sm text-left text-[var(--red-button-color)] mb-2">
+              Hãy chọn trường học trước
+            </div>
+          )}
 
           <div className="flex flex-col gap-3 mb-3">
             <div className="flex-1 flex gap-2">
@@ -229,7 +234,7 @@ const ManageSubjectsPage: React.FC = () => {
               />
               <button
                 onClick={loadSubjects}
-                className="inline-flex items-center px-3 py-1.5 text-xs sm:text-xs xs:text-xs font-medium rounded-md text-white bg-[var(--primary-color)] hover:bg-[var(--secondary-color)] focus:ring-2 focus:ring-[var(--primary-color)] focus:ring-offset-2 transition-colors duration-200"
+                className="inline-flex items-center w-fit px-3 py-1.5 text-xs sm:text-xs xs:text-xs font-medium rounded-md text-white bg-[var(--primary-color)] hover:bg-[var(--secondary-color)] focus:ring-2 focus:ring-[var(--primary-color)] focus:ring-offset-2 transition-colors duration-200 whitespace-nowrap"
               >
                 <SearchOutlined className="mr-1.5" />
                 Tìm kiếm
