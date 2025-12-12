@@ -54,14 +54,14 @@ const UserLayout: React.FC = () => {
   return (
     <div className="h-screen bg-[var(--secondary-background-color)] flex flex-col overflow-hidden">
       {/* Header - cố định ở trên cùng */}
-      <div className="relative z-10 flex-shrink-0">
+      <div className="relative z-[200] flex-shrink-0">
         <Header onMenuToggle={handleMenuToggle} />
       </div>
 
       {/* Content area bên dưới header */}
       <div className="flex flex-1 overflow-hidden">
         {/* Desktop Sidebar - chỉ hiển thị trên desktop */}
-        <div className="hidden lg:block">
+        <div className="hidden z-20 lg:block">
           <Sidebar
             isVisible={isSidebarVisible}
             setIsVisible={setIsSidebarVisible}
